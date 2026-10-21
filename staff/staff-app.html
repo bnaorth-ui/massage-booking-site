@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>พนักงาน - สมาคมวิทยากรฝึกอาชีพคนตาบอด</title>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-192.png"><script src="push.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700&display=swap">
+<style>
+:root{--bg:#eef3f0;--card:#fff;--ink:#1c2b27;--mute:#64766f;--line:#d5e0db;--main:#1f6f5c;--main-ink:#fff;--soft:#dcefe8;--off:#e8ecea;--bad:#b3402a;--bad-bg:#fbe6e1;--wait:#8a5a00;--wait-bg:#fdf0d0;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101a17;--card:#192823;--ink:#e6f0ec;--mute:#93a8a0;--line:#2b3f38;--main:#4cc2a1;--main-ink:#07211a;--soft:#1e3a31;--off:#223530;--bad:#f0907c;--bad-bg:#3a1f1a;--wait:#f0c55a;--wait-bg:#3a3014}}
+:root[data-theme="dark"]{--bg:#101a17;--card:#192823;--ink:#e6f0ec;--mute:#93a8a0;--line:#2b3f38;--main:#4cc2a1;--main-ink:#07211a;--soft:#1e3a31;--off:#223530;--bad:#f0907c;--bad-bg:#3a1f1a;--wait:#f0c55a;--wait-bg:#3a3014}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans Thai",system-ui,sans-serif;line-height:1.5}
+.top{max-width:480px;margin:0 auto;padding:14px 16px 0}
+.prof{display:flex;align-items:center;gap:12px}
+.av{width:56px;height:56px;border-radius:50%;border:3px solid var(--main);background:var(--soft);color:var(--main);font:inherit;font-size:1.3rem;font-weight:700;padding:0;overflow:hidden;cursor:pointer;flex:none;display:grid;place-items:center}
+.av img{width:100%;height:100%;object-fit:cover;display:block}.av:focus-visible,.sw input:focus-visible+.sl{outline:3px solid var(--main);outline-offset:2px}
+.pn{flex:1;min-width:0}.pn b{display:block;line-height:1.3;font-size:1.1rem}.pn small{color:var(--mute);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sw{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.78rem;color:var(--mute);cursor:pointer;flex:none}
+.sw input{position:absolute;opacity:0;width:1px;height:1px}.sl{width:52px;height:30px;border-radius:99px;background:var(--off);border:2px solid var(--line);position:relative;transition:background .15s}
+.sl::after{content:"";position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;background:var(--mute);transition:transform .15s,background .15s}
+.sw input:checked+.sl{background:var(--soft);border-color:var(--main)}.sw input:checked+.sl::after{transform:translateX(22px);background:var(--main)}
+.sw .st{font-weight:700;color:var(--ink)}.sw.off .st{color:var(--bad)}
+.offb{background:var(--bad-bg);color:var(--bad);border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:.92rem}
+.nf{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}.nf button{font:inherit;font-size:.9rem;color:var(--ink);background:var(--card);border:2px solid var(--line);border-radius:99px;padding:6px 12px;cursor:pointer}.nf button.on{background:var(--soft);border-color:var(--main);font-weight:700}
+.nti{background:var(--card);border:2px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:10px}.nti .qh{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.nti small{display:block;color:var(--mute)}.nti pre{white-space:pre-wrap;font:inherit;margin:6px 0 0}
+nav .bdg{position:absolute;top:2px;right:calc(50% - 26px);min-width:18px;height:18px;border-radius:99px;background:#d64545;color:#fff;font-size:.72rem;display:grid;place-items:center;padding:0 5px}
+.app{max-width:480px;margin:0 auto;padding:12px 16px 100px}
+.me{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:.9rem;color:var(--mute)}
+.in{font:inherit;color:var(--ink);background:var(--card);border:2px solid var(--line);border-radius:10px;padding:8px 10px;width:100%}
+h1{font-size:1.3rem;margin:4px 0 2px}.sub{color:var(--mute);margin:0 0 12px;font-size:.95rem}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.stat{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:10px;text-align:center}
+.stat b{font-size:1.4rem;display:block}.stat span{color:var(--mute);font-size:.85rem}
+.q{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px}
+.q.now{border-color:var(--main);background:var(--soft)}
+.q .t{font-weight:700}.q small{color:var(--mute);display:block}
+.qh{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.tag{font-size:.8rem;padding:2px 10px;border-radius:99px;background:var(--soft);color:var(--main);white-space:nowrap}
+.tag.w{background:var(--wait-bg);color:var(--wait)}.tag.o{background:var(--off);color:var(--mute)}.tag.b{background:var(--bad-bg);color:var(--bad)}
+.btn{font:inherit;font-weight:700;border-radius:10px;padding:10px;border:2px solid var(--main);background:var(--main);color:var(--main-ink);cursor:pointer;width:100%;margin-top:10px}
+.btn.g{background:transparent;color:var(--main)}
+.jobs{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:8px}.jobs .btn{width:auto;flex:1;min-width:92px;margin-top:0;padding:8px}.jobs .btn[disabled]{opacity:.5;cursor:default}
+.mini .btn{margin:0;padding:8px;font-size:.9rem}
+button:focus-visible,select:focus-visible{outline:3px solid var(--main);outline-offset:2px}
+.day{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px}
+.day h2{font-size:1rem;margin:0 0 6px}
+.item{padding:6px 0;border-top:1px solid var(--line)}.item:first-of-type{border:0}
+.mute{color:var(--mute)}
+.chips{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.chip{font:inherit;color:inherit;padding:10px 0;border-radius:10px;border:2px solid var(--line);background:var(--card);cursor:pointer}
+.chip.blk{background:var(--bad-bg);color:var(--bad);border-color:var(--bad)}
+.chip:disabled{background:var(--off);color:var(--mute);cursor:not-allowed;border-color:var(--off)}
+.legend{font-size:.85rem;color:var(--mute);margin-top:12px}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav div{max-width:480px;margin:0 auto;display:flex}
+nav button{position:relative;flex:1;font:inherit;font-size:.82rem;border:0;background:transparent;color:var(--mute);padding:10px 2px 9px;cursor:pointer}
+nav button span{display:block;font-size:1.3rem}nav button.on{color:var(--main);font-weight:700}
+.wdg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.wdb{font:inherit;min-height:56px;border-radius:10px;border:2px solid var(--line);background:var(--off);color:var(--mute);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px}.wdb span{font-weight:700}.wdb small{font-size:.66rem}.wdb.on{background:var(--soft);color:var(--ink);border-color:var(--main)}.wdb:focus-visible{outline:3px solid var(--main);outline-offset:2px}.mini{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;margin-bottom:10px}
+.cal{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:10px;margin-bottom:12px}
+.empty{padding:24px 0;text-align:center;color:var(--mute)}
+.agate{max-width:420px;margin:24px auto}.agate h1{font-size:1.4rem;margin:0 0 4px}.asub{color:var(--mute);margin:0 0 14px}.agl{display:block;margin:0 0 10px}.agl span{display:block;margin-bottom:4px;font-weight:600}
+.aerr{color:var(--bad);min-height:1.4em;margin:6px 0}.aok{background:var(--soft);color:var(--main);border-radius:12px;padding:10px 14px;margin-bottom:12px}
+.alinks{text-align:center;margin-top:10px}.alinks .btn{width:auto;padding:8px 16px}
+.btn[disabled]{opacity:.55;cursor:default}
+.toast{background:var(--bad-bg);color:var(--bad);border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:.92rem}
+.ok{background:var(--soft);color:var(--main);border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:.92rem}
+.q a{color:var(--main)}
+</style>
+</head>
+<body>
+<header class="top" id="hdr"></header>
+<main class="app" id="app"></main>
+<nav><div id="nav"></div></nav>
+<script>
+(function(){
+/* =====================================================================
+   หน้าพนักงาน · เชื่อมต่อ Supabase (REST ตรง ไม่ต้องใช้ไลบรารี)
+   สิทธิ์มาจากบัญชีที่ผูกกับพนักงาน (staff.user_id) ในฐานข้อมูล
+   ===================================================================== */
+var SB={url:"https://dwdnmfwepydyweeqfdxn.supabase.co",key:"sb_publishable_4xaAEuN8jFIxGjyhtzABow_FsbGcoI3",alias:"gmail.com"};
+var SSK="sbSessionStaff",SBS=null;
+function rd(k,d){try{var v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}}
+function wr(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}
+function esc(x){return String(x==null?"":x).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function sbEmail(p){return p+"@"+SB.alias}
+function sbReq(path,o){o=o||{};var h={apikey:SB.key};if(o.json)h["Content-Type"]="application/json";if(o.auth!==false&&SBS&&SBS.access_token)h.Authorization="Bearer "+SBS.access_token;if(o.headers)for(var k in o.headers)h[k]=o.headers[k];
+ return fetch(SB.url+path,{method:o.method||"GET",headers:h,body:o.body}).then(function(r){
+  if(o.blob&&r.ok)return r.blob();
+  return r.text().then(function(tx){var j=null;try{j=tx?JSON.parse(tx):null}catch(e){}
+  if(!r.ok){var er=new Error((j&&(j.msg||j.message||j.error_description||j.error))||("HTTP "+r.status));er.status=r.status;er.code=j&&(j.error_code||j.code)||"";throw er}return j})},function(){throw new Error("NET")})}
+function sbSave(s){SBS=s;if(s)wr(SSK,s);else try{localStorage.removeItem(SSK)}catch(e){}}
+function sbSet(j){var s={access_token:j.access_token,refresh_token:j.refresh_token,expires_at:j.expires_at||Math.floor(Date.now()/1000)+(j.expires_in||3600),user:j.user};sbSave(s);return s}
+function sbEnsure(){if(!SBS)return Promise.reject(new Error("NOSESS"));if(SBS.expires_at-60>Date.now()/1000)return Promise.resolve(SBS);
+ return sbReq("/auth/v1/token?grant_type=refresh_token",{method:"POST",json:1,auth:false,body:JSON.stringify({refresh_token:SBS.refresh_token})}).then(sbSet,function(e){if(e&&e.message!=="NET")e.status=401;throw e})}
+function sbApi(path,o){return sbEnsure().then(function(){return sbReq(path,o)})}
+if(window.Push){Push.attach({url:SB.url,key:SB.key,api:sbApi,token:function(){return SBS&&SBS.access_token},uid:function(){return SBS&&SBS.user&&SBS.user.id}});window.addEventListener("push-refresh",function(){try{refresh()}catch(e){}})}
+function rpc(name,args){return sbApi("/rest/v1/rpc/"+name,{method:"POST",json:1,body:JSON.stringify(args||{})})}
+function errTh(e,ctx){var m=String(e&&e.message||"");
+ if(m==="NET")return"เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ ตรวจสอบอินเทอร์เน็ตแล้วลองใหม่";
+ if(e&&e.code==="P0001")return m;
+ if(e.code==="invalid_credentials"||/invalid login/i.test(m))return"เบอร์มือถือหรือรหัสผ่านไม่ถูกต้อง";
+ if(e.code==="user_already_exists"||/already (registered|exists)/i.test(m))return"เบอร์นี้มีบัญชีอยู่แล้ว ให้เข้าสู่ระบบแทน";
+ if(e.code==="email_not_confirmed"||/not confirmed/i.test(m))return"ระบบยังตั้งค่าไม่ครบ: ต้องปิด \"Confirm email\" ใน Supabase > Authentication > Providers > Email";
+ if(e.code==="signup_disabled"||/signups? not allowed|signup.*disabled/i.test(m))return"ระบบปิดรับสมัครสมาชิกอยู่ ต้องเปิด Email signup ใน Supabase";
+ if(e.status===429||/rate limit/i.test(m))return"ทำรายการถี่เกินไป กรุณารอสักครู่แล้วลองใหม่ (รหัส: "+(e.code||e.status)+")";
+ if(e.code==="23P01")return"คิวนี้ชนกับคิวอื่น";
+ if(e.code==="42501"||e.status===403)return"ไม่มีสิทธิ์ทำรายการนี้";
+ if(/schema cache|Could not find the (table|function)|does not exist/i.test(m))return"ฐานข้อมูลยังตั้งค่าไม่ครบ ต้องรันไฟล์ SQL ชุดที่ 2, 3, 4 และ 5 ใน Supabase ("+m+")";
+ return (ctx||"เกิดข้อผิดพลาด")+": "+m}
+function pubUrl(p){if(!p)return null;return SB.url+"/storage/v1/object/public/"+(/^(avatars|place-images)\//.test(p)?p:"place-images/"+p)}
+function cropSquare(file,cb,fail){var fr=new FileReader();fr.onerror=fail;fr.onload=function(){var im=new Image();im.onerror=fail;im.onload=function(){try{var n=Math.min(im.width,im.height),c=document.createElement("canvas");c.width=c.height=192;c.getContext("2d").drawImage(im,(im.width-n)/2,(im.height-n)/2,n,n,0,0,192,192);cb(c.toDataURL("image/jpeg",0.85))}catch(e){fail()}};im.src=fr.result};fr.readAsDataURL(file)}
+function stamp(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5)}
+function phoneN(v){var s=String(v||"").trim(),d=s.replace(/\D/g,"");if(/^66\d{9}$/.test(d))d="0"+d.slice(2);return d}
+
+/* ===================== เวลา (ใช้เวลาประเทศไทยเสมอ) ===================== */
+var H7=7*3600000;
+function bkDate(ts){return new Date(ts+H7).toISOString().slice(0,10)}
+function bkMin(ts){var x=(ts+H7)%86400000;return Math.floor(x/60000)}
+function today(){return bkDate(Date.now())}
+function addDays(d,n){return new Date(Date.parse(d+"T00:00:00Z")+n*86400000).toISOString().slice(0,10)}
+function dow(d){return new Date(d+"T00:00:00Z").getUTCDay()}
+function hm(m){return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0")}
+function nowMin(){return bkMin(Date.now())}
+function thD(d){return new Date(d+"T00:00:00Z").toLocaleDateString("th-TH",{weekday:"long",day:"numeric",month:"long",timeZone:"UTC"})}
+function thS(d){return new Date(d+"T00:00:00Z").toLocaleDateString("th-TH",{day:"numeric",month:"short",timeZone:"UTC"})}
+function ntAt(a){var t=Date.parse(a),d=bkDate(t);return thS(d)+" "+hm(bkMin(t))+" น."}
+function ini(n){return String(n).replace(/^คุณ/,"").charAt(0)||"?"}
+var DAYF=["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัสบดี","ศุกร์","เสาร์"],DAYS=["อา","จ","อ","พ","พฤ","ศ","ส"];
+var TABS=[["q","คิวงาน","📋"],["sc","ตารางงาน","📅"],["nt","การแจ้งเตือน","🔔"]];
+var JSTEPS=[["accept","รับงาน","accepted"],["start","เริ่มงาน","in_progress"],["finish","เสร็จสิ้นงาน","done"]];
+var JRANK={pending:0,accepted:1,in_progress:2,done:3},JL=["รอรับงาน","รับงานแล้ว","กำลังนวด","เสร็จสิ้นแล้ว"];
+
+/* ===================== ข้อมูล ===================== */
+var ME=null,JOBS=[],OFFS=[],BLK={},NT=[],ANN=[],READS=[],ANNREAD=rd("staffAnnRead",[]);
+var S={tab:"q",ntf:"all",ntNew:[],bd:null,msg:"",err:"",busy:false,wdMsg:""};
+var AG={step:"load",fail:0,lock:0,ok:"",err:""};
+var inflight=false;
+function loadAll(){
+ return rpc("staff_me").then(function(me){
+  if(!me)return null;ME=me;var t=today();
+  return Promise.all([rpc("my_jobs",{p_from:new Date(Date.parse(t+"T00:00:00+07:00")-86400000).toISOString()}),
+   sbApi("/rest/v1/staff_days_off?select=day&staff_id=eq."+me.id+"&day=gte."+t),
+   sbApi("/rest/v1/staff_blocks?select=day,minute&staff_id=eq."+me.id+"&day=gte."+t),
+   sbApi("/rest/v1/notifications?select=*&audience=eq.staff&order=created_at.desc&limit=100"),
+   sbApi("/rest/v1/notification_reads?select=notification_id&limit=2000"),
+   sbApi("/rest/v1/announcements?select=*&active=eq.true&order=created_at.desc&limit=50")]).then(function(r){
+    JOBS=r[0]||[];OFFS=(r[1]||[]).map(function(x){return x.day});
+    BLK={};(r[2]||[]).forEach(function(x){(BLK[x.day]=BLK[x.day]||[]).push(x.minute)});
+    NT=r[3]||[];READS=(r[4]||[]).map(function(x){return x.notification_id});
+    ANN=(r[5]||[]).filter(function(a){return(a.audiences||[]).indexOf("พนักงาน")>-1});return true})})}
+function feed(){var L=[];
+ ANN.forEach(function(a){L.push({id:"a-"+a.id,from:"admin",title:"ประกาศ: "+a.title,text:a.body||"",at:a.created_at||(a.day+"T00:00:00Z")})});
+ NT.forEach(function(n){L.push({id:"n-"+n.id,nid:n.id,from:"booking",title:n.title,text:n.body||"",at:n.created_at})});
+ return L.sort(function(a,b){return a.at<b.at?1:-1})}
+function isRead(x){return x.nid?READS.indexOf(x.nid)>-1:ANNREAD.indexOf(x.id)>-1}
+function ntUnread(){return feed().filter(function(x){return!isRead(x)}).length}
+function openNt(){var F=feed(),fresh=F.filter(function(x){return!isRead(x)});S.ntNew=fresh.map(function(x){return x.id});
+ var ids=fresh.filter(function(x){return x.nid}).map(function(x){return x.nid});
+ fresh.forEach(function(x){if(!x.nid)ANNREAD.push(x.id)});wr("staffAnnRead",ANNREAD.slice(-300));
+ if(ids.length){ids.forEach(function(i){READS.push(i)});
+  sbApi("/rest/v1/notification_reads?on_conflict=notification_id,user_id",{method:"POST",json:1,headers:{Prefer:"resolution=ignore-duplicates,return=minimal"},body:JSON.stringify(ids.map(function(i){return{notification_id:i,user_id:SBS.user.id}}))}).catch(function(){})}}
+
+/* ===================== เข้าสู่ระบบ ===================== */
+function gv(i){var e=document.getElementById(i);return e?e.value:""}
+function gerr(t){AG.err=t;var e=document.getElementById("aerr");if(e)e.textContent=t}
+function afld(id,label,type,extra){return '<label class="agl" for="'+id+'"><span>'+label+'</span><input class="in" id="'+id+'" type="'+type+'" '+(extra||"")+'></label>'}
+function gateDraw(){document.getElementById("hdr").innerHTML="";document.getElementById("nav").innerHTML="";document.querySelector("nav").style.display="none";
+ var st=AG.step,h="";
+ var card=function(t,sub,body,links){return '<div class="agate"><h1>'+t+'</h1><p class="asub">'+sub+'</p>'+(AG.ok?'<div class="aok" role="status">'+esc(AG.ok)+'</div>':'')+'<form id="agf" novalidate>'+body+'<p class="aerr" id="aerr" role="alert">'+esc(AG.err)+'</p></form>'+(links||"")+'</div>'};
+ var btn=function(t){return '<button class="btn" type="submit"'+(S.busy?' disabled':'')+'>'+t+'</button>'};
+ if(st==="load")h='<div class="agate"><p class="asub" role="status">กำลังตรวจสอบระบบ…</p></div>';
+ if(st==="login")h=card("เข้าสู่ระบบพนักงาน","สมาคมวิทยากรฝึกอาชีพคนตาบอด",afld("lph","เบอร์มือถือ","tel",'inputmode="numeric" maxlength="10" autocomplete="username" placeholder="0812345678"')+afld("lpw","รหัสผ่าน","password",'autocomplete="current-password"')+btn("เข้าสู่ระบบ"),'<div class="alinks"><button type="button" class="btn g" data-ag="fp">ลืมรหัสผ่าน</button> <button type="button" class="btn g" data-ag="reg">สร้างบัญชีใหม่</button></div><p class="asub" style="text-align:center;margin-top:14px">บัญชีพนักงานจะใช้ได้เมื่อร้านหรือแอดมินบันทึกเบอร์มือถือของคุณไว้ในระบบ แล้วคุณสร้างบัญชีด้วยเบอร์เดียวกัน</p>');
+ if(st==="reg")h=card("สร้างบัญชีพนักงาน","ใช้เบอร์มือถือเดียวกับที่ร้านหรือแอดมินบันทึกไว้ ระบบจะผูกบัญชีกับตัวคุณให้อัตโนมัติ",afld("rfn","ชื่อ","text",'autocomplete="given-name"')+afld("rln","นามสกุล","text",'autocomplete="family-name"')+afld("rph","เบอร์มือถือ","tel",'inputmode="numeric" maxlength="10" autocomplete="username"')+afld("rpw","รหัสผ่าน (อย่างน้อย 6 ตัวอักษร)","password",'autocomplete="new-password"')+afld("rpw2","ยืนยันรหัสผ่าน","password",'autocomplete="new-password"')+btn("สร้างบัญชี"),'<div class="alinks"><button type="button" class="btn g" data-ag="login">กลับไปเข้าสู่ระบบ</button></div>');
+ if(st==="fp")h='<div class="agate"><h1>ลืมรหัสผ่าน</h1><p class="asub">ยังไม่มีการส่ง SMS รีเซ็ตรหัสผ่านอัตโนมัติ ให้ติดต่อแอดมินสมาคมหรือเจ้าของร้านที่สังกัด เพื่อให้ช่วยตั้งรหัสผ่านใหม่ให้</p><div class="alinks"><button type="button" class="btn g" data-ag="login">กลับไปเข้าสู่ระบบ</button></div></div>';
+ if(st==="denied")h='<div class="agate"><h1>บัญชีนี้ยังไม่ผูกกับพนักงาน</h1><p class="asub">เข้าสู่ระบบสำเร็จ แต่ไม่พบพนักงานที่ใช้เบอร์มือถือเดียวกับบัญชีนี้ ให้ร้านหรือแอดมินบันทึกพนักงานด้วยเบอร์เดียวกัน (ที่เมนูพนักงาน) แล้วออกจากระบบและเข้าใหม่อีกครั้ง</p><div class="alinks"><button type="button" class="btn" data-ag="retry">ตรวจสอบอีกครั้ง</button> <button type="button" class="btn g" data-ag="logout">ออกจากระบบ</button></div></div>';
+ if(st==="loaderr")h='<div class="agate"><h1>โหลดข้อมูลไม่สำเร็จ</h1><p class="aerr" role="alert">'+esc(AG.err)+'</p><div class="alinks"><button type="button" class="btn" data-ag="retry">ลองใหม่</button> <button type="button" class="btn g" data-ag="logout">ออกจากระบบ</button></div></div>';
+ document.getElementById("app").innerHTML=h;AG.ok="";
+ document.querySelectorAll("[data-ag]").forEach(function(e){e.onclick=function(){var a=e.dataset.ag;AG.err="";if(a==="logout"){doLogout();return}if(a==="retry"){enter();return}AG.step=a;gateDraw()}});
+ var f=document.getElementById("agf");if(f)f.onsubmit=function(ev){ev.preventDefault();gateSubmit(st)}}
+function busy(b){S.busy=b;var x=document.querySelector("#agf .btn");if(x)x.disabled=b}
+function gateSubmit(st){if(S.busy)return;
+ if(st==="login"){var ph=phoneN(gv("lph")),pw=gv("lpw"),now=Date.now();
+  if(now<AG.lock){gerr("กรอกผิดหลายครั้ง กรุณารอ "+Math.ceil((AG.lock-now)/1000)+" วินาที แล้วลองใหม่");return}
+  if(!/^0\d{9}$/.test(ph)||!pw){gerr("กรอกเบอร์มือถือ 10 หลักและรหัสผ่าน");return}
+  busy(true);gerr("");
+  sbReq("/auth/v1/token?grant_type=password",{method:"POST",json:1,auth:false,body:JSON.stringify({email:sbEmail(ph),password:pw})}).then(sbSet).then(function(){busy(false);AG.fail=0;return enter()})
+   .catch(function(e){busy(false);if(e.code==="invalid_credentials"||/invalid login/i.test(e.message||"")){AG.fail++;if(AG.fail>=5){AG.fail=0;AG.lock=Date.now()+30000;gerr("กรอกผิด 5 ครั้ง ระบบล็อก 30 วินาที");return}}gerr(errTh(e,"เข้าสู่ระบบไม่สำเร็จ"))});return}
+ if(st==="reg"){var fn=gv("rfn").trim(),ln=gv("rln").trim(),p=phoneN(gv("rph")),w=gv("rpw");
+  if(!fn){gerr("กรอกชื่อ");return}if(!/^0\d{9}$/.test(p)){gerr("กรอกเบอร์มือถือ 10 หลักให้ถูกต้อง (เช่น 0812345678)");return}
+  if(w.length<6){gerr("รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร");return}if(w!==gv("rpw2")){gerr("รหัสผ่านทั้งสองช่องไม่ตรงกัน");return}
+  busy(true);gerr("");
+  sbReq("/auth/v1/signup",{method:"POST",json:1,auth:false,body:JSON.stringify({email:sbEmail(p),password:w,data:{first_name:fn,last_name:ln,phone:p}})}).then(function(j){
+   if(!j||!j.access_token){var e=new Error("not confirmed");e.code="email_not_confirmed";throw e}sbSet(j)}).then(function(){busy(false);return enter()}).catch(function(e){busy(false);gerr(errTh(e,"สร้างบัญชีไม่สำเร็จ"))})}}
+function doLogout(){if(window.Push)Push.beforeLogout();if(SBS&&SBS.access_token)sbReq("/auth/v1/logout",{method:"POST"}).catch(function(){});sbSave(null);location.reload()}
+var timer=null;
+function enter(){AG.step="load";S.busy=false;gateDraw();
+ return loadAll().then(function(ok){if(!ok){AG.step="denied";gateDraw();return}startMain()}).catch(function(e){if(e&&(e.status===401||e.message==="NOSESS")){doLogout();return}AG.err=errTh(e,"โหลดข้อมูลไม่สำเร็จ");AG.step="loaderr";gateDraw()})}
+function startMain(){document.querySelector("nav").style.display="";if(S.tab==="nt")openNt();draw();
+ if(!timer){timer=setInterval(refresh,20000);document.addEventListener("visibilitychange",function(){if(!document.hidden)refresh()})}}
+function refresh(){if(!ME||inflight||document.hidden||S.busy)return;var a=document.activeElement;if(a&&/INPUT|SELECT|TEXTAREA/.test(a.tagName))return;
+ inflight=true;loadAll().then(function(ok){inflight=false;if(!ok)return;if(S.tab==="nt")openNt();draw()},function(e){inflight=false;if(e&&e.status===401)doLogout()})}
+
+/* ===================== ส่วนแสดงผล ===================== */
+function mine(d){return JOBS.filter(function(j){return j.active&&bkDate(Date.parse(j.starts_at))===d}).sort(function(a,b){return a.starts_at<b.starts_at?-1:1})}
+function rng(j){var s=bkMin(Date.parse(j.starts_at));return hm(s)+"-"+hm(s+j.minutes)+" น."}
+function booked(d,m){return mine(d).some(function(j){var s=bkMin(Date.parse(j.starts_at));return m<s+j.minutes&&m+30>s})}
+function workOn(d){return(ME.work_days||[]).indexOf(dow(d))>-1&&OFFS.indexOf(d)<0}
+function openDays(){var a=[],t=today();for(var i=0;i<14&&a.length<7;i++){var d=addDays(t,i);if(workOn(d))a.push(d)}return a}
+function jobHtml(j){
+ if(!j.active||j.bstatus==="cancelled"||j.bstatus==="rescheduled")return'<div class="jobs"><span class="tag b">'+(j.bstatus==="rescheduled"?"เลื่อนคิวแล้ว":"ยกเลิกแล้ว")+'</span></div>';
+ var rk=JRANK[j.job]||0;
+ return'<div class="jobs" role="group" aria-label="อัปเดตสถานะงานของคิวนี้"><span class="tag'+(rk===3?"":" w")+'">'+JL[rk]+'</span>'+JSTEPS.map(function(s,i){var done=rk>i,next=rk===i;return'<button type="button" class="btn'+(next?"":" g")+'" data-a="job" data-job="'+s[2]+'" data-id="'+j.id+'"'+(next&&!S.busy?"":" disabled")+'>'+(done?"✓ ":"")+s[1]+'</button>'}).join("")+'</div>'}
+function jobCard(j,showDate){var rk=JRANK[j.job]||0,live=j.active&&j.bstatus==="confirmed"&&rk<3,d=bkDate(Date.parse(j.starts_at));
+ return'<div class="q'+(live&&rk===0?" now":"")+'"><div class="qh"><span class="t">'+(showDate?thS(d)+" · ":"")+rng(j)+'</span>'+(live&&rk===0?'<span class="tag w">คิวใหม่</span>':'')+'</div><b>'+esc(j.customer)+'</b>'+(j.phone?'<small>โทร <a href="tel:'+esc(j.phone)+'">'+esc(j.phone)+'</a></small>':'')+'<small>'+esc(j.service)+' · '+j.minutes+' นาที</small><small>'+esc(j.place)+' · เลขที่ '+esc(j.ref)+'</small>'+jobHtml(j)+'</div>'}
+function drawHeader(){var ph=ME.photo_path?pubUrl(ME.photo_path):null,on=ME.accepting;
+ document.getElementById("hdr").innerHTML='<div class="prof"><button class="av" id="avb" aria-label="รูปโปรไฟล์ของ '+esc(ME.name)+' แตะเพื่อเปลี่ยนรูป">'+(ph?'<img src="'+esc(ph)+'" alt="">':esc(ini(ME.name)))+'</button><input type="file" id="photo" accept="image/*" hidden><div class="pn"><b>'+esc(ME.name)+'</b><small>'+esc(ME.place)+'</small></div><label class="sw'+(on?"":" off")+'"><input type="checkbox" id="onsw" role="switch"'+(on?" checked":"")+' aria-label="เปิดรับงาน"><span class="sl"></span><span class="st">'+(on?"เปิดรับงาน":"ปิดรับงาน")+'</span></label></div>';
+ document.getElementById("avb").onclick=function(){document.getElementById("photo").click()};
+ document.getElementById("photo").onchange=function(){var f=this.files&&this.files[0];if(!f||!/^image\//.test(f.type))return;
+  cropSquare(f,function(url){var path=SBS.user.id+"/staff-"+stamp()+".jpg";
+   fetch(url).then(function(r){return r.blob()}).then(function(b){return sbApi("/storage/v1/object/avatars/"+path,{method:"POST",body:b,headers:{"Content-Type":"image/jpeg"}})})
+   .then(function(){return saveSelf({photo:"avatars/"+path})}).catch(function(e){fail(errTh(e,"อัปโหลดรูปไม่สำเร็จ"))})},function(){fail("อ่านรูปไม่สำเร็จ ลองเลือกรูปอื่น")})};
+ document.getElementById("onsw").onchange=function(){saveSelf({accepting:this.checked})}}
+function fail(t){S.err=t;S.msg="";draw()}
+function saveSelf(o){var acc=o.accepting==null?ME.accepting:o.accepting,wd=o.wd||ME.work_days,keep=o.photo==null;
+ S.busy=true;S.err="";
+ return rpc("staff_save_self",{p_accepting:acc,p_work_days:wd,p_photo:keep?null:o.photo,p_keep_photo:keep}).then(function(){
+  ME.accepting=acc;ME.work_days=wd;if(!keep)ME.photo_path=o.photo;S.busy=false;draw()},function(e){S.busy=false;if(e&&e.status===401){doLogout();return}fail(errTh(e,"บันทึกไม่สำเร็จ"));throw e}).catch(function(){})}
+function daysCard(){var w=ME.work_days||[];
+ return'<div class="cal wd"><b>วันทำงานประจำสัปดาห์</b><p class="sub" style="margin:2px 0 8px">เลือกวันที่คุณทำงาน ลูกค้าจะจองคุณได้เฉพาะวันที่เลือก (ร้านที่สังกัดต้องเปิดวันนั้นด้วย)</p><div class="wdg" role="group" aria-label="เลือกวันทำงาน">'+DAYF.map(function(n,d){var on=w.indexOf(d)>-1;return'<button type="button" class="wdb'+(on?" on":"")+'" data-a="wd" data-d="'+d+'" aria-pressed="'+on+'" aria-label="วัน'+n+' '+(on?"ทำงาน":"หยุด")+'"><span>'+DAYS[d]+'</span><small>'+(on?"ทำงาน":"หยุด")+'</small></button>'}).join("")+'</div><div class="mini" style="display:flex;gap:6px;margin-top:8px"><button type="button" class="btn g" data-a="wdset" data-id="all" style="margin:0">ทุกวัน</button><button type="button" class="btn g" data-a="wdset" data-id="wk" style="margin:0">จันทร์-ศุกร์</button></div><p class="sub" id="wdsum" role="status" style="margin:8px 0 0">ทำงาน '+w.length+' วัน: '+w.map(function(d){return DAYS[d]}).join(" ")+(S.wdMsg?" · "+esc(S.wdMsg):"")+'</p></div>'}
+function blockSection(){var od=openDays();if(!od.length)return'<h2 style="margin-top:22px">ปิดเวลาไม่ว่าง</h2><div class="empty">ยังไม่มีวันทำงานใน 2 สัปดาห์ข้างหน้า</div>';
+ if(!S.bd||od.indexOf(S.bd)<0)S.bd=od[0];
+ var bs=BLK[S.bd]||[],sl=[];for(var m=Math.floor(ME.open_min/30)*30;m<ME.close_min;m+=30)sl.push(m);
+ return'<h2 style="margin-top:22px">ปิดเวลาไม่ว่าง</h2><p class="sub">แตะช่วงเวลาที่ไม่รับจอง ลูกค้าจะเลือกเวลานั้นไม่ได้</p><select class="in" id="bd" aria-label="เลือกวันที่">'+od.map(function(k){return'<option value="'+k+'"'+(k===S.bd?" selected":"")+'>'+thD(k)+'</option>'}).join("")+'</select>'+
+ '<div class="chips">'+sl.map(function(m){var bk=booked(S.bd,m),ps=S.bd===today()&&m<=nowMin(),on=bs.indexOf(m)>-1;
+  return'<button type="button" class="chip'+(on?" blk":"")+'" data-a="slot" data-m="'+m+'"'+((bk||ps)&&!on?" disabled":"")+'>'+hm(m)+(bk?"<br><small>มีคิว</small>":"")+'</button>'}).join("")+'</div><p class="legend">สีแดง = ปิดรับจอง · สีเทา = มีคิวแล้วหรือเวลาผ่านไปแล้ว</p>'+
+ '<div class="mini" style="display:flex;gap:6px;margin-top:12px"><button type="button" class="btn g" data-a="all" style="margin:0">ปิดทั้งวัน</button><button type="button" class="btn g" data-a="none" style="margin:0">เปิดทั้งหมด</button></div>'}
+function ntView(){var L=feed(),f=S.ntf||"all",F=f==="all"?L:L.filter(function(x){return x.from===f}),cnt=function(k){return L.filter(function(x){return x.from===k}).length};
+ return'<h1>การแจ้งเตือน</h1><p class="sub">ประกาศจากสมาคม และข้อความเกี่ยวกับคิวของคุณ (คิวใหม่ ยกเลิก เลื่อนคิว)</p><div class="nf" role="group" aria-label="กรองการแจ้งเตือน">'+[["all","ทั้งหมด ("+L.length+")"],["admin","จากสมาคม ("+cnt("admin")+")"],["booking","เกี่ยวกับคิว ("+cnt("booking")+")"]].map(function(x){return'<button type="button" data-a="ntf" data-id="'+x[0]+'" class="'+(f===x[0]?"on":"")+'" aria-pressed="'+(f===x[0])+'">'+x[1]+'</button>'}).join("")+'</div>'+
+ (F.length?F.map(function(x){return'<div class="nti"><div class="qh"><b>'+esc(x.title)+'</b><span class="tag'+(x.from==="admin"?"":" w")+'">'+(x.from==="admin"?"สมาคม":"คิว")+'</span>'+(S.ntNew.indexOf(x.id)>-1?'<span class="tag w">ใหม่</span>':'')+'</div><small>'+ntAt(x.at)+'</small><pre>'+esc(x.text)+'</pre></div>'}).join(""):'<div class="empty">ยังไม่มีการแจ้งเตือน</div>')}
+function banner(){return(S.err?'<div class="toast" role="alert">'+esc(S.err)+'</div>':'')+(ME.accepting?'':'<div class="offb" role="status">ตอนนี้ปิดรับงานอยู่ ลูกค้าจะไม่เห็นคุณในการจองใหม่ (คิวที่จองไว้แล้วยังต้องให้บริการ) เปิดรับงานได้ที่สวิตช์ด้านบน</div>')}
+function view(){var t=today(),h="";
+ if(S.tab==="q"){var L=mine(t),done=L.filter(function(j){return j.job==="done"||j.bstatus==="completed"}).length;
+  var up=JOBS.filter(function(j){return j.active&&j.bstatus==="confirmed"&&bkDate(Date.parse(j.starts_at))>t}).sort(function(a,b){return a.starts_at<b.starts_at?-1:1});
+  var canc=JOBS.filter(function(j){return!j.active&&bkDate(Date.parse(j.starts_at))===t});
+  h=banner()+'<h1>คิวงาน</h1><p class="sub">วันนี้ · '+thD(t)+' · '+esc(ME.place)+'</p>'+(L.length?'<div class="stats"><div class="stat"><b>'+L.length+'</b><span>ทั้งหมด</span></div><div class="stat"><b>'+done+'</b><span>เสร็จแล้ว</span></div><div class="stat"><b>'+(L.length-done)+'</b><span>เหลืออยู่</span></div></div>'+L.map(function(j){return jobCard(j,false)}).join(""):'<div class="empty">วันนี้ไม่มีคิว</div>')+canc.map(function(j){return jobCard(j,false)}).join("")+
+  (up.length?'<h2 style="margin-top:22px">คิวที่จองเข้ามา ('+up.length+')</h2>'+up.map(function(j){return jobCard(j,true)}).join(""):"")}
+ if(S.tab==="sc"){h=banner()+'<h1>ตารางงาน</h1><p class="sub">'+esc(ME.place)+'</p>'+daysCard()+'<h2 style="margin-top:18px">7 วันข้างหน้า</h2>';
+  for(var i=0;i<7;i++){var k=addDays(t,i),open=workOn(k),L2=mine(k),bm=(BLK[k]||[]).length,off=OFFS.indexOf(k)>-1;
+   h+='<div class="day"><h2>'+(i===0?"วันนี้ · ":i===1?"พรุ่งนี้ · ":"")+thD(k)+'</h2>'+(!open?'<span class="mute">'+(off?"วันหยุดที่ร้านตั้งไว้":"วันหยุดของคุณ")+'</span>':(L2.length?L2.map(function(j){return'<div class="item"><b>'+rng(j)+'</b> '+esc(j.customer)+'<small class="mute" style="display:block">'+esc(j.service)+'</small></div>'}).join(""):'<span class="mute">ไม่มีคิว</span>')+(bm?'<div class="item mute">ปิดรับจอง '+bm+' ช่วง (ช่วงละ 30 นาที)</div>':""))+'</div>'}
+  h+=blockSection()}
+ if(S.tab==="nt")h=(S.err?'<div class="toast" role="alert">'+esc(S.err)+'</div>':'')+ntView();
+ return h}
+function draw(){if(!ME)return;
+ document.getElementById("app").innerHTML='<div class="me"><span style="flex:1;color:var(--mute)">เข้าสู่ระบบด้วย '+esc(ME.phone||"")+'</span><button type="button" class="btn g" id="logout" style="width:auto;margin:0;padding:6px 12px">ออกจากระบบ</button></div>'+view();
+ drawHeader();
+ document.getElementById("nav").innerHTML=TABS.map(function(t){var u=ntUnread();return'<button type="button" data-a="tab" data-id="'+t[0]+'" class="'+(t[0]===S.tab?"on":"")+'"><span>'+t[2]+'</span>'+t[1]+(t[0]==="nt"&&S.tab!=="nt"&&u?'<i class="bdg" aria-label="ยังไม่ได้อ่าน '+u+' รายการ">'+u+'</i>':'')+'</button>'}).join("");
+ document.getElementById("logout").onclick=doLogout;
+ var b=document.getElementById("bd");if(b)b.onchange=function(){S.bd=this.value;draw()}}
+
+/* ===================== การกระทำ ===================== */
+function saveBlocks(d,list){var old=(BLK[d]||[]).slice();BLK[d]=list;S.busy=true;S.err="";draw();
+ return rpc("staff_set_blocks",{p_day:d,p_minutes:list}).then(function(){S.busy=false;draw()},function(e){BLK[d]=old;S.busy=false;if(e&&e.status===401){doLogout();return}fail(errTh(e,"บันทึกเวลาไม่สำเร็จ"))})}
+document.addEventListener("click",function(e){
+ var el=e.target.closest&&e.target.closest("[data-a]");if(!el||!ME)return;var a=el.dataset.a,id=el.dataset.id;
+ if(a==="tab"){S.tab=id;S.err="";if(id==="nt")openNt();draw();return}
+ if(a==="ntf"){S.ntf=id;draw();return}
+ if(S.busy)return;
+ if(a==="job"){var it=JOBS.filter(function(j){return j.id===id})[0];if(!it)return;S.busy=true;S.err="";draw();
+  rpc("set_job_status",{p_item:id,p_status:el.dataset.job}).then(function(){S.busy=false;return loadAll()}).then(function(){draw()},function(er){S.busy=false;if(er&&er.status===401){doLogout();return}fail(errTh(er,"อัปเดตงานไม่สำเร็จ"));loadAll().then(draw,function(){})});return}
+ if(a==="wd"||a==="wdset"){var cur=(ME.work_days||[]).slice(),msg="";
+  if(a==="wd"){var dn=+el.dataset.d,ix=cur.indexOf(dn);if(ix>-1){if(cur.length===1){msg="ต้องเลือกวันทำงานอย่างน้อย 1 วัน"}else{cur.splice(ix,1);var up=JOBS.filter(function(j){return j.active&&j.bstatus==="confirmed"&&dow(bkDate(Date.parse(j.starts_at)))===dn&&bkDate(Date.parse(j.starts_at))>=today()}).length;if(up)msg="วัน"+DAYF[dn]+"ยังมี "+up+" คิวที่จองไว้แล้ว ยังต้องให้บริการตามเดิม"}}else cur.push(dn)}
+  else{cur=id==="all"?[0,1,2,3,4,5,6]:[1,2,3,4,5]}
+  cur.sort(function(x,y){return x-y});S.wdMsg=msg;
+  if(msg==="ต้องเลือกวันทำงานอย่างน้อย 1 วัน"){draw();return}
+  saveSelf({wd:cur});return}
+ if(a==="slot"){var m=+el.dataset.m,l=(BLK[S.bd]||[]).slice(),i=l.indexOf(m);if(i>-1)l.splice(i,1);else l.push(m);saveBlocks(S.bd,l);return}
+ if(a==="all"||a==="none"){var l2=[];if(a==="all")for(var m2=Math.floor(ME.open_min/30)*30;m2<ME.close_min;m2+=30)if(!booked(S.bd,m2)&&!(S.bd===today()&&m2<=nowMin()))l2.push(m2);saveBlocks(S.bd,l2);return}
+});
+
+/* ===================== เริ่มต้น ===================== */
+var saved=rd(SSK,null);
+if(saved&&saved.access_token){SBS=saved;enter()}else{AG.step="login";gateDraw()}
+})();
+</script>
+</body>
+</html>
