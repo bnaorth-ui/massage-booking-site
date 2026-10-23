@@ -12,7 +12,8 @@ function esc(x){return String(x==null?"":x).replace(/[&<>"]/g,function(c){return
 /* ---------- เสียงในหน้า ---------- */
 function unlock(){try{var A=window.AudioContext||window.webkitAudioContext;if(!A)return;if(!ctx)ctx=new A();if(ctx.state==="suspended")ctx.resume()}catch(e){}}
 ["pointerdown","keydown","touchstart"].forEach(function(ev){document.addEventListener(ev,unlock,{passive:true})});
-function beep(){try{unlock();if(!ctx)return;var t=ctx.currentTime;[[880,0],[1175,0.18],[880,0.36],[1175,0.54]].forEach(function(n){var o=ctx.createOscillator(),g=ctx.createGain();o.type="sine";o.frequency.value=n[0];o.connect(g);g.connect(ctx.destination);g.gain.setValueAtTime(0.0001,t+n[1]);g.gain.exponentialRampToValueAtTime(0.35,t+n[1]+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+n[1]+0.16);o.start(t+n[1]);o.stop(t+n[1]+0.18)});if(navigator.vibrate)navigator.vibrate([200,100,200])}catch(e){}}
+var lastBeep=0;
+function beep(){lastBeep=Date.now();try{unlock();if(!ctx)return;var t=ctx.currentTime;[[880,0],[1175,0.18],[880,0.36],[1175,0.54]].forEach(function(n){var o=ctx.createOscillator(),g=ctx.createGain();o.type="sine";o.frequency.value=n[0];o.connect(g);g.connect(ctx.destination);g.gain.setValueAtTime(0.0001,t+n[1]);g.gain.exponentialRampToValueAtTime(0.35,t+n[1]+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+n[1]+0.16);o.start(t+n[1]);o.stop(t+n[1]+0.18)});if(navigator.vibrate)navigator.vibrate([200,100,200])}catch(e){}}
 function toast(title,body){try{if(!toastEl){toastEl=document.createElement("div");toastEl.setAttribute("role","status");toastEl.style.cssText="position:fixed;left:12px;right:12px;top:max(12px,env(safe-area-inset-top));z-index:100;max-width:460px;margin:0 auto;background:#1f6f5c;color:#fff;border-radius:14px;padding:12px 16px;box-shadow:0 6px 24px rgba(0,0,0,.3);font:inherit;display:none;cursor:pointer";toastEl.onclick=function(){toastEl.style.display="none"};document.body.appendChild(toastEl)}
  toastEl.innerHTML="<b>🔔 "+esc(title)+"</b><div style=\"white-space:pre-wrap;font-size:.92rem\">"+esc(body)+"</div>";toastEl.style.display="block";clearTimeout(toastEl._t);toastEl._t=setTimeout(function(){toastEl.style.display="none"},7000)}catch(e){}}
 if("serviceWorker" in navigator)navigator.serviceWorker.addEventListener("message",function(e){var d=e.data||{};if(d.type!=="push")return;if(document.visibilityState==="visible"){beep();toast(d.title,d.body)}try{window.dispatchEvent(new Event("push-refresh"))}catch(x){}});
@@ -63,6 +64,12 @@ function onPill(){unlock();if(busy)return;
 window.Push={
  attach:function(cfg){C=cfg;mkPill();refreshState();var tick=0,had=false;setInterval(function(){tick++;var has=!!(C.uid&&C.uid());if(has!==had||(has&&tick%6===0)){had=has;refreshState()}},1000);document.addEventListener("visibilitychange",function(){if(!document.hidden)refreshState()})},
  beep:beep,
+ /* เสียงสำรองในหน้า: เรียก fn ทุก 2 วินาที (คืนจำนวนแจ้งเตือนที่ยังไม่อ่าน หรือ null ถ้าข้อมูลยังไม่พร้อม) ถ้าจำนวนเพิ่มขึ้น = มีของใหม่ → ส่งเสียง */
+ watch:function(fn){var last=null,since=0;setInterval(function(){var n=null;try{n=fn()}catch(e){n=null}
+  if(typeof n!=="number"){last=null;since=0;return}
+  if(last===null){last=n;since=Date.now();return}
+  if(n>last&&Date.now()-since>6000&&Date.now()-lastBeep>8000){beep();toast("มีแจ้งเตือนใหม่","เปิดเมนูแจ้งเตือนเพื่อดูรายละเอียด")}
+  last=n},2000)},
  /* เรียกก่อนออกจากระบบ: เลิกผูกการแจ้งเตือนของเครื่องนี้กับบัญชีเดิม (ใช้ token ที่จับไว้ก่อนล้าง session) */
  beforeLogout:function(){try{if(!C||!CAN)return;var tk=C.token&&C.token();if(!tk||!("serviceWorker" in navigator))return;
   navigator.serviceWorker.getRegistration("sw.js").then(function(r){return r&&r.pushManager.getSubscription()}).then(function(sub){if(!sub)return;
