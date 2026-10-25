@@ -203,7 +203,7 @@ document.addEventListener("click",function(e){var el=e.target.closest&&e.target.
   .catch(function(e){G.busy=false;G.err=errTh(e,"ส่งคำขอไม่สำเร็จ");gRender()});return}
 });
 
-var DAYN=["อา","จ","อ","พ","พฤ","ศ","ส"],TABS=[["svc","เพิ่มบริการ"],["staff","เพิ่มพนักงาน"],["promo","โปรโมชั่น"],["wal","กระเป๋าเงินระบบ"],["nt","การแจ้งเตือน"],["set","ตั้งค่าร้าน"]];
+var DAYN=["อา","จ","อ","พ","พฤ","ศ","ส"],TABS=[["q","คิวงาน"],["svc","เพิ่มบริการ"],["staff","เพิ่มพนักงาน"],["promo","โปรโมชั่น"],["wal","กระเป๋าเงินระบบ"],["nt","การแจ้งเตือน"],["set","ตั้งค่าร้าน"]];
 function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function addD(n){var d=new Date();d.setDate(d.getDate()+n);return iso(d)}
 function hh(m){return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0")}
@@ -274,11 +274,37 @@ function walView(){
  '<div class="head"><h1>ประวัติรายการ</h1></div><div class="card">'+(L.length?L.map(function(t){var tag=t.st==="สำเร็จ"?"":(t.st==="ยกเลิก"||t.st==="ปฏิเสธ"||t.st==="ค้างชำระ")?"b":"w";return '<div class="row"><div><b>'+esc(t.note)+'</b><small>'+fmtAt(t.at)+(t.reason?' · '+esc(t.reason):'')+'</small></div><div class="acts"><span class="'+(t.amt>=0?"plus":"minus")+'">'+(t.amt>=0?"+":"-")+Math.abs(t.amt).toLocaleString("th-TH")+'</span>'+(t.slipAt&&t.st==="รอยืนยัน"?'<span class="tag">แนบสลิปแล้ว</span>':'')+'<span class="tag '+tag+'">'+t.st+'</span>'+(t.type==="topup"&&t.st==="รอยืนยัน"?'<button class="btn g" data-a="tpview" data-id="'+t.id+'">ดูวิธีโอน</button>':'')+'</div></div>'}).join(""):'<div class="empty">ยังไม่มีรายการ</div>')+'</div>'}
 function view(){var t=S.tab,f=S.form&&S.form.t===t;
  if(t==="nt")return listNt();
+ if(t==="q")return qView();
  if(t==="svc")return '<div class="head"><h1>เพิ่มบริการ</h1>'+addBtn("svc")+'</div>'+(f?svcForm():listSvc());
  if(t==="staff")return '<div class="head"><h1>เพิ่มพนักงาน</h1>'+addBtn("staff")+'</div>'+(f?staffForm():listStaff());
  if(t==="promo")return '<div class="head"><h1>โปรโมชั่น</h1>'+addBtn("promo")+'</div>'+(f?promoForm():listPromo());
  if(t==="wal")return walView();
  return setView()}
+/* ===== คิวงานของร้าน ===== */
+var H7Q=7*36e5;
+function qDate(ts){return new Date(Date.parse(ts)+H7Q).toISOString().slice(0,10)}
+function qHM(ts){return new Date(ts).toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit",timeZone:"Asia/Bangkok"})}
+function qThD(d){return new Date(d+"T00:00:00Z").toLocaleDateString("th-TH",{weekday:"long",day:"numeric",month:"long",timeZone:"UTC"})}
+function qStaff(id){var x=byId(D.staff,id);return x?x.name:"พนักงาน"}
+var QJOB={pending:"รอพนักงานรับงาน",accepted:"พนักงานรับงานแล้ว",in_progress:"กำลังให้บริการ",done:"เสร็จสิ้น"};
+/* หมวดของการจอง: wait = ยังไม่จบ, done = เสร็จสิ้น, cx = ยกเลิก/เลื่อนคิว */
+function qCat(b){if(b.status==="cancelled"||b.status==="rescheduled")return"cx";
+ if(b.status==="completed")return"done";
+ var its=(b.booking_items||[]).filter(function(i){return i.active});
+ if(its.length&&its.every(function(i){return i.job==="done"}))return"done";
+ return"wait"}
+function qCard(b){var c=qCat(b),its=(b.booking_items||[]).slice().sort(function(a,z){return a.starts_at<z.starts_at?-1:1}),
+ tg=b.status==="cancelled"?'<span class="tag b">ยกเลิก</span>':b.status==="rescheduled"?'<span class="tag s">เลื่อนคิว'+(b.moved_to?' → '+esc(b.moved_to):'')+'</span>':c==="done"?'<span class="tag">เสร็จสิ้น</span>':'<span class="tag w">รอให้บริการ</span>';
+ return'<div class="card" style="margin-bottom:10px"><div class="row" style="border:0;padding:0 0 6px"><b>'+qHM(b.starts_at)+'-'+qHM(b.ends_at)+' น.</b>'+tg+'</div><b>'+esc(b.customer_name)+'</b>'+(b.phone?'<small style="display:block">โทร <a href="tel:'+esc(b.phone)+'">'+esc(b.phone)+'</a></small>':'')+
+ its.map(function(i){return'<small style="display:block">'+esc(i.service_name)+' · '+i.minutes+' นาที · พนักงาน '+esc(qStaff(i.staff_id))+(c==="wait"&&i.active?' · '+QJOB[i.job]:'')+'</small>'}).join("")+
+ '<small style="display:block">เลขที่ '+esc(b.ref)+' · '+baht(b.total_price||0)+(b.promo_title?' · '+esc(b.promo_title):'')+'</small></div>'}
+function qView(){var all=(D.bk||[]),L={wait:[],done:[],cx:[]};all.forEach(function(b){L[qCat(b)].push(b)});
+ var TB=[["wait","งานที่รออยู่"],["done","งานที่เสร็จสิ้น"],["cx","งานถูกยกเลิก"]],qt=S.qt||"wait",cur=L[qt]?qt:"wait",
+ list=L[cur].slice().sort(function(a,z){return cur==="wait"?(a.starts_at<z.starts_at?-1:1):(a.starts_at<z.starts_at?1:-1)}),
+ tabs='<div class="nf" role="tablist" aria-label="หมวดคิวงาน">'+TB.map(function(x){return'<button type="button" role="tab" data-a="qt" data-id="'+x[0]+'" class="'+(x[0]===cur?"on":"")+'" aria-selected="'+(x[0]===cur)+'">'+x[1]+' ('+L[x[0]].length+')</button>'}).join("")+'</div>',
+ body="",last="";
+ list.forEach(function(b){var d=qDate(b.starts_at);if(d!==last){body+='<h3 style="margin:14px 0 8px;font-size:1rem">'+qThD(d)+'</h3>';last=d}body+=qCard(b)});
+ return'<div class="head"><h1>คิวงาน</h1></div>'+tabs+(body||'<div class="card"><p class="hint2" style="margin:0">'+(cur==="wait"?"ยังไม่มีคิวงานที่รออยู่":cur==="done"?"ยังไม่มีงานที่เสร็จสิ้น":"ไม่มีงานที่ถูกยกเลิก")+'</p></div>')+(cur==="wait"?'':'<p class="hint2">แสดงย้อนหลัง 30 วัน</p>')}
 function staffForm(){var ed=!!S.form.id,p=ed?byId(D.staff,S.form.id):{name:"",phone:"",img:null,svcs:[]};S.imgTmp=p.img||null;
  return '<div class="card form"><b>'+(ed?"แก้ไขพนักงาน":"เพิ่มพนักงานใหม่")+'</b><div><label for="fn">ชื่อพนักงาน</label><input class="in" id="fn" value="'+esc(p.name)+'"></div>'+
  '<div><label for="fimg">รูปโปรไฟล์พนักงาน (ไม่บังคับ)</label><div class="pimgrow"><span id="imgprev">'+stImg(S.imgTmp,p.name,56)+'</span><input class="in" type="file" id="fimg" accept="image/*"></div><p class="hint2" style="margin:6px 0 0">ระบบครอปเป็นรูปสี่เหลี่ยมจัตุรัสและย่อขนาดให้อัตโนมัติ</p><div id="imgerr" style="color:var(--bad)"></div></div>'+
@@ -314,7 +340,10 @@ function loadCatalog(){var pid=WID;
   if(!r[0]||!r[0][0])throw new Error("ไม่พบข้อมูลร้าน");
   D.shop=mapPlace(r[0][0]);D.svc=r[1].map(mapSvc);D.staff=r[2].map(mapStaff);D.promo=r[3].map(mapPromo)})}
 function annRead(){return rd("shopAnnRead_"+WHO.id,[])}
-function loadLive(){var pid=WID;
+function loadBk(){var pid=WID,from=new Date(Date.now()-30*864e5).toISOString();
+ return g1("bookings?select=id,ref,customer_name,phone,status,starts_at,ends_at,total_price,promo_title,moved_to,created_at,booking_items(id,service_name,minutes,price,starts_at,ends_at,active,job,staff_id)&place_id=eq."+pid+"&ends_at=gte."+from+"&order=starts_at.asc&limit=500").then(function(r){D.bk=r||[]},function(){})}
+function loadLive(){return Promise.all([loadLive0(),loadBk()])}
+function loadLive0(){var pid=WID;
  return Promise.all([g1("places?select=*&id=eq."+pid),g1("wallet_tx?select=*&place_id=eq."+pid+"&order=created_at.desc&limit=300"),g1("topup_requests?select=*&place_id=eq."+pid+"&order=created_at.desc&limit=100"),g1("notifications?select=*&audience=eq.shop&place_id=eq."+pid+"&order=created_at.desc&limit=100"),g1("notification_reads?select=notification_id&limit=1000"),g1("announcements?select=*&active=eq.true&order=created_at.desc&limit=50"),g1("app_settings?select=*&limit=1")]).then(function(r){
   if(r[0]&&r[0][0]){var sh=mapPlace(r[0][0]);["gp","on","autoClosed"].forEach(function(k){D.shop[k]=sh[k]})}
   var tx=[];
@@ -326,8 +355,8 @@ function loadLive(){var pid=WID;
   r[5].forEach(function(a){if((a.audiences||[]).indexOf("ร้านค้า")>-1)nt.push({id:"an-"+a.id,from:"admin",title:"ประกาศ: "+a.title,text:a.body||"",at:a.created_at||(a.day+"T00:00:00")})});
   D.nt=nt;D.ntRead=r[4].map(function(x){return x.notification_id}).concat(annRead());
   var s=r[6]&&r[6][0];if(s){CFG.pp=s.promptpay_id?{on:s.promptpay_on!==false,type:s.promptpay_type,id:s.promptpay_id,name:s.promptpay_name}:{on:false,none:true};CFG.w1=+s.wallet_warn1||100;CFG.w2=+s.wallet_warn2||50}})}
-function loadShop(pid){WID=pid;D={shop:null,svc:[],staff:[],promo:[],tx:[],nt:[],ntRead:[]};return loadCatalog().then(loadLive)}
-var S={tab:"svc",form:null,del:null,saved:false,wmode:null,werr:"",busy:false,hmsg:""};
+function loadShop(pid){WID=pid;D={shop:null,svc:[],staff:[],promo:[],tx:[],nt:[],ntRead:[],bk:[]};return loadCatalog().then(loadLive)}
+var S={tab:"q",qt:"wait",form:null,del:null,saved:false,wmode:null,werr:"",busy:false,hmsg:""};
 function balance(){return D.tx.filter(function(t){return t.st==="สำเร็จ"}).reduce(function(a,t){return a+t.amt},0)}
 function owed(){var b=balance();return b<0?-b:0}
 function warnLv(){return[CFG.w1,CFG.w2]}
@@ -391,8 +420,9 @@ document.addEventListener("click",function(e){
   if(!navigator.geolocation){ps.innerHTML='<p class="hint2" style="color:var(--bad)">อุปกรณ์นี้ไม่รองรับ ใช้การวางลิงก์หรือพิกัดแทน</p>';return}
   ps.innerHTML='<p class="hint2">กำลังหาตำแหน่ง...</p>';
   navigator.geolocation.getCurrentPosition(function(p){setPin(p.coords.latitude.toFixed(6),p.coords.longitude.toFixed(6))},function(){ps.innerHTML='<p class="hint2" style="color:var(--bad)">ใช้ตำแหน่งปัจจุบันไม่ได้ ตรวจสอบสิทธิ์ตำแหน่ง หรือวางลิงก์/พิกัดแทน</p>'},{timeout:10000});return}
- if(a==="tab"){if(id==="nt")openNt();S.tab=id;S.form=null;S.del=null;S.saved=false;S.pwdone=false;S.wmode=null;S.werr="";S.hmsg="";draw();if(id==="wal"||id==="nt")refresh();return}
+ if(a==="tab"){if(id==="nt")openNt();S.tab=id;S.form=null;S.del=null;S.saved=false;S.pwdone=false;S.wmode=null;S.werr="";S.hmsg="";draw();if(id==="wal"||id==="nt"||id==="q")refresh();return}
  if(a==="ntf"){S.ntf=id;draw();return}
+ if(a==="qt"){S.qt=id;draw();return}
  if(a==="new"){S.form={t:t,id:null};draw();return}
  if(a==="edit"){S.form={t:t,id:id};draw();return}
  if(a==="cancel"){S.form=null;draw();return}
@@ -460,7 +490,7 @@ document.addEventListener("click",function(e){
    Object.assign(D.shop,{name:nm,desc:body.description,area:body.area,days:days,open:o1,close:c1,lat:pla,lng:plo,adv:body.advance_days,cancelH:body.cancel_hours,ov:{adv:body.advance_days,cancelH:body.cancel_hours}});S.saved=true;S.pwdone=!!npw;window.scrollTo(0,0)});return}
 });
 var pollT=null;
-function startMain(){if(started){draw();return}started=true;S={tab:"svc",form:null,del:null,saved:false,wmode:null,werr:"",busy:false,hmsg:""};draw();
+function startMain(){if(started){draw();return}started=true;S={tab:"q",qt:"wait",form:null,del:null,saved:false,wmode:null,werr:"",busy:false,hmsg:""};draw();
  pollT=setInterval(function(){if(!document.hidden)refresh()},30000);
  document.addEventListener("visibilitychange",function(){if(!document.hidden)refresh()})}
 /* ---------- เริ่มทำงาน ---------- */

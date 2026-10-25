@@ -43,7 +43,7 @@ h1{font-size:1.3rem;margin:4px 0 2px}.sub{color:var(--mute);margin:0 0 12px;font
 .q .t{font-weight:700}.q small{color:var(--mute);display:block}
 .qh{display:flex;justify-content:space-between;gap:8px;align-items:center}
 .tag{font-size:.8rem;padding:2px 10px;border-radius:99px;background:var(--soft);color:var(--main);white-space:nowrap}
-.tag.w{background:var(--wait-bg);color:var(--wait)}.tag.o{background:var(--off);color:var(--mute)}.tag.b{background:var(--bad-bg);color:var(--bad)}
+.tag.w{background:var(--wait-bg);color:var(--wait)}.tag.o{background:var(--off);color:var(--mute)}.tag.b{background:var(--bad-bg);color:var(--bad)}.tag.s{background:var(--off);color:var(--ink)}
 .btn{font:inherit;font-weight:700;border-radius:10px;padding:10px;border:2px solid var(--main);background:var(--main);color:var(--main-ink);cursor:pointer;width:100%;margin-top:10px}
 .btn.g{background:transparent;color:var(--main)}
 .jobs{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:8px}.jobs .btn{width:auto;flex:1;min-width:92px;margin-top:0;padding:8px}.jobs .btn[disabled]{opacity:.5;cursor:default}
@@ -249,17 +249,20 @@ function view(){var t=today(),h="";
  if(S.tab==="q"){
   var live=function(j){return j.active&&j.bstatus==="confirmed"&&(JRANK[j.job]||0)<3},
    fin=function(j){return!live(j)},
+   cx=function(j){return j.bstatus==="cancelled"||j.bstatus==="rescheduled"||!j.active},
    NEW=JOBS.filter(function(j){return live(j)&&j.job==="pending"}),
    WAIT=JOBS.filter(function(j){return live(j)&&(j.job==="accepted"||j.job==="in_progress")}),
-   DONE=JOBS.filter(fin),
+   DONE=JOBS.filter(function(j){return fin(j)&&!cx(j)}),
+   CXL=JOBS.filter(function(j){return fin(j)&&cx(j)}),
    asc=function(a,b){return a.starts_at<b.starts_at?-1:1},qt=S.qt||"new",
-   TAB=[["new","งานใหม่",NEW],["wait","งานที่รออยู่",WAIT],["done","งานที่เสร็จสิ้น",DONE]],
+   TAB=[["new","งานใหม่",NEW],["wait","งานที่รออยู่",WAIT],["done","งานที่เสร็จสิ้น",DONE],["cx","งานถูกยกเลิก",CXL]],
    cur=(TAB.filter(function(x){return x[0]===qt})[0]||TAB[0]),
    nowI=new Date().toISOString(),ended=function(j){return j.ends_at<nowI},
-   list=cur[2].slice().sort(cur[0]==="done"?function(a,b){return asc(b,a)}:function(a,b){var ea=ended(a),eb=ended(b);return ea!==eb?(ea?1:-1):asc(a,b)}),
+   list=cur[2].slice().sort(cur[0]==="done"||cur[0]==="cx"?function(a,b){return asc(b,a)}:function(a,b){var ea=ended(a),eb=ended(b);return ea!==eb?(ea?1:-1):asc(a,b)}),
    EM={new:"ยังไม่มีงานใหม่ งานที่ลูกค้าจองเข้ามาจะขึ้นที่นี่ กดรับงานเพื่อย้ายไปที่ \"งานที่รออยู่\"",wait:"ไม่มีงานที่รออยู่ งานที่คุณรับแล้วและยังไม่เสร็จจะขึ้นที่นี่",done:"ยังไม่มีงานที่เสร็จสิ้น (แสดงย้อนหลัง 30 วัน)"},
    groups="",last=null,lateShown=false;
-  list.forEach(function(j){if(cur[0]!=="done"&&ended(j)&&!lateShown){lateShown=true;last=null;groups+='<h2 style="margin-top:20px">เลยเวลานัดแล้ว</h2>'}var d=bkDate(Date.parse(j.starts_at));if(d!==last){last=d;groups+='<h3 style="margin:14px 0 6px;font-size:1rem">'+(d===t?"วันนี้ · ":"")+thD(d)+'</h3>'}groups+=jobCard(j,false)});
+  EM.cx="ไม่มีงานที่ถูกยกเลิก (แสดงย้อนหลัง 30 วัน)";
+  list.forEach(function(j){if(cur[0]!=="done"&&cur[0]!=="cx"&&ended(j)&&!lateShown){lateShown=true;last=null;groups+='<h2 style="margin-top:20px">เลยเวลานัดแล้ว</h2>'}var d=bkDate(Date.parse(j.starts_at));if(d!==last){last=d;groups+='<h3 style="margin:14px 0 6px;font-size:1rem">'+(d===t?"วันนี้ · ":"")+thD(d)+'</h3>'}groups+=jobCard(j,false)});
   h=banner()+'<h1>คิวงาน</h1><p class="sub">'+esc(ME.place)+'</p><div class="nf" role="tablist" aria-label="หมวดคิวงาน">'+TAB.map(function(x){return'<button type="button" role="tab" data-a="qt" data-id="'+x[0]+'" class="'+(x[0]===cur[0]?"on":"")+'" aria-selected="'+(x[0]===cur[0])+'">'+x[1]+' ('+x[2].length+')</button>'}).join("")+'</div>'+
    (list.length?groups:'<div class="empty">'+EM[cur[0]]+'</div>')}
  if(S.tab==="sc"){h=banner()+'<h1>ตารางงาน</h1><p class="sub">'+esc(ME.place)+'</p>'+daysCard()+'<h2 style="margin-top:18px">7 วันข้างหน้า</h2>';

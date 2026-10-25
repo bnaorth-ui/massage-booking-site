@@ -256,7 +256,7 @@ function watchLoc(){if(watching||!navigator.geolocation||!navigator.geolocation.
  navigator.geolocation.watchPosition(function(p){var n={lat:p.coords.latitude,lng:p.coords.longitude},moved=!V.loc||hav(V.loc,n)>0.05;V.loc=n;nearbyCheck(true);if(moved&&!S.view&&S.step===0)render(true)},function(){},{maximumAge:60000,timeout:20000})}
 function autoWatch(){try{if(!navigator.geolocation)return;var ask=function(){navigator.geolocation.getCurrentPosition(function(p){V.loc={lat:p.coords.latitude,lng:p.coords.longitude};V.msg="";nearbyCheck(true);watchLoc();if(!S.view&&S.step===0)render(true)},function(){},{timeout:15000,maximumAge:300000})};
  if(navigator.permissions&&navigator.permissions.query)navigator.permissions.query({name:"geolocation"}).then(function(r){if(r.state==="granted")watchLoc();else if(r.state==="prompt")ask()},function(){ask()});else ask()}catch(e){}}
-function menuHtml(){var u=unread(),up=allBk().filter(isUp).length;return '<div class="mn"><button data-view="nt"><span aria-hidden="true">🔔</span><b>แจ้งเตือน</b>'+(u?'<i class="bdg" aria-label="ยังไม่ได้อ่าน '+u+' รายการ">'+u+'</i>':'')+'</button><button data-view="bk"><span aria-hidden="true">📋</span><b>รายการจอง</b>'+(up?'<i class="bdg b2" aria-label="กำลังจะถึง '+up+' รายการ">'+up+'</i>':'')+'</button></div>'}
+function menuHtml(){var u=unread(),up=allBk().filter(isUp).length;return '<div class="mn"><button data-view="nt"><span aria-hidden="true">🔔</span><b>แจ้งเตือน</b>'+(u?'<i class="bdg" aria-label="ยังไม่ได้อ่าน '+u+' รายการ">'+u+'</i>':'')+'</button><button data-view="bk"><span aria-hidden="true">📋</span><b>รายการ</b>'+(up?'<i class="bdg b2" aria-label="กำลังจะถึง '+up+' รายการ">'+up+'</i>':'')+'</button></div>'}
 function actHtml(b){ /* ปุ่มยกเลิก / เลื่อนคิว (ใช้ทั้งในรายการจองและในข้อความหลังจอง) */
  if(b.status==="ยกเลิก")return '<p class="hint">การจองนี้ถูกยกเลิกแล้ว</p>';
  if(b.status==="เลื่อนแล้ว")return '<p class="hint">นัดนี้ถูกเลื่อนไปเลขที่ '+(b.movedTo||"-")+' แล้ว</p>';
@@ -268,7 +268,11 @@ function bkCard(b){var pl=bkPlace(b),sv=(pl?svcOf(pl,b.svc):null)||find(SVC,b.sv
  return '<div class="bk"><div class="qh"><b>'+esc(pl?pl.name:(b.placeName||"-"))+'</b><span class="tag '+st[1]+'">'+st[0]+'</span></div><small>'+esc(b.svcName||(sv?sv.name:"-"))+' · '+(b.price!=null?baht(b.price):"")+'</small>'+(b.promo?'<small>🎁 '+esc(b.promo)+' (-'+baht(b.disc||0)+')</small>':'')+(b.phone?'<small>โทร '+esc(b.phone)+'</small>':'')+'<small>'+bkWhen(b)+'</small><small>พนักงาน: '+esc(bkStaff(b))+'</small><small>เลขที่ '+b.ref+(b.resched?' · เลื่อนมาแล้ว '+b.resched+' ครั้ง':'')+'</small>'+(b.movedTo?'<small>เลื่อนไปเลขที่ '+b.movedTo+'</small>':'')+(b.movedFrom?'<small>เลื่อนมาจากเลขที่ '+b.movedFrom+'</small>':'')+(isUp(b)&&pl?'<small>'+esc(remindLine(pl,"remind","เตือนล่วงหน้า: ")||"ไม่ได้ตั้งเตือน")+'</small>':'')+actHtml(b)+'</div>'}
 function viewRender(){var h="",b='<button class="btn" id="home">กลับหน้าหลัก</button>';
  if(S.view==="bk"){var L=allBk(),st=function(x){return apptStart(x).getTime()},up=L.filter(isUp).sort(function(x,y){return st(x)-st(y)}),hist=L.filter(function(x){return !isUp(x)}).sort(function(x,y){return st(y)-st(x)});
-  h='<h1>รายการจอง</h1>'+(V.flash?'<div class="flash" role="status">'+esc(V.flash)+'</div>':'')+(up.length?'<p class="stl">กำลังจะถึง ('+up.length+')</p>'+up.map(bkCard).join(""):'<div class="empty">ไม่มีรายการจองที่กำลังจะถึง</div>')+(hist.length?'<p class="stl">ประวัติ ('+hist.length+')</p>'+hist.map(bkCard).join(""):"")}
+  var cxl=L.filter(function(x){return x.status==="ยกเลิก"||x.status==="เลื่อนแล้ว"}).sort(function(x,y){return st(y)-st(x)}),
+   hs=hist.filter(function(x){return x.status!=="ยกเลิก"&&x.status!=="เลื่อนแล้ว"}),bt=V.bt||"up",
+   TB=[["up","รายการจอง",up],["hist","ประวัติ",hs],["cx","งานถูกยกเลิก",cxl]],cu=TB.filter(function(x){return x[0]===bt})[0]||TB[0],
+   EMP={up:"ไม่มีรายการจองที่กำลังจะถึง",hist:"ยังไม่มีประวัติการจอง",cx:"ไม่มีงานที่ถูกยกเลิก"};
+  h='<h1>รายการ</h1>'+(V.flash?'<div class="flash" role="status">'+esc(V.flash)+'</div>':'')+'<div class="tg" role="tablist" aria-label="หมวดรายการ">'+TB.map(function(x){return '<button type="button" role="tab" data-bt="'+x[0]+'" class="'+(x[0]===cu[0]?"on":"")+'" aria-selected="'+(x[0]===cu[0])+'">'+x[1]+' ('+x[2].length+')</button>'}).join("")+'</div>'+(cu[2].length?cu[2].map(bkCard).join(""):'<div class="empty">'+EMP[cu[0]]+'</div>')}
  if(S.view==="nt"){var prev=V.prevSeen!=null?V.prevSeen:(V.prevSeen=seenAt()),notes=userNotes(),an=ANN.filter(function(x){return x.on&&(x.auds||[]).indexOf("ผู้ใช้งาน")>-1});
   try{localStorage.setItem("notifSeen",new Date().toISOString())}catch(e){}
   h='<h1>แจ้งเตือน</h1>'+(an.length?'<p class="stl">ประกาศจากสมาคม</p>'+an.map(function(x){return '<div class="ann"><b>📢 '+esc(x.title)+'</b><br>'+esc(x.body)+'</div>'}).join(""):"")+
@@ -287,10 +291,10 @@ function render(keep){
   if(S.step===2&&S.date)ensureBusy();
   h=mvBanner(S.step===0);
   if(S.step===0){
-   syncAdmin();nearbyCheck();var kd=V.kind,KT=kd==="shop"?"ร้านค้า":"หน่วยงาน",R=RADIUS[kd],near=visible(kd).filter(function(p){return dist(p)===Infinity||dist(p)<=R}),shown=near.sort(function(a,b){return(dist(a)===Infinity?1e9:dist(a))-(dist(b)===Infinity?1e9:dist(b))});
+   syncAdmin();nearbyCheck();var kd=V.kind,KT=kd==="shop"?"ร้านนวด":"หน่วยงาน",R=RADIUS[kd],near=visible(kd).filter(function(p){return dist(p)===Infinity||dist(p)<=R}),shown=near.sort(function(a,b){return(dist(a)===Infinity?1e9:dist(a))-(dist(b)===Infinity?1e9:dist(b))});
    h+=(V.moving?"":profHtml()+menuHtml())+'<h1>เลือกสถานที่</h1>'+
    '<div class="loc">📍 '+(V.loc?"ตำแหน่งของคุณ":"ยังไม่ได้ระบุตำแหน่ง")+'<button class="lb" data-loc="gps">'+(V.loc?"อัปเดตตำแหน่ง":"ใช้ตำแหน่งของฉัน")+'</button>'+(V.loc?'<button class="lb" data-loc="reset">ไม่ใช้ตำแหน่ง</button>':'')+'</div>'+(V.msg?'<p class="hint">'+V.msg+'</p>':'')+
-   '<div class="tg" role="group" aria-label="ประเภท">'+[["shop","ร้านค้า"],["org","หน่วยงาน"]].map(function(k){var n=visible(k[0]).filter(function(p){return dist(p)===Infinity||dist(p)<=RADIUS[k[0]]}).length;return '<button data-kind="'+k[0]+'" class="'+(k[0]===kd?"on":"")+'" aria-pressed="'+(k[0]===kd)+'">'+k[1]+' ('+n+')</button>'}).join("")+'</div>'+
+   '<div class="tg" role="group" aria-label="ประเภท">'+[["shop","เลือกร้านนวด"],["org","เลือกหน่วยงาน"]].map(function(k){var n=visible(k[0]).filter(function(p){return dist(p)===Infinity||dist(p)<=RADIUS[k[0]]}).length;return '<button data-kind="'+k[0]+'" class="'+(k[0]===kd?"on":"")+'" aria-pressed="'+(k[0]===kd)+'">'+k[1]+' ('+n+')</button>'}).join("")+'</div>'+
    '<p class="sub">'+(V.loc?'แสดง'+KT+'ในรัศมี '+R+' กม. จากตำแหน่งของคุณ · พบ '+shown.length+' แห่ง เรียงจากใกล้ไปไกล':'แสดง'+KT+'ทั้งหมด '+shown.length+' แห่ง · กด "ใช้ตำแหน่งของฉัน" เพื่อดูเฉพาะที่อยู่ใกล้และเรียงตามระยะทาง')+'</p>'+
    (shown.length?'<div class="list">'+shown.map(placeBtn).join("")+'</div>':!PLACES.length?'<div class="empty">ยังไม่มีร้านค้าหรือหน่วยงานในระบบ<br><small>ผู้ดูแลต้องเพิ่มข้อมูลใน Supabase หรือรันไฟล์ข้อมูลตัวอย่าง</small></div>':'<div class="empty">ไม่มี'+KT+""+'ในรัศมี '+R+' กม.'+(V.loc?'<br><button class="lb" data-loc="reset">ดูทั้งหมดโดยไม่ใช้ตำแหน่ง</button>':'')+'</div>');
   }
@@ -349,6 +353,7 @@ function confirmBooking(){
 function bind(){
  var q=function(s){return document.querySelectorAll(s)},g=function(i){return document.getElementById(i)};
  q("[data-mv]").forEach(function(e){e.onclick=function(){V.moving=null;V.moveKeys=[];V.moveItems=[];S=fresh();S.view="bk";render()}});
+ q("[data-bt]").forEach(function(e){e.onclick=function(){V.bt=e.dataset.bt;V.cfm=null;render()}});
  q("[data-view]").forEach(function(e){e.onclick=function(){V.cfm=null;V.prevSeen=null;S.view=e.dataset.view;render();if(S.view)refreshUser()}});
  q("[data-act=busy]").forEach(function(e){e.onclick=function(){S.busyErr="";render(true)}});
  q("[data-bk]").forEach(function(e){e.onclick=function(){var a=e.dataset.bk,ref=e.dataset.ref;
