@@ -330,6 +330,13 @@ function rpLoad(){var R=S.rp;if(!R.pid){R.err="กรุณาเลือกห
  else{var m0=+R.mon.slice(5,7),y0=+R.mon.slice(0,4);a=new Date(R.mon+"-01T00:00:00+07:00");b=new Date((m0===12?(y0+1)+"-01":y0+"-"+String(m0+1).padStart(2,"0"))+"-01T00:00:00+07:00")}
  R.busy=true;R.err="";R.data=null;draw();
  g1("bookings?select=id,ref,customer_id,customer_name,status,starts_at,ends_at,booking_items(id,service_name,minutes,active,job,starts_at,ends_at,started_at,done_at,staff(name))&place_id=eq."+R.pid+"&starts_at=gte."+encodeURIComponent(a.toISOString())+"&starts_at=lt."+encodeURIComponent(b.toISOString())+"&order=starts_at.asc&limit=2000").then(function(L){R.busy=false;R.data={pid:R.pid,mon:R.mon,mode:R.mode,label:label,from:R.from,to:R.to,L:L||[]};draw()},function(e){R.busy=false;R.err=(e&&e.status===401)?"หมดเวลาเข้าสู่ระบบ":"สร้างรายงานไม่สำเร็จ ลองใหม่อีกครั้ง";draw()})}
+function rpDoc(){var el=document.querySelector(".rp");if(!el)return null;var c=el.cloneNode(true);c.querySelectorAll(".noprint").forEach(function(x){x.remove()});
+ var css=Array.prototype.map.call(document.querySelectorAll("style"),function(x){return x.textContent}).join("\n");
+ return '<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>รายงานการใช้บริการ</title><style>'+css+'</style></head><body><div class="noprint" style="padding:10px 16px"><button class="btn" onclick="window.print()">พิมพ์ / บันทึกเป็น PDF</button></div><main>'+c.outerHTML+'</main><script>window.addEventListener("load",function(){setTimeout(function(){try{window.print()}catch(e){}},500)})<\/script></body></html>'}
+function rpPrint(){var h=rpDoc();if(!h)return;var url=URL.createObjectURL(new Blob([h],{type:"text/html;charset=utf-8"})),w=null;
+ try{w=window.open(url,"_blank")}catch(e){}
+ if(!w){var a=document.createElement("a");a.href=url;a.download="รายงานการใช้บริการ.html";document.body.appendChild(a);a.click();a.remove();S.rp.err="เปิดหน้าพิมพ์ไม่ได้ ระบบดาวน์โหลดไฟล์รายงานให้แทน ให้เปิดไฟล์นั้นแล้วกดพิมพ์ หรือเปิดเว็บแอดมินจาก Safari/Chrome (ไม่ใช่แอปที่ติดตั้งบนหน้าจอ) แล้วลองใหม่";draw()}
+ setTimeout(function(){URL.revokeObjectURL(url)},120000)}
 function rpCsv(){var d=S.rp.data;if(!d)return;var pl=byId(D.orgs.concat(D.comp),d.pid),q=function(x){return '"'+String(x==null?"":x).replace(/"/g,'""')+'"'},
  rows=[["วันที่","เวลานัด","ระยะเวลา (นาที)","เวลาเริ่มจริง","เวลาเสร็จจริง","เลขที่จอง","ผู้ใช้บริการ (ย่อ)","บริการ","พนักงาน","สถานะ"]];
  d.L.slice().sort(function(a,b){return a.starts_at<b.starts_at?-1:1}).forEach(function(b){(b.booking_items&&b.booking_items.length?b.booking_items:[{service_name:"",minutes:"",staff:null,started_at:null,done_at:null}]).forEach(function(i){rows.push([qDay(b.starts_at),qHM(b.starts_at)+"-"+qHM(b.ends_at),i.minutes,i.started_at?qHM(i.started_at):"",i.done_at?qHM(i.done_at):"",b.ref,maskNm(b.customer_name),i.service_name,(i.staff&&i.staff.name)||"",rpStat(b)])})});
@@ -459,7 +466,7 @@ document.addEventListener("click",function(e){
  if(a==="qt"){S.qt=id;draw();return}
  if(a==="rpmode"){var R0=S.rp;R0.pid=(document.getElementById("rpp")||{}).value||R0.pid;R0.mode=id;R0.err="";if(id==="d"&&!R0.from){var t0=new Date(Date.now()+252e5).toISOString().slice(0,10);R0.from=t0.slice(0,8)+"01";R0.to=t0}draw();return}
  if(a==="rpgo"){var R1=S.rp;R1.pid=(document.getElementById("rpp")||{}).value||"";if(R1.mode==="d"){R1.from=(document.getElementById("rpf")||{}).value||"";R1.to=(document.getElementById("rpt")||{}).value||""}else R1.mon=(document.getElementById("rpm")||{}).value||R1.mon;rpLoad();return}
- if(a==="rpprint"){window.print();return}
+ if(a==="rpprint"){rpPrint();return}
  if(a==="rpcsv"){rpCsv();return}
  if(a==="ss"){S.ss=id;S.form=null;S.lic=null;S.rej=null;draw();return}
  if(a==="tab"){S.tab=id;S.form=null;S.del=null;S.saved=false;S.info="";S.hmsg="";S.rej=null;S.lic=null;S.tpc=null;S.tpr=null;S.slipv=null;draw();if(id==="nt"||id==="pp"||id==="shop"||id==="q")refresh();if(id==="set"&&S.sub==="a")loadAdmins().then(draw);return}
