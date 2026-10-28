@@ -144,7 +144,7 @@ function loadAll(){
    sbApi("/rest/v1/announcements?select=*&active=eq.true&order=created_at.desc&limit=50"),
    sbApi("/rest/v1/app_settings?select=*&limit=1").catch(function(){return[]})]).then(function(r){
     JOBS=r[0]||[];OFFS=(r[1]||[]).map(function(x){return x.day});
-    NT=r[2]||[];READS=(r[3]||[]).map(function(x){return x.notification_id});
+    NT=(r[2]||[]).filter(function(n){return n.kind!=="announce"});READS=(r[3]||[]).map(function(x){return x.notification_id});
     var st=(r[5]||[])[0]||{};CT={name:st.association_name||"",addr:st.address||"",phone:st.phone||"",line:st.line_url||"",hours:st.hours_text||""};
     ANN=(r[4]||[]).filter(function(a){return(a.audiences||[]).indexOf("พนักงาน")>-1});return true})})}
 function feed(){var L=[];

@@ -27,10 +27,14 @@ a{color:var(--main)}
 .sw span{width:26px;height:26px;border-radius:50%;background:var(--mute);display:block;transition:transform .15s}
 .sw.on{background:var(--main);border-color:var(--main)}.sw.on span{background:var(--main-ink);transform:translateX(24px)}
 .closed{flex-basis:100%;margin:0 0 6px;background:var(--wait-bg);color:var(--wait);border-radius:10px;padding:8px 12px;font-size:.9rem}
-.tabs{display:flex;gap:4px;overflow-x:auto;margin-top:6px}
-.tabs button{flex:none;font:inherit;border:0;background:transparent;color:var(--mute);padding:10px 14px;border-bottom:3px solid transparent;cursor:pointer}
-.tabs button.on{color:var(--main);border-color:var(--main);font-weight:700}
-main{max-width:760px;margin:0 auto;padding:16px}
+.navb{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.navb>div{max-width:480px;margin:0 auto;display:flex}
+.navb button{position:relative;flex:1;font:inherit;font-size:.82rem;border:0;background:transparent;color:var(--mute);padding:10px 2px 9px;cursor:pointer}
+.navb button span{display:block;font-size:1.3rem}.navb button.on{color:var(--main);font-weight:700}
+.navb .bdg{position:absolute;top:2px;right:calc(50% - 26px);min-width:18px;height:18px;border-radius:99px;background:#d64545;color:#fff;font-size:.72rem;display:grid;place-items:center;padding:0 5px;font-style:normal}
+.ctc{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:14px;margin:0 0 12px}.ctc b{display:block;font-size:1.1rem}.ctc p{margin:4px 0 0;color:var(--mute);white-space:pre-line}.ctc .hr{display:block;white-space:pre-line;margin-top:6px}
+a.cta{display:flex;align-items:center;gap:12px;text-decoration:none;font-weight:700;background:var(--main);color:var(--main-ink);border:2px solid var(--main);border-radius:12px;padding:16px;margin:0 0 10px}a.cta.line{background:#06c755;border-color:#06c755;color:#fff}a.cta span{font-size:1.6rem}a.cta small{display:block;font-weight:400;opacity:.9}a.cta:focus-visible{outline:3px solid var(--main);outline-offset:2px}
+main{max-width:760px;margin:0 auto;padding:16px 16px 96px}
 h1{font-size:1.25rem;margin:0}
 .head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
 .card{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:4px 14px;margin-bottom:14px}
@@ -73,9 +77,9 @@ textarea.in{resize:vertical}
 <body>
 <header class="top"><div>
  <div class="hd" id="hdr"></div>
- <nav class="tabs" id="tabs"></nav>
-</div></header>
+ </div></header>
 <main id="main"></main>
+<div class="navb" id="navb"><div id="tabs"></div></div>
 <script>
 (function(){
 /* =====================================================================
@@ -127,7 +131,7 @@ var box=document.createElement("div");box.id="gate";box.style.cssText="max-width
 function field(id,label,type,extra){return'<div style="margin-bottom:12px"><label for="'+id+'">'+label+'</label><input class="in" id="'+id+'" type="'+type+'" '+(extra||"")+'></div>'}
 function val(id){var e=document.getElementById(id);return e?e.value:""}
 function errBox(){return'<div id="gerr" role="alert" style="color:var(--bad);min-height:1.4em;margin-bottom:8px">'+esc(G.err)+'</div>'}
-function showGate(on){box.hidden=!on;document.querySelector("header.top").hidden=on;document.getElementById("main").hidden=on}
+function showGate(on){box.hidden=!on;document.querySelector("header.top").hidden=on;document.getElementById("navb").hidden=on;document.getElementById("main").hidden=on}
 function gateTitle(){return'<div style="text-align:center;margin:8px 0 18px"><h1 style="margin:0">เข้าสู่ระบบร้านค้า</h1><p class="hint2" style="margin:4px 0 0">สมาคมวิทยากรฝึกอาชีพคนตาบอด</p></div>'}
 function regForm(loggedIn){var cs=G.cats||[];
  return '<div class="card form"><b>ลงทะเบียนร้านนวดใหม่</b><p class="hint2" style="margin:0">กรอกข้อมูลร้าน แล้วรอแอดมินอนุมัติ ค่า GP และเครดิตวงเงินแอดมินเป็นผู้กำหนดตอนอนุมัติ</p>'+field("rn","ชื่อร้าน","text",'value="'+esc(G.f&&G.f.n||"")+'"')+
@@ -203,7 +207,17 @@ document.addEventListener("click",function(e){var el=e.target.closest&&e.target.
   .catch(function(e){G.busy=false;G.err=errTh(e,"ส่งคำขอไม่สำเร็จ");gRender()});return}
 });
 
-var DAYN=["อา","จ","อ","พ","พฤ","ศ","ส"],TABS=[["q","คิวงาน"],["svc","เพิ่มบริการ"],["staff","เพิ่มพนักงาน"],["promo","โปรโมชั่น"],["wal","กระเป๋าเงินระบบ"],["nt","การแจ้งเตือน"],["set","ตั้งค่าร้าน"]];
+var DAYN=["อา","จ","อ","พ","พฤ","ศ","ส"],TABS=[["q","หน้าหลัก","🏠"],["wal","กระเป๋าเงิน","💰"],["nt","การแจ้งเตือน","🔔"],["mg","จัดการร้าน","⚙️"]],MGS=[["svc","เพิ่มบริการ"],["staff","เพิ่มพนักงาน"],["promo","โปรโมชั่น"],["set","ตั้งค่าร้าน"],["ct","ติดต่อเรา"]];
+function inMg(t){return MGS.some(function(x){return x[0]===t})}
+function mgBar(){return '<div class="nf" role="tablist" aria-label="หมวดจัดการร้าน">'+MGS.map(function(x){var on=x[0]===S.tab;return'<button type="button" role="tab" data-a="tab" data-id="'+x[0]+'" class="'+(on?"on":"")+'" aria-selected="'+on+'">'+x[1]+'</button>'}).join("")+'</div>'}
+function okUrl(u){return /^https?:\/\//i.test(u||"")}
+function ctView(){var c=CT,tel=String(c.phone||"").replace(/[^0-9+]/g,""),h='<div class="head"><h1>ติดต่อเรา</h1></div>';
+ h+='<div class="ctc"><b>'+esc(c.name||"สมาคมวิทยากรฝึกอาชีพคนตาบอด")+'</b>'+(c.addr?'<p>'+esc(c.addr)+'</p>':"")+'</div>';
+ if(tel)h+='<a class="cta" href="tel:'+tel+'" aria-label="โทรหาสมาคม '+esc(c.phone)+'"><span aria-hidden="true">📞</span><div>โทรหาสมาคม<small>'+esc(c.phone)+'</small></div></a>';
+ if(okUrl(c.line))h+='<a class="cta line" href="'+esc(c.line)+'" target="_blank" rel="noopener" aria-label="แชตกับสมาคมทาง LINE"><span aria-hidden="true">💬</span><div>แชตทาง LINE<small>เปิดแชตกับสมาคม</small></div></a>';
+ if(c.hours)h+='<div class="ctc"><b>เวลาทำการ</b><span class="hr">'+esc(c.hours)+'</span></div>';
+ if(!tel&&!okUrl(c.line)&&!c.hours)h+='<div class="empty">สมาคมยังไม่ได้ตั้งค่าช่องทางติดต่อ</div>';
+ return h}
 function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function addD(n){var d=new Date();d.setDate(d.getDate()+n);return iso(d)}
 function hh(m){return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0")}
@@ -244,8 +258,8 @@ function listPromo(){return '<div class="head"><h1>โปรโมชั่น�
 function fmtAt(a){var d=new Date(a);return d.toLocaleDateString("th-TH",{day:"numeric",month:"short"})+" "+d.toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"})+" น."}
 function ntAt(a){var d=new Date(a);return d.toLocaleDateString("th-TH",{day:"numeric",month:"short"})+" "+d.toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"})+" น."}
 function listNt(){var L=feed(),n=S.ntNew||[],f=S.ntf||"all",F=f==="all"?L:L.filter(function(x){return x.from===f}),cnt=function(k){return L.filter(function(x){return x.from===k}).length};
- return '<div class="head"><h1>การแจ้งเตือน</h1></div><p class="hint2">ข้อความจากสมาคม (ประกาศ เครดิตวงเงิน) จากผู้ใช้งานเมื่อมีการจอง ยกเลิก หรือเลื่อนคิว จากพนักงานเมื่อกดรับงาน เริ่มงาน หรือเสร็จสิ้นงาน และจากระบบเมื่อยอดกระเป๋าเงินต่ำหรือร้านถูกปิด/เปิดอัตโนมัติ</p><div class="nf" role="group" aria-label="กรองการแจ้งเตือน">'+[["all","ทั้งหมด ("+L.length+")"],["admin","จากสมาคม ("+cnt("admin")+")"],["user","จากผู้ใช้งาน ("+cnt("user")+")"],["staff","จากพนักงาน ("+cnt("staff")+")"],["sys","จากระบบ ("+cnt("sys")+")"]].map(function(x){return '<button data-a="ntf" data-id="'+x[0]+'" class="'+(f===x[0]?"on":"")+'" aria-pressed="'+(f===x[0])+'">'+x[1]+'</button>'}).join("")+'</div>'+
- (F.length?F.map(function(x){return '<div class="nti"><div class="qh"><b>'+esc(x.title)+'</b><span class="tag'+(x.from==="admin"?"":x.from==="staff"||x.from==="sys"?" s":" w")+'">'+(x.from==="admin"?"สมาคม":x.from==="staff"?"พนักงาน":x.from==="sys"?"ระบบ":"ผู้ใช้งาน")+'</span>'+(n.indexOf(x.id)>-1?'<span class="tag w">ใหม่</span>':'')+'</div><small>'+ntAt(x.at)+'</small><pre>'+esc(x.text)+'</pre></div>'}).join(""):'<div class="empty">ยังไม่มีการแจ้งเตือน</div>')}
+ return '<div class="head"><h1>การแจ้งเตือน</h1></div><p class="hint2">ข้อความจากสมาคมและระบบ (ประกาศ เครดิตวงเงิน ยอดกระเป๋าเงินต่ำ ร้านถูกปิด/เปิดอัตโนมัติ) จากผู้ใช้งานเมื่อมีการจอง ยกเลิก หรือเลื่อนคิว จากพนักงานเมื่อกดรับงาน เริ่มงาน หรือเสร็จสิ้นงาน</p><div class="nf" role="group" aria-label="กรองการแจ้งเตือน">'+[["all","ทั้งหมด ("+L.length+")"],["admin","จากสมาคม ("+cnt("admin")+")"],["user","จากผู้ใช้งาน ("+cnt("user")+")"],["staff","จากพนักงาน ("+cnt("staff")+")"]].map(function(x){return '<button data-a="ntf" data-id="'+x[0]+'" class="'+(f===x[0]?"on":"")+'" aria-pressed="'+(f===x[0])+'">'+x[1]+'</button>'}).join("")+'</div>'+
+ (F.length?F.map(function(x){return '<div class="nti"><div class="qh"><b>'+esc(x.title)+'</b><span class="tag'+(x.from==="admin"?"":x.from==="staff"?" s":" w")+'">'+(x.from==="admin"?"สมาคม":x.from==="staff"?"พนักงาน":"ผู้ใช้งาน")+'</span>'+(n.indexOf(x.id)>-1?'<span class="tag w">ใหม่</span>':'')+'</div><small>'+ntAt(x.at)+'</small><pre>'+esc(x.text)+'</pre></div>'}).join(""):'<div class="empty">ยังไม่มีการแจ้งเตือน</div>')}
 function crc16(s){var c=0xFFFF;for(var i=0;i<s.length;i++){c^=s.charCodeAt(i)<<8;for(var j=0;j<8;j++)c=(c&0x8000)?((c<<1)^0x1021):(c<<1);c&=0xFFFF}return c.toString(16).toUpperCase().padStart(4,"0")}
 function tlv(t,v){return t+String(v.length).padStart(2,"0")+v}
 function ppPayload(type,id,amt){id=String(id).replace(/[-\s]/g,"");var acc=type==="mobile"?tlv("01","0066"+id.replace(/^0/,"")):type==="ewallet"?tlv("03",id):tlv("02",id);
@@ -275,11 +289,12 @@ function walView(){
 function view(){var t=S.tab,f=S.form&&S.form.t===t;
  if(t==="nt")return listNt();
  if(t==="q")return qView();
- if(t==="svc")return '<div class="head"><h1>เพิ่มบริการ</h1>'+addBtn("svc")+'</div>'+(f?svcForm():listSvc());
- if(t==="staff")return '<div class="head"><h1>เพิ่มพนักงาน</h1>'+addBtn("staff")+'</div>'+(f?staffForm():listStaff());
- if(t==="promo")return '<div class="head"><h1>โปรโมชั่น</h1>'+addBtn("promo")+'</div>'+(f?promoForm():listPromo());
+ if(t==="ct")return mgBar()+ctView();
+ if(t==="svc")return mgBar()+'<div class="head"><h1>เพิ่มบริการ</h1>'+addBtn("svc")+'</div>'+(f?svcForm():listSvc());
+ if(t==="staff")return mgBar()+'<div class="head"><h1>เพิ่มพนักงาน</h1>'+addBtn("staff")+'</div>'+(f?staffForm():listStaff());
+ if(t==="promo")return mgBar()+'<div class="head"><h1>โปรโมชั่น</h1>'+addBtn("promo")+'</div>'+(f?promoForm():listPromo());
  if(t==="wal")return walView();
- return setView()}
+ return mgBar()+setView()}
 /* ===== คิวงานของร้าน ===== */
 var H7Q=7*36e5;
 function qDate(ts){return new Date(Date.parse(ts)+H7Q).toISOString().slice(0,10)}
@@ -326,7 +341,7 @@ function setView(){var s=D.shop,o=s.ov||{};
  '<div class="card form"><b>กฎการจองของร้าน</b><p class="hint2" style="margin:0">เว้นว่าง = ใช้ค่าเริ่มต้นของสมาคม (ตัวเลขจางๆ คือค่าเริ่มต้น)</p><div class="two">'+num("r2","จองล่วงหน้า (วัน)",o.adv,DEF.adv)+num("r3","ยกเลิกก่อนนัด (ชม.)",o.cancelH,DEF.cancelH)+'</div></div>'+
  '<div id="err" style="color:var(--bad);margin-bottom:10px"></div><button class="btn w" data-a="setsave">บันทึกการตั้งค่า</button><div style="margin-top:18px"><button class="btn g" data-a="logout">ออกจากระบบ</button></div>'}
 /* ===================== ข้อมูลร้าน (โหลดจาก Supabase) ===================== */
-var D=null,WID=null,CFG={pp:{on:false,none:true},w1:100,w2:50},started=false;
+var D=null,WID=null,CFG={pp:{on:false,none:true},w1:100,w2:50},CT={},started=false;
 var DEF={adv:14,cancelH:24};
 function tmin(t){var p=String(t||"0:0").split(":");return (+p[0])*60+(+p[1]||0)}
 function hm(h){return String(h).padStart(2,"0")+":00"}
@@ -351,12 +366,12 @@ function loadLive0(){var pid=WID;
   r[2].forEach(function(q){if(q.status==="confirmed")return;tx.push({id:q.id,rid:q.id,type:"topup",amt:+q.amount,ref:q.ref,note:"เติมเงินผ่านพร้อมเพย์ (อ้างอิง "+q.ref+")",at:q.created_at,st:q.status==="pending"?"รอยืนยัน":q.status==="rejected"?"ปฏิเสธ":"ยกเลิก",slipPath:q.slip_path||null,slipAt:q.slip_at||null})});
   D.tx=tx;
   var KM={booking:"user",cancel:"user",move:"user",job:"staff",credit:"admin",approval:"admin",wallet:"admin",topup:"admin"};
-  var nt=r[3].map(function(n){return{id:n.id,db:1,from:KM[n.kind]||"sys",title:n.title,text:n.body||"",at:n.created_at}});
+  var nt=r[3].filter(function(n){return n.kind!=="announce"}).map(function(n){return{id:n.id,db:1,from:n.title==="ระบบยกเลิกคิวอัตโนมัติ"?"admin":(KM[n.kind]||"admin"),title:n.title,text:n.body||"",at:n.created_at}});
   r[5].forEach(function(a){if((a.audiences||[]).indexOf("ร้านค้า")>-1)nt.push({id:"an-"+a.id,from:"admin",title:"ประกาศ: "+a.title,text:a.body||"",at:a.created_at||(a.day+"T00:00:00")})});
   D.nt=nt;D.ntRead=r[4].map(function(x){return x.notification_id}).concat(annRead());
-  var s=r[6]&&r[6][0];if(s){CFG.pp=s.promptpay_id?{on:s.promptpay_on!==false,type:s.promptpay_type,id:s.promptpay_id,name:s.promptpay_name}:{on:false,none:true};CFG.w1=+s.wallet_warn1||100;CFG.w2=+s.wallet_warn2||50}})}
+  var s=r[6]&&r[6][0];if(s){CT={name:s.association_name||"",addr:s.address||"",phone:s.phone||"",line:s.line_url||"",hours:s.hours_text||""};CFG.pp=s.promptpay_id?{on:s.promptpay_on!==false,type:s.promptpay_type,id:s.promptpay_id,name:s.promptpay_name}:{on:false,none:true};CFG.w1=+s.wallet_warn1||100;CFG.w2=+s.wallet_warn2||50}})}
 function loadShop(pid){WID=pid;D={shop:null,svc:[],staff:[],promo:[],tx:[],nt:[],ntRead:[],bk:[]};return loadCatalog().then(loadLive)}
-var S={tab:"q",qt:"wait",form:null,del:null,saved:false,wmode:null,werr:"",busy:false,hmsg:""};
+var S={tab:"q",mg:"svc",qt:"wait",form:null,del:null,saved:false,wmode:null,werr:"",busy:false,hmsg:""};
 function balance(){return D.tx.filter(function(t){return t.st==="สำเร็จ"}).reduce(function(a,t){return a+t.amt},0)}
 function owed(){var b=balance();return b<0?-b:0}
 function warnLv(){return[CFG.w1,CFG.w2]}
@@ -379,13 +394,14 @@ function imgPathFor(kind,dataUrl,old){
  var rel=WID+"/"+kind+"-"+stamp()+".jpg";return upObj("place-images",rel,dataUrl).then(function(){return"place-images/"+rel})}
 
 function loginCard(){return'<div class="card form"><b>เบอร์โทรศัพท์เข้าใช้งานระบบ</b><p class="hint2" style="margin:0">เบอร์มือถือที่ใช้เข้าสู่ระบบร้านค้า เปลี่ยนเองไม่ได้ ถ้าต้องการเปลี่ยนเบอร์ให้ติดต่อสมาคม</p><div><label for="lph">เบอร์โทรศัพท์</label><input class="in" id="lph" value="'+esc(WHO.phone)+'" readonly></div><div><label for="lpw">เปลี่ยนรหัสผ่าน (เว้นว่างไว้ถ้าไม่เปลี่ยน)</label><input class="in" id="lpw" type="password" autocomplete="new-password" placeholder="อย่างน้อย 6 ตัวอักษร"></div><p class="hint2" style="margin:0">กดปุ่ม "บันทึกการตั้งค่า" ด้านล่างเพื่อบันทึกรหัสผ่านใหม่</p>'+(S.pwdone?'<div class="saved" role="status">เปลี่ยนรหัสผ่านแล้ว</div>':'')+'</div>'}
+function navDraw(){var cur=inMg(S.tab)?"mg":S.tab;document.getElementById("tabs").innerHTML=TABS.map(function(x){var u=x[0]==="nt"&&S.tab!=="nt"?ntUnread():0;return'<button type="button" data-a="tab" data-id="'+x[0]+'" class="'+(x[0]===cur?"on":"")+'"><span aria-hidden="true">'+x[2]+'</span>'+x[1]+(u?'<i class="bdg" aria-label="ยังไม่ได้อ่าน '+u+' รายการ">'+u+'</i>':'')+'</button>'}).join("")}
 function draw(){drawHeader();
- document.getElementById("tabs").innerHTML=TABS.map(function(x){var u=x[0]==="nt"&&S.tab!=="nt"?ntUnread():0;return '<button data-a="tab" data-id="'+x[0]+'" class="'+(x[0]===S.tab?"on":"")+'">'+x[1]+(u?' <span class="tag w">'+u+'</span>':'')+'</button>'}).join("");
+ navDraw();
  document.getElementById("main").innerHTML=view();
  if(S.tab==="wal"&&S.tpshow){var tq=byId(D.tx,S.tpshow),pq=ppInfo();if(tq&&tq.st==="รอยืนยัน"){if(pq.on)drawQr("qrbox",ppPayload(pq.type,pq.id,tq.amt));var sc=document.getElementById("slipcur");if(sc&&tq.slipPath)loadSlip(tq.slipPath,sc)}}}
 /* รีเฟรชเบื้องหลัง: ไม่ล้างฟอร์มที่กำลังกรอกอยู่ */
 function softDraw(){drawHeader();
- document.getElementById("tabs").innerHTML=TABS.map(function(x){var u=x[0]==="nt"&&S.tab!=="nt"?ntUnread():0;return '<button data-a="tab" data-id="'+x[0]+'" class="'+(x[0]===S.tab?"on":"")+'">'+x[1]+(u?' <span class="tag w">'+u+'</span>':'')+'</button>'}).join("");
+ navDraw();
  var busyForm=S.form||S.wmode||S.slipDraft||S.tab==="set"||S.busy;
  if(!busyForm){document.getElementById("main").innerHTML=view();
   if(S.tab==="wal"&&S.tpshow){var tq=byId(D.tx,S.tpshow),pq=ppInfo();if(tq&&tq.st==="รอยืนยัน"){if(pq.on)drawQr("qrbox",ppPayload(pq.type,pq.id,tq.amt));var sc=document.getElementById("slipcur");if(sc&&tq.slipPath)loadSlip(tq.slipPath,sc)}}}}
@@ -419,7 +435,7 @@ document.addEventListener("click",function(e){
   if(!navigator.geolocation){ps.innerHTML='<p class="hint2" style="color:var(--bad)">อุปกรณ์นี้ไม่รองรับ ใช้การวางลิงก์หรือพิกัดแทน</p>';return}
   ps.innerHTML='<p class="hint2">กำลังหาตำแหน่ง...</p>';
   navigator.geolocation.getCurrentPosition(function(p){setPin(p.coords.latitude.toFixed(6),p.coords.longitude.toFixed(6))},function(){ps.innerHTML='<p class="hint2" style="color:var(--bad)">ใช้ตำแหน่งปัจจุบันไม่ได้ ตรวจสอบสิทธิ์ตำแหน่ง หรือวางลิงก์/พิกัดแทน</p>'},{timeout:10000});return}
- if(a==="tab"){if(id==="nt")openNt();S.tab=id;S.form=null;S.del=null;S.saved=false;S.pwdone=false;S.wmode=null;S.werr="";S.hmsg="";draw();if(id==="wal"||id==="nt"||id==="q")refresh();return}
+ if(a==="tab"){if(id==="mg")id=S.mg;if(inMg(id))S.mg=id;if(id==="nt")openNt();S.tab=id;S.form=null;S.del=null;S.saved=false;S.pwdone=false;S.wmode=null;S.werr="";S.hmsg="";draw();if(id==="wal"||id==="nt"||id==="q")refresh();return}
  if(a==="ntf"){S.ntf=id;draw();return}
  if(a==="qt"){S.qt=id;draw();return}
  if(a==="new"){S.form={t:t,id:null};draw();return}
@@ -489,7 +505,7 @@ document.addEventListener("click",function(e){
    Object.assign(D.shop,{name:nm,desc:body.description,area:body.area,days:days,open:o1,close:c1,lat:pla,lng:plo,adv:body.advance_days,cancelH:body.cancel_hours,ov:{adv:body.advance_days,cancelH:body.cancel_hours}});S.saved=true;S.pwdone=!!npw;window.scrollTo(0,0)});return}
 });
 var pollT=null;
-function startMain(){if(started){draw();return}started=true;S={tab:"q",qt:"wait",form:null,del:null,saved:false,wmode:null,werr:"",busy:false,hmsg:""};draw();
+function startMain(){if(started){draw();return}started=true;S={tab:"q",mg:"svc",qt:"wait",form:null,del:null,saved:false,wmode:null,werr:"",busy:false,hmsg:""};draw();
  pollT=setInterval(function(){if(!document.hidden)refresh()},30000);
  document.addEventListener("visibilitychange",function(){if(!document.hidden)refresh()})}
 /* ---------- เริ่มทำงาน ---------- */
