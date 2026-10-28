@@ -20,7 +20,7 @@ if("serviceWorker" in navigator)navigator.serviceWorker.addEventListener("messag
 /* ---------- ปุ่มเปิด/ปิด ---------- */
 function mkPill(){if(pill)return;pill=document.createElement("button");pill.type="button";pill.id="pushpill";pill.style.cssText="position:fixed;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 74px);z-index:60;font:inherit;font-size:.85rem;font-weight:700;border-radius:99px;padding:8px 14px;border:2px solid #1f6f5c;background:#1f6f5c;color:#fff;box-shadow:0 3px 12px rgba(0,0,0,.25);cursor:pointer;max-width:80vw";pill.onclick=onPill;document.body.appendChild(pill)}
 function paint(){if(!pill)return;var label="",bg="#1f6f5c",fg="#fff";
- if(state==="hidden"){pill.style.display="none";return}pill.style.display="";
+ if(state==="hidden"||(state==="on"&&!busy&&!msg)){pill.style.display="none";return}pill.style.display="";
  if(state==="off")label="🔔 เปิดแจ้งเตือนนอกหน้าจอ";
  else if(state==="on"){label="🔔 แจ้งเตือนนอกหน้าจอ: เปิดอยู่";bg="#fff";fg="#1f6f5c"}
  else if(state==="denied"){label="🔕 แจ้งเตือนถูกบล็อก";bg="#b3402a"}
@@ -52,15 +52,10 @@ function enable(){
      navigator.serviceWorker.ready.then(function(rg){rg.showNotification("เปิดแจ้งเตือนแล้ว",{body:"ต่อไปนี้จะมีเสียงเตือนเมื่อมีรายการใหม่ แม้ปิดหน้านี้อยู่",icon:"icon-192.png",tag:"welcome"})}).catch(function(){})})})})
  }).catch(function(e){busy=false;var m=String(e&&e.message||"");
   say(m==="NOKEY"?"ผู้ดูแลยังไม่ได้ตั้งค่ากุญแจแจ้งเตือน (VAPID) ในระบบ":m==="NET"?"เชื่อมต่อไม่ได้ ลองใหม่":/register_push|schema cache|does not exist/i.test(m)?"ฐานข้อมูลยังไม่ได้รัน SQL ชุดที่ 6":"เปิดแจ้งเตือนไม่สำเร็จ: "+m,9000)})}
-function disable(){
- busy=true;paint();
- return navigator.serviceWorker.getRegistration("sw.js").then(function(r){return r&&r.pushManager.getSubscription()}).then(function(sub){
-  if(!sub)return;var ep=sub.endpoint;return C.api("/rest/v1/rpc/unregister_push",{method:"POST",json:1,body:JSON.stringify({p_endpoint:ep})}).catch(function(){}).then(function(){return sub.unsubscribe()})
- }).then(function(){busy=false;state="off";say("ปิดแจ้งเตือนนอกหน้าจอแล้ว")},function(){busy=false;refreshState()})}
 function onPill(){unlock();if(busy)return;
  if(state==="ios"){say("iPhone: กดปุ่มแชร์ แล้วเลือก \"เพิ่มลงในหน้าจอโฮม\" เปิดแอปจากไอคอนนั้น แล้วกดปุ่มนี้อีกครั้ง",12000);return}
  if(state==="denied"){say("เปิดสิทธิ์แจ้งเตือนของเว็บนี้ในตั้งค่าเบราว์เซอร์ แล้วโหลดหน้าใหม่",10000);return}
- if(state==="off")enable();else if(state==="on"){if(pill.dataset.ask==="1"){pill.dataset.ask="";disable()}else{pill.dataset.ask="1";say("กดอีกครั้งเพื่อปิดแจ้งเตือนนอกหน้าจอ",4000);setTimeout(function(){if(pill)pill.dataset.ask=""},4000)}}}
+ if(state==="off")enable()}
 window.Push={
  attach:function(cfg){C=cfg;mkPill();refreshState();var tick=0,had=false;setInterval(function(){tick++;var has=!!(C.uid&&C.uid());if(has!==had||(has&&tick%6===0)){had=has;refreshState()}},1000);document.addEventListener("visibilitychange",function(){if(!document.hidden)refreshState()})},
  beep:beep,
