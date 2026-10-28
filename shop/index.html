@@ -409,7 +409,6 @@ function showErr(m){var x=document.getElementById("err");if(x&&(S.form||S.tab===
 function act(fn,onOk){if(S.busy)return;S.busy=true;S.hmsg="";
  fn().then(function(){S.busy=false;if(onOk)onOk();draw()},function(e){S.busy=false;if(e&&e.status===401){doLogout();return}showErr(errTh(e,"ทำรายการไม่สำเร็จ"))})}
 function patch(tbl,id,body){return sbApi("/rest/v1/"+tbl+"?id=eq."+id,{method:"PATCH",json:1,headers:{Prefer:"return=minimal"},body:JSON.stringify(body)})}
-function reloadAll(){return loadCatalog().then(loadLive)}
 document.addEventListener("click",function(e){
  var el=e.target.closest("[data-a]");if(!el||!D)return;
  var a=el.dataset.a,id=el.dataset.id,t=el.dataset.t,g=function(i){return document.getElementById(i)},L=({svc:D.svc,staff:D.staff,promo:D.promo})[t];

@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700&display=swap">
 <style>
-:root{--bg:#eef3f0;--card:#fff;--ink:#1c2b27;--mute:#64766f;--line:#d5e0db;--main:#1f6f5c;--main-ink:#fff;--soft:#dcefe8;--off:#e8ecea;--bad:#b3402a;
+:root{--tb:62px;--bg:#eef3f0;--card:#fff;--ink:#1c2b27;--mute:#64766f;--line:#d5e0db;--main:#1f6f5c;--main-ink:#fff;--soft:#dcefe8;--off:#e8ecea;--bad:#b3402a;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101a17;--card:#192823;--ink:#e6f0ec;--mute:#93a8a0;--line:#2b3f38;--main:#4cc2a1;--main-ink:#07211a;--soft:#1e3a31;--off:#223530;--bad:#f0907c}}
 :root[data-theme="dark"]{--bg:#101a17;--card:#192823;--ink:#e6f0ec;--mute:#93a8a0;--line:#2b3f38;--main:#4cc2a1;--main-ink:#07211a;--soft:#1e3a31;--off:#223530;--bad:#f0907c}
 *,*::before,*::after{box-sizing:inherit}
@@ -19,7 +19,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans Thai"
 .top{max-width:480px;margin:0 auto;padding:14px 16px 0;display:flex;align-items:center;gap:12px}
 .logo{width:44px;height:44px;flex:none;border-radius:50%;background:#fff}
 .brand{font-weight:700;font-size:1.05rem;line-height:1.3}
-.app{max-width:480px;margin:0 auto;padding:12px 16px 100px}
+.app{max-width:480px;margin:0 auto;padding:12px 16px 170px}
 h1{font-size:1.4rem;margin:8px 0 4px}
 .sub{color:var(--mute);margin:0 0 14px;font-size:.95rem}
 .list{display:grid;gap:10px}
@@ -56,9 +56,9 @@ h1{font-size:1.4rem;margin:8px 0 4px}
 .card2{margin:0 0 12px}
 .inbtns{display:flex;gap:10px;margin-top:16px}.inbtns .btn{margin:0}
 .mbtns a.btn{flex:1;margin:0;padding:10px;text-align:center;text-decoration:none;display:block}
-.mn{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 14px}.ct{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:14px;margin:0 0 12px}.ct b{display:block;font-size:1.1rem}.ct p{margin:4px 0 0;color:var(--mute);white-space:pre-line}.ct .hr{display:block;white-space:pre-line;margin-top:6px}a.cta{display:flex;align-items:center;gap:12px;text-decoration:none;font-weight:700;background:var(--main);color:var(--main-ink);border:2px solid var(--main);border-radius:12px;padding:16px;margin:0 0 10px}a.cta.line{background:#06c755;border-color:#06c755;color:#fff}a.cta.reg{background:transparent;color:var(--main)}a.cta span{font-size:1.6rem}a.cta small{display:block;font-weight:400;opacity:.9}a.cta:focus-visible{outline:3px solid var(--main);outline-offset:2px}
-.mn button{position:relative;font:inherit;color:var(--ink);background:var(--card);border:2px solid var(--line);border-radius:14px;padding:12px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
-.mn button span{font-size:1.5rem}.mn button b{font-weight:700}.mn button:focus-visible{outline:3px solid var(--main);outline-offset:2px}
+.ct{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:14px;margin:0 0 12px}.ct b{display:block;font-size:1.1rem}.ct p{margin:4px 0 0;color:var(--mute);white-space:pre-line}.ct .hr{display:block;white-space:pre-line;margin-top:6px}a.cta{display:flex;align-items:center;gap:12px;text-decoration:none;font-weight:700;background:var(--main);color:var(--main-ink);border:2px solid var(--main);border-radius:12px;padding:16px;margin:0 0 10px}a.cta.line{background:#06c755;border-color:#06c755;color:#fff}a.cta.reg{background:transparent;color:var(--main)}a.cta span{font-size:1.6rem}a.cta small{display:block;font-weight:400;opacity:.9}a.cta:focus-visible{outline:3px solid var(--main);outline-offset:2px}
+
+
 .bdg{position:absolute;top:6px;right:8px;min-width:22px;height:22px;border-radius:99px;background:#d64545;color:#fff;font-style:normal;font-size:.8rem;display:grid;place-items:center;padding:0 6px}.bdg.b2{background:var(--main);color:var(--main-ink)}
 .bk{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px}.bk small{display:block;color:var(--mute)}.bk .qh{margin-bottom:2px}
 .mbtns{display:flex;gap:8px;margin-top:10px}.mbtns .btn{flex:1;margin:0;padding:10px}
@@ -76,7 +76,8 @@ h1{font-size:1.4rem;margin:8px 0 4px}
 .ann{background:var(--soft);border-radius:12px;padding:10px 14px;margin-bottom:10px;font-size:.92rem}
 
 .hint{font-size:.9rem;color:var(--mute);margin:10px 0 0}
-.bar{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px))}
+.bar{position:fixed;left:0;right:0;bottom:calc(var(--tb) + 2px + env(safe-area-inset-bottom,0px));background:var(--bg);border-top:1px solid var(--line);padding:12px 16px}
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--card);border-top:2px solid var(--line);padding:0 0 env(safe-area-inset-bottom,0px)}.tabs div{max-width:480px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}.tabs button{position:relative;font:inherit;background:none;border:0;color:var(--mute);height:var(--tb);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;padding:0}.tabs button span{font-size:1.45rem;line-height:1}.tabs button b{font-size:.8rem;font-weight:700}.tabs button.on{color:var(--main)}.tabs button.on b{text-decoration:underline;text-underline-offset:3px}.tabs button:focus-visible{outline:3px solid var(--main);outline-offset:-3px}.tabs .bdg{position:absolute;top:6px;left:calc(50% + 8px);margin:0}
 .bar div{max-width:480px;margin:0 auto;display:flex;gap:10px}
 .btn{font:inherit;font-weight:700;border-radius:12px;padding:14px;border:2px solid var(--main);cursor:pointer;flex:1;background:var(--main);color:var(--main-ink)}
 .btn.ghost{background:transparent;color:var(--main);flex:0 0 36%}
@@ -85,7 +86,7 @@ h1{font-size:1.4rem;margin:8px 0 4px}
 .done .ico{width:84px;height:84px;font-size:2.6rem;margin:0 auto 12px}
 .ref{font-weight:700;letter-spacing:.06em}
 .prof{display:flex;align-items:center;gap:10px;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:10px}.prof .pi{flex:1;min-width:0;display:flex;flex-direction:column}.prof .pi b,.prof .pi small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.prof small{color:var(--mute)}
-.av{width:44px;height:44px;flex:none;border-radius:50%;object-fit:cover;background:var(--soft);color:var(--main);display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:1.2rem}.avc{position:relative;cursor:pointer;display:inline-flex;flex:none}.avc i{position:absolute;right:-3px;bottom:-3px;width:22px;height:22px;border-radius:50%;background:var(--main);color:#fff;font-style:normal;font-size:.7rem;display:flex;align-items:center;justify-content:center;border:2px solid var(--card)}.chg{color:var(--main);font-size:.9rem;font-weight:700;text-decoration:underline;cursor:pointer;margin-top:2px}.chg:focus-within,.prof:focus-within .chg{outline:3px solid var(--main);outline-offset:2px}.pmsg{color:var(--main)}
+.av{width:44px;height:44px;flex:none;border-radius:50%;object-fit:cover;background:var(--soft);color:var(--main);display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:1.2rem}.chg{color:var(--main);font-size:.9rem;font-weight:700;text-decoration:underline;cursor:pointer;margin-top:2px}.chg:focus-within,.prof:focus-within .chg{outline:3px solid var(--main);outline-offset:2px}.pmsg{color:var(--main)}
 .av.big{width:84px;height:84px;font-size:2rem}
 .avrow{display:flex;align-items:center;gap:14px;margin:0 0 12px}.avbtn{display:inline-block;cursor:pointer}.vh{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}.vh:focus-visible+*,.avrow:focus-within .avbtn{outline:3px solid var(--main);outline-offset:2px}
 .fld{display:block;margin:0 0 10px}.fld span{display:block;margin-bottom:4px;font-weight:600}
@@ -101,16 +102,16 @@ h1{font-size:1.4rem;margin:8px 0 4px}
 </header>
 <main class="app" id="app"></main>
 <div class="bar" id="bar"></div>
+<div class="tabs" id="tabs" style="display:none"></div>
 <script>
 /* ข้อมูลร้าน บริการ พนักงาน โปรโมชั่น ประกาศ มาจากฐานข้อมูล Supabase หลังเข้าสู่ระบบ (ดู loadCatalog) ค่าด้านล่างเป็นค่าเริ่มต้นก่อนโหลด */
 var SET={defShop:{dur:60,adv:14,cancelH:24,radius:10,notifyNew:1,notifyPromo:1,notifyRadius:5,remind:[120],staffRemind:[30]},defOrg:{dur:60,adv:14,cancelH:24,radius:1,notifyOn:1,notifyComp:1,notifyRadius:3,openAt:480,preOpen:[60],remind:[120],staffRemind:[30]},nUser:1,nStaff:1};
 function rmTxt(a){var s=a.slice().sort(function(x,y){return y-x}),pos=s.filter(function(m){return m>0}).map(function(m){return m<60?m+" นาที":(m/60)+" ชั่วโมง"}),r=pos.length?"ก่อนนัด "+pos.join(" และ "):"";if(s.indexOf(0)>-1)r+=(r?" และ ":"")+"เมื่อถึงเวลานัด";return r}
 var ANN=[];
-function dAdd(n){var d=new Date();d.setDate(d.getDate()+n);return iso(d)}
 var PROMOS=[];
 var CENTRAL=[];
 var SVC=[];
-var ALL=[0,1,2,3,4,5,6],MS=[1,2,3,4,5,6];
+
 var PLACES=[];
 /* บริการของร้านค้าแยกเป็นของแต่ละร้าน (เริ่มจากค่าตั้งต้น ไม่ผูกกับบริการของแอดมิน) ส่วนหน่วยงานและบริษัทใช้บริการกลางของแอดมิน */
 var SHOPSVC={};
@@ -128,7 +129,6 @@ function fresh(){return{qty:{},sim:true,asg:{},svcs:[],phone:(typeof ME!=="undef
 var app=document.getElementById("app"),bar=document.getElementById("bar");
 function load(k){try{return JSON.parse(localStorage.getItem(k)||"[]")}catch(e){return[]}}
 function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
-function hash(s){var h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))|0;return Math.abs(h)}
 function k(st,d,m){return st+"|"+d+"|"+m}
 function find(a,id){return a.filter(function(x){return x.id===id})[0]}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
@@ -136,7 +136,7 @@ function cv(p,key){var o=p.ov||{};return o[key]!=null?o[key]:(p.type==="org"?SET
 function actSvcs(p){return svcList(p).filter(function(v){return v.on&&(p.type==="org"?p.staff.some(function(i){var c=find(CENTRAL,i);return c&&c.on&&(c.svcs||[]).indexOf(v.id)>-1}):p.staff.some(function(c){return c.on&&(c.svcs||[]).indexOf(v.id)>-1}))})}
 function fixedDate(p){return p.type==="org"&&!p.comp}
 function dowOf(s){var q=s.split("-");return new Date(+q[0],+q[1]-1,+q[2]).getDay()}
-var ORG0=null,ADM_SHOP={};
+
 function syncAdmin(){} /* ข้อมูลมาจากฐานข้อมูลแล้ว ไม่ซิงก์จากหน้าแอดมินในเครื่องอีก */
 function orgOpenAt(p){var q=p.sdate.split("-"),d=new Date(+q[0],+q[1]-1,+q[2]-cv(p,"adv")),m=cv(p,"openAt");d.setHours(Math.floor(m/60),m%60,0,0);return d}
 function placeState(p){
@@ -184,7 +184,6 @@ function calc(){var shop=S.place.type==="shop",n=1,sub=S.svcs.reduce(function(a,
 function shD(s){var p=s.split("-");return new Date(+p[0],+p[1]-1,+p[2]).toLocaleDateString("th-TH",{day:"numeric",month:"short"})}
 function promoLine(m){return (m.img?'<span class="pr"><img loading="lazy" decoding="async" src="'+m.img+'" alt=""><span>':'')+'<small>'+esc(m.title)+' · '+(m.type==="percent"?"ลด "+m.value+"%":"ลด "+baht(m.value))+' · '+(m.all?"ทุกบริการ":m.svcs.map(function(i){var v=svcOf(S.place,i);return v?v.name:""}).join(", "))+' · ถึง '+shD(m.end)+'</small>'+(m.img?'</span></span>':'')}
 function mapBtn(b){var pl=bkPlace(b);if(!pl||pl.type!=="shop")return"";var q=pos(pl);return '<a class="btn ghost mapb" href="https://www.google.com/maps/search/?api=1&amp;query='+q.lat.toFixed(6)+','+q.lng.toFixed(6)+'" target="_blank" rel="noopener">📍 แผนที่</a>'}
-function mix(n){n=Math.imul(n^(n>>>16),0x45d9f3b);n=Math.imul(n^(n>>>16),0x45d9f3b);return(n^(n>>>16))>>>0}
 function past(d,m){var n=new Date();return d===iso(n)&&m<=n.getHours()*60+n.getMinutes()}
 function slotOk(d,m){return !past(d,m)&&!(S.svc&&lunchHit(S.place,m,S.svc.min))&&assignable(d,m)}
 function stepM(){return 30} /* เวลาเริ่มเลือกได้ทุก 30 นาที ทั้งร้านค้าและหน่วยงาน */
@@ -205,7 +204,6 @@ function placeBtn(p){var st=placeState(p);return '<button class="opt" data-pl="'
 /* ---------- รายการจอง / แจ้งเตือน / ยกเลิก / เลื่อนคิว ---------- */
 function allBk(){return BK.map(function(b){b.min=b.min||60;b.staff=b.staff||[];return b})}
 function findBk(ref){return allBk().filter(function(b){return b.ref===ref})[0]}
-function bkKeys(b,date,time){var r=[],d=date||b.date,t=time==null?b.time:time;if(b.asg){b.asg.forEach(function(a){for(var i=0;i<Math.ceil(a.min/30);i++)r.push(k(a.staff,d,t+a.off+i*30))})}else{var u=Math.ceil(b.min/30);(b.staff||[]).forEach(function(id){for(var i=0;i<u;i++)r.push(k(id,d,t+i*30))})}return r}
 function apptStart(b){var p=b.date.split("-");return new Date(+p[0],+p[1]-1,+p[2],Math.floor(b.time/60),b.time%60)}
 function apptEnd(b){return new Date(apptStart(b).getTime()+b.min*60000)}
 function bkPlace(b){return find(PLACES,b.place)}
@@ -217,36 +215,17 @@ function canChange(b){var pl=bkPlace(b),h=pl?cv(pl,"cancelH"):(b.cancelH!=null?b
 function jobsDone(b){var j=b.jobs||{},ks=Object.keys(j);return ks.length>0&&ks.every(function(x){return j[x]==="นวดเสร็จ"})}
 function isUp(b){return b.status!=="ยกเลิก"&&b.status!=="เลื่อนแล้ว"&&!jobsDone(b)&&apptEnd(b)>new Date()}
 function bkStatus(b){if(b.status==="ยกเลิก")return["ยกเลิกแล้ว","b"];if(b.status==="เลื่อนแล้ว")return["เลื่อนแล้ว","o"];if(jobsDone(b))return["เสร็จสิ้น","o"];var v=Object.keys(b.jobs||{}).map(function(x){return b.jobs[x]});if(v.indexOf("กำลังนวด")>-1)return["กำลังนวด",""];if(v.indexOf("รับงานแล้ว")>-1)return["พนักงานรับงานแล้ว",""];if(apptEnd(b)<=new Date())return["ผ่านไปแล้ว","o"];return["รอพนักงานรับงาน",""]}
-function pushNote(n){try{var a=load("notifications");n.at=new Date().toISOString();a.push(n);localStorage.setItem("notifications",JSON.stringify(a))}catch(e){}}
 function userNotes(){var loc=load("notifications").filter(function(n){return n.kind==="user"&&n.auto});return NOTES.concat(loc).sort(function(a,b){return a.at<b.at?1:-1})}
 function seenAt(){try{return localStorage.getItem("notifSeen")||""}catch(e){return""}}
 function unread(){var s=seenAt();return userNotes().filter(function(n){return n.at>s}).length}
 function remindLine(pl,key,pre){var a=pl?(cv(pl,key)||[]):[];return a.length?pre+rmTxt(a):""}
-function pushShop(place,kind,title,text,ref,extra){try{if(!place||place.type!=="shop")return;var a=JSON.parse(localStorage.getItem("shopInbox")||"[]");a.push(Object.assign({},extra||{},{id:"si"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),place:place.id,kind:kind,title:title,text:text,ref:ref||"",at:new Date().toISOString()}));localStorage.setItem("shopInbox",JSON.stringify(a))}catch(e){}}
 function doCancel(ref){var b=findBk(ref);if(!b||b.status==="ยกเลิก"||b.status==="เลื่อนแล้ว"||!canChange(b).ok)return Promise.resolve(null);
  return sbApi("/rest/v1/rpc/cancel_booking",{method:"POST",json:1,body:JSON.stringify({p_ref:ref})}).then(function(){return loadBookings()}).then(function(){return"ok"})}
 function startResched(ref){var b=findBk(ref);if(!b||!canChange(b).ok||b.status==="ยกเลิก"||b.status==="เลื่อนแล้ว")return;var pl=bkPlace(b);
  V.moving=ref;V.moveKeys=[];V.moveItems=(b.asg||[]).map(function(a){return{staff:a.staff,s:bkTs(b.date,b.time+a.off),e:bkTs(b.date,b.time+a.off+a.min)}});V.cfm=null;V.flash="";if(pl)V.kind=pl.type;S=fresh();render()}
 function mvBanner(full){if(!V.moving)return"";var o=findBk(V.moving);if(!o)return"";var pl=bkPlace(o);
  return '<div class="mv"><b>🔁 กำลังเลื่อนคิว เลขที่ '+o.ref+'</b>'+(full?'<br>นัดเดิม: '+esc(pl?pl.name:(o.placeName||""))+' · '+bkWhen(o)+'<br>เลือกร้านค้าหรือหน่วยงานใหม่ตั้งแต่ต้น นัดเดิมยังอยู่จนกว่าคุณจะยืนยันนัดใหม่':'')+'<button class="lb" data-mv="cancel">ยกเลิกการเลื่อน</button></div>'}
-function remTxt(m){var h=Math.floor(m/60),r=m%60;return h<1?m+" นาที":h+" ชั่วโมง"+(r?" "+r+" นาที":"")}
 function openMoment(d,adv,m){var O=new Date(d.getFullYear(),d.getMonth(),d.getDate()-adv);O.setHours(Math.floor(m/60),m%60,0,0);return O}
-function compNextOpen(p){var now=new Date(),adv=cv(p,"adv"),m=cv(p,"openAt");for(var i=0;i<=adv+7;i++){var D=new Date(now.getFullYear(),now.getMonth(),now.getDate()+i);if(p.days.indexOf(D.getDay())<0)continue;var O=openMoment(D,adv,m);if(O>now)return{date:iso(D),open:O}}return null}
-function nextOpenOf(p){return p.comp?compNextOpen(p):(p.sdate&&p.sdate>=iso(new Date())?{date:p.sdate,open:orgOpenAt(p)}:null)}
-function preOpenCheck(){try{var cfg=SET.defOrg;if(!cfg.notifyOn||!SET.nUser)return;var now=new Date(),loc=V.loc||BASE,seen=JSON.parse(localStorage.getItem("preSeen")||"[]");
- PLACES.forEach(function(p){if(p.type!=="org"||(p.comp&&!cfg.notifyComp)||!p.on||p.adminOn===0||!actSvcs(p).length||(p.lat==null&&p.km==null)||(p.comp&&placeState(p)))return;
-  var nx=nextOpenOf(p);if(!nx)return;var O=nx.open;if(now>=O)return;var d=hav(loc,pos(p));if(d>cfg.notifyRadius)return;
-  var ap=(cfg.preOpen||[]).filter(function(L){return[60,120,180].indexOf(L)>-1&&now>=new Date(O.getTime()-L*60000)}).sort(function(a,b){return a-b});if(!ap.length)return;
-  var keys=ap.map(function(L){return p.id+"|"+nx.date+"|"+L});if(keys.every(function(k){return seen.indexOf(k)>-1}))return;
-  keys.forEach(function(k){if(seen.indexOf(k)<0)seen.push(k)});
-  pushNote({kind:"user",place:p.id,auto:true,title:"ใกล้เปิดรับจองบริการ",to:"แจ้งเตือนอัตโนมัติ",text:p.name+" จะเปิดรับจองบริการวันที่ "+thDate(nx.date)+" ในอีก "+remTxt(Math.max(1,Math.round((O-now)/60000)))+" (เปิดจอง "+shD(iso(O))+" เวลา "+hh(cv(p,"openAt"))+")\nอยู่ห่างจากคุณ "+d.toFixed(1)+" กม. ("+(V.loc?"คำนวณจากตำแหน่งของคุณ":"คำนวณจากตำแหน่งตัวอย่าง")+")",ref:""})});
- localStorage.setItem("preSeen",JSON.stringify(seen.slice(-200)))}catch(e){}}
-function nearEventsCheck(){try{var cfg=SET.defShop,loc=V.loc||BASE,now=Date.now(),seen=JSON.parse(localStorage.getItem("evSeen")||"[]"),ev=JSON.parse(localStorage.getItem("nearEvents")||"[]"),out=[];
- ev.forEach(function(e){if(seen.indexOf(e.id)>-1||now-new Date(e.at).getTime()>48*3600000)return;if(e.type==="newshop"&&!cfg.notifyNew)return;if(e.type==="promo"&&!cfg.notifyPromo)return;
-  var q=find(PLACES,e.place||ADM_SHOP[e.shop]||"s-"+e.shop),pt=q&&(q.lat!=null||q.km!=null)?pos(q):(e.lat!=null&&e.lng!=null?{lat:e.lat,lng:e.lng}:null);if(!pt)return;var d=hav(loc,pt);if(d>cfg.notifyRadius)return;out.push({e:e,d:d,q:q})});
- out.sort(function(a,b){return a.d-b.d}).slice(0,3).forEach(function(x){var e=x.e,basis="\n("+(V.loc?"คำนวณจากตำแหน่งของคุณ":"คำนวณจากตำแหน่งตัวอย่าง")+")";seen.push(e.id);
-  pushNote(e.type==="newshop"?{kind:"user",place:x.q?x.q.id:"",auto:true,title:"มีร้านนวดใหม่ในระบบ",to:"แจ้งเตือนอัตโนมัติ",text:e.name+" เพิ่งเข้าร่วมระบบ อยู่ห่างจากคุณ "+x.d.toFixed(1)+" กม."+(x.q&&placeState(x.q)?"\nร้านกำลังเตรียมเปิดรับจอง":"")+basis,ref:""}:{kind:"user",place:x.q?x.q.id:"",auto:true,title:"ร้านนวดใกล้คุณเพิ่มโปรโมชั่น",to:"แจ้งเตือนอัตโนมัติ",text:e.shopName+" อยู่ห่างจากคุณ "+x.d.toFixed(1)+" กม.\nโปรโมชั่น: "+e.title+" ("+e.value+")"+(e.desc?"\n"+e.desc:"")+basis,ref:""})});
- localStorage.setItem("evSeen",JSON.stringify(seen.slice(-200)))}catch(e){}}
 /* แจ้งเตือนใกล้เคียง (ก่อนเปิดรับจอง/โปรโมชั่นใหม่) ทำบนเซิร์ฟเวอร์แล้ว หน้านี้ส่งตำแหน่งล่าสุดไปเก็บให้เท่านั้น */
 var LOCSENT=null;
 function saveLoc(){try{if(!V.loc||!ME)return;var n=Date.now();if(LOCSENT&&n-LOCSENT.t<1800000&&hav(LOCSENT.p,V.loc)<0.3)return;LOCSENT={t:n,p:{lat:V.loc.lat,lng:V.loc.lng}};sbApi("/rest/v1/rpc/set_my_location",{method:"POST",json:1,body:JSON.stringify({p_lat:V.loc.lat,p_lng:V.loc.lng})}).catch(function(){LOCSENT=null})}catch(e){}}
@@ -256,7 +235,10 @@ function watchLoc(){if(watching||!navigator.geolocation||!navigator.geolocation.
  navigator.geolocation.watchPosition(function(p){var n={lat:p.coords.latitude,lng:p.coords.longitude},moved=!V.loc||hav(V.loc,n)>0.05;V.loc=n;nearbyCheck(true);if(moved&&!S.view&&S.step===0)render(true)},function(){},{maximumAge:60000,timeout:20000})}
 function autoWatch(){try{if(!navigator.geolocation)return;var ask=function(){navigator.geolocation.getCurrentPosition(function(p){V.loc={lat:p.coords.latitude,lng:p.coords.longitude};V.msg="";nearbyCheck(true);watchLoc();if(!S.view&&S.step===0)render(true)},function(){},{timeout:15000,maximumAge:300000})};
  if(navigator.permissions&&navigator.permissions.query)navigator.permissions.query({name:"geolocation"}).then(function(r){if(r.state==="granted")watchLoc();else if(r.state==="prompt")ask()},function(){ask()});else ask()}catch(e){}}
-function menuHtml(){var u=unread(),up=allBk().filter(isUp).length;return '<div class="mn"><button data-view="nt"><span aria-hidden="true">🔔</span><b>แจ้งเตือน</b>'+(u?'<i class="bdg" aria-label="ยังไม่ได้อ่าน '+u+' รายการ">'+u+'</i>':'')+'</button><button data-view="bk"><span aria-hidden="true">📋</span><b>รายการ</b>'+(up?'<i class="bdg b2" aria-label="กำลังจะถึง '+up+' รายการ">'+up+'</i>':'')+'</button><button data-view="ct"><span aria-hidden="true">📞</span><b>ติดต่อเรา</b></button></div>'}
+function tabsRender(){var t=document.getElementById("tabs");if(!t)return;if(!ME||CAT.state!=="ok"){t.style.display="none";return}
+ var u=unread(),up=allBk().filter(isUp).length,cur=S.view||"",T=[["","🏠","หน้าหลัก",0,""],["bk","📋","รายการ",up,"กำลังจะถึง "+up+" รายการ"],["nt","🔔","แจ้งเตือน",u,"ยังไม่ได้อ่าน "+u+" รายการ"],["ct","📞","ติดต่อเรา",0,""]];
+ t.innerHTML="<div>"+T.map(function(x){return '<button type="button" data-tab="'+x[0]+'"'+(cur===x[0]?' class="on"':'')+'><span aria-hidden="true">'+x[1]+'</span><b>'+x[2]+'</b>'+(x[3]?'<i class="bdg'+(x[0]==="bk"?" b2":"")+'" aria-label="'+x[4]+'">'+x[3]+'</i>':'')+'</button>'}).join("")+"</div>";t.style.display="";
+ t.querySelectorAll("[data-tab]").forEach(function(e){e.onclick=function(){var v=e.dataset.tab;V.cfm=null;V.prevSeen=null;if(v){S.view=v;render();refreshUser()}else{S.view=null;V.flash="";if(S.step===5)S=fresh();render()}}})}
 function okUrl(u){return /^https?:\/\//i.test(u||"")}
 function ctHtml(){var c=SET.ct||{},tel=String(c.phone||"").replace(/[^0-9+]/g,""),h='<h1>ติดต่อเรา</h1>';
  h+='<div class="ct"><b>'+esc(c.name||"สมาคมวิทยากรฝึกอาชีพคนตาบอด")+'</b>'+(c.addr?'<p>'+esc(c.addr)+'</p>':'')+'</div>';
@@ -275,7 +257,7 @@ function actHtml(b){ /* ปุ่มยกเลิก / เลื่อนค�
  return '<div class="mbtns"><button class="btn ghost" data-bk="resched" data-ref="'+b.ref+'">เลื่อนคิว</button><button class="btn dng" data-bk="cancel" data-ref="'+b.ref+'">ยกเลิก</button>'+mapBtn(b)+'</div><p class="hint">ยกเลิกหรือเลื่อนคิวได้ก่อนนัด '+ch.h+' ชั่วโมง</p>'}
 function bkCard(b){var pl=bkPlace(b),sv=(pl?svcOf(pl,b.svc):null)||find(SVC,b.svc),st=bkStatus(b);
  return '<div class="bk"><div class="qh"><b>'+esc(pl?pl.name:(b.placeName||"-"))+'</b><span class="tag '+st[1]+'">'+st[0]+'</span></div><small>'+esc(b.svcName||(sv?sv.name:"-"))+' · '+(b.price!=null?baht(b.price):"")+'</small>'+(b.promo?'<small>🎁 '+esc(b.promo)+' (-'+baht(b.disc||0)+')</small>':'')+(b.phone?'<small>โทร '+esc(b.phone)+'</small>':'')+'<small>'+bkWhen(b)+'</small><small>พนักงาน: '+esc(bkStaff(b))+'</small><small>เลขที่ '+b.ref+(b.resched?' · เลื่อนมาแล้ว '+b.resched+' ครั้ง':'')+'</small>'+(b.movedTo?'<small>เลื่อนไปเลขที่ '+b.movedTo+'</small>':'')+(b.movedFrom?'<small>เลื่อนมาจากเลขที่ '+b.movedFrom+'</small>':'')+(isUp(b)&&pl?'<small>'+esc(remindLine(pl,"remind","เตือนล่วงหน้า: ")||"ไม่ได้ตั้งเตือน")+'</small>':'')+actHtml(b)+'</div>'}
-function viewRender(){var h="",b='<button class="btn" id="home">กลับหน้าหลัก</button>';
+function viewRender(){var h="",b="";
  if(S.view==="bk"){var L=allBk(),st=function(x){return apptStart(x).getTime()},up=L.filter(isUp).sort(function(x,y){return st(x)-st(y)}),hist=L.filter(function(x){return !isUp(x)}).sort(function(x,y){return st(y)-st(x)});
   var cxl=L.filter(function(x){return x.status==="ยกเลิก"||x.status==="เลื่อนแล้ว"}).sort(function(x,y){return st(y)-st(x)}),
    hs=hist.filter(function(x){return x.status!=="ยกเลิก"&&x.status!=="เลื่อนแล้ว"}),bt=V.bt||"up",
@@ -289,20 +271,20 @@ function viewRender(){var h="",b='<button class="btn" id="home">กลับห�
   (notes.length?notes.map(function(n){var d=new Date(n.at);return '<div class="msg"><div class="mh"><b>'+esc(n.title||n.to||"แจ้งเตือน")+'</b>'+(n.at>prev?'<span class="tag">ใหม่</span>':'')+'</div><small class="mt">'+d.toLocaleDateString("th-TH",{day:"numeric",month:"short"})+' '+d.toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"})+' น.</small><pre>'+esc(n.text)+'</pre>'+(n.ref?'<button class="lb" data-view="bk">ดูรายการจอง</button>':'')+(n.auto?'<button class="lb" data-view="">เปิดหน้าจอง</button>':'')+'</div>'}).join(""):'<div class="empty">ยังไม่มีการแจ้งเตือน</div>')}
  return[h,b]}
 function render(keep){
+ try{tabsRender()}catch(e){}
  if(!ME){if(!document.getElementById("authf"))authRender();return}
  if(CAT.state!=="ok"){catRender();return}
  if(S.view){var vv=viewRender();app.innerHTML=vv[0];bar.innerHTML=vv[1]?"<div>"+vv[1]+"</div>":"";bar.style.display=vv[1]?"":"none";if(!keep)window.scrollTo(0,0);bind();return}
  var h="",b="";
  if(S.step===5){
-  h=(S.movedFrom?'<div class="flash" role="status">ยกเลิกนัดเดิมเลขที่ '+S.movedFrom+' ให้แล้ว และคืนคิวเดิมเรียบร้อย</div>':'')+'<div class="done"><div class="ico">✅</div><h1>'+(S.movedFrom?'เลื่อนคิวสำเร็จ':'จองสำเร็จแล้ว')+'</h1><p class="sub">เลขที่การจอง <span class="ref">'+S.ref+'</span></p></div>'+summary()+
-  '<button class="lb" data-view="bk">ดูรายการจองทั้งหมด</button>';
-  b='<button class="btn" id="again">กลับหน้าหลัก</button>';
+  h=(S.movedFrom?'<div class="flash" role="status">ยกเลิกนัดเดิมเลขที่ '+S.movedFrom+' ให้แล้ว และคืนคิวเดิมเรียบร้อย</div>':'')+'<div class="done"><div class="ico">✅</div><h1>'+(S.movedFrom?'เลื่อนคิวสำเร็จ':'จองสำเร็จแล้ว')+'</h1><p class="sub">เลขที่การจอง <span class="ref">'+S.ref+'</span></p></div>'+summary();
+  b="";
  } else {
   if(S.step===2&&S.date)ensureBusy();
   h=mvBanner(S.step===0);
   if(S.step===0){
    syncAdmin();nearbyCheck();var kd=V.kind,KT=kd==="shop"?"ร้านนวด":"หน่วยงาน",R=RADIUS[kd],near=visible(kd).filter(function(p){return dist(p)===Infinity||dist(p)<=R}),shown=near.sort(function(a,b){return(dist(a)===Infinity?1e9:dist(a))-(dist(b)===Infinity?1e9:dist(b))});
-   h+=(V.moving?"":profHtml()+menuHtml())+'<h1>เลือกสถานที่</h1>'+
+   h+=(V.moving?"":profHtml())+'<h1>เลือกสถานที่</h1>'+
    '<div class="loc">📍 '+(V.loc?"ตำแหน่งของคุณ":"ยังไม่ได้ระบุตำแหน่ง")+'<button class="lb" data-loc="gps">'+(V.loc?"อัปเดตตำแหน่ง":"ใช้ตำแหน่งของฉัน")+'</button>'+(V.loc?'<button class="lb" data-loc="reset">ไม่ใช้ตำแหน่ง</button>':'')+'</div>'+(V.msg?'<p class="hint">'+V.msg+'</p>':'')+
    '<div class="tg" role="group" aria-label="ประเภท">'+[["shop","เลือกร้านนวด"],["org","เลือกหน่วยงาน"]].map(function(k){var n=visible(k[0]).filter(function(p){return dist(p)===Infinity||dist(p)<=RADIUS[k[0]]}).length;return '<button data-kind="'+k[0]+'" class="'+(k[0]===kd?"on":"")+'" aria-pressed="'+(k[0]===kd)+'">'+k[1]+' ('+n+')</button>'}).join("")+'</div>'+
    '<p class="sub">'+(V.loc?'แสดง'+KT+'ในรัศมี '+R+' กม. จากตำแหน่งของคุณ · พบ '+shown.length+' แห่ง เรียงจากใกล้ไปไกล':'แสดง'+KT+'ทั้งหมด '+shown.length+' แห่ง · กด "ใช้ตำแหน่งของฉัน" เพื่อดูเฉพาะที่อยู่ใกล้และเรียงตามระยะทาง')+'</p>'+
@@ -449,7 +431,7 @@ function loadBusy(p,date){var ids=placeStaffIds(p);BUSY={};if(!ids.length||!date
 function busyReady(){return !!S.date&&S.busyKey===S.place.id+"|"+S.date}
 function ensureBusy(){var key=S.place.id+"|"+S.date,SS=S;if(SS.busyKey===key||SS.busyLoad===key||SS.busyErr)return;SS.busyLoad=key;
  loadBusy(SS.place,SS.date).then(function(){SS.busyLoad=null;if(S!==SS)return;SS.busyKey=key;render(true)},function(e){SS.busyLoad=null;if(S!==SS)return;SS.busyErr=errTh(e,"โหลดเวลาว่างไม่สำเร็จ");render(true)})}
-function catRender(){var a=document.getElementById("app"),b=document.getElementById("bar");b.innerHTML="";b.style.display="none";
+function catRender(){var a=document.getElementById("app"),b=document.getElementById("bar");var tb=document.getElementById("tabs");if(tb)tb.style.display="none";b.innerHTML="";b.style.display="none";
  if(CAT.state==="err"){a.innerHTML='<h1>โหลดข้อมูลไม่สำเร็จ</h1><div class="err" role="alert">'+esc(CAT.msg)+'</div><button class="btn wide" id="cretry">ลองใหม่</button><div class="alinks"><button class="lb" data-auth="out">ออกจากระบบ</button></div>';
   document.getElementById("cretry").onclick=startApp;document.querySelectorAll("[data-auth=out]").forEach(function(e){e.onclick=logout});return}
  a.innerHTML='<p class="sub" role="status">กำลังโหลดข้อมูลร้านและบริการ…</p>'}
@@ -504,7 +486,7 @@ function changeAvatar(fl){if(!fl||!ME)return;if(!/^image\//.test(fl.type)){V.pms
    function(e){V.pmsg=errTh(e,"เปลี่ยนรูปไม่สำเร็จ ลองใหม่อีกครั้ง");render(true)})},
   function(){V.pmsg="อ่านรูปไม่สำเร็จ ลองเลือกรูปอื่น";render(true)})}
 function fld(id,label,type,extra){return '<label class="fld" for="'+id+'"><span>'+label+'</span><input class="sel" id="'+id+'" type="'+type+'" '+(extra||"")+'></label>'}
-function authRender(){
+function authRender(){var tb=document.getElementById("tabs");if(tb)tb.style.display="none";
  var a=document.getElementById("app"),b=document.getElementById("bar"),h="",st=AU.step;b.innerHTML="";b.style.display="none";
  if(AU.loading){a.innerHTML='<p class="sub" role="status">กำลังตรวจสอบการเข้าสู่ระบบ…</p>';return}
  if(st==="login"){
