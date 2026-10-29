@@ -131,7 +131,6 @@ function fresh(){return{qty:{},sim:true,asg:{},svcs:[],phone:(typeof ME!=="undef
 var app=document.getElementById("app"),bar=document.getElementById("bar");
 function load(k){try{return JSON.parse(localStorage.getItem(k)||"[]")}catch(e){return[]}}
 function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
-function k(st,d,m){return st+"|"+d+"|"+m}
 function find(a,id){return a.filter(function(x){return x.id===id})[0]}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 function cv(p,key){var o=p.ov||{};return o[key]!=null?o[key]:(p.type==="org"?SET.defOrg:SET.defShop)[key]}
@@ -200,7 +199,6 @@ function durT(m){var h=Math.floor(m/60),r=m%60;return(h?h+" ชม.":"")+(h&&r?"
 function baht(n){return n.toLocaleString("th-TH")+" บาท"}
 function typeT(p){return p.type==="org"?"หน่วยงาน":"ร้านนวด"}
 function label(p){return "ให้บริการ"+(p.days.length===7?"ทุกวัน":"วัน "+p.days.map(function(d){return DN[d]}).join(" "))+" "+hm(p.open*60)+"-"+hm(p.close*60)+" น."+lunchTxt(p)}
-function total(){return calc().total}
 function names(){return S.sts.map(function(c){return c.name}).join(", ")}
 
 function visible(kind){return PLACES.filter(function(p){return p.type===kind})}
@@ -218,7 +216,7 @@ function bkStaff(b){if(b.asg&&b.asg.length>1)return b.asg.map(function(a){return
 function canChange(b){var pl=bkPlace(b),h=pl?cv(pl,"cancelH"):(b.cancelH!=null?b.cancelH:24);return{ok:new Date()<=new Date(apptStart(b).getTime()-h*3600000),h:h}}
 function jobsDone(b){var j=b.jobs||{},ks=Object.keys(j);return ks.length>0&&ks.every(function(x){return j[x]==="นวดเสร็จ"})}
 function isUp(b){return b.status!=="ยกเลิก"&&b.status!=="เลื่อนแล้ว"&&!jobsDone(b)&&apptEnd(b)>new Date()}
-function bkStatus(b){if(b.status==="ยกเลิก")return["ยกเลิกแล้ว","b"];if(b.status==="เลื่อนแล้ว")return["เลื่อนแล้ว","o"];if(jobsDone(b))return["เสร็จสิ้น","o"];var v=Object.keys(b.jobs||{}).map(function(x){return b.jobs[x]});if(v.indexOf("กำลังนวด")>-1)return["กำลังนวด",""];if(v.indexOf("รับงานแล้ว")>-1)return["พนักงานรับงานแล้ว",""];if(apptEnd(b)<=new Date())return["ผ่านไปแล้ว","o"];return["รอพนักงานรับงาน",""]}
+function bkStatus(b){if(b.noShow)return["ไม่ได้มาตามนัด","b"];if(b.status==="ยกเลิก")return["ยกเลิกแล้ว","b"];if(b.status==="เลื่อนแล้ว")return["เลื่อนแล้ว","o"];if(jobsDone(b))return["เสร็จสิ้น","o"];var v=Object.keys(b.jobs||{}).map(function(x){return b.jobs[x]});if(v.indexOf("กำลังนวด")>-1)return["กำลังนวด",""];if(v.indexOf("รับงานแล้ว")>-1)return["พนักงานรับงานแล้ว",""];if(apptEnd(b)<=new Date())return["ผ่านไปแล้ว","o"];return["รอพนักงานรับงาน",""]}
 function userNotes(){var loc=load("notifications").filter(function(n){return n.kind==="user"&&n.auto});return NOTES.concat(loc).sort(function(a,b){return a.at<b.at?1:-1})}
 function seenAt(){try{return localStorage.getItem("notifSeen")||""}catch(e){return""}}
 function unread(){var s=seenAt();return userNotes().filter(function(n){return n.at>s}).length}
@@ -253,7 +251,7 @@ function ctHtml(){var c=SET.ct||{},tel=String(c.phone||"").replace(/[^0-9+]/g,""
  if(!tel&&!okUrl(c.line)&&!c.hours&&!okUrl(c.reg))h+='<div class="empty">สมาคมยังไม่ได้ตั้งค่าช่องทางติดต่อ</div>';
  return h}
 function actHtml(b){ /* ปุ่มยกเลิก / เลื่อนคิว (ใช้ทั้งในรายการจองและในข้อความหลังจอง) */
- if(b.status==="ยกเลิก")return '<p class="hint">การจองนี้ถูกยกเลิกแล้ว</p>';
+ if(b.status==="ยกเลิก")return '<p class="hint">'+(b.noShow?'การจองนี้ถูกบันทึกว่าไม่ได้มารับบริการตามนัด':'การจองนี้ถูกยกเลิกแล้ว')+'</p>';
  if(b.status==="เลื่อนแล้ว")return '<p class="hint">นัดนี้ถูกเลื่อนไปเลขที่ '+(b.movedTo||"-")+' แล้ว</p>';
  if(!isUp(b))return "";var ch=canChange(b);
  if(!ch.ok)return '<p class="hint">เกินเวลาที่ยกเลิกหรือเลื่อนคิวได้ (ต้องทำก่อนนัด '+ch.h+' ชั่วโมง)</p>'+(mapBtn(b)?'<div class="mbtns">'+mapBtn(b)+'</div>':'');
@@ -437,13 +435,13 @@ function applyCatalog(R){
  CLOSED={};(R.overrides||[]).forEach(function(x){(CLOSED[x.place_id]=CLOSED[x.place_id]||{})[x.day]=true});
  var st=R.settings;if(st){SET.defShop.radius=+st.shop_radius_km;SET.defOrg.radius=+st.org_radius_km;SET.nUser=st.notify_user?1:0;if(st.book_open_min!=null)SET.defOrg.openAt=+st.book_open_min;SET.nStaff=st.notify_staff?1:0;SET.ct={name:st.association_name||"",addr:st.address||"",phone:st.phone||"",line:st.line_url||"",hours:st.hours_text||"",reg:st.register_url||""}}
  ANN=(R.ann||[]).map(function(x){return{title:x.title,body:x.body||"",auds:x.audiences||[],on:1}})}
-var JOBTH={pending:"รอรับงาน",accepted:"รับงานแล้ว",in_progress:"กำลังนวด",done:"นวดเสร็จ"},STTH={confirmed:"ยืนยันแล้ว",cancelled:"ยกเลิก",rescheduled:"เลื่อนแล้ว",completed:"ยืนยันแล้ว"};
+var JOBTH={pending:"รอรับงาน",accepted:"รับงานแล้ว",in_progress:"กำลังนวด",done:"นวดเสร็จ"},STTH={confirmed:"ยืนยันแล้ว",cancelled:"ยกเลิก",rescheduled:"เลื่อนแล้ว",no_show:"ยกเลิก",completed:"ยืนยันแล้ว"};
 function mapBk(r){var all=r.items||[],its=all.filter(function(i){return i.active}),use=its.length?its:all,t0=Date.parse(r.starts_at),s=bdate(t0),
  asg=use.map(function(i){return{uid:i.id,svc:i.service_id,svcName:i.service_name,staff:i.staff_id,staffName:i.staff_name,off:Math.round((Date.parse(i.starts_at)-t0)/60000),min:i.minutes,net:+i.price}}),jobs={};
  its.forEach(function(i){jobs[i.id]=JOBTH[i.job]||"รอรับงาน"});
  var names=uniq(asg.map(function(a){return a.staffName}));
  return{uid:ME?ME.id:"",ref:r.ref,place:r.place_id,ptype:r.place_type==="shop"?"shop":"org",placeName:r.place_name,svc:asg[0]?asg[0].svc:"",svcs:asg.map(function(a){return a.svc}),svcName:uniq(asg.map(function(a){return a.svcName})).join(", "),phone:r.phone||"",promo:r.promo||"",disc:+r.discount||0,asg:asg,staff:uniq(asg.map(function(a){return a.staff})),
-  staffName:asg.length>1?asg.map(function(a){return a.svcName+": "+a.staffName}).join(", "):names.join(", "),date:s.date,time:s.min,min:Math.max(1,Math.round((Date.parse(r.ends_at)-t0)/60000)),pu:+r.points_used||0,pd:+r.points_discount||0,price:+r.total||0,customer:r.customer_name,status:STTH[r.status]||"ยืนยันแล้ว",movedFrom:r.moved_from,movedTo:r.moved_to,at:r.created_at,jobs:jobs,cancelH:r.cancel_hours}}
+  staffName:asg.length>1?asg.map(function(a){return a.svcName+": "+a.staffName}).join(", "):names.join(", "),date:s.date,time:s.min,min:Math.max(1,Math.round((Date.parse(r.ends_at)-t0)/60000)),pu:+r.points_used||0,pd:+r.points_discount||0,price:+r.total||0,customer:r.customer_name,status:STTH[r.status]||"ยืนยันแล้ว",noShow:r.status==="no_show",movedFrom:r.moved_from,movedTo:r.moved_to,at:r.created_at,jobs:jobs,cancelH:r.cancel_hours}}
 function loadPoints(){return sbApi("/rest/v1/rpc/my_points",{method:"POST",json:1,body:"{}"}).then(function(a){PT=a||null}).catch(function(){})}
 function loadBookings(){return sbApi("/rest/v1/rpc/my_bookings",{method:"POST",json:1,body:"{}"}).then(function(a){BK=(a||[]).map(mapBk)})}
 function loadNotes(){return sbApi("/rest/v1/notifications?select=id,kind,title,body,created_at,booking_id&audience=eq.user&order=created_at.desc&limit=60").then(function(a){NOTES=(a||[]).filter(function(n){return n.kind!=="announce"}).map(function(n){return{kind:"user",id:n.id,at:new Date(n.created_at).toISOString(),title:n.title,text:n.body||"",ref:n.booking_id?"1":"",auto:(n.kind==="preopen"||n.kind==="promo")}})})}

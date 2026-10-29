@@ -303,13 +303,13 @@ function qThD(d){return new Date(d+"T00:00:00Z").toLocaleDateString("th-TH",{wee
 function qStaff(id){var x=byId(D.staff,id);return x?x.name:"พนักงาน"}
 var QJOB={pending:"รอพนักงานรับงาน",accepted:"พนักงานรับงานแล้ว",in_progress:"กำลังให้บริการ",done:"เสร็จสิ้น"};
 /* หมวดของการจอง: wait = ยังไม่จบ, done = เสร็จสิ้น, cx = ยกเลิก/เลื่อนคิว */
-function qCat(b){if(b.status==="cancelled"||b.status==="rescheduled")return"cx";
+function qCat(b){if(b.status==="cancelled"||b.status==="rescheduled"||b.status==="no_show")return"cx";
  if(b.status==="completed")return"done";
  var its=(b.booking_items||[]).filter(function(i){return i.active});
  if(its.length&&its.every(function(i){return i.job==="done"}))return"done";
  return"wait"}
 function qCard(b){var c=qCat(b),its=(b.booking_items||[]).slice().sort(function(a,z){return a.starts_at<z.starts_at?-1:1}),
- tg=b.status==="cancelled"?'<span class="tag b">ยกเลิก</span>':b.status==="rescheduled"?'<span class="tag s">เลื่อนคิว'+(b.moved_to?' → '+esc(b.moved_to):'')+'</span>':c==="done"?'<span class="tag">เสร็จสิ้น</span>':'<span class="tag w">รอให้บริการ</span>';
+ tg=b.status==="no_show"?'<span class="tag b">ลูกค้าไม่มา</span>':b.status==="cancelled"?'<span class="tag b">ยกเลิก</span>':b.status==="rescheduled"?'<span class="tag s">เลื่อนคิว'+(b.moved_to?' → '+esc(b.moved_to):'')+'</span>':c==="done"?'<span class="tag">เสร็จสิ้น</span>':'<span class="tag w">รอให้บริการ</span>';
  return'<div class="card" style="margin-bottom:10px"><div class="row" style="border:0;padding:0 0 6px"><b>'+qHM(b.starts_at)+'-'+qHM(b.ends_at)+' น.</b>'+tg+'</div><b>'+esc(b.customer_name)+'</b>'+(b.phone?'<small style="display:block">โทร <a href="tel:'+esc(b.phone)+'">'+esc(b.phone)+'</a></small>':'')+
  its.map(function(i){return'<small style="display:block">'+esc(i.service_name)+', '+i.minutes+' นาที, พนักงาน '+esc(qStaff(i.staff_id))+(c==="wait"&&i.active?', '+QJOB[i.job]:'')+'</small>'}).join("")+
  '<small style="display:block">เลขที่ '+esc(b.ref)+', '+baht(b.total_price||0)+(b.promo_title?', '+esc(b.promo_title):'')+'</small></div>'}
@@ -504,9 +504,9 @@ document.addEventListener("click",function(e){
   act(function(){return patch("places",WID,body).then(function(){return npw?sbApi("/auth/v1/user",{method:"PUT",json:1,body:JSON.stringify({password:npw})}):null})},function(){
    Object.assign(D.shop,{name:nm,desc:body.description,area:body.area,days:days,open:o1,close:c1,lat:pla,lng:plo,adv:body.advance_days,cancelH:body.cancel_hours,ov:{adv:body.advance_days,cancelH:body.cancel_hours}});S.saved=true;S.pwdone=!!npw;window.scrollTo(0,0)});return}
 });
-var pollT=null;
+
 function startMain(){if(started){draw();return}started=true;S={tab:"q",mg:"svc",qt:"wait",form:null,del:null,saved:false,wmode:null,werr:"",busy:false,hmsg:""};draw();
- pollT=setInterval(function(){if(!document.hidden)refresh()},30000);
+ setInterval(function(){if(!document.hidden)refresh()},30000);
  document.addEventListener("visibilitychange",function(){if(!document.hidden)refresh()})}
 /* ---------- เริ่มทำงาน ---------- */
 showGate(true);
