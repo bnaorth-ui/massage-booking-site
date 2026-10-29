@@ -55,7 +55,7 @@ h1{font-size:1.4rem;margin:8px 0 4px}
 .err{background:#fbe6e1;color:#b3402a;border-radius:10px;padding:10px 12px;margin:10px 0;font-size:.92rem}
 .card2{margin:0 0 12px}
 .chh{margin:0 0 6px}.chh .btn{width:auto;padding:8px 14px}.chl{display:flex;flex-direction:column;gap:8px;margin:10px 0 90px}.msg{max-width:85%;border-radius:14px;padding:8px 12px;border:2px solid var(--line);background:var(--card)}.msg.mine{align-self:flex-end;background:var(--soft,#dcefe8)}.msg small{display:block;opacity:.8}.msg p{margin:2px 0 0;white-space:normal;overflow-wrap:anywhere}.chf{position:sticky;bottom:var(--nbh,0px);display:flex;gap:8px;align-items:flex-end;background:var(--bg);padding:10px 0;border-top:1px solid var(--line)}.chf textarea{flex:1;margin:0;resize:none}.chf .btn{width:auto;margin:0;padding:10px 18px}.cn{display:inline-block;min-width:22px;border-radius:99px;background:#d64545;color:#fff;font-size:.8rem;padding:0 6px;margin-left:6px}.chb{flex-wrap:wrap}.chb .btn{min-width:140px}
-.rtl{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:-4px 0 10px;padding:0 4px}.rtl .sc{font-weight:700}.rtl .lb{margin-left:auto}.tag.nw{background:#fff3cd;color:#6b4e00}.rvh .btn{width:auto;padding:8px 14px}.rvs{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 12px}.rvs button{font:inherit;min-height:44px;padding:6px 12px;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);cursor:pointer}.rvs button[aria-pressed=true]{border-color:var(--main);background:var(--soft);font-weight:700}.rvb{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:12px 14px;margin:0 0 12px}.rvb h2{font-size:1.05rem;margin:0 0 4px}.rv{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px}.rv p{margin:6px 0 0;overflow-wrap:anywhere}.rv .rp{border-left:4px solid var(--main);padding-left:10px;color:var(--ink)}.rvavg{font-size:1.4rem;font-weight:700;margin:6px 0}.ptsbox{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:14px;margin:0 0 12px}.ptsbox b{display:block}.ptsbox p{margin:6px 0}.ptsn b{display:inline;font-size:2rem}.chk{display:flex;align-items:center;gap:10px;min-height:44px;font-weight:700}.chk input{width:24px;height:24px}.ptsl{margin:10px 0 0;padding-left:20px}.ptsl li{padding:4px 0}
+.pv h2.stl{margin:16px 0 4px}.pvl{margin:4px 0;padding-left:22px}.pvl li{padding:3px 0}.rtl{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:-4px 0 10px;padding:0 4px}.rtl .sc{font-weight:700}.rtl .lb{margin-left:auto}.tag.nw{background:#fff3cd;color:#6b4e00}.rvh .btn{width:auto;padding:8px 14px}.rvs{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 12px}.rvs button{font:inherit;min-height:44px;padding:6px 12px;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);cursor:pointer}.rvs button[aria-pressed=true]{border-color:var(--main);background:var(--soft);font-weight:700}.rvb{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:12px 14px;margin:0 0 12px}.rvb h2{font-size:1.05rem;margin:0 0 4px}.rv{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px}.rv p{margin:6px 0 0;overflow-wrap:anywhere}.rv .rp{border-left:4px solid var(--main);padding-left:10px;color:var(--ink)}.rvavg{font-size:1.4rem;font-weight:700;margin:6px 0}.ptsbox{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:14px;margin:0 0 12px}.ptsbox b{display:block}.ptsbox p{margin:6px 0}.ptsn b{display:inline;font-size:2rem}.chk{display:flex;align-items:center;gap:10px;min-height:44px;font-weight:700}.chk input{width:24px;height:24px}.ptsl{margin:10px 0 0;padding-left:20px}.ptsl li{padding:4px 0}
 .inbtns{display:flex;gap:10px;margin-top:16px}.inbtns .btn{margin:0}
 .mbtns a.btn{flex:1;margin:0;padding:10px;text-align:center;text-decoration:none;display:block}
 .ct{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:14px;margin:0 0 12px}.ct b{display:block;font-size:1.1rem}.ct p{margin:4px 0 0;color:var(--mute);white-space:pre-line}.ct .hr{display:block;white-space:pre-line;margin-top:6px}a.cta{display:flex;align-items:center;gap:12px;text-decoration:none;font-weight:700;background:var(--main);color:var(--main-ink);border:2px solid var(--main);border-radius:12px;padding:16px;margin:0 0 10px}a.cta.line{background:#06c755;border-color:#06c755;color:#fff}a.cta.reg{background:transparent;color:var(--main)}a.cta span{font-size:1.6rem}a.cta small{display:block;font-weight:400;opacity:.9}a.cta:focus-visible{outline:3px solid var(--main);outline-offset:2px}
@@ -249,7 +249,7 @@ function watchLoc(){if(watching||!navigator.geolocation||!navigator.geolocation.
 function autoWatch(){try{if(!navigator.geolocation)return;var ask=function(){navigator.geolocation.getCurrentPosition(function(p){V.loc={lat:p.coords.latitude,lng:p.coords.longitude};V.msg="";nearbyCheck(true);watchLoc();if(!S.view&&S.step===0)render(true)},function(){},{timeout:15000,maximumAge:300000})};
  if(navigator.permissions&&navigator.permissions.query)navigator.permissions.query({name:"geolocation"}).then(function(r){if(r.state==="granted")watchLoc();else if(r.state==="prompt")ask()},function(){ask()});else ask()}catch(e){}}
 function tabsRender(){var t=document.getElementById("tabs");if(!t)return;if(!ME||CAT.state!=="ok"){t.style.display="none";return}
- var u=unread(),up=allBk().filter(isUp).length,cur=S.view||"",T=[["","🏠","หน้าหลัก",0,""],["bk","📋","รายการ",up,"กำลังจะถึง "+up+" รายการ"],["nt","🔔","แจ้งเตือน",u,"ยังไม่ได้อ่าน "+u+" รายการ"],["ac","👤","บัญชี",0,""]];
+ var u=unread(),up=allBk().filter(isUp).length,cur=S.view==="pv"?"ac":(S.view||""),T=[["","🏠","หน้าหลัก",0,""],["bk","📋","รายการ",up,"กำลังจะถึง "+up+" รายการ"],["nt","🔔","แจ้งเตือน",u,"ยังไม่ได้อ่าน "+u+" รายการ"],["ac","👤","บัญชี",0,""]];
  t.innerHTML="<div>"+T.map(function(x){return '<button type="button" data-tab="'+x[0]+'"'+(cur===x[0]?' class="on"':'')+'><span aria-hidden="true">'+x[1]+'</span><b>'+x[2]+'</b>'+(x[3]?'<i class="bdg'+(x[0]==="bk"?" b2":"")+'" aria-label="'+x[4]+'">'+x[3]+'</i>':'')+'</button>'}).join("")+"</div>";t.style.display="";
  t.querySelectorAll("[data-tab]").forEach(function(e){e.onclick=function(){var v=e.dataset.tab;RF=null;RL=null;V.rv=false;V.cfm=null;V.prevSeen=null;if(v){S.view=v;render();refreshUser()}else{S.view=null;V.flash="";if(S.step===5)S=fresh();render()}}})}
 function okUrl(u){return /^https?:\/\//i.test(u||"")}
@@ -270,14 +270,18 @@ function actHtml(b){ /* ปุ่มยกเลิก / เลื่อนค�
  return '<div class="mbtns"><button class="btn ghost" data-bk="resched" data-ref="'+b.ref+'">เลื่อนคิว</button><button class="btn dng" data-bk="cancel" data-ref="'+b.ref+'">ยกเลิก</button>'+mapBtn(b)+'</div><p class="hint">ยกเลิกหรือเลื่อนคิวได้ก่อนนัด '+ch.h+' ชั่วโมง</p>'}
 function bkCard(b){var pl=bkPlace(b),sv=(pl?svcOf(pl,b.svc):null)||find(SVC,b.svc),st=bkStatus(b);
  return '<div class="bk"><div class="qh"><b>'+esc(pl?pl.name:(b.placeName||"-"))+'</b><span class="tag '+st[1]+'">'+st[0]+'</span></div><small>'+esc(b.svcName||(sv?sv.name:"-"))+', '+(b.price!=null?baht(b.price):"")+'</small>'+(b.promo?'<small>🎁 '+esc(b.promo)+' (-'+baht(b.disc||0)+')</small>':'')+(b.pu?'<small>⭐ ใช้แต้มสะสม '+b.pu+' แต้ม (-'+baht(b.pd)+')</small>':'')+(b.phone?'<small>โทร '+esc(b.phone)+'</small>':'')+'<small>'+bkWhen(b)+'</small><small>พนักงาน: '+esc(bkStaff(b))+'</small><small>เลขที่ '+b.ref+(b.resched?', เลื่อนมาแล้ว '+b.resched+' ครั้ง':'')+'</small>'+(b.movedTo?'<small>เลื่อนไปเลขที่ '+b.movedTo+'</small>':'')+(b.movedFrom?'<small>เลื่อนมาจากเลขที่ '+b.movedFrom+'</small>':'')+(isUp(b)&&pl?'<small>'+esc(remindLine(pl,"remind","เตือนล่วงหน้า: ")||"ไม่ได้ตั้งเตือน")+'</small>':'')+actHtml(b)+chatBtns(b)+rvBtn(b)+'</div>'}
+var BPG={hist:10,cx:10};
+function bkPage(cu){var k=cu[0],L=cu[2];if(k==="up")return L.map(bkCard).join("");var n=BPG[k]||10,rest=L.length-n;
+ return L.slice(0,n).map(bkCard).join("")+(rest>0?'<button type="button" class="btn ghost wide" data-more="'+k+'">ดูเพิ่มอีก '+Math.min(10,rest)+' รายการ (เหลืออีก '+rest+')</button>':'')}
 function viewRender(){var h="",b="";
  if(S.view==="bk"){var L=allBk(),st=function(x){return apptStart(x).getTime()},up=L.filter(isUp).sort(function(x,y){return st(x)-st(y)}),hist=L.filter(function(x){return !isUp(x)}).sort(function(x,y){return st(y)-st(x)});
   var cxl=L.filter(function(x){return x.status==="ยกเลิก"||x.status==="เลื่อนแล้ว"}).sort(function(x,y){return st(y)-st(x)}),
    hs=hist.filter(function(x){return x.status!=="ยกเลิก"&&x.status!=="เลื่อนแล้ว"}),bt=V.bt||"up",
    TB=[["up","รายการจอง",up],["hist","ประวัติ",hs],["cx","งานถูกยกเลิก",cxl]],cu=TB.filter(function(x){return x[0]===bt})[0]||TB[0],
    EMP={up:"ไม่มีรายการจองที่กำลังจะถึง",hist:"ยังไม่มีประวัติการจอง",cx:"ไม่มีงานที่ถูกยกเลิก"};
-  h='<h1>รายการ</h1>'+(V.flash?'<div class="flash" role="status">'+esc(V.flash)+'</div>':'')+'<div class="tg" role="tablist" aria-label="หมวดรายการ">'+TB.map(function(x){return '<button type="button" role="tab" data-bt="'+x[0]+'" class="'+(x[0]===cu[0]?"on":"")+'" aria-selected="'+(x[0]===cu[0])+'">'+x[1]+' ('+x[2].length+')</button>'}).join("")+'</div>'+(cu[2].length?cu[2].map(bkCard).join(""):'<div class="empty">'+EMP[cu[0]]+'</div>')}
- if(S.view==="ac"){h='<h1>บัญชี</h1>'+profHtml()+ptsCard()+ctHtml()+'<button type="button" class="btn wide ghost" data-auth="out" style="margin-top:14px">ออกจากระบบ</button>'}
+  h='<h1>รายการ</h1>'+(V.flash?'<div class="flash" role="status">'+esc(V.flash)+'</div>':'')+'<div class="tg" role="tablist" aria-label="หมวดรายการ">'+TB.map(function(x){return '<button type="button" role="tab" data-bt="'+x[0]+'" class="'+(x[0]===cu[0]?"on":"")+'" aria-selected="'+(x[0]===cu[0])+'">'+x[1]+' ('+x[2].length+')</button>'}).join("")+'</div>'+(cu[2].length?bkPage(cu):'<div class="empty">'+EMP[cu[0]]+'</div>')+(cu[0]!=="up"?'<p class="hint">แสดงประวัติย้อนหลัง 12 เดือน</p>':'')}
+ if(S.view==="pv"){h='<button type="button" class="lb" data-view="ac">← กลับไปหน้าบัญชี</button><h1>นโยบายความเป็นส่วนตัว</h1>'+pvHtml()}
+ if(S.view==="ac"){h='<h1>บัญชี</h1>'+profHtml()+ptsCard()+ctHtml()+'<button type="button" class="btn wide ghost" data-view="pv" style="margin-top:14px">นโยบายความเป็นส่วนตัว</button>'+'<button type="button" class="btn wide ghost" data-auth="out" style="margin-top:14px">ออกจากระบบ</button>'}
  if(S.view==="nt"){var prev=V.prevSeen!=null?V.prevSeen:(V.prevSeen=seenAt()),notes=userNotes(),an=ANN.filter(function(x){return x.on&&(x.auds||[]).indexOf("ผู้ใช้งาน")>-1});
   try{localStorage.setItem("notifSeen",new Date().toISOString())}catch(e){}
   var nsub=V.nt==="a"?"a":"n",NTB=[["n","แจ้งเตือน",notes.length],["a","จากสมาคม",an.length]];
@@ -378,6 +382,7 @@ function bind(){
  q("[data-bt]").forEach(function(e){e.onclick=function(){V.bt=e.dataset.bt;V.cfm=null;render()}});
  q("[data-view]").forEach(function(e){e.onclick=function(){V.cfm=null;V.prevSeen=null;S.view=e.dataset.view;render();if(S.view)refreshUser()}});
  q("[data-act=busy]").forEach(function(e){e.onclick=function(){S.busyErr="";render(true)}});
+ q("[data-more]").forEach(function(e){e.onclick=function(){var k=e.dataset.more,old=document.querySelectorAll(".bk").length;BPG[k]=(BPG[k]||10)+10;render(true);var c=document.querySelectorAll(".bk")[old];if(c){c.setAttribute("tabindex","-1");c.focus()}}});
  q("[data-rv]").forEach(function(e){e.onclick=function(){openRvList(e.dataset.rv,e.dataset.n)}});
  q("[data-rate]").forEach(function(e){e.onclick=function(){openRvForm(e.dataset.rate)}});
  q("[data-chat]").forEach(function(e){e.onclick=function(){openChat(e.dataset.chat,e.dataset.room,e.dataset.ref,e.dataset.t)}});
@@ -596,6 +601,16 @@ function changeAvatar(fl){if(!fl||!ME)return;if(!/^image\//.test(fl.type)){V.pms
    function(e){V.pmsg=errTh(e,"เปลี่ยนรูปไม่สำเร็จ ลองใหม่อีกครั้ง");render(true)})},
   function(){V.pmsg="อ่านรูปไม่สำเร็จ ลองเลือกรูปอื่น";render(true)})}
 function fld(id,label,type,extra){return '<label class="fld" for="'+id+'"><span>'+label+'</span><input class="sel" id="'+id+'" type="'+type+'" '+(extra||"")+'></label>'}
+/* ===== นโยบายความเป็นส่วนตัว ===== */
+function pvHtml(){var c=(typeof SET!=="undefined"&&SET.ct)||{},tel=String(c.phone||"").trim(),nm=c.name||"สมาคมวิทยากรฝึกอาชีพคนตาบอด";
+ var S2=function(t,b){return '<h2 class="stl">'+t+'</h2>'+b},L=function(a){return '<ul class="pvl">'+a.map(function(x){return '<li>'+x+'</li>'}).join("")+'</ul>'};
+ return '<div class="pv"><p>'+esc(nm)+' เป็นผู้ดูแลข้อมูลของคุณในระบบจองคิวนวดนี้</p>'+
+  S2("เราเก็บข้อมูลอะไร",L(["ชื่อ เบอร์โทรศัพท์ และรูปโปรไฟล์ (ถ้าคุณเพิ่ม)","รายการจอง แต้มสะสม ข้อความแชต และรีวิวที่คุณเขียน","ตำแหน่งโดยประมาณ เก็บเฉพาะเมื่อคุณกดอนุญาต"]))+
+  S2("เราใช้ข้อมูลทำอะไร",L(["ให้คุณจองคิว ยกเลิก เลื่อนคิว และคุยกับร้านหรือพนักงาน","แสดงร้านที่อยู่ใกล้ และแจ้งเตือนเรื่องการจอง โปรโมชั่น หรือร้านใหม่ใกล้คุณ","คำนวณแต้มสะสม และตรวจสอบรีวิวที่ถูกแจ้ง"]))+
+  S2("ใครเห็นข้อมูลของคุณ",L(["ร้านและพนักงานที่คุณจอง เห็นชื่อ เบอร์โทร และรายละเอียดของการจองนั้น","รีวิวของคุณแสดงเฉพาะชื่อต้น","ผู้ดูแลของสมาคมเห็นข้อมูลเท่าที่จำเป็นต่อการดูแลระบบ","เราไม่ขายข้อมูลของคุณให้ใคร"]))+
+  S2("เราเก็บนานแค่ไหน",L(["ชื่อและเบอร์โทรในรายการจองถูกลบหลังการใช้บริการผ่านไป 12 เดือน","ข้อความแชตถูกลบอัตโนมัติหลัง 90 วัน","ข้อมูลอื่นเก็บไว้ตราบที่บัญชียังอยู่"]))+
+  S2("สิทธิ์ของคุณ",L(["ปิดการใช้ตำแหน่งได้ทุกเมื่อ (ปุ่ม &quot;ไม่ใช้ตำแหน่ง&quot; หน้าเลือกร้าน)","ขอดู แก้ไข หรือลบข้อมูลและบัญชีได้โดยติดต่อสมาคม"]))+
+  S2("ติดต่อเรา",'<p>'+esc(nm)+(tel?' โทร '+esc(tel):' (เบอร์โทรดูได้ที่หน้าบัญชี หลังเข้าสู่ระบบ)')+'</p>')+'</div>'}
 function authRender(){var tb=document.getElementById("tabs");if(tb)tb.style.display="none";
  var a=document.getElementById("app"),b=document.getElementById("bar"),h="",st=AU.step;b.innerHTML="";b.style.display="none";
  if(AU.loading){a.innerHTML='<p class="sub" role="status">กำลังตรวจสอบการเข้าสู่ระบบ…</p>';return}
@@ -603,20 +618,24 @@ function authRender(){var tb=document.getElementById("tabs");if(tb)tb.style.disp
   h='<h1>เข้าสู่ระบบ</h1><p class="sub">เข้าใช้งานด้วยเบอร์มือถือและรหัสผ่าน</p>'+(AU.ok?'<div class="flash" role="status">'+esc(AU.ok)+'</div>':'')+
   '<form id="authf" novalidate>'+fld("lph","เบอร์มือถือ","tel",'inputmode="tel" autocomplete="tel" placeholder="เช่น 0812345678"')+fld("lpw","รหัสผ่าน","password",'autocomplete="current-password"')+
   '<p class="aerr" id="aerr" role="alert"></p><button class="btn wide" type="submit">เข้าสู่ระบบ</button></form>'+
-  '<div class="alinks"><button class="lb" data-ag="fp">ลืมรหัสผ่าน</button><button class="lb" data-ag="reg">ลงทะเบียนสมาชิกใหม่</button></div>'}
+  '<div class="alinks"><button class="lb" data-ag="fp">ลืมรหัสผ่าน</button><button class="lb" data-ag="reg">ลงทะเบียนสมาชิกใหม่</button><button class="lb" data-ag="pv">นโยบายความเป็นส่วนตัว</button></div>'}
  if(st==="reg"){
   h='<h1>ลงทะเบียนสมาชิกใหม่</h1><p class="sub">กรอกข้อมูลเพื่อสร้างบัญชีผู้ใช้งาน</p>'+
   '<form id="authf" novalidate><div class="avrow"><span id="avprev">'+avHtml({fn:"?",img:AU.img},true)+'</span><label class="lb avbtn" for="rimg">เลือกรูปโปรไฟล์</label><input id="rimg" type="file" accept="image/*" class="vh"></div>'+
   fld("rfn","ชื่อ","text",'autocomplete="given-name"')+fld("rln","นามสกุล","text",'autocomplete="family-name"')+fld("rph","เบอร์มือถือ","tel",'inputmode="tel" autocomplete="tel" placeholder="เช่น 0812345678"')+
   fld("rpw","รหัสผ่าน (อย่างน้อย 6 ตัวอักษร)","password",'autocomplete="new-password"')+fld("rpw2","ยืนยันรหัสผ่าน","password",'autocomplete="new-password"')+
+  '<label class="chk" for="rpv"><input type="checkbox" id="rpv"> ฉันได้อ่านและยอมรับนโยบายความเป็นส่วนตัว</label><div class="alinks"><button type="button" class="lb" data-ag="pv">อ่านนโยบายความเป็นส่วนตัว</button></div>'+
   '<p class="aerr" id="aerr" role="alert"></p><button class="btn wide" type="submit">ลงทะเบียน</button></form>'+
   '<div class="alinks"><button class="lb" data-ag="login">มีบัญชีแล้ว? เข้าสู่ระบบ</button></div>'}
+ if(st==="pv"){
+  h='<div class="alinks"><button class="lb" data-ag="'+(AU.pvBack==="reg"?"reg":"login")+'">← กลับ</button></div><h1 id="pvt" tabindex="-1">นโยบายความเป็นส่วนตัว</h1>'+pvHtml()}
  if(st==="fp"){
   h='<h1>ลืมรหัสผ่าน</h1><div class="codebox">การรีเซ็ตรหัสผ่านอัตโนมัติด้วย SMS ยังไม่เปิดให้บริการ<small>กรุณาติดต่อสมาคมวิทยากรฝึกอาชีพคนตาบอด เพื่อให้เจ้าหน้าที่ช่วยตั้งรหัสผ่านใหม่ให้</small></div>'+
   '<div class="alinks"><button class="lb" data-ag="login">กลับไปเข้าสู่ระบบ</button></div>'}
  a.innerHTML=h;window.scrollTo(0,0);AU.ok="";
  var g=function(i){return document.getElementById(i)},er=function(t){g("aerr").textContent=t},v=function(i){return g(i).value};
- document.querySelectorAll("[data-ag]").forEach(function(e){e.onclick=function(){AU.step=e.dataset.ag;if(AU.step!=="reg")AU.img=null;authRender()}});
+ document.querySelectorAll("[data-ag]").forEach(function(e){e.onclick=function(){var nx=e.dataset.ag;if(nx==="pv"){AU.pvBack=AU.step;if(AU.step==="reg"){AU.draft={rfn:v("rfn"),rln:v("rln"),rph:v("rph"),rpv:g("rpv").checked}}}else if(AU.step==="pv"&&nx==="reg"){}else AU.draft=null;AU.step=nx;if(nx==="login"||nx==="fp")AU.img=null;authRender();if(nx==="pv"){var t=document.getElementById("pvt");if(t)t.focus()}}});
+ if(st==="reg"&&AU.draft){["rfn","rln","rph"].forEach(function(i){g(i).value=AU.draft[i]||""});g("rpv").checked=!!AU.draft.rpv;AU.draft=null}
  var f=g("authf");if(!f)return;
  if(st==="reg"){g("rimg").onchange=function(){var fl=this.files&&this.files[0];if(!fl)return;if(!/^image\//.test(fl.type)){er("เลือกไฟล์รูปภาพเท่านั้น");return}
    fitAv(fl,function(d){AU.img=d;g("avprev").innerHTML=avHtml({fn:"?",img:d},true);er("")},function(){er("อ่านรูปไม่สำเร็จ ลองเลือกรูปอื่น")})}}
@@ -634,6 +653,7 @@ function authRender(){var tb=document.getElementById("tabs");if(tb)tb.style.disp
    if(!/^0\d{8,9}$/.test(p)){er("กรอกเบอร์มือถือให้ถูกต้อง (เช่น 0812345678)");return}
    if(w.length<6){er("รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร");return}
    if(w!==w2){er("รหัสผ่านทั้งสองช่องไม่ตรงกัน");return}
+   if(!g("rpv").checked){er("กรุณาติ๊กยอมรับนโยบายความเป็นส่วนตัวก่อนลงทะเบียน");g("rpv").focus();return}
    busy(true);er("");var img=AU.img;
    sbReq("/auth/v1/signup",{method:"POST",json:1,auth:false,body:JSON.stringify({email:sbEmail(p),password:w,data:{first_name:fn,last_name:ln,phone:p}})}).then(function(j){
      if(!j||!j.access_token){var e=new Error("not confirmed");e.code="email_not_confirmed";throw e}
