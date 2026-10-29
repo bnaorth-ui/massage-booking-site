@@ -65,7 +65,7 @@ button:focus-visible,select:focus-visible{outline:3px solid var(--main);outline-
 .toast{background:var(--bad-bg);color:var(--bad);border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:.92rem}
 .ok{background:var(--soft);color:var(--main);border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:.92rem}
 .q a{color:var(--main)}
-.chh{margin:0 0 6px}.chh .btn{width:auto;padding:8px 14px}.chl{display:flex;flex-direction:column;gap:8px;margin:10px 0 90px}.msg{max-width:85%;border-radius:14px;padding:8px 12px;border:2px solid var(--line);background:var(--card)}.msg.mine{align-self:flex-end;background:var(--soft)}.msg small{display:block;opacity:.8}.msg p{margin:2px 0 0;overflow-wrap:anywhere}.chf{position:sticky;bottom:0;display:flex;gap:8px;align-items:flex-end;background:var(--bg);padding:10px 0;border-top:1px solid var(--line)}.chf textarea{flex:1;margin:0;resize:none;font:inherit;padding:10px;border:2px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}.chf .btn{width:auto;margin:0;padding:10px 18px}.cn{display:inline-block;min-width:22px;border-radius:99px;background:#d64545;color:#fff;font-size:.8rem;padding:0 6px;margin-left:6px}.chb{margin-top:8px}.chb .btn{width:auto;padding:8px 14px}.vh{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
+.chh{margin:0 0 6px}.chh .btn{width:auto;padding:8px 14px}.chl{display:flex;flex-direction:column;gap:8px;margin:10px 0 90px}.msg{max-width:85%;border-radius:14px;padding:8px 12px;border:2px solid var(--line);background:var(--card)}.msg.mine{align-self:flex-end;background:var(--soft)}.msg small{display:block;opacity:.8}.msg p{margin:2px 0 0;overflow-wrap:anywhere}.chf{position:sticky;bottom:var(--nbh,0px);display:flex;gap:8px;align-items:flex-end;background:var(--bg);padding:10px 0;border-top:1px solid var(--line)}.chf textarea{flex:1;margin:0;resize:none;font:inherit;padding:10px;border:2px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}.chf .btn{width:auto;margin:0;padding:10px 18px}.cn{display:inline-block;min-width:22px;border-radius:99px;background:#d64545;color:#fff;font-size:.8rem;padding:0 6px;margin-left:6px}.chb{margin-top:8px}.chb .btn{width:auto;padding:8px 14px}.vh{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
 </style>
 </head>
 <body>
@@ -208,7 +208,7 @@ function enter(){AG.step="load";S.busy=false;gateDraw();
 function startMain(){document.getElementById("navb").style.display="";if(S.tab==="nt")openNt();draw();
  if(!timer){timer=setInterval(refresh,20000);document.addEventListener("visibilitychange",function(){if(!document.hidden)refresh()})}}
 function refresh(){if(!ME||inflight||document.hidden||S.busy)return;var a=document.activeElement;if(a&&/INPUT|SELECT|TEXTAREA/.test(a.tagName))return;
- inflight=true;loadAll().then(function(ok){inflight=false;if(!ok)return;if(S.tab==="nt")openNt();draw()},function(e){inflight=false;if(e&&e.status===401)doLogout()})}
+ inflight=true;loadAll().then(function(ok){inflight=false;if(!ok)return;if(S.tab==="nt")openNt();if(S.tab==="ac")rvLoad();draw()},function(e){inflight=false;if(e&&e.status===401)doLogout()})}
 
 /* ===================== ส่วนแสดงผล ===================== */
 function mine(d){return JOBS.filter(function(j){return j.active&&bkDate(Date.parse(j.starts_at))===d}).sort(function(a,b){return a.starts_at<b.starts_at?-1:1})}
@@ -234,7 +234,7 @@ function chMsgHtml(m){var me=m.sender_id===SBS.user.id;return '<div class="msg '
 function chatRender(){if(!CH)return;var C=document.getElementById("app");
  C.innerHTML='<div class="chh"><button type="button" class="btn g" id="chback">← กลับ</button></div><h1 id="chtitle" tabindex="-1">แชตกับลูกค้า '+esc(CH.name)+'</h1><p class="sub">การจองเลขที่ '+esc(CH.ref)+', ข้อความนี้เห็นเฉพาะคุณกับลูกค้า ห้องแชตเปิดถึง 3 ชั่วโมงหลังการจองสิ้นสุด</p><div id="chl" class="chl" role="log" aria-live="polite" aria-label="ข้อความในห้องแชต">'+(CH.msgs.length?CH.msgs.map(chMsgHtml).join(""):'<p class="sub" id="chempty">ยังไม่มีข้อความ พิมพ์ข้อความแรกได้เลย</p>')+'</div><div id="che" role="alert" style="display:none;color:var(--bad);margin:8px 0"></div>'+
   (CH.closed?'<p class="sub">ห้องแชตนี้ปิดแล้ว อ่านย้อนหลังได้อย่างเดียว</p>':'<form id="chf" class="chf"><label class="vh" for="chi">พิมพ์ข้อความ</label><textarea id="chi" maxlength="500" rows="2" placeholder="พิมพ์ข้อความ (ไม่เกิน 500 ตัวอักษร)"></textarea><button class="btn" type="submit" id="chsend">ส่ง</button></form>');
- document.getElementById("navb").style.display="none";
+ var nb=document.getElementById("navb");document.documentElement.style.setProperty("--nbh",(nb?nb.offsetHeight:0)+"px");
  window.scrollTo(0,document.body.scrollHeight)}
 function chErr(t){var e=document.getElementById("che");if(!e)return;e.textContent=t||"";e.style.display=t?"":"none"}
 function chFetch(){if(!CH||chBusy)return Promise.resolve();chBusy=true;var c=CH,first=!c.loaded;
@@ -244,7 +244,7 @@ function chFetch(){if(!CH||chBusy)return Promise.resolve();chBusy=true;var c=CH,
   if(a.length){var l=document.getElementById("chl");if(l){var em=document.getElementById("chempty");if(em)em.remove();var near=l.scrollHeight-l.scrollTop-l.clientHeight<80;l.insertAdjacentHTML("beforeend",a.map(chMsgHtml).join(""));if(near)l.scrollTop=l.scrollHeight;window.scrollTo(0,document.body.scrollHeight)}
    if(a.some(function(m){return m.sender_id!==SBS.user.id}))chatReadMark()}},function(e){chBusy=false;if(CH!==c)return;if(first){c.loaded=true;chatRender();chErr(errTh(e,"โหลดข้อความไม่สำเร็จ"))}})}
 function chatReadMark(){if(!CH)return;var c=CH;sbApi("/rest/v1/rpc/chat_mark_read",{method:"POST",json:1,body:JSON.stringify({p_booking:c.bid,p_room:c.room})}).then(function(){delete CU[chKey(c.bid,c.room)]}).catch(function(){})}
-function openChat(bid,room,ref,name){CH={bid:bid,room:room,ref:ref,name:name,msgs:[],ids:{},last:null,loaded:false,closed:false,sending:false};S.chat=true;document.getElementById("navb").style.display="none";document.getElementById("app").innerHTML='<p class="sub" role="status">กำลังโหลดข้อความ</p>';window.scrollTo(0,0);
+function openChat(bid,room,ref,name){CH={bid:bid,room:room,ref:ref,name:name,msgs:[],ids:{},last:null,loaded:false,closed:false,sending:false};S.chat=true;document.getElementById("app").innerHTML='<p class="sub" role="status">กำลังโหลดข้อความ</p>';window.scrollTo(0,0);
  chFetch();clearInterval(chT);chT=setInterval(function(){if(!document.hidden)chFetch()},4000)}
 function closeChat(){clearInterval(chT);chT=null;CH=null;S.chat=false;document.getElementById("navb").style.display="";draw();loadAll().then(draw,function(){})}
 function chatSend(){if(!CH||CH.sending)return;var c=CH,ta=document.getElementById("chi"),txt=ta?ta.value.trim():"";if(!txt){if(ta)ta.focus();return}
@@ -263,8 +263,23 @@ function bindAcct(){ var ab=document.getElementById("avb");if(!ab)return;
   cropSquare(f,function(url){var path=SBS.user.id+"/staff-"+stamp()+".jpg";
    fetch(url).then(function(r){return r.blob()}).then(function(b){return sbApi("/storage/v1/object/avatars/"+path,{method:"POST",body:b,headers:{"Content-Type":"image/jpeg"}})})
    .then(function(){return saveSelf({photo:"avatars/"+path})}).catch(function(e){fail(errTh(e,"อัปโหลดรูปไม่สำเร็จ"))})},function(){fail("อ่านรูปไม่สำเร็จ ลองเลือกรูปอื่น")})};}
+/* ===== รีวิวของฉัน ===== */
+var RV={loaded:false,err:"",rows:[],show:10,busy:false,msg:""};
+function rvLoad(){if(!ME)return;sbApi("/rest/v1/review_staff?select=*&staff_id=eq."+ME.id+"&order=created_at.desc&limit=300").then(function(a){RV.rows=a||[];RV.loaded=true;RV.off=false;RV.err="";if(S.tab==="ac"&&!S.rvReply)draw()},function(e){RV.loaded=true;RV.err="";RV.rows=[];RV.off=true;if(S.tab==="ac"&&!S.rvReply)draw()})}
+function rvD(x){return new Date(x).toLocaleDateString("th-TH",{day:"numeric",month:"short",year:"numeric",timeZone:"Asia/Bangkok"})}
+function rvView(){if(!RV.loaded||RV.off)return"";var v=RV.rows.filter(function(x){return !x.hidden}),av=v.length?v.reduce(function(p,c){return p+c.rating},0)/v.length:null;
+ return '<div class="ctc"><b>รีวิวของฉัน</b>'+(RV.msg?'<div class="okb" role="status">'+esc(RV.msg)+'</div>':'')+'<p class="sub" style="margin:2px 0 8px">คะแนนเฉลี่ย '+(av==null?'ยังไม่มีคะแนน':av.toFixed(1)+' จาก 5 ('+v.length+' รีวิว)')+'. คะแนนส่วนนี้เห็นเฉพาะคุณ ร้านที่สังกัด และสมาคม</p>'+
+  (RV.rows.length?RV.rows.slice(0,RV.show).map(function(x){var key=x.id;return '<div class="nti"><div class="qh"><b>'+esc(x.reviewer_first)+'</b><span class="tag">'+x.rating+' คะแนน จาก 5</span>'+(x.hidden?'<span class="tag w">สมาคมซ่อนไว้</span>':'')+(x.reported&&!x.hidden?'<span class="tag w">แจ้งตรวจสอบแล้ว</span>':'')+'</div><small>'+rvD(x.created_at)+'</small>'+(x.comment?'<pre>'+esc(x.comment)+'</pre>':'')+
+   (x.reply?'<p style="margin:6px 0;border-left:4px solid var(--main);padding-left:10px"><small>คำตอบของคุณ</small><br>'+esc(x.reply)+'</p>':'')+
+   (S.rvReply===key?'<label for="rvtxt" class="sub">ข้อความตอบกลับ (ตอบได้ครั้งเดียว ไม่เกิน 300 ตัวอักษร)</label><textarea id="rvtxt" maxlength="300" rows="3" style="width:100%;font:inherit;padding:8px;border:2px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)"></textarea><div id="rverr" class="toast" role="alert" style="display:none"></div><div class="mini" style="display:flex;gap:6px;margin-top:8px"><button type="button" class="btn" data-a="rvsend" data-id="'+key+'">ส่งคำตอบ</button><button type="button" class="btn g" data-a="rvno">ยกเลิก</button></div>':
+    '<div class="mini" style="display:flex;gap:6px;margin-top:6px">'+(x.reply||x.hidden?'':'<button type="button" class="btn g" data-a="rvreply" data-id="'+key+'">ตอบกลับ</button>')+(x.reported||x.hidden?'':'<button type="button" class="btn g" data-a="rvrep" data-id="'+key+'">แจ้งแอดมินตรวจสอบ</button>')+'</div>')+'</div>'}).join(""):'<div class="empty">ยังไม่มีรีวิว</div>')+
+  (RV.rows.length>RV.show?'<button type="button" class="btn g" data-a="rvmore">ดูรีวิวเพิ่ม</button>':'')+'</div>'}
+function rvSend(id){if(RV.busy)return;var ta=document.getElementById("rvtxt"),t=ta?ta.value.trim():"",er=document.getElementById("rverr");
+ if(!t){if(er){er.textContent="กรุณาพิมพ์ข้อความตอบกลับ";er.style.display=""}return}
+ RV.busy=true;rpc("reply_review",{p_kind:"staff",p_id:id,p_text:t}).then(function(){RV.busy=false;var r=RV.rows.filter(function(x){return x.id===id})[0];if(r)r.reply=t;S.rvReply=null;RV.msg="ส่งคำตอบแล้ว";draw()},function(e){RV.busy=false;var x=document.getElementById("rverr");if(x){x.textContent=errTh(e,"ส่งคำตอบไม่สำเร็จ");x.style.display=""}})}
+function rvReport(id){rpc("report_review",{p_kind:"staff",p_id:id}).then(function(){var r=RV.rows.filter(function(x){return x.id===id})[0];if(r)r.reported=true;RV.msg="แจ้งสมาคมตรวจสอบแล้ว";draw()},function(e){RV.msg=errTh(e,"แจ้งไม่สำเร็จ");draw()})}
 function acView(){var ph=ME.photo_path?pubUrl(ME.photo_path):null;
- return'<h1>บัญชี</h1><div class="ctc"><div class="prof"><span class="av" aria-hidden="true">'+(ph?'<img loading="lazy" decoding="async" src="'+esc(ph)+'" alt="">':esc(ini(ME.name)))+'</span><div class="pn"><b>'+esc(ME.name)+'</b><small>'+esc(ME.place)+'</small><small>'+esc(ME.phone||"")+'</small></div></div><button type="button" class="btn g" id="avb" style="margin-top:10px">เปลี่ยนรูปโปรไฟล์</button><input type="file" id="photo" accept="image/*" hidden></div>'+ctView()+'<button type="button" class="btn g" id="logout" style="margin-top:14px">ออกจากระบบ</button>'}
+ return'<h1>บัญชี</h1><div class="ctc"><div class="prof"><span class="av" aria-hidden="true">'+(ph?'<img loading="lazy" decoding="async" src="'+esc(ph)+'" alt="">':esc(ini(ME.name)))+'</span><div class="pn"><b>'+esc(ME.name)+'</b><small>'+esc(ME.place)+'</small><small>'+esc(ME.phone||"")+'</small></div></div><button type="button" class="btn g" id="avb" style="margin-top:10px">เปลี่ยนรูปโปรไฟล์</button><input type="file" id="photo" accept="image/*" hidden></div>'+rvView()+ctView()+'<button type="button" class="btn g" id="logout" style="margin-top:14px">ออกจากระบบ</button>'}
 function focusJob(id){var e=document.querySelector('[data-id="'+id+'"][data-a=job],[data-id="'+id+'"][data-a=fin]')||document.querySelector('[data-id="'+id+'"][data-a=ns]');if(e)e.focus()}
 function fail(t){S.err=t;draw()}
 function saveSelf(o){var acc=o.accepting==null?ME.accepting:o.accepting,wd=o.wd||ME.work_days,keep=o.photo==null;
@@ -305,6 +320,7 @@ function view(){var t=today(),h="";
  return h}
 function draw(){if(!ME)return;
  if(S.chat&&document.getElementById("chl"))return;
+ if(S.rvReply&&document.getElementById("rvtxt"))return;
  document.getElementById("app").innerHTML=view();
  drawHeader();
  document.getElementById("nav").innerHTML=TABS.map(function(t){var u=t[0]==="nt"?ntUnread():t[0]==="q"?newJobs():0,lb=t[0]==="nt"?"ยังไม่ได้อ่าน "+u+" รายการ":"งานใหม่ที่ยังไม่ได้รับ "+u+" งาน";return'<button type="button" data-a="tab" data-id="'+t[0]+'" class="'+(t[0]===S.tab?"on":"")+'"><span aria-hidden="true">'+t[2]+'</span>'+t[1]+(S.tab!==t[0]&&u?'<i class="bdg" aria-label="'+lb+'">'+u+'</i>':'')+'</button>'}).join("");
@@ -314,7 +330,12 @@ function draw(){if(!ME)return;
 /* ===================== การกระทำ ===================== */
 document.addEventListener("click",function(e){
  var el=e.target.closest&&e.target.closest("[data-a]");if(!el||!ME)return;var a=el.dataset.a,id=el.dataset.id;
- if(a==="tab"){S.tab=id;S.err="";S.ok="";S.cfm=null;if(id==="nt")openNt();draw();return}
+ if(a==="tab"){S.tab=id;S.err="";S.ok="";S.cfm=null;S.rvReply=null;if(id==="nt")openNt();if(id==="ac")rvLoad();draw();return}
+ if(a==="rvreply"){S.rvReply=id;draw();var ta=document.getElementById("rvtxt");if(ta)ta.focus();return}
+ if(a==="rvno"){S.rvReply=null;draw();return}
+ if(a==="rvsend"){rvSend(id);return}
+ if(a==="rvrep"){rvReport(id);return}
+ if(a==="rvmore"){RV.show+=10;draw();return}
  if(a==="ntf"){S.ntf=id;draw();return}
  if(a==="qt"){S.qt=id;draw();return}
  if(S.busy)return;
