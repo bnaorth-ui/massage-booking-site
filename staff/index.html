@@ -65,6 +65,7 @@ button:focus-visible,select:focus-visible{outline:3px solid var(--main);outline-
 .toast{background:var(--bad-bg);color:var(--bad);border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:.92rem}
 .ok{background:var(--soft);color:var(--main);border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:.92rem}
 .q a{color:var(--main)}
+.chh{margin:0 0 6px}.chh .btn{width:auto;padding:8px 14px}.chl{display:flex;flex-direction:column;gap:8px;margin:10px 0 90px}.msg{max-width:85%;border-radius:14px;padding:8px 12px;border:2px solid var(--line);background:var(--card)}.msg.mine{align-self:flex-end;background:var(--soft)}.msg small{display:block;opacity:.8}.msg p{margin:2px 0 0;overflow-wrap:anywhere}.chf{position:sticky;bottom:0;display:flex;gap:8px;align-items:flex-end;background:var(--bg);padding:10px 0;border-top:1px solid var(--line)}.chf textarea{flex:1;margin:0;resize:none;font:inherit;padding:10px;border:2px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}.chf .btn{width:auto;margin:0;padding:10px 18px}.cn{display:inline-block;min-width:22px;border-radius:99px;background:#d64545;color:#fff;font-size:.8rem;padding:0 6px;margin-left:6px}.chb{margin-top:8px}.chb .btn{width:auto;padding:8px 14px}.vh{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
 </style>
 </head>
 <body>
@@ -147,7 +148,7 @@ function loadAll(){
     JOBS=r[0]||[];OFFS=(r[1]||[]).map(function(x){return x.day});
     NT=(r[2]||[]).filter(function(n){return n.kind!=="announce"});READS=(r[3]||[]).map(function(x){return x.notification_id});
     var st=(r[5]||[])[0]||{};CT={name:st.association_name||"",addr:st.address||"",phone:st.phone||"",line:st.line_url||"",hours:st.hours_text||"",ach:+st.auto_close_hours||0};
-    ANN=(r[4]||[]).filter(function(a){return(a.audiences||[]).indexOf("พนักงาน")>-1});return true})})}
+    ANN=(r[4]||[]).filter(function(a){return(a.audiences||[]).indexOf("พนักงาน")>-1});return loadChatUnread().then(function(){return true})})})}
 function feed(){var L=[];
  ANN.forEach(function(a){L.push({id:"a-"+a.id,from:"admin",title:"ประกาศ: "+a.title,text:a.body||"",at:a.created_at||(a.day+"T00:00:00Z")})});
  NT.forEach(function(n){L.push({id:"n-"+n.id,nid:n.id,from:"booking",title:n.title,text:n.body||"",at:n.created_at})});
@@ -222,8 +223,37 @@ function jobHtml(j){
  var st=JSTEPS[rk],late=j.ends_at<new Date().toISOString(),ns=rk<2&&j.starts_at<=new Date().toISOString();
  return'<div class="jobs" role="group" aria-label="อัปเดตสถานะงานของคิวนี้"><span class="tag w">'+JL[rk]+'</span><button type="button" class="btn" data-a="'+(rk===2?"fin":"job")+'" data-job="'+st[2]+'" data-id="'+j.id+'" aria-label="'+st[1]+' '+esc(who)+'"'+(S.busy?" disabled":"")+'>'+st[1]+'</button>'+(ns?'<button type="button" class="btn g" data-a="ns" data-id="'+j.id+'" aria-label="ลูกค้าไม่มา '+esc(who)+'"'+(S.busy?" disabled":"")+'>ลูกค้าไม่มา</button>':'')+'</div>'+
   (late&&CT.ach>0?'<small class="acc">⏱ คิวจบแล้ว กดเสร็จสิ้นงานหรือลูกค้าไม่มาภายใน '+new Date(Date.parse(j.ends_at)+CT.ach*3600000).toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit",timeZone:"Asia/Bangkok"})+' น. มิฉะนั้นระบบจะปิดงานและคิดค่าบริการให้เอง</small>':'')}
+/* ===== แชต (ผูกกับการจอง) ===== */
+var CHOK=false,CU={},CH=null,chT=null,chBusy=false;
+function chKey(b,r){return b+"|"+r}
+function loadChatUnread(){return sbApi("/rest/v1/rpc/chat_unread",{method:"POST",json:1,body:"{}"}).then(function(a){CHOK=true;CU={};(a||[]).forEach(function(x){CU[chKey(x.booking_id,x.room)]=+x.n})}).catch(function(){})}
+function chatBtn(bid,room,ref,name,endIso,active){if(!CHOK||!bid||!active)return"";if(Date.parse(endIso)+3*3600000<Date.now())return"";var n=CU[chKey(bid,room)]||0;
+ return '<div class="chb"><button type="button" class="btn g" data-chat="'+bid+'" data-room="'+esc(room)+'" data-ref="'+esc(ref)+'" data-name="'+esc(name)+'">💬 แชตกับลูกค้า'+(n?' <span class="cn" aria-label="ข้อความใหม่ '+n+' ข้อความ">'+n+'</span>':'')+'</button></div>'}
+function chTime(iso){var d=new Date(iso),t=d.toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit",timeZone:"Asia/Bangkok"}),day=function(x){return new Date(x.getTime()+252e5).toISOString().slice(0,10)};return (day(d)===day(new Date())?"":d.toLocaleDateString("th-TH",{day:"numeric",month:"short",timeZone:"Asia/Bangkok"})+" ")+t+" น."}
+function chMsgHtml(m){var me=m.sender_id===SBS.user.id;return '<div class="msg '+(me?"mine":"theirs")+'"><small>'+(me?"คุณ":esc(m.sender_name||"ลูกค้า"))+', '+chTime(m.created_at)+'</small><p>'+esc(m.body).replace(/\n/g,"<br>")+'</p></div>'}
+function chatRender(){if(!CH)return;var C=document.getElementById("app");
+ C.innerHTML='<div class="chh"><button type="button" class="btn g" id="chback">← กลับ</button></div><h1 id="chtitle" tabindex="-1">แชตกับลูกค้า '+esc(CH.name)+'</h1><p class="sub">การจองเลขที่ '+esc(CH.ref)+', ข้อความนี้เห็นเฉพาะคุณกับลูกค้า ห้องแชตเปิดถึง 3 ชั่วโมงหลังการจองสิ้นสุด</p><div id="chl" class="chl" role="log" aria-live="polite" aria-label="ข้อความในห้องแชต">'+(CH.msgs.length?CH.msgs.map(chMsgHtml).join(""):'<p class="sub" id="chempty">ยังไม่มีข้อความ พิมพ์ข้อความแรกได้เลย</p>')+'</div><div id="che" role="alert" style="display:none;color:var(--bad);margin:8px 0"></div>'+
+  (CH.closed?'<p class="sub">ห้องแชตนี้ปิดแล้ว อ่านย้อนหลังได้อย่างเดียว</p>':'<form id="chf" class="chf"><label class="vh" for="chi">พิมพ์ข้อความ</label><textarea id="chi" maxlength="500" rows="2" placeholder="พิมพ์ข้อความ (ไม่เกิน 500 ตัวอักษร)"></textarea><button class="btn" type="submit" id="chsend">ส่ง</button></form>');
+ document.getElementById("navb").style.display="none";
+ window.scrollTo(0,document.body.scrollHeight)}
+function chErr(t){var e=document.getElementById("che");if(!e)return;e.textContent=t||"";e.style.display=t?"":"none"}
+function chFetch(){if(!CH||chBusy)return Promise.resolve();chBusy=true;var c=CH,first=!c.loaded;
+ var path="/rest/v1/chat_messages?select=id,sender_id,sender_role,sender_name,body,created_at&booking_id=eq."+c.bid+"&room_key=eq."+encodeURIComponent(c.room)+"&order=created_at.asc&limit=200"+(c.last?"&created_at=gt."+encodeURIComponent(c.last):"");
+ return sbApi(path).then(function(a){chBusy=false;if(CH!==c)return;a=(a||[]).filter(function(m){return !c.ids[m.id]});a.forEach(function(m){c.ids[m.id]=1;c.msgs.push(m);c.last=m.created_at});c.loaded=true;
+  if(first){chatRender();chatReadMark();var t=document.getElementById("chtitle");if(t)t.focus();return}
+  if(a.length){var l=document.getElementById("chl");if(l){var em=document.getElementById("chempty");if(em)em.remove();var near=l.scrollHeight-l.scrollTop-l.clientHeight<80;l.insertAdjacentHTML("beforeend",a.map(chMsgHtml).join(""));if(near)l.scrollTop=l.scrollHeight;window.scrollTo(0,document.body.scrollHeight)}
+   if(a.some(function(m){return m.sender_id!==SBS.user.id}))chatReadMark()}},function(e){chBusy=false;if(CH!==c)return;if(first){c.loaded=true;chatRender();chErr(errTh(e,"โหลดข้อความไม่สำเร็จ"))}})}
+function chatReadMark(){if(!CH)return;var c=CH;sbApi("/rest/v1/rpc/chat_mark_read",{method:"POST",json:1,body:JSON.stringify({p_booking:c.bid,p_room:c.room})}).then(function(){delete CU[chKey(c.bid,c.room)]}).catch(function(){})}
+function openChat(bid,room,ref,name){CH={bid:bid,room:room,ref:ref,name:name,msgs:[],ids:{},last:null,loaded:false,closed:false,sending:false};S.chat=true;document.getElementById("navb").style.display="none";document.getElementById("app").innerHTML='<p class="sub" role="status">กำลังโหลดข้อความ</p>';window.scrollTo(0,0);
+ chFetch();clearInterval(chT);chT=setInterval(function(){if(!document.hidden)chFetch()},4000)}
+function closeChat(){clearInterval(chT);chT=null;CH=null;S.chat=false;document.getElementById("navb").style.display="";draw();loadAll().then(draw,function(){})}
+function chatSend(){if(!CH||CH.sending)return;var c=CH,ta=document.getElementById("chi"),txt=ta?ta.value.trim():"";if(!txt){if(ta)ta.focus();return}
+ c.sending=true;var bt=document.getElementById("chsend");if(bt)bt.disabled=true;chErr("");
+ sbApi("/rest/v1/rpc/chat_send",{method:"POST",json:1,body:JSON.stringify({p_booking:c.bid,p_room:c.room,p_body:txt})}).then(function(){c.sending=false;if(CH!==c)return;if(ta)ta.value="";if(bt)bt.disabled=false;chBusy=false;return chFetch().then(function(){var t=document.getElementById("chi");if(t)t.focus()})},function(e){c.sending=false;if(bt)bt.disabled=false;var m=errTh(e,"ส่งข้อความไม่สำเร็จ");if(/ปิดแล้ว/.test(m))c.closed=true;chErr(m);if(c.closed){clearInterval(chT);var f=document.getElementById("chf");if(f)f.outerHTML='<p class="sub">ห้องแชตนี้ปิดแล้ว อ่านย้อนหลังได้อย่างเดียว</p>'}})}
+document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest("[data-chat],#chback");if(!el)return;if(el.id==="chback"){closeChat();return}openChat(el.dataset.chat,el.dataset.room,el.dataset.ref,el.dataset.name)});
+document.addEventListener("submit",function(e){if(e.target&&e.target.id==="chf"){e.preventDefault();chatSend()}});
 function jobCard(j,showDate){var rk=JRANK[j.job]||0,live=j.active&&j.bstatus==="confirmed"&&rk<3,d=bkDate(Date.parse(j.starts_at));
- return'<div class="q'+(live&&rk===0?" now":"")+'"><div class="qh"><span class="t">'+(showDate?thS(d)+", ":"")+rng(j)+'</span>'+(live&&rk===0?'<span class="tag w">คิวใหม่</span>':'')+'</div><b>'+esc(j.customer)+'</b>'+(j.phone?'<small>โทร <a href="tel:'+esc(j.phone)+'">'+esc(j.phone)+'</a></small>':'')+'<small>'+esc(j.service)+', '+j.minutes+' นาที'+(j.price>0?', ราคา '+Number(j.price).toLocaleString("th-TH")+' บาท':'')+'</small><small>'+esc(j.place)+', เลขที่ '+esc(j.ref)+'</small>'+(live&&rk===0&&j.accept_by?'<small class="acc">⏱ กดรับงานภายใน '+new Date(j.accept_by).toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit",timeZone:"Asia/Bangkok"})+' น. มิฉะนั้นระบบจะยกเลิกคิวนี้อัตโนมัติ</small>':'')+jobHtml(j)+'</div>'}
+ return'<div class="q'+(live&&rk===0?" now":"")+'"><div class="qh"><span class="t">'+(showDate?thS(d)+", ":"")+rng(j)+'</span>'+(live&&rk===0?'<span class="tag w">คิวใหม่</span>':'')+'</div><b>'+esc(j.customer)+'</b>'+(j.phone?'<small>โทร <a href="tel:'+esc(j.phone)+'">'+esc(j.phone)+'</a></small>':'')+'<small>'+esc(j.service)+', '+j.minutes+' นาที'+(j.price>0?', ราคา '+Number(j.price).toLocaleString("th-TH")+' บาท':'')+'</small><small>'+esc(j.place)+', เลขที่ '+esc(j.ref)+'</small>'+(live&&rk===0&&j.accept_by?'<small class="acc">⏱ กดรับงานภายใน '+new Date(j.accept_by).toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit",timeZone:"Asia/Bangkok"})+' น. มิฉะนั้นระบบจะยกเลิกคิวนี้อัตโนมัติ</small>':'')+jobHtml(j)+chatBtn(j.booking_id,"staff:"+ME.id,j.ref,j.customer,j.ends_at,j.bstatus==="confirmed"||j.bstatus==="completed")+'</div>'}
 function drawHeader(){var ph=ME.photo_path?pubUrl(ME.photo_path):null,on=ME.accepting;
  document.getElementById("hdr").innerHTML='<div class="prof"><span class="av" aria-hidden="true">'+(ph?'<img loading="lazy" decoding="async" src="'+esc(ph)+'" alt="">':esc(ini(ME.name)))+'</span><div class="pn"><b>'+esc(ME.name)+'</b><small>'+esc(ME.place)+'</small></div><label class="sw'+(on?"":" off")+'"><input type="checkbox" id="onsw" role="switch"'+(on?" checked":"")+' aria-label="เปิดรับงาน"><span class="sl"></span><span class="st">'+(on?"เปิดรับงาน":"ปิดรับงาน")+'</span></label></div>';
  document.getElementById("onsw").onchange=function(){saveSelf({accepting:this.checked})}}
@@ -274,6 +304,7 @@ function view(){var t=today(),h="";
  if(S.tab==="nt")h=(S.err?'<div class="toast" role="alert">'+esc(S.err)+'</div>':'')+ntView();
  return h}
 function draw(){if(!ME)return;
+ if(S.chat&&document.getElementById("chl"))return;
  document.getElementById("app").innerHTML=view();
  drawHeader();
  document.getElementById("nav").innerHTML=TABS.map(function(t){var u=t[0]==="nt"?ntUnread():t[0]==="q"?newJobs():0,lb=t[0]==="nt"?"ยังไม่ได้อ่าน "+u+" รายการ":"งานใหม่ที่ยังไม่ได้รับ "+u+" งาน";return'<button type="button" data-a="tab" data-id="'+t[0]+'" class="'+(t[0]===S.tab?"on":"")+'"><span aria-hidden="true">'+t[2]+'</span>'+t[1]+(S.tab!==t[0]&&u?'<i class="bdg" aria-label="'+lb+'">'+u+'</i>':'')+'</button>'}).join("");
