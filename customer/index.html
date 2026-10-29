@@ -251,7 +251,7 @@ function autoWatch(){try{if(!navigator.geolocation)return;var ask=function(){nav
 function tabsRender(){var t=document.getElementById("tabs");if(!t)return;if(!ME||CAT.state!=="ok"){t.style.display="none";return}
  var u=unread(),up=allBk().filter(isUp).length,cur=S.view==="pv"?"ac":(S.view||""),T=[["","🏠","หน้าหลัก",0,""],["bk","📋","รายการ",up,"กำลังจะถึง "+up+" รายการ"],["nt","🔔","แจ้งเตือน",u,"ยังไม่ได้อ่าน "+u+" รายการ"],["ac","👤","บัญชี",0,""]];
  t.innerHTML="<div>"+T.map(function(x){return '<button type="button" data-tab="'+x[0]+'"'+(cur===x[0]?' class="on"':'')+'><span aria-hidden="true">'+x[1]+'</span><b>'+x[2]+'</b>'+(x[3]?'<i class="bdg'+(x[0]==="bk"?" b2":"")+'" aria-label="'+x[4]+'">'+x[3]+'</i>':'')+'</button>'}).join("")+"</div>";t.style.display="";
- t.querySelectorAll("[data-tab]").forEach(function(e){e.onclick=function(){var v=e.dataset.tab;V.del=false;RF=null;RL=null;V.rv=false;V.cfm=null;V.prevSeen=null;if(v){S.view=v;render();refreshUser()}else{S.view=null;V.flash="";if(S.step===5)S=fresh();render()}}})}
+ t.querySelectorAll("[data-tab]").forEach(function(e){e.onclick=function(){var v=e.dataset.tab;V.del=false;V.pwc=false;V.pwok="";RF=null;RL=null;V.rv=false;V.cfm=null;V.prevSeen=null;if(v){S.view=v;render();refreshUser()}else{S.view=null;V.flash="";if(S.step===5)S=fresh();render()}}})}
 function okUrl(u){return /^https?:\/\//i.test(u||"")}
 function ctHtml(){var c=SET.ct||{},tel=String(c.phone||"").replace(/[^0-9+]/g,""),h='<h2 class="stl">ติดต่อเรา</h2>';
  h+='<div class="ct"><b>'+esc(c.name||"สมาคมวิทยากรฝึกอาชีพคนตาบอด")+'</b>'+(c.addr?'<p>'+esc(c.addr)+'</p>':'')+'</div>';
@@ -281,7 +281,8 @@ function viewRender(){var h="",b="";
    EMP={up:"ไม่มีรายการจองที่กำลังจะถึง",hist:"ยังไม่มีประวัติการจอง",cx:"ไม่มีงานที่ถูกยกเลิก"};
   h='<h1>รายการ</h1>'+(V.flash?'<div class="flash" role="status">'+esc(V.flash)+'</div>':'')+'<div class="tg" role="tablist" aria-label="หมวดรายการ">'+TB.map(function(x){return '<button type="button" role="tab" data-bt="'+x[0]+'" class="'+(x[0]===cu[0]?"on":"")+'" aria-selected="'+(x[0]===cu[0])+'">'+x[1]+' ('+x[2].length+')</button>'}).join("")+'</div>'+(cu[2].length?bkPage(cu):'<div class="empty">'+EMP[cu[0]]+'</div>')+(cu[0]!=="up"?'<p class="hint">แสดงประวัติย้อนหลัง 12 เดือน</p>':'')}
  if(S.view==="pv"){h='<button type="button" class="lb" data-view="ac">← กลับไปหน้าบัญชี</button><h1>นโยบายความเป็นส่วนตัว</h1>'+pvHtml()}
- if(S.view==="ac"){h='<h1>บัญชี</h1>'+profHtml()+ptsCard()+ctHtml()+'<button type="button" class="btn wide ghost" data-view="pv" style="margin-top:14px">นโยบายความเป็นส่วนตัว</button>'+'<button type="button" class="btn wide ghost" data-auth="out" style="margin-top:14px">ออกจากระบบ</button><h2 class="stl">ลบบัญชี</h2><p class="hint">ลบบัญชีและข้อมูลส่วนตัวของคุณถาวร กู้คืนไม่ได้</p><button type="button" class="btn wide dgr ghost" data-del="ask" style="margin-top:8px">ลบบัญชีของฉัน</button>'}
+ if(S.view==="ac"&&V.pwc){h='<button type="button" class="lb" data-pw="no">← กลับ</button><h1 id="pwt" tabindex="-1">เปลี่ยนรหัสผ่าน</h1><p class="sub">กรอกรหัสผ่านเดิม แล้วตั้งรหัสผ่านใหม่</p><form id="pwf" novalidate>'+fld("pwo","รหัสผ่านเดิม (หรือรหัสชั่วคราวที่สมาคมให้)","password",'autocomplete="current-password"')+fld("pwn","รหัสผ่านใหม่ (อย่างน้อย 6 ตัวอักษร)","password",'autocomplete="new-password"')+fld("pwn2","ยืนยันรหัสผ่านใหม่","password",'autocomplete="new-password"')+'<p class="aerr" id="pwerr" role="alert"></p><div class="mbtns"><button type="button" class="btn ghost" data-pw="no">ยกเลิก</button><button type="submit" class="btn" id="pwgo">บันทึกรหัสผ่านใหม่</button></div></form>'}
+ if(S.view==="ac"&&!V.pwc){h='<h1>บัญชี</h1>'+(V.pwok?'<div class="flash" role="status">'+esc(V.pwok)+'</div>':'')+profHtml()+ptsCard()+ctHtml()+'<button type="button" class="btn wide ghost" data-view="pv" style="margin-top:14px">นโยบายความเป็นส่วนตัว</button>'+'<button type="button" class="btn wide ghost" data-pw="ask" style="margin-top:10px">เปลี่ยนรหัสผ่าน</button><button type="button" class="btn wide ghost" data-auth="out" style="margin-top:14px">ออกจากระบบ</button><h2 class="stl">ลบบัญชี</h2><p class="hint">ลบบัญชีและข้อมูลส่วนตัวของคุณถาวร กู้คืนไม่ได้</p><button type="button" class="btn wide dgr ghost" data-del="ask" style="margin-top:8px">ลบบัญชีของฉัน</button>'}
  if(S.view==="ac"&&V.del){h='<button type="button" class="lb" data-del="no">← ยกเลิก ไม่ลบ</button><h1 id="delt" tabindex="-1">ลบบัญชีถาวร</h1><p>การลบนี้กู้คืนไม่ได้ สิ่งที่จะเกิดขึ้น</p><ul class="pvl"><li>โปรไฟล์ รูปโปรไฟล์ แต้มสะสม การแจ้งเตือน และข้อความแชตที่คุณส่ง จะถูกลบ</li><li>ประวัติการจองจะถูกล้างชื่อและเบอร์โทร ไม่ผูกกับคุณอีก</li><li>รีวิวที่คุณเขียนยังอยู่ แต่ไม่ผูกกับบัญชีคุณ</li><li>ต้องไม่มีการจองที่ยังไม่เสร็จสิ้น</li></ul><form id="delf" novalidate>'+fld("delpw","กรอกรหัสผ่านเพื่อยืนยัน","password",'autocomplete="current-password"')+'<p class="aerr" id="delerr" role="alert"></p><div class="mbtns"><button type="button" class="btn" data-del="no">ยกเลิก ไม่ลบ</button><button type="submit" class="btn dgr" id="delgo">ยืนยันลบบัญชีถาวร</button></div></form>'}
  if(S.view==="nt"){var prev=V.prevSeen!=null?V.prevSeen:(V.prevSeen=seenAt()),notes=userNotes(),an=ANN.filter(function(x){return x.on&&(x.auds||[]).indexOf("ผู้ใช้งาน")>-1});
   try{localStorage.setItem("notifSeen",new Date().toISOString())}catch(e){}
@@ -296,6 +297,7 @@ function render(keep){
  if(CAT.state!=="ok"){catRender();return}
  if(V.chat&&CH){if(!document.getElementById("chl"))chatRender();return}
  if(V.del&&S.view==="ac"&&document.getElementById("delf"))return;
+ if(V.pwc&&S.view==="ac"&&document.getElementById("pwf"))return;
  if(V.rv&&(RF||RL)){if(!document.getElementById("rvp"))rvRender();return}
  if(S.view){var vv=viewRender();app.innerHTML=vv[0];bar.innerHTML=vv[1]?"<div>"+vv[1]+"</div>":"";bar.style.display=vv[1]?"":"none";if(!keep)window.scrollTo(0,0);bind();return}
  var h="",b="";
@@ -386,6 +388,8 @@ function bind(){
  q("[data-act=busy]").forEach(function(e){e.onclick=function(){S.busyErr="";render(true)}});
  q("[data-del]").forEach(function(e){e.onclick=function(){V.del=e.dataset.del==="ask";render();if(V.del){var t=document.getElementById("delt");if(t)t.focus()}else window.scrollTo(0,document.body.scrollHeight)}});
  if(g("delf"))g("delf").onsubmit=function(ev){ev.preventDefault();delAccount()};
+ q("[data-pw]").forEach(function(e){e.onclick=function(){V.pwc=e.dataset.pw==="ask";V.pwok="";render();if(V.pwc){var t=document.getElementById("pwt");if(t)t.focus()}else window.scrollTo(0,0)}});
+ if(g("pwf"))g("pwf").onsubmit=function(ev){ev.preventDefault();pwChange()};
  q("[data-more]").forEach(function(e){e.onclick=function(){var k=e.dataset.more,old=document.querySelectorAll(".bk").length;BPG[k]=(BPG[k]||10)+10;render(true);var c=document.querySelectorAll(".bk")[old];if(c){c.setAttribute("tabindex","-1");c.focus()}}});
  q("[data-rv]").forEach(function(e){e.onclick=function(){openRvList(e.dataset.rv,e.dataset.n)}});
  q("[data-rate]").forEach(function(e){e.onclick=function(){openRvForm(e.dataset.rate)}});
@@ -559,6 +563,20 @@ function closeChat(){clearInterval(chT);chT=null;CH=null;V.chat=false;render();r
 function chatSend(){if(!CH||CH.sending)return;var c=CH,ta=document.getElementById("chi"),txt=ta?ta.value.trim():"";if(!txt){if(ta)ta.focus();return}
  c.sending=true;var bt=document.getElementById("chsend");if(bt)bt.disabled=true;chErr("");
  sbApi("/rest/v1/rpc/chat_send",{method:"POST",json:1,body:JSON.stringify({p_booking:c.bid,p_room:c.room,p_body:txt})}).then(function(){c.sending=false;if(CH!==c)return;if(ta)ta.value="";if(bt)bt.disabled=false;chBusy=false;return chFetch().then(function(){var t=document.getElementById("chi");if(t)t.focus()})},function(e){c.sending=false;if(bt)bt.disabled=false;var m=errTh(e,"ส่งข้อความไม่สำเร็จ");if(/ปิดแล้ว/.test(m))c.closed=true;chErr(m);if(c.closed){clearInterval(chT);var f=document.getElementById("chf");if(f)f.outerHTML='<p class="hint">ห้องแชตนี้ปิดแล้ว อ่านย้อนหลังได้อย่างเดียว</p>'}})}
+/* ===== เปลี่ยนรหัสผ่าน ===== */
+var PWB=false;
+function pwErr(t){var e=document.getElementById("pwerr");if(e)e.textContent=t||""}
+function pwChange(){if(PWB)return;var o=document.getElementById("pwo").value,n=document.getElementById("pwn").value,n2=document.getElementById("pwn2").value;
+ if(!o){pwErr("กรอกรหัสผ่านเดิม");document.getElementById("pwo").focus();return}
+ if(n.length<6){pwErr("รหัสผ่านใหม่ต้องมีอย่างน้อย 6 ตัวอักษร");document.getElementById("pwn").focus();return}
+ if(n!==n2){pwErr("รหัสผ่านใหม่ทั้งสองช่องไม่ตรงกัน");document.getElementById("pwn2").focus();return}
+ if(n===o){pwErr("รหัสผ่านใหม่ต้องไม่ซ้ำกับรหัสผ่านเดิม");return}
+ PWB=true;document.getElementById("pwgo").disabled=true;pwErr("");
+ sbReq("/auth/v1/token?grant_type=password",{method:"POST",json:1,auth:false,body:JSON.stringify({email:sbEmail(ME.phone),password:o})}).then(sbSet,function(e){var x=new Error(e&&e.message==="NET"?errTh(e):"รหัสผ่านเดิมไม่ถูกต้อง");x.stop=1;throw x})
+  .then(function(){return sbApi("/auth/v1/user",{method:"PUT",json:1,body:JSON.stringify({password:n})})})
+  .then(function(){PWB=false;V.pwc=false;V.pwok="เปลี่ยนรหัสผ่านเรียบร้อยแล้ว ครั้งต่อไปให้เข้าสู่ระบบด้วยรหัสผ่านใหม่";render();window.scrollTo(0,0)},
+   function(e){PWB=false;var b=document.getElementById("pwgo");if(b)b.disabled=false;
+    pwErr(e&&e.stop?e.message:(e&&(e.code==="same_password"||/different from the old/i.test(e.message||""))?"รหัสผ่านใหม่ต้องไม่ซ้ำกับรหัสผ่านเดิม":(e&&(e.code==="weak_password")?"รหัสผ่านใหม่คาดเดาง่ายเกินไป ลองตั้งใหม่":errTh(e,"เปลี่ยนรหัสผ่านไม่สำเร็จ"))))})}
 /* ===== ลบบัญชี ===== */
 function delErr(t){var e=document.getElementById("delerr");if(e)e.textContent=t||""}
 function delAccount(){var pw=document.getElementById("delpw").value,bt=document.getElementById("delgo");if(DELB)return;
@@ -645,7 +663,11 @@ function authRender(){var tb=document.getElementById("tabs");if(tb)tb.style.disp
  if(st==="pv"){
   h='<div class="alinks"><button class="lb" data-ag="'+(AU.pvBack==="reg"?"reg":"login")+'">← กลับ</button></div><h1 id="pvt" tabindex="-1">นโยบายความเป็นส่วนตัว</h1>'+pvHtml()}
  if(st==="fp"){
-  h='<h1>ลืมรหัสผ่าน</h1><div class="codebox">การรีเซ็ตรหัสผ่านอัตโนมัติด้วย SMS ยังไม่เปิดให้บริการ<small>กรุณาติดต่อสมาคมวิทยากรฝึกอาชีพคนตาบอด เพื่อให้เจ้าหน้าที่ช่วยตั้งรหัสผ่านใหม่ให้</small></div>'+
+  if(AU.ct===undefined&&!AU.ctLoading){AU.ctLoading=true;sbReq("/rest/v1/rpc/public_contact",{method:"POST",json:1,auth:false,body:"{}"}).then(function(j){AU.ct=j||null},function(){AU.ct=null}).then(function(){AU.ctLoading=false;if(AU.step==="fp"&&!SBS)authRender()})}
+  var ct=AU.ct,tel=ct&&String(ct.phone||"").replace(/[^0-9+]/g,""),ln=ct&&/^https?:\/\//i.test(ct.line||"")?ct.line:"";
+  h='<h1>ลืมรหัสผ่าน</h1><div class="codebox">ระบบยังไม่มีการรีเซ็ตรหัสผ่านอัตโนมัติ<small>กรุณาติดต่อ'+esc(ct&&ct.name||"สมาคมวิทยากรฝึกอาชีพคนตาบอด")+' เจ้าหน้าที่จะสอบถามข้อมูลเพื่อยืนยันตัวตนก่อน แล้วตั้งรหัสผ่านชั่วคราวให้</small></div>'+
+  (tel||ln||(ct&&ct.hours)?'<div class="codebox">'+(tel?'<a class="btn wide" href="tel:'+esc(tel)+'">โทร '+esc(ct.phone)+'</a>':'')+(ln?'<a class="btn wide ghost" href="'+esc(ln)+'" target="_blank" rel="noopener" style="margin-top:8px">ติดต่อทาง LINE</a>':'')+(ct.hours?'<small>เวลาทำการ: '+esc(ct.hours)+'</small>':'')+'</div>':(AU.ctLoading?'<p class="hint" role="status">กำลังโหลดช่องทางติดต่อ…</p>':''))+
+  '<p class="hint">หลังได้รหัสชั่วคราว ให้เข้าสู่ระบบ แล้วเปลี่ยนรหัสผ่านเองทันทีที่หน้า "บัญชี" &gt; "เปลี่ยนรหัสผ่าน"</p>'+
   '<div class="alinks"><button class="lb" data-ag="login">กลับไปเข้าสู่ระบบ</button></div>'}
  a.innerHTML=h;window.scrollTo(0,0);AU.ok="";
  var g=function(i){return document.getElementById(i)},er=function(t){g("aerr").textContent=t},v=function(i){return g(i).value};
