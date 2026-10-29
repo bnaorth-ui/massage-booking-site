@@ -54,6 +54,7 @@ h1{font-size:1.4rem;margin:8px 0 4px}
 .promo{background:var(--soft);border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:.92rem}.promo small{display:block;color:var(--ink)}
 .err{background:#fbe6e1;color:#b3402a;border-radius:10px;padding:10px 12px;margin:10px 0;font-size:.92rem}
 .card2{margin:0 0 12px}
+.ptsbox{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:14px;margin:0 0 12px}.ptsbox b{display:block}.ptsbox p{margin:6px 0}.ptsn b{display:inline;font-size:2rem}.chk{display:flex;align-items:center;gap:10px;min-height:44px;font-weight:700}.chk input{width:24px;height:24px}.ptsl{margin:10px 0 0;padding-left:20px}.ptsl li{padding:4px 0}
 .inbtns{display:flex;gap:10px;margin-top:16px}.inbtns .btn{margin:0}
 .mbtns a.btn{flex:1;margin:0;padding:10px;text-align:center;text-decoration:none;display:block}
 .ct{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:14px;margin:0 0 12px}.ct b{display:block;font-size:1.1rem}.ct p{margin:4px 0 0;color:var(--mute);white-space:pre-line}.ct .hr{display:block;white-space:pre-line;margin-top:6px}a.cta{display:flex;align-items:center;gap:12px;text-decoration:none;font-weight:700;background:var(--main);color:var(--main-ink);border:2px solid var(--main);border-radius:12px;padding:16px;margin:0 0 10px}a.cta.line{background:#06c755;border-color:#06c755;color:#fff}a.cta.reg{background:transparent;color:var(--main)}a.cta span{font-size:1.6rem}a.cta small{display:block;font-weight:400;opacity:.9}a.cta:focus-visible{outline:3px solid var(--main);outline-offset:2px}
@@ -105,6 +106,7 @@ h1{font-size:1.4rem;margin:8px 0 4px}
 <div class="tabs" id="tabs" style="display:none"></div>
 <script>
 /* ข้อมูลร้าน บริการ พนักงาน โปรโมชั่น ประกาศ มาจากฐานข้อมูล Supabase หลังเข้าสู่ระบบ (ดู loadCatalog) ค่าด้านล่างเป็นค่าเริ่มต้นก่อนโหลด */
+var PT=null;
 var SET={defShop:{dur:60,adv:14,cancelH:24,radius:10,notifyNew:1,notifyPromo:1,notifyRadius:5,remind:[120],staffRemind:[30]},defOrg:{dur:60,adv:14,cancelH:24,radius:1,notifyOn:1,notifyComp:1,notifyRadius:3,openAt:480,preOpen:[60],remind:[120],staffRemind:[30]},nUser:1,nStaff:1};
 function rmTxt(a){var s=a.slice().sort(function(x,y){return y-x}),pos=s.filter(function(m){return m>0}).map(function(m){return m<60?m+" นาที":(m/60)+" ชั่วโมง"}),r=pos.length?"ก่อนนัด "+pos.join(" และ "):"";if(s.indexOf(0)>-1)r+=(r?" และ ":"")+"เมื่อถึงเวลานัด";return r}
 var ANN=[];
@@ -125,7 +127,7 @@ function hasPin(p){return p.lat!=null&&p.lng!=null}
 function dist(p){return(!V.loc||!hasPin(p))?Infinity:hav(V.loc,pos(p))}
 var DN=["อา","จ","อ","พ","พฤ","ศ","ส"],CUSTOMER="";
 var S=fresh();
-function fresh(){return{qty:{},sim:true,asg:{},svcs:[],phone:(typeof ME!=="undefined"&&ME?ME.phone:""),err:"",view:null,cancelled:false,step:0,kind:null,place:null,svc:null,date:null,time:null,sts:[],ref:null,msgs:null}}
+function fresh(){return{qty:{},sim:true,asg:{},svcs:[],phone:(typeof ME!=="undefined"&&ME?ME.phone:""),err:"",view:null,cancelled:false,step:0,kind:null,place:null,svc:null,date:null,time:null,sts:[],ref:null,msgs:null,usePts:0,ptsOn:false}}
 var app=document.getElementById("app"),bar=document.getElementById("bar");
 function load(k){try{return JSON.parse(localStorage.getItem(k)||"[]")}catch(e){return[]}}
 function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
@@ -258,7 +260,7 @@ function actHtml(b){ /* ปุ่มยกเลิก / เลื่อนค�
  if(V.cfm===b.ref)return '<p class="hint">ยืนยันยกเลิกการจองเลขที่ '+b.ref+' ?</p><div class="mbtns"><button class="btn ghost" data-bk="keep">ไม่ยกเลิก</button><button class="btn dng" data-bk="cancelok" data-ref="'+b.ref+'">ยืนยันยกเลิก</button></div>';
  return '<div class="mbtns"><button class="btn ghost" data-bk="resched" data-ref="'+b.ref+'">เลื่อนคิว</button><button class="btn dng" data-bk="cancel" data-ref="'+b.ref+'">ยกเลิก</button>'+mapBtn(b)+'</div><p class="hint">ยกเลิกหรือเลื่อนคิวได้ก่อนนัด '+ch.h+' ชั่วโมง</p>'}
 function bkCard(b){var pl=bkPlace(b),sv=(pl?svcOf(pl,b.svc):null)||find(SVC,b.svc),st=bkStatus(b);
- return '<div class="bk"><div class="qh"><b>'+esc(pl?pl.name:(b.placeName||"-"))+'</b><span class="tag '+st[1]+'">'+st[0]+'</span></div><small>'+esc(b.svcName||(sv?sv.name:"-"))+', '+(b.price!=null?baht(b.price):"")+'</small>'+(b.promo?'<small>🎁 '+esc(b.promo)+' (-'+baht(b.disc||0)+')</small>':'')+(b.phone?'<small>โทร '+esc(b.phone)+'</small>':'')+'<small>'+bkWhen(b)+'</small><small>พนักงาน: '+esc(bkStaff(b))+'</small><small>เลขที่ '+b.ref+(b.resched?', เลื่อนมาแล้ว '+b.resched+' ครั้ง':'')+'</small>'+(b.movedTo?'<small>เลื่อนไปเลขที่ '+b.movedTo+'</small>':'')+(b.movedFrom?'<small>เลื่อนมาจากเลขที่ '+b.movedFrom+'</small>':'')+(isUp(b)&&pl?'<small>'+esc(remindLine(pl,"remind","เตือนล่วงหน้า: ")||"ไม่ได้ตั้งเตือน")+'</small>':'')+actHtml(b)+'</div>'}
+ return '<div class="bk"><div class="qh"><b>'+esc(pl?pl.name:(b.placeName||"-"))+'</b><span class="tag '+st[1]+'">'+st[0]+'</span></div><small>'+esc(b.svcName||(sv?sv.name:"-"))+', '+(b.price!=null?baht(b.price):"")+'</small>'+(b.promo?'<small>🎁 '+esc(b.promo)+' (-'+baht(b.disc||0)+')</small>':'')+(b.pu?'<small>⭐ ใช้แต้มสะสม '+b.pu+' แต้ม (-'+baht(b.pd)+')</small>':'')+(b.phone?'<small>โทร '+esc(b.phone)+'</small>':'')+'<small>'+bkWhen(b)+'</small><small>พนักงาน: '+esc(bkStaff(b))+'</small><small>เลขที่ '+b.ref+(b.resched?', เลื่อนมาแล้ว '+b.resched+' ครั้ง':'')+'</small>'+(b.movedTo?'<small>เลื่อนไปเลขที่ '+b.movedTo+'</small>':'')+(b.movedFrom?'<small>เลื่อนมาจากเลขที่ '+b.movedFrom+'</small>':'')+(isUp(b)&&pl?'<small>'+esc(remindLine(pl,"remind","เตือนล่วงหน้า: ")||"ไม่ได้ตั้งเตือน")+'</small>':'')+actHtml(b)+'</div>'}
 function viewRender(){var h="",b="";
  if(S.view==="bk"){var L=allBk(),st=function(x){return apptStart(x).getTime()},up=L.filter(isUp).sort(function(x,y){return st(x)-st(y)}),hist=L.filter(function(x){return !isUp(x)}).sort(function(x,y){return st(y)-st(x)});
   var cxl=L.filter(function(x){return x.status==="ยกเลิก"||x.status==="เลื่อนแล้ว"}).sort(function(x,y){return st(y)-st(x)}),
@@ -266,7 +268,7 @@ function viewRender(){var h="",b="";
    TB=[["up","รายการจอง",up],["hist","ประวัติ",hs],["cx","งานถูกยกเลิก",cxl]],cu=TB.filter(function(x){return x[0]===bt})[0]||TB[0],
    EMP={up:"ไม่มีรายการจองที่กำลังจะถึง",hist:"ยังไม่มีประวัติการจอง",cx:"ไม่มีงานที่ถูกยกเลิก"};
   h='<h1>รายการ</h1>'+(V.flash?'<div class="flash" role="status">'+esc(V.flash)+'</div>':'')+'<div class="tg" role="tablist" aria-label="หมวดรายการ">'+TB.map(function(x){return '<button type="button" role="tab" data-bt="'+x[0]+'" class="'+(x[0]===cu[0]?"on":"")+'" aria-selected="'+(x[0]===cu[0])+'">'+x[1]+' ('+x[2].length+')</button>'}).join("")+'</div>'+(cu[2].length?cu[2].map(bkCard).join(""):'<div class="empty">'+EMP[cu[0]]+'</div>')}
- if(S.view==="ac"){h='<h1>บัญชี</h1>'+profHtml()+ctHtml()+'<button type="button" class="btn wide ghost" data-auth="out" style="margin-top:14px">ออกจากระบบ</button>'}
+ if(S.view==="ac"){h='<h1>บัญชี</h1>'+profHtml()+ptsCard()+ctHtml()+'<button type="button" class="btn wide ghost" data-auth="out" style="margin-top:14px">ออกจากระบบ</button>'}
  if(S.view==="nt"){var prev=V.prevSeen!=null?V.prevSeen:(V.prevSeen=seenAt()),notes=userNotes(),an=ANN.filter(function(x){return x.on&&(x.auds||[]).indexOf("ผู้ใช้งาน")>-1});
   try{localStorage.setItem("notifSeen",new Date().toISOString())}catch(e){}
   var nsub=V.nt==="a"?"a":"n",NTB=[["n","แจ้งเตือน",notes.length],["a","จากสมาคม",an.length]];
@@ -320,7 +322,7 @@ function render(keep){
    b='<button class="btn ghost" id="back">ย้อนกลับ</button><button class="btn" id="next"'+(asgDone()?"":" disabled")+'>ถัดไป</button>';
   }
   if(S.step===4){
-   h+='<h1>สรุปรายการ</h1><p class="sub">กรอกเบอร์โทรศัพท์ แล้วตรวจสอบรายการก่อนกดยืนยัน</p>'+(S.err?'<div class="err" role="alert">'+esc(S.err)+'</div>':'')+(S.place.type==="shop"?'<div class="card2"><label class="fl" for="ph">เบอร์โทรศัพท์ผู้จอง (จำเป็น)</label><input class="sel" id="ph" type="text" inputmode="tel" enterkeyhint="done" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="16" placeholder="เช่น 0812345678" value="'+esc(S.phone)+'"></div>':'')+summary();
+   h+='<h1>สรุปรายการ</h1><p class="sub">กรอกเบอร์โทรศัพท์ แล้วตรวจสอบรายการก่อนกดยืนยัน</p>'+(S.err?'<div class="err" role="alert">'+esc(S.err)+'</div>':'')+(S.place.type==="shop"?'<div class="card2"><label class="fl" for="ph">เบอร์โทรศัพท์ผู้จอง (จำเป็น)</label><input class="sel" id="ph" type="text" inputmode="tel" enterkeyhint="done" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="16" placeholder="เช่น 0812345678" value="'+esc(S.phone)+'"></div>':'')+ptsBox()+summary();
    var bt='<button class="btn ghost" id="back"'+(S.saving?' disabled':'')+'>ย้อนกลับ</button><button class="btn" id="ok"'+(S.saving?' disabled':'')+'>'+(S.saving?'กำลังจอง…':'ยืนยันการจอง')+'</button>';
    if(S.place.type==="shop"){h+='<div class="inbtns">'+bt+'</div>';b=""}else b=bt;
   }
@@ -329,20 +331,30 @@ function render(keep){
  if(!keep)window.scrollTo(0,0);bind();
 }
 function unitNets(){var cl=calc(),el=0;if(cl.promo)S.svcs.forEach(function(v){if(promoCovers(cl.promo,v))el+=v.price});return S.svcs.map(function(v){var d=(cl.promo&&el&&promoCovers(cl.promo,v))?cl.disc*v.price/el:0;return Math.round((v.price-d)*100)/100})}
-function summary(){var sh=S.place.type==="shop",cl=S.final||calc(),R=function(l,v){return '<div class="row"><span>'+l+'</span><span>'+v+'</span></div>'},multi=S.svcs.length>1;
+function ptsRate(){return PT&&PT.per_baht>0?PT.per_baht:10}
+function ptsMax(){if(!PT||!PT.on||!S.place||S.place.type!=="shop")return 0;var r=ptsRate(),cap=Math.floor(calc().total)*r,m=Math.min(PT.balance,cap);m=Math.floor(m/r)*r;return m>=PT.min&&m>0?m:0}
+function ptsOpts(mx){var a=[],st=Math.max(100,ptsRate()*10),v=Math.max(PT.min,ptsRate());v=Math.ceil(v/ptsRate())*ptsRate();for(;v<=mx;v+=st)a.push(v);if(a[a.length-1]!==mx)a.push(mx);return a}
+function ptsCur(){var mx=ptsMax();if(!S.ptsOn||!mx)return 0;var u=S.usePts;if(!u||u>mx||u<PT.min)u=mx;return u}
+function ptsBox(){if(!PT||!PT.on||S.place.type!=="shop")return"";var mx=ptsMax(),r=ptsRate();
+ if(!mx)return PT.balance>0?'<div class="ptsbox"><b>แต้มสะสม</b><p>คุณมี '+PT.balance+' แต้ม ใช้เป็นส่วนลดได้เมื่อมีตั้งแต่ '+PT.min+' แต้มขึ้นไป ทุก '+r+' แต้มลดได้ 1 บาท</p></div>':"";
+ var u=ptsCur(),o=ptsOpts(mx);
+ return '<div class="ptsbox"><b>ใช้แต้มสะสมเป็นส่วนลด</b><p>คุณมี '+PT.balance+' แต้ม ทุก '+r+' แต้มลดได้ 1 บาท ใช้ได้ตั้งแต่ '+PT.min+' แต้ม</p>'+
+  '<label class="chk"><input type="checkbox" id="ptson"'+(S.ptsOn?" checked":"")+'> ใช้แต้มเป็นส่วนลด</label>'+
+  (S.ptsOn?'<label class="fl" for="ptsamt">จำนวนแต้มที่ใช้</label><select class="sel" id="ptsamt">'+o.map(function(x){return '<option value="'+x+'"'+(x===u?" selected":"")+'>'+x+' แต้ม, ลด '+baht(x/r)+'</option>'}).join("")+'</select><p role="status">ใช้ '+u+' แต้ม ลด '+baht(u/r)+' ราคาจาก '+baht(calc().total)+' เหลือ '+baht(calc().total-u/r)+'</p>':'')+'</div>'}
+function summary(){var sh=S.place.type==="shop",cl=S.final||calc(),R=function(l,v){return '<div class="row"><span>'+l+'</span><span>'+v+'</span></div>'},multi=S.svcs.length>1,pu=S.final?(S.final.pu||0):(sh&&S.step===4?ptsCur():0),pd=S.final?(S.final.pd||0):pu/ptsRate();
  var rows=sh?S.svcs.map(function(v,i){var off=svcOff(i),c=S.asg[v.uid];return R(esc(v.name)+(v.of>1?' (คนที่ '+v.n+'/'+v.of+')':'')+' <small>('+durT(v.min)+')</small>','นวดโดย '+esc(c?c.name:"-")+(multi?'<br><small>'+hh(S.time+off)+'-'+hh(S.time+off+v.min)+'</small>':''))}).join("")+(multi?R("รูปแบบ",S.sim?"นวดพร้อมกัน":"นวดต่อกันตามลำดับ"):""):R("บริการ",S.svc.name);
  return '<div class="sum">'+R("ผู้จอง",CUSTOMER)+(sh&&S.step===5&&S.phone?R("เบอร์โทร",esc(S.phone)):"")+R(typeT(S.place),S.place.name)+rows+R("วันที่",thDate(S.date))+R("เวลา",hh(S.time)+'-'+hh(S.time+S.svc.min)+' ('+durT(S.svc.min)+')')+(sh?"":R("พนักงาน",names()))+R("ยกเลิกได้","ก่อนนัด "+cv(S.place,"cancelH")+" ชั่วโมง")+
- (sh&&(cl.promo||S.svcs.length>1)?R("ราคาก่อนลด",baht(cl.sub)):"")+(cl.promo?R("🎁 "+esc(cl.promo.title),"-"+baht(cl.disc)):"")+R("ราคารวม",baht(cl.total))+'</div>'}
+ (sh&&(cl.promo||pd||S.svcs.length>1)?R("ราคาก่อนลด",baht(cl.sub)):"")+(cl.promo?R("🎁 "+esc(cl.promo.title),"-"+baht(cl.disc)):"")+(pd?R("⭐ ใช้แต้มสะสม "+pu+" แต้ม","-"+baht(pd)):"")+R("ราคารวม",baht(cl.total-(S.final?0:pd)))+'</div>'}
 function confirmBooking(){
  var OLD=V.moving?findBk(V.moving):null;
  if(V.moving&&(!OLD||OLD.status==="ยกเลิก"||OLD.status==="เลื่อนแล้ว"||!canChange(OLD).ok)){V.flash="เลื่อนคิวไม่สำเร็จ นัดเดิมเกินเวลาที่เลื่อนได้หรือถูกยกเลิกแล้ว";V.moving=null;V.moveKeys=[];V.moveItems=[];S=fresh();S.view="bk";render();return}
  if(S.saving)return;
  syncSts();var SS=S,items=asgList().map(function(a){return{service_id:a.svc,staff_id:a.staff,offset_min:a.off}});
  S.saving=true;S.err="";render(true);
- sbApi("/rest/v1/rpc/create_booking",{method:"POST",json:1,body:JSON.stringify({p_place:S.place.id,p_start:new Date(bkTs(S.date,S.time)).toISOString(),p_items:items,p_phone:S.phone||null,p_moved_from:OLD?OLD.ref:null})})
- .then(function(ref){return loadBookings().catch(function(){}).then(function(){return ref})})
+ sbApi("/rest/v1/rpc/create_booking",{method:"POST",json:1,body:JSON.stringify({p_place:S.place.id,p_start:new Date(bkTs(S.date,S.time)).toISOString(),p_items:items,p_phone:S.phone||null,p_moved_from:OLD?OLD.ref:null,p_points:(S.place.type==="shop"?ptsCur():0)})})
+ .then(function(ref){return Promise.all([loadBookings().catch(function(){}),loadPoints()]).then(function(){return ref})})
  .then(function(ref){SS.saving=false;if(S!==SS)return;SS.ref=ref;SS.movedFrom=OLD?OLD.ref:null;
-  var b=findBk(ref);if(b)SS.final={sub:b.price+b.disc,disc:b.disc,total:b.price,promo:b.promo?{title:b.promo}:null};
+  var b=findBk(ref);if(b)SS.final={sub:b.price+b.disc+b.pd,disc:b.disc,pd:b.pd,pu:b.pu,total:b.price,promo:b.promo?{title:b.promo}:null};
   V.moving=null;V.moveKeys=[];V.moveItems=[];SS.step=5;loadNotes().catch(function(){});render()})
  .catch(function(e){SS.saving=false;if(S!==SS)return;var m=errTh(e,"จองไม่สำเร็จ");
   if(e&&e.code==="P0001"&&/เต็ม|หยุด|ไม่ได้ประจำ|ปิดให้บริการ|นอกเวลา|ผ่านไปแล้ว|ไม่ให้บริการ|ไม่เปิดให้จอง/.test(m)){SS.note=m;SS.step=2;SS.time=null;SS.sts=[];SS.asg={};SS.busyKey=null;SS.busyErr="";render()}
@@ -380,6 +392,9 @@ function bind(){
  if(g("go3"))g("go3").onclick=function(){if(!S.date||!S.time)return;S.note="";S.sts=[];S.asg={};S.step=3;render()};
  if(g("next"))g("next").onclick=function(){S.step++;render()};
  if(g("back"))g("back").onclick=function(){S.step--;render()};
+ if(g("ptson"))g("ptson").onchange=function(){S.ptsOn=this.checked;S.usePts=0;render(true);var e=g("ptson");if(e)e.focus()};
+ if(g("ptsamt"))g("ptsamt").onchange=function(){S.usePts=+this.value;render(true);var e=g("ptsamt");if(e)e.focus()};
+ if(g("pthist"))g("pthist").onclick=function(){V.pth=!V.pth;render(true);var e=g("pthist");if(e)e.focus()};
  if(g("ph")){var ip=g("ph");ip.oninput=ip.onchange=ip.onblur=function(){S.phone=this.value};ip.onkeydown=function(ev){if(ev&&ev.key==="Enter"&&this.blur)this.blur()}}
  if(g("ok"))g("ok").onclick=function(){
   if(S.place.type==="shop"){var ph=normPhone(g("ph")?g("ph").value:S.phone);if(!/^0\d{8,9}$/.test(ph)){S.phone=g("ph")?g("ph").value:S.phone;S.err="กรอกเบอร์โทรศัพท์ให้ถูกต้อง (เช่น 0812345678 หรือ +66812345678)";render(true);return}S.phone=ph;S.err=""}
@@ -428,10 +443,11 @@ function mapBk(r){var all=r.items||[],its=all.filter(function(i){return i.active
  its.forEach(function(i){jobs[i.id]=JOBTH[i.job]||"รอรับงาน"});
  var names=uniq(asg.map(function(a){return a.staffName}));
  return{uid:ME?ME.id:"",ref:r.ref,place:r.place_id,ptype:r.place_type==="shop"?"shop":"org",placeName:r.place_name,svc:asg[0]?asg[0].svc:"",svcs:asg.map(function(a){return a.svc}),svcName:uniq(asg.map(function(a){return a.svcName})).join(", "),phone:r.phone||"",promo:r.promo||"",disc:+r.discount||0,asg:asg,staff:uniq(asg.map(function(a){return a.staff})),
-  staffName:asg.length>1?asg.map(function(a){return a.svcName+": "+a.staffName}).join(", "):names.join(", "),date:s.date,time:s.min,min:Math.max(1,Math.round((Date.parse(r.ends_at)-t0)/60000)),price:+r.total||0,customer:r.customer_name,status:STTH[r.status]||"ยืนยันแล้ว",movedFrom:r.moved_from,movedTo:r.moved_to,at:r.created_at,jobs:jobs,cancelH:r.cancel_hours}}
+  staffName:asg.length>1?asg.map(function(a){return a.svcName+": "+a.staffName}).join(", "):names.join(", "),date:s.date,time:s.min,min:Math.max(1,Math.round((Date.parse(r.ends_at)-t0)/60000)),pu:+r.points_used||0,pd:+r.points_discount||0,price:+r.total||0,customer:r.customer_name,status:STTH[r.status]||"ยืนยันแล้ว",movedFrom:r.moved_from,movedTo:r.moved_to,at:r.created_at,jobs:jobs,cancelH:r.cancel_hours}}
+function loadPoints(){return sbApi("/rest/v1/rpc/my_points",{method:"POST",json:1,body:"{}"}).then(function(a){PT=a||null}).catch(function(){})}
 function loadBookings(){return sbApi("/rest/v1/rpc/my_bookings",{method:"POST",json:1,body:"{}"}).then(function(a){BK=(a||[]).map(mapBk)})}
 function loadNotes(){return sbApi("/rest/v1/notifications?select=id,kind,title,body,created_at,booking_id&audience=eq.user&order=created_at.desc&limit=60").then(function(a){NOTES=(a||[]).filter(function(n){return n.kind!=="announce"}).map(function(n){return{kind:"user",id:n.id,at:new Date(n.created_at).toISOString(),title:n.title,text:n.body||"",ref:n.booking_id?"1":"",auto:(n.kind==="preopen"||n.kind==="promo")}})})}
-function refreshUser(){var v=S.view;return Promise.all([loadBookings().catch(function(){}),loadNotes().catch(function(){})]).then(function(){if(S.view===v)render(true)})}
+function refreshUser(){var v=S.view;return Promise.all([loadBookings().catch(function(){}),loadNotes().catch(function(){}),loadPoints()]).then(function(){if(S.view===v)render(true)})}
 /* เวลาว่างของพนักงาน: ถามฐานข้อมูลเฉพาะช่วงที่ไม่ว่าง (ไม่เห็นข้อมูลลูกค้าคนอื่น) */
 function placeStaffIds(p){return p.type==="shop"?p.staff.map(function(c){return c.id}):(p.staff||[]).slice()}
 function loadBusy(p,date){var ids=placeStaffIds(p);BUSY={};if(!ids.length||!date)return Promise.resolve();var f=bkTs(date,0);
@@ -444,7 +460,7 @@ function catRender(){var a=document.getElementById("app"),b=document.getElementB
   document.getElementById("cretry").onclick=startApp;document.querySelectorAll("[data-auth=out]").forEach(function(e){e.onclick=logout});return}
  a.innerHTML='<p class="sub" role="status">กำลังโหลดข้อมูลร้านและบริการ…</p>'}
 function startApp(){CAT.state="loading";CAT.msg="";render();
- return loadCatalog().then(function(){CAT.state="ok";CAT.at=Date.now();render();return Promise.all([loadBookings().catch(function(){}),loadNotes().catch(function(){})])}).then(function(){if(CAT.state==="ok")render(true)},function(e){if(e&&e.status===401){logout();return}CAT.state="err";CAT.msg=errTh(e,"โหลดข้อมูลไม่สำเร็จ");render()})}
+ return loadCatalog().then(function(){CAT.state="ok";CAT.at=Date.now();render();return Promise.all([loadBookings().catch(function(){}),loadNotes().catch(function(){}),loadPoints()])}).then(function(){if(CAT.state==="ok")render(true)},function(e){if(e&&e.status===401){logout();return}CAT.state="err";CAT.msg=errTh(e,"โหลดข้อมูลไม่สำเร็จ");render()})}
 document.addEventListener("visibilitychange",function(){if(document.visibilityState!=="visible"||!ME||CAT.state!=="ok"||Date.now()-CAT.at<60000||(S.step>0&&!S.view))return;CAT.at=Date.now();
  Promise.all([loadCatalog(),loadBookings(),loadNotes()]).then(function(){if(CAT.state==="ok")render(true)},function(){})});
 
@@ -482,6 +498,15 @@ function errTh(e,ctx){var m=String(e&&e.message||"");
  return (ctx||"เกิดข้อผิดพลาด")+": "+m}
 function fitAv(file,cb,fail){var fr=new FileReader();fr.onerror=fail;fr.onload=function(){var im=new Image();im.onerror=fail;im.onload=function(){try{var m=360,k=Math.min(1,m/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);var x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);cb(c.toDataURL("image/jpeg",.85))}catch(e){fail()}};im.src=fr.result};fr.readAsDataURL(file)}
 function avHtml(u,big){var cl="av"+(big?" big":"");if(u&&u.img)return '<img loading="lazy" decoding="async" class="'+cl+'" alt="" src="'+esc(u.img)+'">';return '<span class="'+cl+'" aria-hidden="true">'+esc(((u&&u.fn)||"?").charAt(0))+'</span>'}
+function ptsCard(){if(!PT||!PT.on)return"";var r=PT.per_baht,b=PT.balance,h='<h2 class="stl">แต้มสะสม</h2><div class="ptsbox">';
+ h+='<p class="ptsn"><b>'+b+'</b> แต้ม</p>';
+ h+='<p>'+(b>=PT.min?'ใช้เป็นส่วนลดได้ '+baht(Math.floor(b/r))+' ตอนจองร้านนวด':'อีก '+(PT.min-b)+' แต้ม จะใช้เป็นส่วนลดได้ ('+PT.min+' แต้มขึ้นไป ทุก '+r+' แต้มลด 1 บาท)')+'</p>';
+ h+='<p>ได้ 1 แต้มทุก '+PT.baht_per+' บาทที่จ่ายจริง เมื่อรับบริการเสร็จสิ้น'+(PT.expire_months>0?' แต้มหมดอายุ '+PT.expire_months+' เดือนหลังได้รับ':'')+'</p>';
+ if(PT.next_expiry)h+='<p>แต้มที่จะหมดอายุก่อน '+PT.next_expiry_points+' แต้ม ภายในวันที่ '+new Date(PT.next_expiry).toLocaleDateString("th-TH",{day:"numeric",month:"long",year:"numeric"})+'</p>';
+ var H=PT.history||[];
+ h+='<button type="button" class="btn ghost wide" id="pthist" aria-expanded="'+!!V.pth+'">'+(V.pth?"ซ่อน":"ดู")+'ประวัติแต้ม</button>';
+ if(V.pth)h+=H.length?'<ul class="ptsl">'+H.map(function(x){var d=new Date(x.at).toLocaleDateString("th-TH",{day:"numeric",month:"short",year:"2-digit"});return '<li>'+d+' '+esc(x.note||"")+', '+(x.points>0?'ได้รับ '+x.points:'ใช้ไป '+(-x.points))+' แต้ม</li>'}).join("")+'</ul>':'<p>ยังไม่มีประวัติแต้ม</p>';
+ return h+'</div>'}
 function profHtml(){return ME?'<div class="prof">'+avHtml(ME)+'<div class="pi"><b>'+esc(CUSTOMER)+'</b><small>'+esc(ME.phone)+'</small><label class="chg" for="myimg" aria-hidden="true">เปลี่ยนรูปโปรไฟล์</label>'+(V.pmsg?'<small class="pmsg" role="status">'+esc(V.pmsg)+'</small>':'')+'</div><input id="myimg" type="file" accept="image/*" class="vh" aria-label="เปลี่ยนรูปโปรไฟล์"></div>':""}
 /* เปลี่ยนรูปโปรไฟล์: ย่อรูป -> อัปโหลดเข้า avatars/<uid>/ -> บันทึก path ลงโปรไฟล์ */
 function changeAvatar(fl){if(!fl||!ME)return;if(!/^image\//.test(fl.type)){V.pmsg="เลือกไฟล์รูปภาพเท่านั้น";render(true);return}
