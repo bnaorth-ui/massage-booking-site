@@ -286,9 +286,13 @@ function listSvc(){return '<div class="head"><h1>บริการทั้ง�
 function listPromo(){return '<div class="head"><h1>โปรโมชั่นทั้งหมด ('+D.promo.length+')</h1></div><div class="card">'+(D.promo.length?D.promo.map(function(m){var st=pst(m);return '<div class="row"><div style="display:flex;gap:10px;align-items:center">'+stImg(m.img,m.title,40)+'<div><b>'+esc(m.title)+'</b><small>'+discTxt(m)+', '+(m.all?"ทุกบริการ":esc(svcNames(m.svcs)))+'</small><small>'+shortD(m.start)+' - '+shortD(m.end)+(m.desc?', '+esc(m.desc):'')+'</small></div></div><div class="acts"><span class="tag '+st[1]+'">'+st[0]+'</span><button class="btn g" data-a="tog" data-t="promo" data-id="'+m.id+'">'+(m.on?"ปิด":"เปิด")+'</button><button class="btn g" data-a="edit" data-t="promo" data-id="'+m.id+'">แก้ไข</button>'+delBtn("promo",m.id)+'</div></div>'}).join(""):'<div class="empty">ยังไม่มีโปรโมชั่น</div>')+'</div>'}
 function fmtAt(a){var d=new Date(a);return d.toLocaleDateString("th-TH",{day:"numeric",month:"short"})+" "+d.toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"})+" น."}
 function ntAt(a){var d=new Date(a);return d.toLocaleDateString("th-TH",{day:"numeric",month:"short"})+" "+d.toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"})+" น."}
-function listNt(){var L=feed(),n=S.ntNew||[],f=S.ntf||"all",F=f==="all"?L:L.filter(function(x){return x.from===f}),cnt=function(k){return L.filter(function(x){return x.from===k}).length};
- return '<div class="head"><h1>การแจ้งเตือน</h1></div><p class="hint2">ข้อความจากสมาคมและระบบ (ประกาศ เครดิตวงเงิน ยอดกระเป๋าเงินต่ำ ร้านถูกปิด/เปิดอัตโนมัติ) จากผู้ใช้งานเมื่อมีการจอง ยกเลิก หรือเลื่อนคิว จากพนักงานเมื่อกดรับงาน เริ่มงาน หรือเสร็จสิ้นงาน</p><div class="nf" role="group" aria-label="กรองการแจ้งเตือน">'+[["all","ทั้งหมด ("+L.length+")"],["admin","จากสมาคม ("+cnt("admin")+")"],["user","จากผู้ใช้งาน ("+cnt("user")+")"],["staff","จากพนักงาน ("+cnt("staff")+")"]].map(function(x){return '<button data-a="ntf" data-id="'+x[0]+'" class="'+(f===x[0]?"on":"")+'" aria-pressed="'+(f===x[0])+'">'+x[1]+'</button>'}).join("")+'</div>'+
- (F.length?F.map(function(x){return '<div class="nti"><div class="qh"><b>'+esc(x.title)+'</b><span class="tag'+(x.from==="admin"?"":x.from==="staff"?" s":" w")+'">'+(x.from==="admin"?"สมาคม":x.from==="staff"?"พนักงาน":"ผู้ใช้งาน")+'</span>'+(n.indexOf(x.id)>-1?'<span class="tag w">ใหม่</span>':'')+'</div><small>'+ntAt(x.at)+'</small><pre>'+esc(x.text)+'</pre></div>'}).join(""):'<div class="empty">ยังไม่มีการแจ้งเตือน</div>')}
+function listNt(){var L=feed(),n=S.ntNew||[],CATS=[["admin","จากสมาคม"],["user","จากผู้ใช้งาน"],["staff","จากพนักงาน"],["gp","ค่า GP"]],
+ cnt=function(k){return L.filter(function(x){return x.from===k}).length},nw=function(k){return L.filter(function(x){return x.from===k&&n.indexOf(x.id)>-1}).length};
+ if(!S.ntf||S.ntf==="all"){var first=CATS.filter(function(c){return nw(c[0])>0})[0];S.ntf=first?first[0]:"admin"}
+ var f=S.ntf,F=L.filter(function(x){return x.from===f}),lab=function(k){return k==="admin"?"สมาคม":k==="staff"?"พนักงาน":k==="gp"?"ค่า GP":"ผู้ใช้งาน"};
+ return '<div class="head"><h1>การแจ้งเตือน</h1></div><p class="hint2">เลือกหมวดที่ต้องการดู: ข้อความจากสมาคมและระบบ (ประกาศ เครดิตวงเงิน ยอดกระเป๋าเงินต่ำ ร้านถูกปิด/เปิดอัตโนมัติ) จากผู้ใช้งานเมื่อมีการจอง ยกเลิก หรือเลื่อนคิว จากพนักงานเมื่อกดรับงาน เริ่มงาน หรือเสร็จสิ้นงาน และค่า GP ที่ระบบหักในแต่ละงาน</p><div class="nf" role="group" aria-label="เลือกหมวดการแจ้งเตือน">'+CATS.map(function(x){var w=nw(x[0]);return '<button data-a="ntf" data-id="'+x[0]+'" class="'+(f===x[0]?"on":"")+'" aria-pressed="'+(f===x[0])+'">'+x[1]+' ('+cnt(x[0])+')'+(w?' · ใหม่ '+w:'')+'</button>'}).join("")+'</div>'+
+ (F.length?F.map(function(x){return '<div class="nti"><div class="qh"><b>'+esc(x.title)+'</b><span class="tag'+(x.from==="admin"?"":x.from==="staff"?" s":" w")+'">'+lab(x.from)+'</span>'+(n.indexOf(x.id)>-1?'<span class="tag w">ใหม่</span>':'')+'</div><small>'+ntAt(x.at)+'</small><pre>'+esc(x.text)+'</pre></div>'}).join(""):'<div class="empty">ยังไม่มีการแจ้งเตือนในหมวดนี้</div>')+
+ (f==="gp"?'<div class="acts" style="margin-top:10px"><button type="button" class="btn g" data-a="gprpt">ดูรายงานค่า GP</button></div><p class="hint2">การแจ้งเตือนถูกล้างทุกวัน ถ้าต้องการดูประวัติค่า GP ย้อนหลังให้ดูที่เมนูรายงาน</p>':'')}
 function crc16(s){var c=0xFFFF;for(var i=0;i<s.length;i++){c^=s.charCodeAt(i)<<8;for(var j=0;j<8;j++)c=(c&0x8000)?((c<<1)^0x1021):(c<<1);c&=0xFFFF}return c.toString(16).toUpperCase().padStart(4,"0")}
 function tlv(t,v){return t+String(v.length).padStart(2,"0")+v}
 function ppPayload(type,id,amt){id=String(id).replace(/[-\s]/g,"");var acc=type==="mobile"?tlv("01","0066"+id.replace(/^0/,"")):type==="ewallet"?tlv("03",id):tlv("02",id);
@@ -540,7 +544,7 @@ function loadLive0(){var pid=WID;
   r[1].forEach(function(w){tx.push({id:w.id,type:w.type,amt:+w.amount,note:w.note,at:w.created_at,ref:w.ref||"",st:w.status==="success"?"สำเร็จ":w.status==="pending"?"รอยืนยัน":"ยกเลิก"})});
   r[2].forEach(function(q){if(q.status==="confirmed")return;tx.push({id:q.id,rid:q.id,type:"topup",amt:+q.amount,ref:q.ref,note:"เติมเงินผ่านพร้อมเพย์ (อ้างอิง "+q.ref+")",at:q.created_at,st:q.status==="pending"?"รอยืนยัน":q.status==="rejected"?"ปฏิเสธ":"ยกเลิก",slipPath:q.slip_path||null,slipAt:q.slip_at||null})});
   D.tx=tx;
-  var KM={review:"user",chat:"user",booking:"user",cancel:"user",move:"user",job:"staff",credit:"admin",approval:"admin",wallet:"admin",topup:"admin"};
+  var KM={review:"user",chat:"user",booking:"user",cancel:"user",move:"user",job:"staff",credit:"admin",approval:"admin",wallet:"admin",topup:"admin",gp:"gp"};
   var nt=r[3].filter(function(n){return n.kind!=="announce"}).map(function(n){return{id:n.id,db:1,from:n.title==="ระบบยกเลิกคิวอัตโนมัติ"?"admin":(KM[n.kind]||"admin"),title:n.title,text:n.body||"",at:n.created_at}});
   r[5].forEach(function(a){if((a.audiences||[]).indexOf("ร้านค้า")>-1)nt.push({id:"an-"+a.id,from:"admin",title:"ประกาศ: "+a.title,text:a.body||"",at:a.created_at||(a.day+"T00:00:00")})});
   D.nt=nt;D.ntRead=r[4].map(function(x){return x.notification_id}).concat(annRead());
@@ -555,7 +559,7 @@ function ppInfo(){return CFG.pp}
 /* ---------- แจ้งเตือน ---------- */
 function feed(){var L=(D.nt||[]).slice().sort(function(a,b){return a.at<b.at?1:-1});return L}
 function ntUnread(){return feed().filter(function(x){return D.ntRead.indexOf(x.id)<0}).length}
-function openNt(){var un=feed().filter(function(x){return D.ntRead.indexOf(x.id)<0});S.ntNew=un.map(function(x){return x.id});if(!un.length)return;
+function openNt(){var un=feed().filter(function(x){return D.ntRead.indexOf(x.id)<0});if(!un.length)return;S.ntNew=(S.ntNew||[]).concat(un.map(function(x){return x.id}));
  un.forEach(function(x){D.ntRead.push(x.id)});
  var ann=un.filter(function(x){return!x.db}).map(function(x){return x.id});if(ann.length)wr("shopAnnRead_"+WHO.id,annRead().concat(ann));
  var db=un.filter(function(x){return x.db}).map(function(x){return{notification_id:x.id,user_id:WHO.id}});
@@ -652,7 +656,7 @@ document.addEventListener("click",function(e){
   if(!navigator.geolocation){ps.innerHTML='<p class="hint2" style="color:var(--bad)">อุปกรณ์นี้ไม่รองรับ ใช้การวางลิงก์หรือพิกัดแทน</p>';return}
   ps.innerHTML='<p class="hint2">กำลังหาตำแหน่ง...</p>';
   navigator.geolocation.getCurrentPosition(function(p){setPin(p.coords.latitude.toFixed(6),p.coords.longitude.toFixed(6))},function(){ps.innerHTML='<p class="hint2" style="color:var(--bad)">ใช้ตำแหน่งปัจจุบันไม่ได้ ตรวจสอบสิทธิ์ตำแหน่ง หรือวางลิงก์/พิกัดแทน</p>'},{timeout:10000});return}
- if(a==="tab"){if(id==="mg")id=S.mg;if(inMg(id))S.mg=id;if(id==="nt")openNt();if(id==="rv")rvLoad();S.tab=id;S.form=null;S.del=null;S.saved=false;S.pwdone=false;S.shareok=false;S.pv=false;S.wmode=null;S.werr="";S.hmsg="";draw();if(id==="wal"||id==="nt"||id==="q")refresh();return}
+ if(a==="tab"){if(id==="mg")id=S.mg;if(inMg(id))S.mg=id;if(id==="nt"){S.ntf=null;S.ntNew=[];openNt()}if(id==="rv")rvLoad();S.tab=id;S.form=null;S.del=null;S.saved=false;S.pwdone=false;S.shareok=false;S.pv=false;S.wmode=null;S.werr="";S.hmsg="";draw();if(id==="wal"||id==="nt"||id==="q")refresh();return}
  if(a==="rvreply"){S.rvReply=id;draw();var ta=document.getElementById("rvtxt");if(ta)ta.focus();return}
  if(a==="rvno"){S.rvReply=null;draw();return}
  if(a==="rvsend"){rvSend(id);return}
@@ -715,6 +719,7 @@ document.addEventListener("click",function(e){
  if(a==="logout"){doLogout();return}
  if(a==="pwsave"){pwChange();return}
  if(a==="sharesave"){shareSave();return}
+ if(a==="gprpt"){RP.kind="gp";RP.data=null;RP.err="";S.tab="rp";S.form=null;S.del=null;S.saved=false;draw();window.scrollTo(0,0);return}
  if(a==="rpkind"){rpSave();RP.kind=id;RP.data=null;RP.err="";draw();return}
  if(a==="rpmode"){rpSave();RP.mode=id;RP.err="";draw();return}
  if(a==="rpgo"){rpGo();return}
