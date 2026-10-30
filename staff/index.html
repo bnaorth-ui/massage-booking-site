@@ -59,6 +59,7 @@ button:focus-visible,select:focus-visible{outline:3px solid var(--main);outline-
 .empty{padding:24px 0;text-align:center;color:var(--mute)}.ctc{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:14px;margin:0 0 12px}.ctc b{display:block;font-size:1.1rem}.ctc p{margin:4px 0 0;color:var(--mute);white-space:pre-line}.ctc .hr{display:block;white-space:pre-line;margin-top:6px}a.cta{display:flex;align-items:center;gap:12px;text-decoration:none;font-weight:700;background:var(--main);color:var(--main-ink,#fff);border:2px solid var(--main);border-radius:12px;padding:16px;margin:0 0 10px}a.cta.line{background:#06c755;border-color:#06c755;color:#fff}a.cta span{font-size:1.6rem}a.cta small{display:block;font-weight:400;opacity:.9}a.cta:focus-visible{outline:3px solid var(--main);outline-offset:2px}
 .agate{max-width:420px;margin:24px auto}.agate h1{font-size:1.4rem;margin:0 0 4px}.asub{color:var(--mute);margin:0 0 14px}.agl{display:block;margin:0 0 10px}.agl span{display:block;margin-bottom:4px;font-weight:600}
 .aerr{color:var(--bad);min-height:1.4em;margin:6px 0}.aok{background:var(--soft);color:var(--main);border-radius:12px;padding:10px 14px;margin-bottom:12px}
+.insol{padding-left:26px;margin:8px 0 14px}.insol li{padding:7px 0;font-size:1.05rem}.insic{width:72px;height:72px;border-radius:16px;display:block;margin:6px 0 10px}.agate .flash{background:var(--soft);color:var(--main);border-radius:12px;padding:10px 14px;margin:8px 0}.agate .hint{color:var(--mute);font-size:.92rem}.agate .btn.wide{width:100%;margin-top:8px}
 .alinks{text-align:center;margin-top:10px}.alinks .btn{width:auto;padding:8px 16px}
 .btn[disabled]{opacity:.55;cursor:default}
 .okb{background:var(--soft,#e8f4ec);color:var(--main,#0a5);border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:.92rem}.cfm{flex-direction:column;align-items:stretch}.cfm .btn{width:100%;flex:none}.cq{margin:0 0 4px;font-weight:700}
@@ -134,7 +135,8 @@ var JRANK={pending:0,accepted:1,in_progress:2,done:3},JL=["รอรับงา
 /* ===================== ข้อมูล ===================== */
 var ME=null,JOBS=[],OFFS=[],NT=[],ANN=[],READS=[],ANNREAD=rd("staffAnnRead",[]);
 var S={tab:"q",qt:"new",ntf:"all",ntNew:[],err:"",busy:false,wdMsg:""};
-var AG={step:"load",fail:0,lock:0,ok:"",err:""};
+var AG={step:"load",fail:0,lock:0,ok:"",err:"",join:"",ph:""};
+var INS={ev:null,done:false,fd:false};
 var inflight=false;
 function loadAll(){
  return rpc("staff_me").then(function(me){
@@ -179,13 +181,16 @@ function gateDraw(){document.getElementById("hdr").innerHTML="";document.getElem
  var card=function(t,sub,body,links){return '<div class="agate"><h1>'+t+'</h1><p class="asub">'+sub+'</p>'+(AG.ok?'<div class="aok" role="status">'+esc(AG.ok)+'</div>':'')+'<form id="agf" novalidate>'+body+'<p class="aerr" id="aerr" role="alert">'+esc(AG.err)+'</p></form>'+(links||"")+'</div>'};
  var btn=function(t){return '<button class="btn" type="submit"'+(S.busy?' disabled':'')+'>'+t+'</button>'};
  if(st==="load")h='<div class="agate"><p class="asub" role="status">กำลังตรวจสอบระบบ…</p></div>';
- if(st==="login")h=card("เข้าสู่ระบบพนักงาน","สมาคมวิทยากรฝึกอาชีพคนตาบอด",afld("lph","เบอร์มือถือ","tel",'inputmode="numeric" maxlength="10" autocomplete="username" placeholder="0812345678"')+afld("lpw","รหัสผ่าน","password",'autocomplete="current-password"')+btn("เข้าสู่ระบบ"),'<div class="alinks"><button type="button" class="btn g" data-ag="fp">ลืมรหัสผ่าน</button> <button type="button" class="btn g" data-ag="reg">สร้างบัญชีใหม่</button></div><p class="asub" style="text-align:center;margin-top:14px">บัญชีพนักงานจะใช้ได้เมื่อร้านหรือแอดมินบันทึกเบอร์มือถือของคุณไว้ในระบบ แล้วคุณสร้างบัญชีด้วยเบอร์เดียวกัน</p>');
- if(st==="reg")h=card("สร้างบัญชีพนักงาน","ใช้เบอร์มือถือเดียวกับที่ร้านหรือแอดมินบันทึกไว้ ระบบจะผูกบัญชีกับตัวคุณให้อัตโนมัติ",afld("rfn","ชื่อ","text",'autocomplete="given-name"')+afld("rln","นามสกุล","text",'autocomplete="family-name"')+afld("rph","เบอร์มือถือ","tel",'inputmode="numeric" maxlength="10" autocomplete="username"')+afld("rpw","รหัสผ่าน (อย่างน้อย 6 ตัวอักษร)","password",'autocomplete="new-password"')+afld("rpw2","ยืนยันรหัสผ่าน","password",'autocomplete="new-password"')+btn("สร้างบัญชี"),'<div class="alinks"><button type="button" class="btn g" data-ag="login">กลับไปเข้าสู่ระบบ</button></div>');
+ if(st==="login")h=card("เข้าสู่ระบบพนักงาน","สมาคมวิทยากรฝึกอาชีพคนตาบอด",afld("lph","เบอร์มือถือ","tel",'inputmode="numeric" maxlength="10" autocomplete="username" placeholder="0812345678"'+(AG.ph?' value="'+esc(AG.ph)+'"':""))+afld("lpw","รหัสผ่าน","password",'autocomplete="current-password"')+btn("เข้าสู่ระบบ"),'<div class="alinks"><button type="button" class="btn g" data-ag="fp">ลืมรหัสผ่าน</button> <button type="button" class="btn g" data-ag="reg">สร้างบัญชีใหม่</button></div><p class="asub" style="text-align:center;margin-top:14px">บัญชีพนักงานจะใช้ได้เมื่อร้านหรือแอดมินบันทึกเบอร์มือถือของคุณไว้ในระบบ แล้วคุณสร้างบัญชีด้วยเบอร์เดียวกัน</p>');
+ if(st==="reg")h=card("สร้างบัญชีพนักงาน","ใช้เบอร์มือถือเดียวกับที่ร้านหรือแอดมินบันทึกไว้ ระบบจะผูกบัญชีกับตัวคุณให้อัตโนมัติ",afld("rfn","ชื่อ","text",'autocomplete="given-name"')+afld("rln","นามสกุล","text",'autocomplete="family-name"')+afld("rph","เบอร์มือถือ"+(AG.join?" (ร้านบันทึกไว้ให้แล้ว)":""),"tel",'inputmode="numeric" maxlength="10" autocomplete="username"'+(AG.join?' value="'+esc(AG.join)+'" readonly':""))+afld("rpw","รหัสผ่าน (อย่างน้อย 6 ตัวอักษร)","password",'autocomplete="new-password"')+afld("rpw2","ยืนยันรหัสผ่าน","password",'autocomplete="new-password"')+btn("สร้างบัญชี"),'<div class="alinks"><button type="button" class="btn g" data-ag="login">กลับไปเข้าสู่ระบบ</button></div>');
+ if(st==="ins")h='<div class="agate"><div class="alinks"><button type="button" class="btn g" data-ins="skip">ข้าม ใช้ต่อในเบราว์เซอร์</button></div>'+insBody()+'<button type="button" class="btn wide g" data-ins="skip">'+(AG.join?"ไปสร้างบัญชี":"ไปหน้าเข้าสู่ระบบ")+'</button></div>';
  if(st==="fp")h='<div class="agate"><h1>ลืมรหัสผ่าน</h1><p class="asub">ยังไม่มีการส่ง SMS รีเซ็ตรหัสผ่านอัตโนมัติ ให้ติดต่อแอดมินสมาคมหรือเจ้าของร้านที่สังกัด เพื่อให้ช่วยตั้งรหัสผ่านใหม่ให้</p><div class="alinks"><button type="button" class="btn g" data-ag="login">กลับไปเข้าสู่ระบบ</button></div></div>';
  if(st==="denied")h='<div class="agate"><h1>บัญชีนี้ยังไม่ผูกกับพนักงาน</h1><p class="asub">เข้าสู่ระบบสำเร็จ แต่ไม่พบพนักงานที่ใช้เบอร์มือถือเดียวกับบัญชีนี้ ให้ร้านหรือแอดมินบันทึกพนักงานด้วยเบอร์เดียวกัน (ที่เมนูพนักงาน) แล้วออกจากระบบและเข้าใหม่อีกครั้ง</p><div class="alinks"><button type="button" class="btn" data-ag="retry">ตรวจสอบอีกครั้ง</button> <button type="button" class="btn g" data-ag="logout">ออกจากระบบ</button></div></div>';
  if(st==="loaderr")h='<div class="agate"><h1>โหลดข้อมูลไม่สำเร็จ</h1><p class="aerr" role="alert">'+esc(AG.err)+'</p><div class="alinks"><button type="button" class="btn" data-ag="retry">ลองใหม่</button> <button type="button" class="btn g" data-ag="logout">ออกจากระบบ</button></div></div>';
  document.getElementById("app").innerHTML=h;AG.ok="";
  document.querySelectorAll("[data-ag]").forEach(function(e){e.onclick=function(){var a=e.dataset.ag;AG.err="";if(a==="logout"){doLogout();return}if(a==="retry"){enter();return}AG.step=a;gateDraw()}});
+ document.querySelectorAll("[data-ins]").forEach(function(e){e.onclick=function(){if(e.dataset.ins==="go"){insGo();return}wr("insSeen",true);AG.err="";AG.step=AG.join?"reg":"login";gateDraw()}});
+ if(st==="ins"&&!INS.fd){INS.fd=true;var ti=document.getElementById("inst");if(ti)ti.focus()}
  var f=document.getElementById("agf");if(f)f.onsubmit=function(ev){ev.preventDefault();gateSubmit(st)}}
 function busy(b){S.busy=b;var x=document.querySelector("#agf .btn");if(x)x.disabled=b}
 function gateSubmit(st){if(S.busy)return;
@@ -200,7 +205,7 @@ function gateSubmit(st){if(S.busy)return;
   if(w.length<6){gerr("รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร");return}if(w!==gv("rpw2")){gerr("รหัสผ่านทั้งสองช่องไม่ตรงกัน");return}
   busy(true);gerr("");
   sbReq("/auth/v1/signup",{method:"POST",json:1,auth:false,body:JSON.stringify({email:sbEmail(p),password:w,data:{first_name:fn,last_name:ln,phone:p}})}).then(function(j){
-   if(!j||!j.access_token){var e=new Error("not confirmed");e.code="email_not_confirmed";throw e}sbSet(j)}).then(function(){busy(false);return enter()}).catch(function(e){busy(false);gerr(errTh(e,"สร้างบัญชีไม่สำเร็จ"))})}}
+   if(!j||!j.access_token){var e=new Error("not confirmed");e.code="email_not_confirmed";throw e}sbSet(j)}).then(function(){busy(false);return enter()}).catch(function(e){busy(false);if(e&&(e.code==="user_already_exists"||/already (registered|exists)/i.test(e.message||""))){AG.ph=p;AG.ok="เบอร์นี้มีบัญชีอยู่แล้ว เข้าสู่ระบบด้วยรหัสผ่านเดิมได้เลย";AG.err="";AG.step="login";gateDraw();return}gerr(errTh(e,"สร้างบัญชีไม่สำเร็จ"))})}}
 function doLogout(){if(window.Push)Push.beforeLogout();if(SBS&&SBS.access_token)sbReq("/auth/v1/logout",{method:"POST"}).catch(function(){});sbSave(null);location.reload()}
 var timer=null;
 function enter(){AG.step="load";S.busy=false;gateDraw();
@@ -353,9 +358,32 @@ if(a==="cfmno"){S.cfm=null;draw();focusJob(id);return}
   saveSelf({wd:cur});return}
 });
 
+/* ===== แนะนำการติดตั้งแอป (เปิดจากลิงก์ที่ร้านส่งให้) ===== */
+function insKind(){try{var ua=navigator.userAgent||"";if((window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone||INS.done)return null;
+ var ios=/iPad|iPhone|iPod/.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1),an=/Android/i.test(ua),app=/Line\/|FBAN|FBAV|Instagram|MicroMessenger/i.test(ua);
+ if(ios)return app?"ios-app":"ios";if(an)return app?"app":"android";return null}catch(e){return null}}
+function insBody(){var k=insKind(),h='<img class="insic" src="icon-192.png" alt=""><h1 id="inst" tabindex="-1">ติดตั้งแอปรับงานพนักงาน</h1>';
+ if(INS.done||!k)return h+'<div class="flash" role="status">ติดตั้งแล้ว เปิดแอปจากหน้าจอโฮมได้เลย</div>';
+ h+='<p class="asub">ติดตั้งไว้ที่หน้าจอโฮม เปิดได้เหมือนแอป และรับแจ้งเตือนเมื่อมีงานใหม่</p>';
+ var ol=function(a){return '<ol class="insol">'+a.map(function(x){return '<li>'+x+'</li>'}).join("")+'</ol>'};
+ if(k==="android"){if(INS.ev)h+='<button type="button" class="btn wide" data-ins="go">ติดตั้งแอปไว้ที่หน้าจอโฮม</button>'+ol(["กดปุ่มด้านบน","เมื่อมีหน้าต่างถาม ให้กด <b>ติดตั้ง</b>","เปิดแอปรับงานจากหน้าจอโฮมได้เลย"]);
+  else h+=ol(["กดเมนู <b>⋮</b> มุมขวาบนของเบราว์เซอร์","เลือก <b>ติดตั้งแอป</b> หรือ <b>เพิ่มลงในหน้าจอหลัก</b>","กด <b>ติดตั้ง</b> แล้วเปิดแอปรับงานจากหน้าจอโฮม"])}
+ if(k==="app")h+='<p>หน้านี้เปิดอยู่ในแอปอื่น (เช่น LINE) ซึ่งติดตั้งไม่ได้ ให้ทำตามนี้</p>'+ol(["กดเมนูมุมขวาบนของหน้านี้ (จุดสามจุด หรือปุ่มแชร์)","เลือก <b>เปิดใน Chrome</b> หรือ <b>เปิดด้วยเบราว์เซอร์อื่น</b>","เมื่อเปิดแล้ว กดปุ่ม <b>ติดตั้งแอปไว้ที่หน้าจอโฮม</b>"]);
+ if(k==="ios"||k==="ios-app"){if(k==="ios-app")h+='<p>หน้านี้เปิดอยู่ในแอปอื่น (เช่น LINE) ให้กดเมนูแล้วเลือก <b>เปิดใน Safari</b> ก่อน แล้วทำตามขั้นตอนนี้</p>';
+  h+=ol(["กดปุ่ม <b>แชร์</b> (รูปสี่เหลี่ยมมีลูกศรชี้ขึ้น) ที่แถบด้านล่างของ Safari","เลื่อนหาและเลือก <b>เพิ่มไปยังหน้าจอโฮม</b>","กด <b>เพิ่ม</b> ที่มุมขวาบน แล้วเปิดแอปจากหน้าจอโฮม"])+'<p class="hint">ต้องติดตั้งไว้ที่หน้าจอโฮมก่อน จึงจะรับแจ้งเตือนบน iPhone ได้</p>'}
+ return h}
+function insGo(){var e=INS.ev;if(!e)return;INS.ev=null;try{e.prompt();e.userChoice.then(function(r){if(r&&r.outcome==="accepted")INS.done=true;insRefresh()},function(){insRefresh()})}catch(x){insRefresh()}}
+function insRefresh(){if(AG.step==="ins"&&!SBS)gateDraw()}
+window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();INS.ev=e;insRefresh()});
+window.addEventListener("appinstalled",function(){INS.done=true;wr("insSeen",true);insRefresh()});
+
 /* ===================== เริ่มต้น ===================== */
 var saved=rd(SSK,null);
-if(saved&&saved.access_token){SBS=saved;enter()}else{AG.step="login";gateDraw()}
+var jp="";try{jp=(new URLSearchParams(location.search).get("join")||"").replace(/[\s-]/g,"")}catch(e){}
+if(/^0\d{9}$/.test(jp))AG.join=jp;
+if(saved&&saved.access_token){SBS=saved;enter()}
+else if(AG.join){AG.step=insKind()&&!rd("insSeen",false)?"ins":"reg";gateDraw()}
+else{AG.step="login";gateDraw()}
 })();
 </script>
 </body>

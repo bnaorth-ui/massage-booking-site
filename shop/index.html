@@ -505,7 +505,19 @@ function staffForm(){var ed=!!S.form.id,p=ed?byId(D.staff,S.form.id):{name:"",ph
  '<div><label>ให้บริการอะไรได้บ้าง (จากบริการของร้าน)</label>'+(D.svc.length?'<div class="dchk">'+D.svc.map(function(v){return '<label><input type="checkbox" class="ss" value="'+v.id+'"'+((p.svcs||[]).indexOf(v.id)>-1?" checked":"")+'> '+esc(v.name)+', '+v.min+' นาที'+(v.on?"":" (ปิดชั่วคราว)")+'</label>'}).join("")+'</div>':'<p class="hint2">ยังไม่มีบริการ เพิ่มได้ที่เมนู "เพิ่มบริการ" ก่อน</p>')+'</div>'+
  '<div class="pinbox"><b>เบอร์มือถือสำหรับเข้าสู่ระบบ</b><p class="hint2" style="margin:0">พนักงานสมัครสมาชิกและตั้งรหัสผ่านเองด้วยเบอร์มือถือนี้ ระบบเชื่อมบัญชีให้อัตโนมัติ ร้านไม่ต้องตั้งรหัสผ่านให้</p><div><label for="fph">เบอร์มือถือ</label><input class="in" id="fph" type="tel" inputmode="numeric" maxlength="10" value="'+esc(p.phone||"")+'" placeholder="0812345678" autocomplete="off"></div>'+(ed?'<p class="hint2" style="margin:0">'+(p.linked?'เชื่อมกับบัญชีพนักงานแล้ว':'ยังไม่ได้เชื่อมบัญชี รอพนักงานสมัครสมาชิกด้วยเบอร์นี้')+'</p>':'')+'</div>'+
  '<div class="acts"><button class="btn" data-a="save">บันทึก</button><button class="btn g" data-a="cancel">ยกเลิก</button></div><div id="err" style="color:var(--bad)"></div></div>'}
-function listStaff(){return '<div class="head"><h1>พนักงานทั้งหมด ('+D.staff.length+')</h1></div><div class="card">'+(D.staff.length?D.staff.map(function(p){return '<div class="row"><div style="display:flex;gap:10px;align-items:center">'+stImg(p.img,p.name,40)+'<div><b>'+esc(p.name)+'</b><small>บริการที่รับ: '+esc(svcNames(p.svcs))+'</small><small>เบอร์มือถือ: '+(p.phone?esc(p.phone):"ยังไม่ตั้งเบอร์")+(p.linked?", เชื่อมบัญชีแล้ว":", รอพนักงานสมัครสมาชิกด้วยเบอร์นี้")+'</small></div></div><div class="acts"><span class="tag '+(p.on?"":"o")+'">'+(p.on?"ใช้งาน":"ระงับ")+'</span><button class="btn g" data-a="tog" data-t="staff" data-id="'+p.id+'">'+(p.on?"ระงับ":"เปิดใช้งาน")+'</button><button class="btn g" data-a="edit" data-t="staff" data-id="'+p.id+'">แก้ไข</button>'+delBtn("staff",p.id)+'</div></div>'}).join(""):'<div class="empty">ยังไม่มีพนักงาน</div>')+'</div>'}
+/* ===== ส่งลิงก์ให้พนักงาน ===== */
+function stLink(p){var b=CT.staff||"";if(!b||!p||!p.phone)return"";return b+(b.indexOf("?")>-1?"&":"?")+"join="+encodeURIComponent(p.phone)}
+function stMsg(p){return"สวัสดีค่ะ/ครับ คุณ"+p.name+" ร้าน"+D.shop.name+" เพิ่มคุณเข้าระบบรับงานแล้ว เปิดลิงก์นี้เพื่อสร้างบัญชีและติดตั้งแอป: "+stLink(p)+"\nใช้เบอร์ "+p.phone+" ตอนสร้างบัญชี แล้วตั้งรหัสผ่านเอง"}
+function stShare(id){var p=byId(D.staff,id);if(!p)return;
+ if(!CT.staff){S.stmsg="สมาคมยังไม่ได้ตั้งลิงก์แอปพนักงาน กรุณาติดต่อสมาคม"+(CT.phone?" โทร "+CT.phone:"");S.stok=false;draw();return}
+ if(!p.phone){S.stmsg="ยังไม่ได้บันทึกเบอร์มือถือของพนักงานคนนี้";S.stok=false;draw();return}
+ var t=stMsg(p),done=function(m){S.stmsg=m;S.stok=true;draw()},copy=function(){
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){done("คัดลอกข้อความและลิงก์ของ "+p.name+" แล้ว นำไปวางส่งใน LINE หรือ SMS ได้เลย")},function(){S.stmsg="คัดลอกไม่สำเร็จ ลองกดอีกครั้ง";S.stok=false;draw()})}
+  else{S.stmsg="เครื่องนี้คัดลอกอัตโนมัติไม่ได้ ลิงก์คือ "+stLink(p);S.stok=false;draw()}};
+ if(navigator.share){navigator.share({title:"ลิงก์แอปรับงานพนักงาน",text:t}).then(function(){done("เปิดเมนูแชร์ให้แล้ว")},function(e){if(e&&e.name==="AbortError")return;copy()})}else copy()}
+function listStaff(){var nw=S.stnew?D.staff.filter(function(x){return x.phone===S.stnew})[0]:null;
+ return '<div class="head"><h1>พนักงานทั้งหมด ('+D.staff.length+')</h1></div>'+(S.stmsg?'<div class="'+(S.stok?"saved":"closed")+'" role="status">'+esc(S.stmsg)+'</div>':'')+
+ (nw&&!nw.linked?'<div class="card"><b>เพิ่ม'+esc(nw.name)+'แล้ว</b><p class="hint2" style="margin:4px 0 8px">ส่งลิงก์ให้พนักงานสร้างบัญชีและติดตั้งแอปรับงานบนโทรศัพท์ได้เลย</p><div class="acts"><button type="button" class="btn" data-a="stshare" data-id="'+nw.id+'">ส่งลิงก์ให้'+esc(nw.name)+'</button><button type="button" class="btn g" data-a="stnewno">ไว้ทีหลัง</button></div></div>':'')+'<div class="card">'+(D.staff.length?D.staff.map(function(p){return '<div class="row"><div style="display:flex;gap:10px;align-items:center">'+stImg(p.img,p.name,40)+'<div><b>'+esc(p.name)+'</b><small>บริการที่รับ: '+esc(svcNames(p.svcs))+'</small><small>เบอร์มือถือ: '+(p.phone?esc(p.phone):"ยังไม่ตั้งเบอร์")+(p.linked?", เชื่อมบัญชีแล้ว":", รอพนักงานสมัครสมาชิกด้วยเบอร์นี้")+'</small></div></div><div class="acts">'+(p.linked||!p.on?"":'<button class="btn g" data-a="stshare" data-id="'+p.id+'" aria-label="ส่งลิงก์แอปรับงานให้'+esc(p.name)+'">ส่งลิงก์ให้พนักงาน</button>')+'<span class="tag '+(p.on?"":"o")+'">'+(p.on?"ใช้งาน":"ระงับ")+'</span><button class="btn g" data-a="tog" data-t="staff" data-id="'+p.id+'">'+(p.on?"ระงับ":"เปิดใช้งาน")+'</button><button class="btn g" data-a="edit" data-t="staff" data-id="'+p.id+'">แก้ไข</button>'+delBtn("staff",p.id)+'</div></div>'}).join(""):'<div class="empty">ยังไม่มีพนักงาน</div>')+'</div>'}
 function walletMsg(){var b=balance(),lv=warnLv(),o=owed(),m="";
  if(o>0)m='ค้างชำระค่า GP '+baht(o)+' ร้านถูกปิดชั่วคราว เติมเงินอย่างน้อย '+baht(Math.max(100,-b+1))+' เพื่อชำระและเปิดร้านอีกครั้ง';
  else if(b<lv[1])m='ยอดเหลือต่ำกว่า '+baht(lv[1])+' กรุณาเติมเงิน ถ้าหักค่า GP ไม่ได้ ระบบจะปิดร้านชั่วคราว';
@@ -548,7 +560,7 @@ function loadLive0(){var pid=WID;
   var nt=r[3].filter(function(n){return n.kind!=="announce"}).map(function(n){return{id:n.id,db:1,from:n.title==="ระบบยกเลิกคิวอัตโนมัติ"?"admin":(KM[n.kind]||"admin"),title:n.title,text:n.body||"",at:n.created_at}});
   r[5].forEach(function(a){if((a.audiences||[]).indexOf("ร้านค้า")>-1)nt.push({id:"an-"+a.id,from:"admin",title:"ประกาศ: "+a.title,text:a.body||"",at:a.created_at||(a.day+"T00:00:00")})});
   D.nt=nt;D.ntRead=r[4].map(function(x){return x.notification_id}).concat(annRead());
-  var s=r[6]&&r[6][0];if(s){CT={name:s.association_name||"",addr:s.address||"",phone:s.phone||"",line:s.line_url||"",hours:s.hours_text||""};CFG.pp=s.promptpay_id?{on:s.promptpay_on!==false,type:s.promptpay_type,id:s.promptpay_id,name:s.promptpay_name}:{on:false,none:true};CFG.w1=+s.wallet_warn1||100;CFG.w2=+s.wallet_warn2||50}})}
+  var s=r[6]&&r[6][0];if(s){CT={name:s.association_name||"",addr:s.address||"",phone:s.phone||"",line:s.line_url||"",hours:s.hours_text||"",staff:/^https:\/\//i.test(s.staff_url||"")?s.staff_url:""};CFG.pp=s.promptpay_id?{on:s.promptpay_on!==false,type:s.promptpay_type,id:s.promptpay_id,name:s.promptpay_name}:{on:false,none:true};CFG.w1=+s.wallet_warn1||100;CFG.w2=+s.wallet_warn2||50}})}
 function loadShop(pid){WID=pid;D={shop:null,svc:[],staff:[],promo:[],tx:[],nt:[],ntRead:[],bk:[]};return loadCatalog().then(loadLive)}
 var S={tab:"q",mg:"svc",qt:"wait",form:null,del:null,saved:false,wmode:null,werr:"",busy:false,hmsg:""};
 function balance(){return D.tx.filter(function(t){return t.st==="สำเร็จ"}).reduce(function(a,t){return a+t.amt},0)}
@@ -656,7 +668,7 @@ document.addEventListener("click",function(e){
   if(!navigator.geolocation){ps.innerHTML='<p class="hint2" style="color:var(--bad)">อุปกรณ์นี้ไม่รองรับ ใช้การวางลิงก์หรือพิกัดแทน</p>';return}
   ps.innerHTML='<p class="hint2">กำลังหาตำแหน่ง...</p>';
   navigator.geolocation.getCurrentPosition(function(p){setPin(p.coords.latitude.toFixed(6),p.coords.longitude.toFixed(6))},function(){ps.innerHTML='<p class="hint2" style="color:var(--bad)">ใช้ตำแหน่งปัจจุบันไม่ได้ ตรวจสอบสิทธิ์ตำแหน่ง หรือวางลิงก์/พิกัดแทน</p>'},{timeout:10000});return}
- if(a==="tab"){if(id==="mg")id=S.mg;if(inMg(id))S.mg=id;if(id==="nt"){S.ntf=null;S.ntNew=[];openNt()}if(id==="rv")rvLoad();S.tab=id;S.form=null;S.del=null;S.saved=false;S.pwdone=false;S.shareok=false;S.pv=false;S.wmode=null;S.werr="";S.hmsg="";draw();if(id==="wal"||id==="nt"||id==="q")refresh();return}
+ if(a==="tab"){if(id==="mg")id=S.mg;if(inMg(id))S.mg=id;if(id==="nt"){S.ntf=null;S.ntNew=[];openNt()}if(id==="rv")rvLoad();S.tab=id;S.form=null;S.del=null;S.saved=false;S.pwdone=false;S.shareok=false;S.stmsg="";S.stnew=null;S.pv=false;S.wmode=null;S.werr="";S.hmsg="";draw();if(id==="wal"||id==="nt"||id==="q")refresh();return}
  if(a==="rvreply"){S.rvReply=id;draw();var ta=document.getElementById("rvtxt");if(ta)ta.focus();return}
  if(a==="rvno"){S.rvReply=null;draw();return}
  if(a==="rvsend"){rvSend(id);return}
@@ -684,7 +696,7 @@ document.addEventListener("click",function(e){
    if(D.svc.length&&!ss.length){er.textContent="เลือกบริการที่พนักงานให้บริการได้อย่างน้อย 1 รายการ";return}
    if(!/^0\d{9}$/.test(ph)){er.textContent="เบอร์มือถือต้องเป็นตัวเลข 10 หลักขึ้นต้นด้วย 0";return}
    if(D.staff.some(function(x){return x.phone===ph&&(!cur||x.id!==cur.id)})){er.textContent="เบอร์มือถือนี้ถูกใช้กับพนักงานคนอื่นแล้ว";return}
-   act(function(){return imgPathFor(kind,tmp,cur&&cur.imgPath).then(function(ip){return rpc("shop_save_staff",{p_place:WID,p_id:cur?cur.id:null,p_name:n,p_phone:ph,p_photo:ip,p_services:ss})}).then(loadCatalog)},function(){S.form=null});return}
+   act(function(){return imgPathFor(kind,tmp,cur&&cur.imgPath).then(function(ip){return rpc("shop_save_staff",{p_place:WID,p_id:cur?cur.id:null,p_name:n,p_phone:ph,p_photo:ip,p_services:ss})}).then(loadCatalog)},function(){S.form=null;S.stmsg="";S.stnew=cur?null:ph});return}
   if(ft==="promo"){var mt=g("mt").value.trim(),mv=+g("mv").value,ty=g("mty").value,all=g("mall").checked,ms=[].slice.call(document.querySelectorAll(".ms:checked")).map(function(x){return x.value}),s1=g("ms1").value,e1=g("me1").value;
    if(!mt){er.textContent="กรุณากรอกชื่อโปรโมชั่น";return}
    if(!(g("mv").value!==""&&mv>0)){er.textContent="มูลค่าส่วนลดต้องมากกว่า 0";return}
@@ -719,6 +731,8 @@ document.addEventListener("click",function(e){
  if(a==="logout"){doLogout();return}
  if(a==="pwsave"){pwChange();return}
  if(a==="sharesave"){shareSave();return}
+ if(a==="stshare"){stShare(id);return}
+ if(a==="stnewno"){S.stnew=null;S.stmsg="";draw();return}
  if(a==="gprpt"){RP.kind="gp";RP.data=null;RP.err="";S.tab="rp";S.form=null;S.del=null;S.saved=false;draw();window.scrollTo(0,0);return}
  if(a==="rpkind"){rpSave();RP.kind=id;RP.data=null;RP.err="";draw();return}
  if(a==="rpmode"){rpSave();RP.mode=id;RP.err="";draw();return}
