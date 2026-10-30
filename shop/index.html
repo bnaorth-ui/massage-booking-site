@@ -27,6 +27,9 @@ a{color:var(--main)}
 .sw span{width:26px;height:26px;border-radius:50%;background:var(--mute);display:block;transition:transform .15s}
 .sw.on{background:var(--main);border-color:var(--main)}.sw.on span{background:var(--main-ink);transform:translateX(24px)}
 .closed{flex-basis:100%;margin:0 0 6px;background:var(--wait-bg);color:var(--wait);border-radius:10px;padding:8px 12px;font-size:.9rem}
+.rph{text-align:center}.rpti{margin:10px 0;font-size:1.3rem}.rps{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-top:8px}.rps div{background:var(--soft);border-radius:10px;padding:10px;text-align:center}.rps b{display:block;font-size:1.25rem}.rps small{color:var(--mute)}
+.rpt{width:100%;border-collapse:collapse;margin-top:6px;font-size:.92rem}.rpt th,.rpt td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}.rpt th{color:var(--mute);font-weight:600}.rpw{overflow-x:auto}.rbar{display:block;height:6px;background:var(--line);border-radius:3px;margin-top:4px}.rbar i{display:block;height:6px;background:var(--main);border-radius:3px}
+@media print{*{-webkit-print-color-adjust:exact;print-color-adjust:exact}header.top,.navb,.noprint{display:none!important}body{background:#fff!important}main{padding:0!important;max-width:none!important}.card{box-shadow:none!important;break-inside:avoid-page}.rpw .rpt{font-size:.8rem}}
 .navb{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
 .navb>div{max-width:480px;margin:0 auto;display:flex}
 .navb button{position:relative;flex:1;font:inherit;font-size:.82rem;border:0;background:transparent;color:var(--mute);padding:10px 2px 9px;cursor:pointer}
@@ -232,7 +235,7 @@ document.addEventListener("click",function(e){var el=e.target.closest&&e.target.
   .catch(function(e){G.busy=false;G.err=errTh(e,"ส่งคำขอไม่สำเร็จ");gRender()});return}
 });
 
-var DAYN=["อา","จ","อ","พ","พฤ","ศ","ส"],TABS=[["q","หน้าหลัก","🏠"],["wal","กระเป๋าเงิน","💰"],["nt","การแจ้งเตือน","🔔"],["mg","จัดการร้าน","⚙️"]],MGS=[["svc","เพิ่มบริการ"],["staff","เพิ่มพนักงาน"],["promo","โปรโมชั่น"],["rv","รีวิว"],["set","ตั้งค่าร้าน"],["ct","ติดต่อเรา"]];
+var DAYN=["อา","จ","อ","พ","พฤ","ศ","ส"],TABS=[["q","หน้าหลัก","🏠"],["wal","กระเป๋าเงิน","💰"],["rp","รายงาน","📊"],["nt","การแจ้งเตือน","🔔"],["mg","จัดการร้าน","⚙️"]],MGS=[["svc","เพิ่มบริการ"],["staff","เพิ่มพนักงาน"],["promo","โปรโมชั่น"],["rv","รีวิว"],["set","ตั้งค่าร้าน"],["ct","ติดต่อเรา"]];
 function inMg(t){return MGS.some(function(x){return x[0]===t})}
 function mgBar(){return '<div class="nf" role="tablist" aria-label="หมวดจัดการร้าน">'+MGS.map(function(x){var on=x[0]===S.tab;return'<button type="button" role="tab" data-a="tab" data-id="'+x[0]+'" class="'+(on?"on":"")+'" aria-selected="'+on+'">'+x[1]+'</button>'}).join("")+'</div>'}
 function okUrl(u){return /^https?:\/\//i.test(u||"")}
@@ -309,10 +312,126 @@ function slipRead(file,cb){if(!file||!/^image\//.test(file.type)){cb(null,"เ�
 function walView(){
  if(S.wmode)return '<div class="head"><h1>เติมเงินเข้ากระเป๋าระบบ</h1></div><div class="card form"><p class="hint2" style="margin:0">ยอดคงเหลือ '+baht(balance())+', เงินในกระเป๋านี้ใช้ให้ระบบหักค่า GP เมื่อพนักงานกดนวดเสร็จ</p>'+num("wa","จำนวนเงิน (บาท) ขั้นต่ำ 100",null)+'<p class="hint2" style="margin:0">ระบบจะแสดง QR พร้อมเพย์ของสมาคมตามยอดที่ระบุ โอนแล้วรอแอดมินตรวจสอบและยืนยัน ยอดจะเข้ากระเป๋าเงินอัตโนมัติ</p><div class="acts"><button class="btn" data-a="wsave">สร้างรายการเติมเงิน</button><button class="btn g" data-a="wcancel">ยกเลิก</button></div><div id="err" style="color:var(--bad)">'+esc(S.werr)+'</div></div>';
  var mo=iso(new Date()).slice(0,7),gpm=-D.tx.filter(function(t){return t.type==="gp"&&t.at.slice(0,7)===mo&&t.st==="สำเร็จ"}).reduce(function(a,t){return a+t.amt},0);
- var L=D.tx.slice().sort(function(a,b){return a.at<b.at?1:-1});
- return '<div class="bal'+(balance()<warnLv()[0]||owed()>0?" low":"")+'"><small>ยอดคงเหลือสำหรับหักค่า GP</small><b>'+baht(balance())+'</b><small>ค่า GP '+GPR()+'% ของราคาบริการ, หักเดือนนี้ '+baht(gpm)+'</small>'+walletMsg()+'<div class="acts"><button class="btn" data-a="wnew">เติมเงิน</button></div></div>'+(S.tpshow&&byId(D.tx,S.tpshow)&&byId(D.tx,S.tpshow).st==="รอยืนยัน"?tpPanel(byId(D.tx,S.tpshow)):"")+
- '<div class="head"><h1>ประวัติรายการ</h1></div><div class="card">'+(L.length?L.map(function(t){var tag=t.st==="สำเร็จ"?"":(t.st==="ยกเลิก"||t.st==="ปฏิเสธ"||t.st==="ค้างชำระ")?"b":"w";return '<div class="row"><div><b>'+esc(t.note)+'</b><small>'+fmtAt(t.at)+(t.reason?', '+esc(t.reason):'')+'</small></div><div class="acts"><span class="'+(t.amt>=0?"plus":"minus")+'">'+(t.amt>=0?"+":"-")+Math.abs(t.amt).toLocaleString("th-TH")+'</span>'+(t.slipAt&&t.st==="รอยืนยัน"?'<span class="tag">แนบสลิปแล้ว</span>':'')+'<span class="tag '+tag+'">'+t.st+'</span>'+(t.type==="topup"&&t.st==="รอยืนยัน"?'<button class="btn g" data-a="tpview" data-id="'+t.id+'">ดูวิธีโอน</button>':'')+'</div></div>'}).join(""):'<div class="empty">ยังไม่มีรายการ</div>')+'</div>'}
+ var L=D.tx.filter(function(t){return!(t.type==="gp"&&t.st==="สำเร็จ")}).sort(function(a,b){return a.at<b.at?1:-1});
+ return '<div class="bal'+(balance()<warnLv()[0]||owed()>0?" low":"")+'"><small>ยอดคงเหลือสำหรับหักค่า GP</small><b>'+baht(balance())+'</b><small>ค่า GP '+GPR()+'% ของราคาบริการ, หักเดือนนี้ '+baht(gpm)+'</small><button type="button" class="btn g" data-a="tab" data-id="rp" style="margin-top:8px">ดูรายละเอียดค่า GP ในเมนูรายงาน</button>'+walletMsg()+'<div class="acts"><button class="btn" data-a="wnew">เติมเงิน</button></div></div>'+(S.tpshow&&byId(D.tx,S.tpshow)&&byId(D.tx,S.tpshow).st==="รอยืนยัน"?tpPanel(byId(D.tx,S.tpshow)):"")+
+ '<div class="head"><h1>ประวัติรายการ</h1></div><p class="hint2" style="margin:0 0 8px">แสดงการเติมเงิน เครดิต ปรับยอด และค่า GP ที่ค้างชำระ รายการหักค่า GP ที่ชำระแล้วดูได้ที่เมนูรายงาน</p><div class="card">'+(L.length?L.map(function(t){var tag=t.st==="สำเร็จ"?"":(t.st==="ยกเลิก"||t.st==="ปฏิเสธ"||t.st==="ค้างชำระ")?"b":"w";return '<div class="row"><div><b>'+esc(t.note)+'</b><small>'+fmtAt(t.at)+(t.reason?', '+esc(t.reason):'')+'</small></div><div class="acts"><span class="'+(t.amt>=0?"plus":"minus")+'">'+(t.amt>=0?"+":"-")+Math.abs(t.amt).toLocaleString("th-TH")+'</span>'+(t.slipAt&&t.st==="รอยืนยัน"?'<span class="tag">แนบสลิปแล้ว</span>':'')+'<span class="tag '+tag+'">'+t.st+'</span>'+(t.type==="topup"&&t.st==="รอยืนยัน"?'<button class="btn g" data-a="tpview" data-id="'+t.id+'">ดูวิธีโอน</button>':'')+'</div></div>'}).join(""):'<div class="empty">ยังไม่มีรายการ</div>')+'</div>'}
+/* ===== ส่วนแบ่งพนักงาน + รายงานของร้าน ===== */
+var RP={kind:"use",mode:"m",mon:"",from:"",to:"",staff:"",svc:"",busy:false,err:"",data:null};
+function rpMonths(){var o=[],n=new Date(Date.now()+H7Q),y=n.getUTCFullYear(),m=n.getUTCMonth();for(var i=0;i<12;i++){var v=y+"-"+String(m+1).padStart(2,"0");o.push({v:v,t:new Date(v+"-01T00:00:00Z").toLocaleDateString("th-TH",{month:"long",year:"numeric",timeZone:"UTC"})});m--;if(m<0){m=11;y--}}return o}
+function rpThD(d){return new Date(d+"T00:00:00Z").toLocaleDateString("th-TH",{day:"numeric",month:"long",year:"numeric",timeZone:"UTC"})}
+function rpMask(n){n=String(n||"").trim();if(!n)return"-";var p=n.split(/\s+/);return p[0]+(p.length>1?" "+p[1].charAt(0)+".":"")}
+function rpMoney(n){return n==null?"-":Number(n).toLocaleString("th-TH",{maximumFractionDigits:2})}
+function rpHr(m){return(m/60).toLocaleString("th-TH",{maximumFractionDigits:1})+" ชม."}
+function rpBar(v,mx){return '<span class="rbar" aria-hidden="true"><i style="width:'+(mx?Math.round(v*100/mx):0)+'%"></i></span>'}
+/* --- การ์ดตั้งค่าส่วนแบ่ง (ในหน้าตั้งค่าร้าน) --- */
+function shareCard(){
+ var h='<div class="card form"><b>ส่วนแบ่งพนักงาน (สำหรับรายงาน)</b>';
+ if(!D.rates)return h+'<p class="hint2" style="margin:6px 0 0">ฟีเจอร์นี้ยังไม่พร้อมใช้งาน ต้องให้ผู้ดูแลระบบอัปเดตฐานข้อมูลก่อน</p></div>';
+ h+='<p class="hint2" style="margin:0">ตั้งเป็นเปอร์เซ็นต์ของราคาเต็มก่อนหักส่วนลดโปรโมชั่น ใช้แสดงในรายงานเท่านั้น ระบบไม่ได้จ่ายเงินให้พนักงาน ไม่ตั้ง = รายงานไม่แสดงส่วนแบ่ง</p>'+
+ num("sh0","ส่วนแบ่งพนักงานทั้งร้าน (%)",D.rates.shop,"เช่น 50")+'<p class="hint2" style="margin:0" id="shex"></p>'+
+ (D.svc.length?'<div><label>เฉพาะบริการ (เว้นว่าง = ใช้ค่าทั้งร้าน)</label>'+D.svc.map(function(v){return '<div class="two" style="align-items:end;margin-top:6px"><div style="align-self:center">'+esc(v.name)+'<small style="display:block;color:var(--mute)">'+baht(v.price)+'</small></div>'+num("sh_"+v.id,"ส่วนแบ่ง (%) "+esc(v.name),D.rates.svc[v.id],"ใช้ค่าทั้งร้าน")+'</div>'}).join("")+'</div>':'');
+ return h+'<div class="acts"><button class="btn" data-a="sharesave">บันทึกส่วนแบ่ง</button></div><div id="sherr" style="color:var(--bad)" role="alert"></div>'+(S.shareok?'<div class="saved" role="status">บันทึกส่วนแบ่งแล้ว ใช้กับงานที่เสร็จหลังจากนี้ งานเก่าไม่เปลี่ยน</div>':'')+'</div>'}
+function shareEx(){var el=document.getElementById("sh0"),o=document.getElementById("shex");if(!el||!o)return;var p=parseFloat(el.value);o.textContent=(p>=0&&p<=100)?"ตัวอย่าง: บริการ 200 บาท พนักงานได้ "+rpMoney(Math.round(200*p)/100)+" บาท":""}
+function shareSave(){var er=document.getElementById("sherr"),calls=[],bad=null;er.textContent="";
+ var rd1=function(id){var el=document.getElementById(id);if(!el)return undefined;var s=el.value.trim();if(s==="")return null;var n=Number(s);if(!(n>=0&&n<=100)){bad=true;return undefined}return n};
+ var w=rd1("sh0");if(bad){er.textContent="ส่วนแบ่งต้องเป็นตัวเลข 0-100";return}
+ if(w!==undefined&&w!==D.rates.shop)calls.push([null,w]);
+ for(var i=0;i<D.svc.length;i++){var v=D.svc[i],x=rd1("sh_"+v.id);if(bad){er.textContent="ส่วนแบ่งต้องเป็นตัวเลข 0-100 ("+v.name+")";return}
+  if(x!==undefined&&x!==(D.rates.svc[v.id]==null?null:D.rates.svc[v.id]))calls.push([v.id,x])}
+ if(!calls.length){er.textContent="ยังไม่ได้เปลี่ยนค่าใด";return}
+ act(function(){var p=Promise.resolve();calls.forEach(function(c){p=p.then(function(){return rpc("shop_set_share",{p_place:WID,p_service:c[0],p_pct:c[1]})})});return p.then(loadRates)},function(){S.shareok=true})}
+function loadRates(){return g1("share_rates?select=service_id,pct&place_id=eq."+WID).then(function(a){var r={shop:null,svc:{}};(a||[]).forEach(function(x){if(x.service_id)r.svc[x.service_id]=+x.pct;else r.shop=+x.pct});D.rates=r},function(){D.rates=null})}
+function rateFor(sid){if(!D.rates)return null;if(sid&&D.rates.svc[sid]!=null)return D.rates.svc[sid];return D.rates.shop}
+/* --- หน้ารายงาน --- */
+var RPK=[["use","การใช้บริการ"],["inc","รายได้และส่วนแบ่ง"],["gp","ค่า GP"]];
+function rpView(){var R=RP,mons=rpMonths();if(!R.mon)R.mon=mons[0].v;
+ var h='<div class="head noprint"><h1>รายงาน</h1></div><div class="card form noprint" id="rpctl">'+
+ '<div class="nf" role="tablist" aria-label="ประเภทรายงาน">'+RPK.map(function(x){return '<button type="button" role="tab" data-a="rpkind" data-id="'+x[0]+'" class="'+(x[0]===R.kind?"on":"")+'" aria-selected="'+(x[0]===R.kind)+'">'+x[1]+'</button>'}).join("")+'</div>'+
+ '<div class="nf" role="tablist" aria-label="รูปแบบช่วงเวลา">'+[["m","เลือกเดือน"],["d","ระบุวันที่"]].map(function(x){return '<button type="button" role="tab" data-a="rpmode" data-id="'+x[0]+'" class="'+(x[0]===R.mode?"on":"")+'" aria-selected="'+(x[0]===R.mode)+'">'+x[1]+'</button>'}).join("")+'</div>'+
+ (R.mode==="m"?'<div><label for="rpm">เดือน</label><select class="in" id="rpm">'+mons.map(function(m){return '<option value="'+m.v+'"'+(m.v===R.mon?" selected":"")+'>'+m.t+'</option>'}).join("")+'</select></div>':'<div class="two"><div><label for="rpf">ตั้งแต่วันที่</label><input class="in" type="date" id="rpf" value="'+esc(R.from)+'"></div><div><label for="rpt">ถึงวันที่</label><input class="in" type="date" id="rpt" value="'+esc(R.to)+'"></div></div><p class="hint2" style="margin:0">เลือกได้สูงสุด 366 วัน</p>')+
+ '<div class="two"><div><label for="rps">พนักงาน</label><select class="in" id="rps"><option value="">พนักงานทุกคน</option>'+D.staff.map(function(x){return '<option value="'+x.id+'"'+(x.id===R.staff?" selected":"")+'>'+esc(x.name)+'</option>'}).join("")+'</select></div>'+
+ '<div><label for="rpv">บริการ</label><select class="in" id="rpv"><option value="">ทุกบริการ</option>'+D.svc.map(function(x){return '<option value="'+x.id+'"'+(x.id===R.svc?" selected":"")+'>'+esc(x.name)+'</option>'}).join("")+'</select></div></div>'+
+ '<div class="acts"><button class="btn" data-a="rpgo"'+(R.busy?" disabled":"")+'>'+(R.busy?"กำลังสร้างรายงาน…":"สร้างรายงาน")+'</button></div>'+(R.err?'<div style="color:var(--bad)" role="alert">'+esc(R.err)+'</div>':'')+'</div>';
+ if(!R.data)return h;
+ var d=R.data,c=rpCalc(d),st=d.staff?(byId(D.staff,d.staff)||{}).name:"พนักงานทุกคน",sv=d.svc?(byId(D.svc,d.svc)||{}).name:"ทุกบริการ",
+ issue=new Date().toLocaleDateString("th-TH",{day:"numeric",month:"long",year:"numeric",timeZone:"Asia/Bangkok"}),
+ title=({use:"รายงานการใช้บริการ",inc:"รายงานรายได้และส่วนแบ่งพนักงาน",gp:"รายงานค่า GP"})[d.kind];
+ h+='<div class="rp"><div class="card rph"><b>'+esc(D.shop.name)+'</b><h2 class="rpti">'+title+'</h2><div>ช่วงเวลา: '+esc(d.label)+'</div><div>พนักงาน: '+esc(st)+' · บริการ: '+esc(sv)+'</div><div class="hint2">ออกรายงานวันที่ '+issue+'</div></div>'+
+ '<div class="acts noprint" style="margin:10px 0"><button class="btn" data-a="rpprint">พิมพ์ / บันทึกเป็น PDF</button><button class="btn g" data-a="rpcsv">ดาวน์โหลด Excel (CSV)</button></div>'+
+ (d.noShare&&d.kind==="inc"?'<p class="hint2" role="status">ฐานข้อมูลยังไม่รองรับส่วนแบ่ง (รอผู้ดูแลระบบอัปเดต) ตัวเลขส่วนแบ่งจึงไม่แสดง</p>':'')+
+ (c.est&&d.kind==="inc"&&!d.noShare?'<p class="hint2" role="status">มี '+c.est+' งานที่เสร็จก่อนเริ่มบันทึกส่วนแบ่ง ตัวเลขที่มีเครื่องหมาย * เป็นค่าประมาณจากอัตราปัจจุบัน</p>':'')+
+ rpBody(d,c)+'</div>';
+ return h}
+function rpCalc(d){var c={rows:[],tot:0,done:0,cx:0,mv:0,mins:0,full:0,disc:0,paid:0,share:0,shareN:0,gp:0,net:0,est:0,svc:{},stf:{}};
+ d.bks.forEach(function(b){var its=(b.booking_items||[]).filter(function(i){return i.active});
+  if(b.status==="cancelled")c.cx++;else if(b.status==="rescheduled")c.mv++;
+  var sumP=its.reduce(function(a,i){return a+(+i.price)},0),gpb=d.gp[b.id]||0;
+  its.forEach(function(i){
+   if(d.staff&&i.staff_id!==d.staff)return;if(d.svc&&i.service_id!==d.svc)return;
+   var sn=i.service_name,sf=(byId(D.staff,i.staff_id)||{}).name||"พนักงาน";
+   var so=c.svc[sn]=c.svc[sn]||{n:0,d:0,m:0,full:0,share:0,gp:0,paid:0},fo=c.stf[sf]=c.stf[sf]||{n:0,d:0,m:0,full:0,share:0,gp:0,paid:0};
+   so.n++;fo.n++;c.tot++;
+   if(i.job!=="done")return;
+   var m=Math.round((Date.parse(i.ends_at)-Date.parse(i.starts_at))/6e4);
+   var ish=i.item_shares,lp=ish&&ish.list_price!=null?+ish.list_price:null,est=false;
+   if(lp==null){var sv=byId(D.svc,i.service_id);lp=sv?sv.price:+i.price;est=true}
+   var disc=Math.max(0,lp-(+i.price)),sh=ish&&ish.share!=null?+ish.share:null;
+   if(sh==null&&(!ish||ish.pct==null)){var rt=rateFor(i.service_id);if(rt!=null&&!d.noShare&&est){sh=Math.round(lp*rt)/100}else sh=null}
+   var gp=sumP>0?gpb*(+i.price)/sumP:(its.length?gpb/its.length:0);
+   var net=sh==null?null:(+i.price)-sh-gp;
+   c.done++;c.mins+=m;c.full+=lp;c.disc+=disc;c.paid+=(+i.price);c.gp+=gp;if(sh!=null){c.share+=sh;c.shareN++;c.net+=net}if(est)c.est++;
+   so.d++;so.m+=m;so.full+=lp;so.paid+=(+i.price);so.gp+=gp;if(sh!=null)so.share+=sh;
+   fo.d++;fo.m+=m;fo.full+=lp;fo.paid+=(+i.price);fo.gp+=gp;if(sh!=null)fo.share+=sh;
+   c.rows.push({at:i.starts_at,ref:b.ref,cust:rpMask(b.customer_name),svc:sn,staff:sf,min:m,full:lp,disc:disc,paid:+i.price,share:sh,est:est&&sh!=null,gp:gp,net:net,stat:"เสร็จสิ้น"})})});
+ c.rows.sort(function(a,b){return a.at<b.at?-1:1});return c}
+function rpTbl(head,rows){return '<div class="rpw"><table class="rpt"><thead><tr>'+head.map(function(x){return '<th>'+x+'</th>'}).join("")+'</tr></thead><tbody>'+rows.map(function(r){return '<tr>'+r.map(function(x){return '<td>'+x+'</td>'}).join("")+'</tr>'}).join("")+'</tbody></table></div>'}
+function rpTime(at){return qThD(qDate(at)).replace(/^วัน\S+ที่ /,"")+" "+qHM(at)}
+function rpBody(d,c){var k=d.kind,o='';
+ var sums=function(a){return '<div class="rps">'+a.map(function(x){return '<div><b>'+x[0]+'</b><small>'+x[1]+'</small></div>'}).join("")+'</div>'};
+ var grp=function(map,lab,cols,fn){var ks=Object.keys(map).sort(function(a,b){return map[b].d-map[a].d||map[b].n-map[a].n}),mx=ks.length?(map[ks[0]].d||map[ks[0]].n):0;
+  return '<div class="card"><b>'+lab+'</b>'+(ks.length?rpTbl(cols,ks.map(function(n){return fn(n,map[n],mx)})):'<p class="hint2">ไม่มีข้อมูล</p>')+'</div>'};
+ if(k==="use"){
+  o+='<div class="card"><b>สรุปภาพรวม</b>'+sums([[c.tot,"รายการคิว"],[c.done,"เสร็จสิ้น"],[d.bks.filter(function(b){return b.status==="cancelled"}).length,"ยกเลิก (การจอง)"],[d.bks.filter(function(b){return b.status==="rescheduled"}).length,"เลื่อนคิว (การจอง)"],[rpHr(c.mins),"เวลาที่ให้บริการ"]])+'</div>';
+  o+=grp(c.svc,"แยกตามบริการ",["บริการ","รายการคิว","เสร็จสิ้น","เวลา"],function(n,x,mx){return [esc(n)+rpBar(x.d||x.n,mx),x.n,x.d,rpHr(x.m)]});
+  o+=grp(c.stf,"แยกตามพนักงาน",["พนักงาน","รายการคิว","เสร็จสิ้น","เวลา"],function(n,x,mx){return [esc(n)+rpBar(x.d||x.n,mx),x.n,x.d,rpHr(x.m)]});
+  o+='<div class="card"><b>รายการงานที่เสร็จสิ้น ('+c.rows.length+')</b><p class="hint2" style="margin:2px 0 8px">ชื่อลูกค้าแสดงแบบย่อ ไม่แสดงเบอร์โทร</p>'+(c.rows.length?rpTbl(["วันที่","เลขที่จอง","ลูกค้า","บริการ","พนักงาน","เวลา"],c.rows.map(function(r){return [rpTime(r.at),esc(r.ref),esc(r.cust),esc(r.svc),esc(r.staff),r.min+" นาที"]})):'<p class="hint2">ไม่มีข้อมูล</p>')+'</div>'}
+ else if(k==="inc"){
+  o+='<div class="card"><b>สรุปรายได้ ('+c.done+' งานที่เสร็จ)</b>'+sums([[rpMoney(c.full),"ราคาเต็ม (บาท)"],[rpMoney(c.disc),"ส่วนลดโปรโมชั่น"],[rpMoney(c.paid),"ลูกค้าจ่ายจริง"],[c.shareN?rpMoney(c.share):"-","ส่วนแบ่งพนักงาน"],[rpMoney(c.gp),"ค่า GP"],[c.shareN?rpMoney(c.net):"-","ร้านสุทธิ"]])+
+   '<p class="hint2" style="margin:8px 0 0">ร้านสุทธิ = ลูกค้าจ่ายจริง − ส่วนแบ่งพนักงาน − ค่า GP (ส่วนลดโปรโมชั่นเป็นภาระของร้าน)'+(c.shareN<c.done?' · มี '+(c.done-c.shareN)+' งานที่ไม่มีข้อมูลส่วนแบ่ง ไม่ถูกนับในยอดส่วนแบ่งและร้านสุทธิ':'')+'</p></div>';
+  var cols=["","งานที่เสร็จ","ราคาเต็ม","ส่วนแบ่ง","GP","ร้านสุทธิ"];
+  var fn=function(n,x,mx){return [esc(n)+rpBar(x.d,mx),x.d,rpMoney(x.full),c.shareN?rpMoney(x.share):"-",rpMoney(x.gp),c.shareN?rpMoney(x.paid-x.share-x.gp):"-"]};
+  o+=grp(c.stf,"แยกตามพนักงาน",["พนักงาน"].concat(cols.slice(1)),fn);o+=grp(c.svc,"แยกตามบริการ",["บริการ"].concat(cols.slice(1)),fn);
+  o+='<div class="card"><b>รายการทีละงาน ('+c.rows.length+')</b>'+(c.rows.length?rpTbl(["วันที่","เลขที่จอง","บริการ","พนักงาน","ราคาเต็ม","ส่วนลด","จ่ายจริง","ส่วนแบ่ง","GP","ร้านสุทธิ"],c.rows.map(function(r){return [rpTime(r.at),esc(r.ref),esc(r.svc),esc(r.staff),rpMoney(r.full),rpMoney(r.disc),rpMoney(r.paid),r.share==null?"-":rpMoney(r.share)+(r.est?" *":""),rpMoney(r.gp),r.net==null?"-":rpMoney(r.net)]})):'<p class="hint2">ไม่มีข้อมูล</p>')+'</div>'}
+ else{
+  o+='<div class="card"><b>สรุปค่า GP</b>'+sums([[c.done,"งานที่เสร็จ"],[rpMoney(c.paid),"ยอดที่คิด GP (บาท)"],[rpMoney(c.gp),"ค่า GP ที่หัก"],[GPR()+"%","อัตรา GP ปัจจุบัน"]])+'<p class="hint2" style="margin:8px 0 0">ค่า GP คิดจากยอดที่ลูกค้าจ่ายจริงหลังหักโปรโมชั่น ถ้างานมีหลายรายการ ระบบแบ่ง GP ตามสัดส่วนราคาของแต่ละรายการ</p></div>';
+  var fn2=function(n,x,mx){return [esc(n)+rpBar(x.d,mx),x.d,rpMoney(x.paid),rpMoney(x.gp)]};
+  o+=grp(c.stf,"แยกตามพนักงาน",["พนักงาน","งานที่เสร็จ","ยอดที่คิด GP","ค่า GP"],fn2);o+=grp(c.svc,"แยกตามบริการ",["บริการ","งานที่เสร็จ","ยอดที่คิด GP","ค่า GP"],fn2);
+  o+='<div class="card"><b>รายการหักค่า GP ('+c.rows.length+')</b>'+(c.rows.length?rpTbl(["วันที่","เลขที่จอง","บริการ","พนักงาน","ยอดที่คิด GP","ค่า GP"],c.rows.map(function(r){return [rpTime(r.at),esc(r.ref),esc(r.svc),esc(r.staff),rpMoney(r.paid),rpMoney(r.gp)]})):'<p class="hint2">ไม่มีข้อมูล</p>')+'</div>'}
+ return o}
+function rpSave(){var g=function(i){return document.getElementById(i)};if(g("rpm"))RP.mon=g("rpm").value;if(g("rpf"))RP.from=g("rpf").value;if(g("rpt"))RP.to=g("rpt").value;if(g("rps"))RP.staff=g("rps").value;if(g("rpv"))RP.svc=g("rpv").value}
+function rpPages(base,sel){var all=[],off=0;function next(){return sbApi("/rest/v1/"+base+"&limit=1000&offset="+off).then(function(a){a=a||[];all=all.concat(a);if(a.length===1000&&off<9000){off+=1000;return next()}return all})}return next()}
+function rpGo(){rpSave();var R=RP,a,b,label;R.err="";
+ if(R.mode==="d"){if(!R.from||!R.to){R.err="กรุณาเลือกวันที่เริ่มต้นและวันที่สิ้นสุด";draw();return}
+  if(R.to<R.from){R.err="วันที่สิ้นสุดต้องไม่ก่อนวันที่เริ่มต้น";draw();return}
+  a=new Date(R.from+"T00:00:00+07:00");b=new Date(new Date(R.to+"T00:00:00+07:00").getTime()+864e5);
+  if((b-a)/864e5>366){R.err="เลือกช่วงวันที่ได้ไม่เกิน 366 วัน";draw();return}
+  label=R.from===R.to?rpThD(R.from):rpThD(R.from)+" ถึง "+rpThD(R.to)}
+ else{var m0=+R.mon.slice(5,7),y0=+R.mon.slice(0,4);a=new Date(R.mon+"-01T00:00:00+07:00");b=new Date((m0===12?(y0+1)+"-01":y0+"-"+String(m0+1).padStart(2,"0"))+"-01T00:00:00+07:00");label=rpMonths().filter(function(m){return m.v===R.mon})[0].t}
+ R.busy=true;R.data=null;draw();
+ var kind=R.kind,sel="id,ref,customer_name,status,starts_at,booking_items(id,service_id,service_name,staff_id,price,active,job,starts_at,ends_at,item_shares(list_price,pct,share))",
+  q=function(s){return "bookings?select="+s+"&place_id=eq."+WID+"&starts_at=gte."+encodeURIComponent(a.toISOString())+"&starts_at=lt."+encodeURIComponent(b.toISOString())+"&order=starts_at"},
+  noShare=false;
+ rpPages(q(sel)).catch(function(e){if(e&&e.status===401)throw e;noShare=true;return rpPages(q(sel.replace(",item_shares(list_price,pct,share)","")))}).then(function(bks){
+  var ids=bks.map(function(x){return x.id}),gp={},chunks=[];for(var i=0;i<ids.length;i+=80)chunks.push(ids.slice(i,i+80));
+  var p=Promise.resolve();chunks.forEach(function(ch){p=p.then(function(){return g1("wallet_tx?select=booking_id,amount,status&place_id=eq."+WID+"&type=eq.gp&booking_id=in.("+ch.join(",")+")&limit=1000").then(function(t){(t||[]).forEach(function(x){if(x.status!=="cancelled")gp[x.booking_id]=(gp[x.booking_id]||0)-(+x.amount)})})})});
+  return p.then(function(){R.data={kind:kind,label:label,bks:bks,gp:gp,staff:R.staff,svc:R.svc,noShare:noShare};R.busy=false;draw()})}).catch(function(e){R.busy=false;if(e&&e.status===401){doLogout();return}R.err=errTh(e,"สร้างรายงานไม่สำเร็จ ลองใหม่อีกครั้ง");draw()})}
+function rpCsv(){var d=RP.data;if(!d)return;var c=rpCalc(d),q=function(x){x=String(x==null?"":x);return /[",\n]/.test(x)?'"'+x.replace(/"/g,'""')+'"':x},rows;
+ var cols=d.kind==="use"?["วันที่","เวลา","เลขที่จอง","ลูกค้า","บริการ","พนักงาน","นาที"]:d.kind==="inc"?["วันที่","เวลา","เลขที่จอง","บริการ","พนักงาน","ราคาเต็ม","ส่วนลด","จ่ายจริง","ส่วนแบ่งพนักงาน","ค่า GP","ร้านสุทธิ","หมายเหตุ"]:["วันที่","เวลา","เลขที่จอง","บริการ","พนักงาน","ยอดที่คิด GP","ค่า GP"];
+ rows=[cols].concat(c.rows.map(function(r){var dt=qDate(r.at),tm=qHM(r.at),f=function(n){return n==null?"":Math.round(n*100)/100};
+  return d.kind==="use"?[dt,tm,r.ref,r.cust,r.svc,r.staff,r.min]:d.kind==="inc"?[dt,tm,r.ref,r.svc,r.staff,f(r.full),f(r.disc),f(r.paid),f(r.share),f(r.gp),f(r.net),r.est?"ส่วนแบ่งโดยประมาณ":""]:[dt,tm,r.ref,r.svc,r.staff,f(r.paid),f(r.gp)]}));
+ var csv="﻿"+rows.map(function(r){return r.map(q).join(",")}).join("\r\n"),a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));a.download="report-"+d.kind+"-"+(RP.mode==="m"?RP.mon:RP.from+"_"+RP.to)+".csv";document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href)},2000)}
 function view(){var t=S.tab,f=S.form&&S.form.t===t;
+ if(t==="rp")return rpView();
  if(t==="nt")return listNt();
  if(t==="q")return qView();
  if(t==="ct")return mgBar()+ctView();
@@ -393,7 +512,7 @@ function setView(){var s=D.shop,o=s.ov||{};
  return '<div class="head"><h1>ตั้งค่าร้าน</h1></div>'+(S.saved?'<div class="saved" role="status">บันทึกการตั้งค่าแล้ว</div>':'')+
  '<div class="card form"><b>ข้อมูลร้าน</b><div><label for="s1">ชื่อร้าน</label><input class="in" id="s1" value="'+esc(s.name)+'"></div><div><label for="s2">คำอธิบายร้าน (ไม่บังคับ)</label><input class="in" id="s2" value="'+esc(s.desc||"")+'"></div><div><label for="s5">พื้นที่/ที่ตั้ง (เช่น เขต อำเภอ)</label><input class="in" id="s5" value="'+esc(s.area||"")+'"></div><div><label for="pimg">รูปโปรไฟล์ร้าน</label><div class="pimgrow"><span id="imgprev">'+avatar(56)+'</span><input class="in" type="file" id="pimg" accept="image/*"></div><p class="hint2" style="margin:6px 0 0">ระบบครอปเป็นรูปสี่เหลี่ยมจัตุรัสและย่อขนาดให้อัตโนมัติ รูปจะเปลี่ยนทันทีที่เลือก</p><div id="imgerr" style="color:var(--bad)"></div></div></div>'+
  '<div class="card form"><b>เวลาทำการ</b><div><label>วันที่เปิดให้บริการ</label><div class="dchk">'+DAYN.map(function(n,i){return '<label><input type="checkbox" class="fd" value="'+i+'"'+(s.days.indexOf(i)>-1?" checked":"")+'> '+n+'</label>'}).join("")+'</div></div><div class="two"><div><label for="s3">เวลาเปิด</label><select class="in" id="s3">'+hsel(s.open)+'</select></div><div><label for="s4">เวลาปิด</label><select class="in" id="s4">'+hsel(s.close)+'</select></div></div></div>'+
- loginCard()+pwCard()+pinHtml(s)+
+ shareCard()+loginCard()+pwCard()+pinHtml(s)+
  '<div class="card form"><b>กฎการจองของร้าน</b><p class="hint2" style="margin:0">เว้นว่าง = ใช้ค่าเริ่มต้นของสมาคม (ตัวเลขจางๆ คือค่าเริ่มต้น)</p><div class="two">'+num("r2","จองล่วงหน้า (วัน)",o.adv,DEF.adv)+num("r3","ยกเลิกก่อนนัด (ชม.)",o.cancelH,DEF.cancelH)+'</div></div>'+
  '<div id="err" style="color:var(--bad);margin-bottom:10px"></div><button class="btn w" data-a="setsave">บันทึกการตั้งค่า</button><div style="margin-top:18px"><button class="btn g" data-a="logout">ออกจากระบบ</button></div>'}
 /* ===================== ข้อมูลร้าน (โหลดจาก Supabase) ===================== */
@@ -409,7 +528,7 @@ function g1(path){return sbApi("/rest/v1/"+path)}
 function loadCatalog(){var pid=WID;
  return Promise.all([g1("places?select=*&id=eq."+pid),g1("services?select=*&place_id=eq."+pid+"&order=created_at"),g1("staff?select=*,staff_services(service_id)&place_id=eq."+pid+"&order=created_at"),g1("promotions?select=*,promotion_services(service_id)&place_id=eq."+pid+"&order=created_at")]).then(function(r){
   if(!r[0]||!r[0][0])throw new Error("ไม่พบข้อมูลร้าน");
-  D.shop=mapPlace(r[0][0]);D.svc=r[1].map(mapSvc);D.staff=r[2].map(mapStaff);D.promo=r[3].map(mapPromo)})}
+  D.shop=mapPlace(r[0][0]);D.svc=r[1].map(mapSvc);D.staff=r[2].map(mapStaff);D.promo=r[3].map(mapPromo)}).then(loadRates)}
 function annRead(){return rd("shopAnnRead_"+WHO.id,[])}
 function loadBk(){var pid=WID,from=new Date(Date.now()-30*864e5).toISOString();
  return g1("bookings?select=id,ref,customer_name,phone,status,starts_at,ends_at,total_price,promo_title,moved_to,created_at,booking_items(id,service_name,minutes,price,starts_at,ends_at,active,job,staff_id)&place_id=eq."+pid+"&ends_at=gte."+from+"&order=starts_at.asc&limit=500").then(function(r){D.bk=r||[]},function(){})}
@@ -494,11 +613,12 @@ function draw(){drawHeader();
  navDraw();
  if(S.chat&&document.getElementById("chl"))return;
  document.getElementById("main").innerHTML=view();
- if(S.tab==="wal"&&S.tpshow){var tq=byId(D.tx,S.tpshow),pq=ppInfo();if(tq&&tq.st==="รอยืนยัน"){if(pq.on)drawQr("qrbox",ppPayload(pq.type,pq.id,tq.amt));var sc=document.getElementById("slipcur");if(sc&&tq.slipPath)loadSlip(tq.slipPath,sc)}}}
+ if(S.tab==="wal"&&S.tpshow){var tq=byId(D.tx,S.tpshow),pq=ppInfo();if(tq&&tq.st==="รอยืนยัน"){if(pq.on)drawQr("qrbox",ppPayload(pq.type,pq.id,tq.amt));var sc=document.getElementById("slipcur");if(sc&&tq.slipPath)loadSlip(tq.slipPath,sc)}}
+ if(S.tab==="set")shareEx()}
 /* รีเฟรชเบื้องหลัง: ไม่ล้างฟอร์มที่กำลังกรอกอยู่ */
 function softDraw(){drawHeader();
  navDraw();
- var busyForm=S.form||S.wmode||S.slipDraft||S.tab==="set"||S.busy||S.chat||S.rvReply;
+ var busyForm=S.form||S.wmode||S.slipDraft||S.tab==="set"||S.tab==="rp"||S.busy||S.chat||S.rvReply;
  if(!busyForm){document.getElementById("main").innerHTML=view();
   if(S.tab==="wal"&&S.tpshow){var tq=byId(D.tx,S.tpshow),pq=ppInfo();if(tq&&tq.st==="รอยืนยัน"){if(pq.on)drawQr("qrbox",ppPayload(pq.type,pq.id,tq.amt));var sc=document.getElementById("slipcur");if(sc&&tq.slipPath)loadSlip(tq.slipPath,sc)}}}}
 function refresh(){if(!D||S.busy)return Promise.resolve();return loadLive().then(function(){if(S.tab==="nt"){openNt()}if(S.tab==="rv"&&!S.rvReply)rvLoad();softDraw()},function(e){if(e&&e.status===401)doLogout()})}
@@ -507,6 +627,7 @@ document.addEventListener("change",function(e){var t=e.target;if(!t||t.id!=="sli
  if(msg)msg.textContent="กำลังอ่านรูป...";
  slipRead(t.files[0],function(d,err){if(!d){S.slipDraft=null;if(msg)msg.textContent=err;if(bt)bt.disabled=true;return}S.slipDraft=d;S.slipMsg="";S.slipAsk=false;if(bt)bt.textContent="ส่งสลิปให้แอดมิน";if(pv)pv.innerHTML='<img loading="lazy" decoding="async" class="slipth" src="'+d+'" alt="สลิปที่เลือก">';if(msg)msg.textContent="";if(bt)bt.disabled=false})});
 document.addEventListener("input",function(e){var t=e.target;if(!t||S.tab!=="set")return;
+ if(t.id==="sh0"){shareEx();return}
  if(t.id==="opin"){var r=parsePin(t.value);if(r)setPin(r[0],r[1]);else if(t.value.trim())document.getElementById("pinst").innerHTML='<p class="hint2" style="color:var(--bad)">อ่านพิกัดจากข้อความนี้ไม่ได้ ถ้าเป็นลิงก์แบบย่อ (maps.app.goo.gl) ให้เปิดลิงก์ก่อน แล้วคัดลอกพิกัดจากแถบที่อยู่หรือคลิกขวาที่หมุดเพื่อคัดลอกพิกัด</p>'}
  if(t.id==="olat"||t.id==="olng")document.getElementById("pinst").innerHTML=pinStatus(document.getElementById("olat").value.trim(),document.getElementById("olng").value.trim())});
 document.addEventListener("change",function(e){var t=e.target;if(!t||!D)return;
@@ -531,7 +652,7 @@ document.addEventListener("click",function(e){
   if(!navigator.geolocation){ps.innerHTML='<p class="hint2" style="color:var(--bad)">อุปกรณ์นี้ไม่รองรับ ใช้การวางลิงก์หรือพิกัดแทน</p>';return}
   ps.innerHTML='<p class="hint2">กำลังหาตำแหน่ง...</p>';
   navigator.geolocation.getCurrentPosition(function(p){setPin(p.coords.latitude.toFixed(6),p.coords.longitude.toFixed(6))},function(){ps.innerHTML='<p class="hint2" style="color:var(--bad)">ใช้ตำแหน่งปัจจุบันไม่ได้ ตรวจสอบสิทธิ์ตำแหน่ง หรือวางลิงก์/พิกัดแทน</p>'},{timeout:10000});return}
- if(a==="tab"){if(id==="mg")id=S.mg;if(inMg(id))S.mg=id;if(id==="nt")openNt();if(id==="rv")rvLoad();S.tab=id;S.form=null;S.del=null;S.saved=false;S.pwdone=false;S.pv=false;S.wmode=null;S.werr="";S.hmsg="";draw();if(id==="wal"||id==="nt"||id==="q")refresh();return}
+ if(a==="tab"){if(id==="mg")id=S.mg;if(inMg(id))S.mg=id;if(id==="nt")openNt();if(id==="rv")rvLoad();S.tab=id;S.form=null;S.del=null;S.saved=false;S.pwdone=false;S.shareok=false;S.pv=false;S.wmode=null;S.werr="";S.hmsg="";draw();if(id==="wal"||id==="nt"||id==="q")refresh();return}
  if(a==="rvreply"){S.rvReply=id;draw();var ta=document.getElementById("rvtxt");if(ta)ta.focus();return}
  if(a==="rvno"){S.rvReply=null;draw();return}
  if(a==="rvsend"){rvSend(id);return}
@@ -593,6 +714,12 @@ document.addEventListener("click",function(e){
  if(a==="tpcancel"){var cx=byId(D.tx,id);if(cx&&cx.st==="รอยืนยัน"){act(function(){return rpc("cancel_topup",{p_id:cx.rid||cx.id}).then(loadLive)},function(){S.tpshow=null})}else{S.tpshow=null;draw()}return}
  if(a==="logout"){doLogout();return}
  if(a==="pwsave"){pwChange();return}
+ if(a==="sharesave"){shareSave();return}
+ if(a==="rpkind"){rpSave();RP.kind=id;RP.data=null;RP.err="";draw();return}
+ if(a==="rpmode"){rpSave();RP.mode=id;RP.err="";draw();return}
+ if(a==="rpgo"){rpGo();return}
+ if(a==="rpprint"){window.print();return}
+ if(a==="rpcsv"){rpCsv();return}
  if(a==="pvopen"){S.pv=true;draw();var t=document.getElementById("pvt");if(t)t.focus();return}
  if(a==="pvno"){S.pv=false;draw();return}
  if(a==="setsave"){var er2=g("err"),days=[].slice.call(document.querySelectorAll(".fd:checked")).map(function(x){return+x.value}),nm=g("s1").value.trim(),o1=+g("s3").value,c1=+g("s4").value,la=g("olat").value.trim(),lo=g("olng").value.trim(),pla=null,plo=null,v=function(i){var x=g(i).value;return x===""?null:+x};er2.textContent="";
