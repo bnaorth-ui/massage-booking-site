@@ -74,6 +74,7 @@ textarea.in{resize:vertical}
 .tag.s{background:var(--off);color:var(--ink)}
 .plus{color:var(--ok);font-weight:700}.minus{color:var(--bad);font-weight:700}
 .pimgrow{display:flex;gap:12px;align-items:center}.pimgrow input{flex:1;min-width:0}
+.insol{padding-left:26px;margin:8px 0 14px}.insol li{padding:7px 0;font-size:1.05rem}.insic{width:72px;height:72px;border-radius:16px;display:block;margin:6px 0 10px}
 .btn.ghost{background:transparent;color:var(--main)}.flash{background:var(--soft);border:2px solid var(--main);border-radius:12px;padding:8px 12px;margin:0 0 12px}.err{background:var(--bad-bg);color:var(--bad);border:2px solid var(--bad);border-radius:10px;padding:8px 12px;margin:8px 0}.chh{margin:0 0 6px}.chh .btn{width:auto;padding:8px 14px}.chl{display:flex;flex-direction:column;gap:8px;margin:10px 0 90px}.msg{max-width:85%;border-radius:14px;padding:8px 12px;border:2px solid var(--line);background:var(--card)}.msg.mine{align-self:flex-end;background:var(--soft)}.msg small{display:block;opacity:.8}.msg p{margin:2px 0 0;overflow-wrap:anywhere}.chf{position:sticky;bottom:var(--nbh,0px);display:flex;gap:8px;align-items:flex-end;background:var(--bg);padding:10px 0;border-top:1px solid var(--line)}.chf textarea{flex:1;margin:0;resize:none;font:inherit;padding:10px;border:2px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}.chf .btn{width:auto;margin:0;padding:10px 18px}.cn{display:inline-block;min-width:22px;border-radius:99px;background:#d64545;color:#fff;font-size:.8rem;padding:0 6px;margin-left:6px}.chb{margin-top:8px}.chb .btn{width:auto;padding:8px 14px}.vh{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -160,11 +161,31 @@ function regForm(loggedIn){var cs=G.cats||[];
    :'<div class="pinbox"><b>ข้อมูลเข้าสู่ระบบของเจ้าของร้าน</b>'+field("rph","เบอร์มือถือ","tel",'inputmode="numeric" maxlength="10" placeholder="0812345678" autocomplete="off" value="'+esc(G.f&&G.f.p||"")+'"')+field("rpw","รหัสผ่าน (อย่างน้อย 6 ตัวอักษร)","password",'autocomplete="new-password"')+field("rpw2","ยืนยันรหัสผ่าน","password",'autocomplete="new-password"')+'<p class="hint2" style="margin:0">ถ้าเบอร์นี้เคยสมัครเป็นผู้ใช้งานแล้ว ให้ใส่รหัสผ่านเดิมของบัญชีนั้น</p></div>')+
   '<label class="ck" for="rpv" style="display:flex;gap:8px;align-items:flex-start;margin-bottom:8px"><input type="checkbox" id="rpv" style="margin-top:4px"><span>ฉันได้อ่านและยอมรับนโยบายความเป็นส่วนตัว</span></label><div style="margin-bottom:10px"><button type="button" class="btn g" data-g="pv">อ่านนโยบายความเป็นส่วนตัว</button></div>'+
   errBox()+'<button type="button" class="btn" data-g="regsend" style="width:100%"'+(G.busy?' disabled':'')+'>'+(G.busy?'กำลังส่งคำขอ…':'ส่งคำขอลงทะเบียน')+'</button></div><div style="text-align:center;margin-top:14px">'+(loggedIn?'<button type="button" class="btn g" data-g="logout">ออกจากระบบ</button>':'<button type="button" class="btn g" data-g="back">กลับไปหน้าเข้าสู่ระบบ</button>')+'</div>'}
+/* ===== แนะนำการติดตั้งแอปร้านค้า ===== */
+var INS={ev:null,done:false,fd:false};
+function insKind(){try{var ua=navigator.userAgent||"";if((window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone||INS.done)return null;
+ var ios=/iPad|iPhone|iPod/.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1),an=/Android/i.test(ua),app=/Line\/|FBAN|FBAV|Instagram|MicroMessenger/i.test(ua);
+ if(ios)return app?"ios-app":"ios";if(an)return app?"app":"android";return null}catch(e){return null}}
+function insBody(){var k=insKind(),h='<img class="insic" src="icon-192.png" alt=""><h1 id="inst" tabindex="-1" style="margin:0 0 8px">ติดตั้งแอปร้านค้า</h1>';
+ if(INS.done||!k)return h+'<div class="flash" role="status">ติดตั้งแล้ว เปิดแอปจากหน้าจอโฮมได้เลย</div>';
+ h+='<p class="hint2">ติดตั้งไว้ที่หน้าจอโฮม เปิดได้เหมือนแอป และรับแจ้งเตือนเรื่องการจองและยอดเงินได้</p>';
+ var ol=function(a){return '<ol class="insol">'+a.map(function(x){return '<li>'+x+'</li>'}).join("")+'</ol>'};
+ if(k==="android"){if(INS.ev)h+='<button type="button" class="btn" data-g="insgo" style="width:100%">ติดตั้งแอปไว้ที่หน้าจอโฮม</button>'+ol(["กดปุ่มด้านบน","เมื่อมีหน้าต่างถาม ให้กด <b>ติดตั้ง</b>","เปิดแอปร้านค้าจากหน้าจอโฮมได้เลย"]);
+  else h+=ol(["กดเมนู <b>⋮</b> มุมขวาบนของเบราว์เซอร์","เลือก <b>ติดตั้งแอป</b> หรือ <b>เพิ่มลงในหน้าจอหลัก</b>","กด <b>ติดตั้ง</b> แล้วเปิดแอปร้านค้าจากหน้าจอโฮม"])}
+ if(k==="app")h+='<p>หน้านี้เปิดอยู่ในแอปอื่น (เช่น LINE) ซึ่งติดตั้งไม่ได้ ให้ทำตามนี้</p>'+ol(["กดเมนูมุมขวาบนของหน้านี้ (จุดสามจุด หรือปุ่มแชร์)","เลือก <b>เปิดใน Chrome</b> หรือ <b>เปิดด้วยเบราว์เซอร์อื่น</b>","เมื่อเปิดแล้ว กดปุ่ม <b>ติดตั้งแอปไว้ที่หน้าจอโฮม</b>"]);
+ if(k==="ios"||k==="ios-app"){if(k==="ios-app")h+='<p>หน้านี้เปิดอยู่ในแอปอื่น (เช่น LINE) ให้กดเมนูแล้วเลือก <b>เปิดใน Safari</b> ก่อน แล้วทำตามขั้นตอนนี้</p>';
+  h+=ol(["กดปุ่ม <b>แชร์</b> (รูปสี่เหลี่ยมมีลูกศรชี้ขึ้น) ที่แถบด้านล่างของ Safari","เลื่อนหาและเลือก <b>เพิ่มไปยังหน้าจอโฮม</b>","กด <b>เพิ่ม</b> ที่มุมขวาบน แล้วเปิดแอปจากหน้าจอโฮม"])+'<p class="hint2">ต้องติดตั้งไว้ที่หน้าจอโฮมก่อน จึงจะรับแจ้งเตือนบน iPhone ได้</p>'}
+ return h}
+function insGo(){var e=INS.ev;if(!e)return;INS.ev=null;try{e.prompt();e.userChoice.then(function(r){if(r&&r.outcome==="accepted")INS.done=true;insRefresh()},function(){insRefresh()})}catch(x){insRefresh()}}
+function insRefresh(){if(G.mode==="ins"&&!WHO)gRender()}
+window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();INS.ev=e;insRefresh()});
+window.addEventListener("appinstalled",function(){INS.done=true;wr("insSeen",true);insRefresh()});
 function gRender(){var h=gateTitle();
+ if(G.mode==="ins"){box.innerHTML='<div style="margin-bottom:10px"><button type="button" class="btn g" data-g="insskip">ข้าม ใช้ต่อในเบราว์เซอร์</button></div><div class="card">'+insBody()+'<button type="button" class="btn g" data-g="insskip" style="width:100%;margin-top:8px">ไปหน้าเข้าสู่ระบบ</button></div>';if(!INS.fd){INS.fd=true;var ti=document.getElementById("inst");if(ti)ti.focus()}return}
  if(G.mode==="load")h+='<p class="hint2" style="text-align:center" role="status">กำลังโหลดข้อมูลร้าน…</p>';
  else if(G.mode==="loaderr")h+='<div class="card form"><b>โหลดข้อมูลไม่สำเร็จ</b><div role="alert" style="color:var(--bad)">'+esc(G.err)+'</div><button type="button" class="btn" data-g="retry">ลองใหม่</button><button type="button" class="btn g" data-g="logout">ออกจากระบบ</button></div>';
  else if(G.mode==="in"){if(G.ok)h+='<div class="saved" role="status">'+esc(G.ok)+'</div>';
-  h+=field("gph","เบอร์มือถือ","tel",'inputmode="numeric" maxlength="10" autocomplete="username" placeholder="0812345678" value="'+esc(G.ph)+'"')+field("gpw","รหัสผ่าน","password",'autocomplete="current-password"')+errBox()+'<button type="button" class="btn" data-g="login" style="width:100%"'+(G.busy?' disabled':'')+'>เข้าสู่ระบบ</button><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px"><button type="button" class="btn g" data-g="forgot">ลืมรหัสผ่าน</button><button type="button" class="btn g" data-g="reg">ลงทะเบียนร้านนวดใหม่</button><button type="button" class="btn g" data-g="pv">นโยบายความเป็นส่วนตัว</button></div>'}
+  h+=field("gph","เบอร์มือถือ","tel",'inputmode="numeric" maxlength="10" autocomplete="username" placeholder="0812345678" value="'+esc(G.ph)+'"')+field("gpw","รหัสผ่าน","password",'autocomplete="current-password"')+errBox()+'<button type="button" class="btn" data-g="login" style="width:100%"'+(G.busy?' disabled':'')+'>เข้าสู่ระบบ</button><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px"><button type="button" class="btn g" data-g="forgot">ลืมรหัสผ่าน</button><button type="button" class="btn g" data-g="reg">ลงทะเบียนร้านนวดใหม่</button><button type="button" class="btn g" data-g="pv">นโยบายความเป็นส่วนตัว</button>'+(insKind()?'<button type="button" class="btn g" data-g="ins">วิธีติดตั้งแอปไว้ที่หน้าจอโฮม</button>':"")+'</div>'}
  else if(G.mode==="forgot"){var ct=G.ct,tel=ct&&String(ct.phone||"").replace(/[^0-9+]/g,""),ln=ct&&/^https?:\/\//i.test(ct.line||"")?ct.line:"";
   h+='<div class="card form"><b>ลืมรหัสผ่าน</b><p class="hint2" style="margin:0">ระบบยังไม่มีการรีเซ็ตรหัสผ่านอัตโนมัติ กรุณาติดต่อ'+esc(ct&&ct.name||"สมาคมวิทยากรฝึกอาชีพคนตาบอด")+' เจ้าหน้าที่จะสอบถามข้อมูลเพื่อยืนยันตัวตนก่อน แล้วตั้งรหัสผ่านชั่วคราวให้</p>'+
    (tel?'<a class="btn" href="tel:'+esc(tel)+'" style="text-align:center;text-decoration:none">โทร '+esc(ct.phone)+'</a>':'')+(ln?'<a class="btn g" href="'+esc(ln)+'" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">ติดต่อทาง LINE</a>':'')+(ct&&ct.hours?'<p class="hint2" style="margin:0">เวลาทำการ: '+esc(ct.hours)+'</p>':(G.ctL?'<p class="hint2" style="margin:0" role="status">กำลังโหลดช่องทางติดต่อ…</p>':''))+
@@ -205,6 +226,9 @@ document.addEventListener("click",function(e){var el=e.target.closest&&e.target.
  if(a==="back"){G.draft=null;gMode("in");return}
  if(a==="pv"){G.pvBack=G.mode;if(G.mode==="reg"||G.mode==="reg2")G.draft=regDraft();gMode("pv");ctLoad();var t0=document.getElementById("pvt");if(t0)t0.focus();return}
  if(a==="pvback"){gMode(G.pvBack||"in");return}
+ if(a==="insgo"){insGo();return}
+ if(a==="insskip"){wr("insSeen",true);gMode("in");return}
+ if(a==="ins"){INS.fd=false;gMode("ins");return}
  if(a==="logout"){doLogout();return}
  if(a==="retry"){afterLogin();return}
  if(a==="login"){var ph=val("gph").replace(/[\s-]/g,""),pw=val("gpw");G.ph=ph;
@@ -760,7 +784,7 @@ function startMain(){if(started){draw();return}started=true;S={tab:"q",mg:"svc",
 /* ---------- เริ่มทำงาน ---------- */
 showGate(true);
 SBS=rd(SSK,null);
-if(SBS&&SBS.refresh_token){afterLogin()}else{SBS=null;gMode("in")}
+if(SBS&&SBS.refresh_token){afterLogin()}else{SBS=null;gMode(insKind()&&!rd("insSeen",false)?"ins":"in")}
 
 })();
 </script>
