@@ -185,7 +185,7 @@ function calc(){var shop=S.place.type==="shop",n=1,sub=S.svcs.reduce(function(a,
  if(shop)promosOf(S.place).forEach(function(m){var d=discOf(m,S.svcs,n);if(d>bd){bd=d;best=m}});return{sub:sub,disc:bd,promo:best,total:sub-bd}}
 function shD(s){var p=s.split("-");return new Date(+p[0],+p[1]-1,+p[2]).toLocaleDateString("th-TH",{day:"numeric",month:"short"})}
 function promoLine(m){return (m.img?'<span class="pr"><img loading="lazy" decoding="async" src="'+m.img+'" alt=""><span>':'')+'<small>'+esc(m.title)+', '+(m.type==="percent"?"ลด "+m.value+"%":"ลด "+baht(m.value))+', '+(m.all?"ทุกบริการ":m.svcs.map(function(i){var v=svcOf(S.place,i);return v?v.name:""}).join(", "))+', ถึง '+shD(m.end)+'</small>'+(m.img?'</span></span>':'')}
-function mapBtn(b){var pl=bkPlace(b);if(!pl||pl.type!=="shop")return"";var q=pos(pl);return '<a class="btn ghost mapb" href="https://www.google.com/maps/search/?api=1&amp;query='+q.lat.toFixed(6)+','+q.lng.toFixed(6)+'" target="_blank" rel="noopener">📍 แผนที่</a>'}
+function mapBtn(b){var pl=bkPlace(b);if(!pl||pl.type!=="shop")return"";var q=pos(pl);return '<a class="btn ghost mapb" href="https://www.google.com/maps/dir/?api=1&amp;destination='+q.lat.toFixed(6)+','+q.lng.toFixed(6)+'" target="_blank" rel="noopener" aria-label="นำทางไปร้าน'+esc(pl.name)+'"><span aria-hidden="true">📍</span> นำทางไปร้าน</a>'}
 function past(d,m){var n=new Date();return d===iso(n)&&m<=n.getHours()*60+n.getMinutes()}
 function slotOk(d,m){return !past(d,m)&&!(S.svc&&lunchHit(S.place,m,S.svc.min))&&assignable(d,m)}
 function preDate(){var n=new Date(),t=iso(n),od=openDays();for(var i=0;i<od.length;i++){var x=iso(od[i]);if(x===t&&!slots().some(function(m){return !past(x,m)}))continue;return x}return null}
