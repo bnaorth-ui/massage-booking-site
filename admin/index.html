@@ -244,7 +244,7 @@ function enter(){AG.step="load";S.busy=false;gateDraw();whoAmI();
 
 /* ===================== หน้าจอ ===================== */
 var NAV=[["q","หน้าหลัก","🏠","คิวงานใหม่"],["pl","สถานที่และคน","🏪","ร้านรอตรวจ"],["fin","การเงิน","💰","คำขอเติมเงินรอยืนยัน"],["nt","การแจ้งเตือน","🔔","ยังไม่ได้อ่าน"],["sys","จัดการระบบ","⚙️",""]],
-SUBM={pl:[["shop","ร้านนวด"],["org","หน่วยงาน"],["comp","บริษัท"],["staff","พนักงาน"]],fin:[["pprq","คำขอเติมเงิน"],["ppac","บัญชีรับเงิน"],["rp","รายงาน"]],sys:[["svc","บริการกลาง"],["cat","หมวดหมู่"],["rvw","รีวิว"],["ann","ประกาศ"],["set","การตั้งค่า"]]},
+SUBM={pl:[["shop","ร้านนวด"],["org","หน่วยงาน"],["comp","บริษัท"],["staff","พนักงาน"]],fin:[["pprq","คำขอเติมเงิน"],["ppac","บัญชีรับเงิน"],["rp","รายงาน"]],sys:[["svc","บริการกลาง"],["cat","หมวดหมู่"],["rvw","รีวิว"],["usr","ผู้ใช้งาน"],["ann","ประกาศ"],["set","การตั้งค่า"]]},
 NAVN={pl:"สถานที่และคน",fin:"การเงิน",sys:"จัดการระบบ"};
 function groupOf(t){return t==="q"||t==="nt"?t:/^(shop|org|comp|staff)$/.test(t)?"pl":/^(pp|rp|pprq|ppac)$/.test(t)?"fin":"sys"}
 function curSub(){return S.tab==="pp"?"pp"+(S.pps==="ac"?"ac":"rq"):S.tab}
@@ -415,6 +415,27 @@ function ppView(){var ps=S.pps||"rq",pp=D.pp,okk=pp.id&&ppValid(pp.type,pp.id),p
 var RW={loaded:false,err:"",sh:[],st:[]};
 function nsCard(c){return c.nsOk?'<div class="card form"><b>แจ้งเตือนร้านนวดใหม่</b><p class="hint">เมื่ออนุมัติร้านใหม่ (และร้านมีพิกัด เปิดรับจอง) ระบบแจ้งผู้ใช้งานที่เปิดตำแหน่งไว้ในรัศมีนี้ ส่งครั้งเดียวต่อร้าน</p><label class="ck"><input type="checkbox" id="nson"'+(c.nso?" checked":"")+'> แจ้งเตือนผู้ใช้งานเมื่อมีร้านนวดใหม่</label><div class="two">'+num("nsr","รัศมีแจ้งเตือนร้านใหม่ (กม.)",c.nsr,null,1)+'</div></div>':''}
 function rvwLoad(){return Promise.all([sbApi("/rest/v1/reviews?select=*&or=(reported.eq.true,hidden.eq.true,shop_rating.lte.2)&order=created_at.desc&limit=200"),sbApi("/rest/v1/review_staff?select=*&or=(reported.eq.true,hidden.eq.true,rating.lte.2)&order=created_at.desc&limit=200")]).then(function(r){RW.sh=r[0]||[];RW.st=r[1]||[];RW.loaded=true;RW.err="";if(S.tab==="rvw"&&!S.rvwC)draw()},function(e){RW.loaded=true;RW.err=errTh(e,"โหลดรีวิวไม่สำเร็จ ตรวจสอบว่ารันไฟล์ SQL ส่วนที่ 23 แล้ว");if(S.tab==="rvw")draw()})}
+/* ---- ผู้ใช้งาน: ตั้งรหัสผ่านใหม่ให้ผู้ใช้ที่ลืมรหัส ---- */
+var US={q:"",res:null,loading:false,err:"",sel:null,pw:"",cfm:false,done:null,copied:false,log:null,logErr:""},UKIND={user:"ผู้ใช้ทั่วไป",shop:"ร้านค้า",staff:"พนักงาน"};
+function usrFind(){var q=((document.getElementById("usq")||{}).value||"").trim();US.q=q;var d=q.replace(/\D/g,"");
+ if(d.length<3){US.err="พิมพ์เบอร์อย่างน้อย 3 หลัก";US.res=null;draw();return}
+ US.err="";US.loading=true;US.sel=null;US.done=null;draw();
+ rpc("admin_find_users",{p_q:q}).then(function(a){US.res=a||[];US.loading=false;draw()},function(e){US.loading=false;US.res=null;US.err=errTh(e,"ค้นหาไม่สำเร็จ ตรวจสอบว่ารันไฟล์ SQL ส่วนที่ 27 แล้ว");draw()})}
+function usrLogLoad(redraw){return sbApi("/rest/v1/password_reset_log?select=*&order=created_at.desc&limit=50").then(function(a){US.log=a||[];US.logErr="";if(S.tab==="usr"&&!S.busy||redraw)draw()},function(e){US.logErr=errTh(e,"โหลดประวัติไม่สำเร็จ ตรวจสอบว่ารันไฟล์ SQL ส่วนที่ 27 แล้ว");if(S.tab==="usr")draw()})}
+function usrView(){var h='<div class="head"><h1>ผู้ใช้งาน</h1></div><p class="hint2">ใช้เมื่อผู้ใช้ลืมรหัสผ่านและติดต่อสมาคม ค้นหาจากเบอร์ ตั้งรหัสผ่านชั่วคราวให้ แล้วแจ้งผู้ใช้ให้เข้าสู่ระบบและเปลี่ยนรหัสเองที่หน้าบัญชีทันที</p>';
+ if(US.done){var d=US.done;h+='<div class="card" role="status"><b>ตั้งรหัสผ่านใหม่ให้ '+esc(d.name||"-")+' แล้ว</b><small>เบอร์ '+esc(d.phone||"-")+'</small><div style="font-size:1.6rem;font-weight:700;letter-spacing:.12em;margin:10px 0;overflow-wrap:anywhere" id="uspwshow">'+esc(d.pw)+'</div><div class="acts"><button type="button" class="btn g" data-a="uscopy">'+(US.copied?"คัดลอกแล้ว":"คัดลอกรหัส")+'</button></div><p class="hint2" style="margin:10px 0 0">แจ้งรหัสนี้ให้เจ้าของบัญชีทางโทรศัพท์ แล้วบอกให้เข้าสู่ระบบและเปลี่ยนรหัสผ่านเองที่หน้าบัญชีทันที รหัสนี้จะไม่แสดงอีกหลังกด "เสร็จสิ้น" เครื่องที่ล็อกอินค้างไว้ถูกบังคับออกจากระบบแล้ว</p><button type="button" class="btn" data-a="usdone" style="margin-top:8px">เสร็จสิ้น</button></div>'}
+ else if(US.sel){var u=US.sel;h+='<div class="card form"><b>ตั้งรหัสผ่านใหม่ให้ '+esc(u.name||"-")+'</b><small>เบอร์ '+esc(u.phone||"-")+' · '+esc(UKIND[u.kind]||"")+'</small><div><label for="uspw">รหัสผ่านชั่วคราว (อย่างน้อย 8 ตัวอักษร)</label><input class="in" id="uspw" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="'+esc(US.pw)+'"'+(US.cfm?" readonly":"")+'></div>'+
+  (US.cfm?'<div role="alert" style="margin-top:8px;font-weight:600">ยืนยันว่าได้สอบถามและยืนยันตัวตนของ '+esc(u.name||"-")+' (เบอร์ '+esc(u.phone||"-")+') ทางโทรศัพท์แล้ว? เครื่องที่ล็อกอินค้างไว้จะถูกบังคับออกจากระบบ</div><div class="acts" style="margin-top:8px"><button type="button" class="btn d" data-a="usgo">ยืนยันตั้งรหัสผ่านใหม่</button><button type="button" class="btn g" data-a="usno">ยังไม่ตั้ง</button></div>'
+   :'<div class="acts" style="margin-top:8px"><button type="button" class="btn" data-a="usask">ตั้งรหัสผ่านใหม่</button><button type="button" class="btn g" data-a="usgen">สุ่มรหัสให้</button><button type="button" class="btn g" data-a="uscancel">ยกเลิก</button></div>')+
+  (US.err?'<div role="alert" style="color:var(--bad);margin-top:8px">'+esc(US.err)+'</div>':'')+'</div>'}
+ else{h+='<div class="srch"><input class="in" id="usq" type="tel" inputmode="numeric" aria-label="ค้นหาเบอร์ผู้ใช้" placeholder="🔍 พิมพ์เบอร์มือถืออย่างน้อย 3 หลัก" value="'+esc(US.q)+'" autocomplete="off"></div><div class="acts" style="margin-bottom:10px"><button type="button" class="btn" data-a="usfind">ค้นหา</button></div>'+(US.err?'<div role="alert" style="color:var(--bad);margin-bottom:8px">'+esc(US.err)+'</div>':'');
+  if(US.loading)h+='<p class="hint2" role="status">กำลังค้นหา</p>';
+  else if(US.res)h+=US.res.length?US.res.map(function(x){return '<div class="row"><div><b>'+esc(x.name||"(ไม่ระบุชื่อ)")+'</b> <span class="tag">'+esc(UKIND[x.kind]||"")+'</span>'+(x.is_admin?' <span class="tag o">แอดมิน</span>':'')+'<small>เบอร์ '+esc(x.phone||"-")+'</small></div>'+(x.is_admin?'<small>ตั้งรหัสให้แอดมินไม่ได้</small>':'<button type="button" class="btn g" data-a="uspick" data-id="'+x.id+'">ตั้งรหัสผ่านใหม่</button>')+'</div>'}).join(""):'<div class="empty">ไม่พบผู้ใช้ที่ตรงกับเบอร์นี้</div>'}
+ h+='<h2 style="margin:22px 0 8px;font-size:1.05rem">ประวัติการตั้งรหัสผ่านใหม่</h2><p class="hint2">แสดง 50 รายการล่าสุด ไม่เก็บรหัสผ่าน</p>';
+ if(US.logErr)h+='<div role="alert" style="color:var(--bad)">'+esc(US.logErr)+'</div>';
+ else if(!US.log)h+='<p class="hint2" role="status">กำลังโหลด</p>';
+ else h+=US.log.length?US.log.map(function(x){return '<div class="row"><div><b>'+esc(x.user_name||"-")+'</b> <small>เบอร์ '+esc(x.user_phone||"-")+'</small><small>ตั้งโดย '+esc(x.admin_name||"-")+' · '+new Date(x.created_at).toLocaleString("th-TH",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",timeZone:"Asia/Bangkok"})+'</small></div></div>'}).join(""):'<div class="empty">ยังไม่มีการตั้งรหัสผ่านใหม่</div>';
+ return h}
 function rvwPending(){return RW.sh.filter(function(x){return x.reported&&!x.hidden}).length+RW.st.filter(function(x){return x.reported&&!x.hidden}).length}
 function rvwView(){var f=S.rvwf||"rep",h='<div class="head"><h1>ตรวจสอบรีวิว</h1></div>';
  if(!RW.loaded)return h+'<p class="hint2" role="status">กำลังโหลดรีวิว</p>';
@@ -450,7 +471,7 @@ function view(){return subBar(groupOf(S.tab))+viewIn()}
 function viewIn(){var t=S.tab;
  if(t==="q")return qView();if(t==="rp")return rpView();if(t==="shop")return shopView();if(t==="org"||t==="comp")return orgView(t);
  if(t==="staff")return '<div class="head"><h1>เพิ่มพนักงาน</h1>'+addBtn("staff")+'</div>'+(S.form&&S.form.t==="staff"?staffForm():searchBox("staff","ค้นหาชื่อหรือเบอร์พนักงาน")+'<div id="lst">'+staffList()+'</div>');
- if(t==="svc")return svcView();if(t==="cat")return catView();if(t==="ann")return annView();if(t==="rvw")return rvwView();if(t==="nt")return ntView();if(t==="pp")return ppView();return setView()}
+ if(t==="svc")return svcView();if(t==="cat")return catView();if(t==="ann")return annView();if(t==="rvw")return rvwView();if(t==="usr")return usrView();if(t==="nt")return ntView();if(t==="pp")return ppView();return setView()}
 function listHtml(tab){return tab==="org"||tab==="comp"?orgList(tab):tab==="shop"?shopList():staffList()}
 function navDraw(){var g=groupOf(S.tab);document.getElementById("navb").hidden=false;
  document.getElementById("tabs").innerHTML=NAV.map(function(x){var u=x[0]==="nt"?ntUnread():x[0]==="pl"?regPending():x[0]==="fin"?tpPending():x[0]==="q"?qNew():0;return '<button type="button" data-a="tab" data-id="'+x[0]+'" class="'+(x[0]===g?"on":"")+'"><span aria-hidden="true">'+x[2]+'</span>'+x[1]+(u?'<i class="bdg" aria-label="'+x[3]+' '+u+' รายการ">'+u+'</i>':'')+'</button>'}).join("");
@@ -461,12 +482,15 @@ function post(){var lg=document.getElementById("alogo");if(lg){if(!lg.dataset.o)
   D.tp.forEach(function(t){var el=document.getElementById("slipth_"+t.id);if(el&&t.slipPath)loadBlobInto("/storage/v1/object/authenticated/slips/"+t.slipPath,el,"สลิปการโอน","slipth");var bg=document.getElementById("slipbig_"+t.id);if(bg&&t.slipPath)loadBlobInto("/storage/v1/object/authenticated/slips/"+t.slipPath,bg,"สลิปการโอนขยาย","slipbig")})}
  if(S.tab==="shop"&&S.lic){var r=byId(D.regs,S.lic),el2=document.getElementById("lic_"+S.lic);if(r&&el2)loadBlobInto("/storage/v1/object/authenticated/licenses/"+r.license_path,el2,"ใบอนุญาตจัดตั้งร้านนวดของ "+esc(r.name),"licimg")}}
 function draw(){navDraw();document.getElementById("main").innerHTML=view();post()}
-function softDraw(){navDraw();var a=document.activeElement;if(S.form||S.busy||(a&&/INPUT|SELECT|TEXTAREA/.test(a.tagName)&&a.id!=="")||S.tab==="set")return;document.getElementById("main").innerHTML=view();post()}
+function softDraw(){navDraw();var a=document.activeElement;if(S.form||S.busy||(a&&/INPUT|SELECT|TEXTAREA/.test(a.tagName)&&a.id!=="")||S.tab==="set"||S.tab==="usr")return;document.getElementById("main").innerHTML=view();post()}
 function refresh(){if(!D||S.busy)return Promise.resolve();if(S.tab==="rvw"||RW.loaded)rvwLoad();return Promise.all([loadLive(),loadBk()]).then(softDraw,function(e){if(e&&e.status===401)doLogout()})}
 
 /* ===================== เหตุการณ์ ===================== */
 function setPin(la,lo){document.getElementById("olat").value=la;document.getElementById("olng").value=lo;document.getElementById("pinst").innerHTML=pinStatus(String(la),String(lo))}
+document.addEventListener("keydown",function(e){if(e.key==="Enter"&&e.target&&e.target.id==="usq"){e.preventDefault();usrFind()}});
 document.addEventListener("input",function(e){var t=e.target;if(!t||!D)return;
+ if(t.id==="uspw"){US.pw=t.value;return}
+ if(t.id==="usq"){US.q=t.value;return}
  if(t.id&&t.id.indexOf("q_")===0){var tab=t.id.slice(2);S.q[tab]=t.value;var l=document.getElementById("lst");if(l)l.innerHTML=listHtml(tab);return}
  if(t.id==="spq"&&S.form){S.form.spq=t.value;var sp=document.getElementById("staffpick");if(sp)sp.innerHTML=staffRowsHtml();return}
  if(t.id==="opin"){var r=parsePin(t.value);if(r)setPin(r[0],r[1]);else if(t.value.trim())document.getElementById("pinst").innerHTML='<p class="hint2" style="color:var(--bad)">อ่านพิกัดจากข้อความนี้ไม่ได้ ถ้าเป็นลิงก์แบบย่อ (maps.app.goo.gl) ให้เปิดลิงก์ก่อน แล้วคัดลอกพิกัดจากแถบที่อยู่หรือคลิกขวาที่หมุดเพื่อคัดลอกพิกัด</p>'}
@@ -494,7 +518,7 @@ document.addEventListener("click",function(e){
  if(a==="rpprint"){rpPrint();return}
  if(a==="rpcsv"){rpCsv();return}
  if(a==="ss"){S.ss=id;S.form=null;S.lic=null;S.rej=null;draw();return}
- if(a==="tab"){if(S.last[id])id=S.last[id];var gg=groupOf(id);if(S.last[gg])S.last[gg]=id;if(id==="pprq"||id==="ppac"){S.pps=id.slice(2);id="pp"}S.tab=id;S.ppsaved=false;S.form=null;S.del=null;S.saved=false;S.info="";S.hmsg="";S.rej=null;S.lic=null;S.tpc=null;S.tpr=null;S.slipv=null;draw();if(id==="nt"||id==="pp"||id==="shop"||id==="q")refresh();if(id==="rvw")rvwLoad();if(id==="set"&&S.sub==="a")loadAdmins().then(draw);return}
+ if(a==="tab"){if(S.last[id])id=S.last[id];var gg=groupOf(id);if(S.last[gg])S.last[gg]=id;if(id==="pprq"||id==="ppac"){S.pps=id.slice(2);id="pp"}S.tab=id;S.ppsaved=false;S.form=null;S.del=null;S.saved=false;S.info="";S.hmsg="";S.rej=null;S.lic=null;S.tpc=null;S.tpr=null;S.slipv=null;draw();if(id==="nt"||id==="pp"||id==="shop"||id==="q")refresh();if(id==="rvw")rvwLoad();if(id==="usr")usrLogLoad();if(id==="set"&&S.sub==="a")loadAdmins().then(draw);return}
  if(a==="sub"){S.saved=false;S.del=null;var sv=document.querySelector(".saved");if(sv)sv.remove();subTo(id);if(id==="a")loadAdmins().then(function(){var h=document.querySelector("[data-sg=a]");if(h&&S.sub==="a")h.innerHTML=adminHtml()},function(x){showErr(errTh(x))});return}
  if(a==="ntf"){S.ntf=id;draw();return}
  if(a==="new"){S.form={t:t,id:null,sel:[],sd:{},date:"",spq:""};S.saved=false;draw();return}
@@ -573,6 +597,15 @@ document.addEventListener("click",function(e){
   act(function(){return rpc("add_admin",{p_phone:ap}).then(loadAdmins)},function(){S.saved="เพิ่มแอดมินแล้ว"});return}
  if(a==="rmadmin"){if(S.del!=="adm"+id){S.del="adm"+id;draw();return}S.del=null;
   act(function(){return rpc("remove_admin",{p_user:id}).then(loadAdmins)},function(){S.saved="ถอดสิทธิ์แอดมินแล้ว"});return}
+ if(a==="usfind"){usrFind();return}
+ if(a==="uspick"){US.sel=(US.res||[]).filter(function(x){return x.id===id})[0]||null;US.pw="";US.cfm=false;US.err="";US.done=null;draw();var e1=g("uspw");if(e1)e1.focus();return}
+ if(a==="usgen"){var al="abcdefghjkmnpqrstuvwxyz23456789",u8=new Uint8Array(8),o="";crypto.getRandomValues(u8);for(var i=0;i<8;i++)o+=al[u8[i]%al.length];US.pw=o;US.cfm=false;US.err="";draw();return}
+ if(a==="usask"){var pw=(g("uspw")||{}).value||"";US.pw=pw;if(pw.length<8){US.err="รหัสผ่านชั่วคราวต้องมีอย่างน้อย 8 ตัวอักษร";US.cfm=false}else{US.err="";US.cfm=true}draw();return}
+ if(a==="usno"){US.cfm=false;draw();return}
+ if(a==="uscancel"){US.sel=null;US.pw="";US.cfm=false;US.err="";draw();return}
+ if(a==="usgo"){var tg=US.sel,pw2=US.pw;act(function(){return rpc("admin_reset_password",{p_user:tg.id,p_password:pw2}).then(function(){US.done={name:tg.name,phone:tg.phone,pw:pw2};US.sel=null;US.pw="";US.cfm=false;return usrLogLoad(true)})},function(){});return}
+ if(a==="usdone"){US.done=null;draw();return}
+ if(a==="uscopy"){var tx=US.done&&US.done.pw;if(tx&&navigator.clipboard)navigator.clipboard.writeText(tx).then(function(){US.copied=true;draw()},function(){});return}
  if(a==="rvwf"){S.rvwf=id;S.rvwC=null;draw();return}
  if(a==="rvwask"){S.rvwC=id;draw();return}
  if(a==="rvwno"){S.rvwC=null;draw();return}
