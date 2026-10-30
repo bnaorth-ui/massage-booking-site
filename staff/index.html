@@ -138,19 +138,21 @@ var S={tab:"q",qt:"new",ntf:"all",ntNew:[],err:"",busy:false,wdMsg:""};
 var AG={step:"load",fail:0,lock:0,ok:"",err:"",join:"",ph:""};
 var INS={ev:null,done:false,fd:false};
 var inflight=false;
-function loadAll(){
- return rpc("staff_me").then(function(me){
-  if(!me)return null;ME=me;var t=today();
-  return Promise.all([rpc("my_jobs",{p_from:new Date(Date.parse(t+"T00:00:00+07:00")-30*86400000).toISOString()}),
-   sbApi("/rest/v1/staff_days_off?select=day&staff_id=eq."+me.id+"&day=gte."+t),
+/* loadAll(light): ครั้งแรกโหลดครบ; ตอนรีเฟรชซ้ำ (light) ข้ามวันหยุดกับข้อมูลติดต่อสมาคมที่ไม่ค่อยเปลี่ยน */
+function loadAll(light){
+ var t=today(),pre=Promise.all([rpc("my_jobs",{p_from:new Date(Date.parse(t+"T00:00:00+07:00")-30*86400000).toISOString()}),
    sbApi("/rest/v1/notifications?select=*&audience=eq.staff&order=created_at.desc&limit=100"),
    sbApi("/rest/v1/notification_reads?select=notification_id&limit=2000"),
    sbApi("/rest/v1/announcements?select=*&active=eq.true&order=created_at.desc&limit=50"),
-   sbApi("/rest/v1/app_settings?select=*&limit=1").catch(function(){return[]})]).then(function(r){
-    JOBS=r[0]||[];OFFS=(r[1]||[]).map(function(x){return x.day});
-    NT=(r[2]||[]).filter(function(n){return n.kind!=="announce"});READS=(r[3]||[]).map(function(x){return x.notification_id});
-    var st=(r[5]||[])[0]||{};CT={name:st.association_name||"",addr:st.address||"",phone:st.phone||"",line:st.line_url||"",hours:st.hours_text||"",ach:+st.auto_close_hours||0};
-    ANN=(r[4]||[]).filter(function(a){return(a.audiences||[]).indexOf("พนักงาน")>-1});return loadChatUnread().then(function(){return true})})})}
+   light?null:sbApi("/rest/v1/app_settings?select=*&limit=1").catch(function(){return[]})]);
+ pre.catch(function(){});
+ return rpc("staff_me").then(function(me){
+  if(!me)return null;ME=me;
+  return Promise.all([pre,light?null:sbApi("/rest/v1/staff_days_off?select=day&staff_id=eq."+me.id+"&day=gte."+t),loadChatUnread()]).then(function(x){
+    var r=x[0];JOBS=r[0]||[];if(!light)OFFS=(x[1]||[]).map(function(d){return d.day});
+    NT=(r[1]||[]).filter(function(n){return n.kind!=="announce"});READS=(r[2]||[]).map(function(d){return d.notification_id});
+    if(!light){var st=(r[4]||[])[0]||{};CT={name:st.association_name||"",addr:st.address||"",phone:st.phone||"",line:st.line_url||"",hours:st.hours_text||"",ach:+st.auto_close_hours||0}}
+    ANN=(r[3]||[]).filter(function(a){return(a.audiences||[]).indexOf("พนักงาน")>-1});return true})})}
 function feed(){var L=[];
  ANN.forEach(function(a){L.push({id:"a-"+a.id,from:"admin",title:"ประกาศ: "+a.title,text:a.body||"",at:a.created_at||(a.day+"T00:00:00Z")})});
  NT.forEach(function(n){L.push({id:"n-"+n.id,nid:n.id,from:"booking",title:n.title,text:n.body||"",at:n.created_at})});
@@ -226,7 +228,7 @@ function enter(){AG.d=null;AG.step="load";S.busy=false;gateDraw();
 function startMain(){document.getElementById("navb").style.display="";if(S.tab==="nt")openNt();draw();
  if(!timer){timer=setInterval(refresh,20000);document.addEventListener("visibilitychange",function(){if(!document.hidden)refresh()})}}
 function refresh(){if(!ME||inflight||document.hidden||S.busy)return;var a=document.activeElement;if(a&&/INPUT|SELECT|TEXTAREA/.test(a.tagName))return;
- inflight=true;loadAll().then(function(ok){inflight=false;if(!ok)return;if(S.tab==="nt")openNt();if(S.tab==="ac")rvLoad();draw()},function(e){inflight=false;if(e&&e.status===401)doLogout()})}
+ inflight=true;loadAll(true).then(function(ok){inflight=false;if(!ok)return;if(S.tab==="nt")openNt();if(S.tab==="ac")rvLoad();draw()},function(e){inflight=false;if(e&&e.status===401)doLogout()})}
 
 /* ===================== ส่วนแสดงผล ===================== */
 function mine(d){return JOBS.filter(function(j){return j.active&&bkDate(Date.parse(j.starts_at))===d}).sort(function(a,b){return a.starts_at<b.starts_at?-1:1})}
@@ -264,7 +266,7 @@ function chFetch(){if(!CH||chBusy)return Promise.resolve();chBusy=true;var c=CH,
 function chatReadMark(){if(!CH)return;var c=CH;sbApi("/rest/v1/rpc/chat_mark_read",{method:"POST",json:1,body:JSON.stringify({p_booking:c.bid,p_room:c.room})}).then(function(){delete CU[chKey(c.bid,c.room)]}).catch(function(){})}
 function openChat(bid,room,ref,name){CH={bid:bid,room:room,ref:ref,name:name,msgs:[],ids:{},last:null,loaded:false,closed:false,sending:false};S.chat=true;document.getElementById("app").innerHTML='<p class="sub" role="status">กำลังโหลดข้อความ</p>';window.scrollTo(0,0);
  chFetch();clearInterval(chT);chT=setInterval(function(){if(!document.hidden)chFetch()},4000)}
-function closeChat(){clearInterval(chT);chT=null;CH=null;S.chat=false;document.getElementById("navb").style.display="";draw();loadAll().then(draw,function(){})}
+function closeChat(){clearInterval(chT);chT=null;CH=null;S.chat=false;document.getElementById("navb").style.display="";draw();loadAll(true).then(draw,function(){})}
 function chatSend(){if(!CH||CH.sending)return;var c=CH,ta=document.getElementById("chi"),txt=ta?ta.value.trim():"";if(!txt){if(ta)ta.focus();return}
  c.sending=true;var bt=document.getElementById("chsend");if(bt)bt.disabled=true;chErr("");
  sbApi("/rest/v1/rpc/chat_send",{method:"POST",json:1,body:JSON.stringify({p_booking:c.bid,p_room:c.room,p_body:txt})}).then(function(){c.sending=false;if(CH!==c)return;if(ta)ta.value="";if(bt)bt.disabled=false;chBusy=false;return chFetch().then(function(){var t=document.getElementById("chi");if(t)t.focus()})},function(e){c.sending=false;if(bt)bt.disabled=false;var m=errTh(e,"ส่งข้อความไม่สำเร็จ");if(/ปิดแล้ว/.test(m))c.closed=true;chErr(m);if(c.closed){clearInterval(chT);var f=document.getElementById("chf");if(f)f.outerHTML='<p class="sub">ห้องแชตนี้ปิดแล้ว อ่านย้อนหลังได้อย่างเดียว</p>'}})}
@@ -427,7 +429,7 @@ if(a==="cfmno"){S.cfm=null;draw();focusJob(id);return}
  if(a==="job"||a==="cfmok"){var it=JOBS.filter(function(j){return j.id===id})[0];if(!it)return;var kind=a==="job"?"job":S.cfm&&S.cfm.id===id?S.cfm.k:"";if(!kind)return;
   var okT=kind==="job"?(el.dataset.job==="accepted"?"รับงานแล้ว":"เริ่มงานแล้ว"):kind==="fin"?"เสร็จสิ้นงานแล้ว":"บันทึกว่าลูกค้าไม่มาแล้ว";
   S.busy=true;S.err="";S.ok="";draw();
-  (kind==="ns"?rpc("staff_mark_no_show",{p_item:id}):rpc("set_job_status",{p_item:id,p_status:kind==="fin"?"done":el.dataset.job})).then(function(){S.busy=false;S.cfm=null;S.ok=okT+" "+it.customer;S.qt=kind==="ns"?"cx":kind==="fin"?"done":(el.dataset.job==="accepted"?"wait":S.qt);return loadAll()}).then(function(){draw();focusJob(id)},function(er){S.busy=false;S.cfm=null;if(er&&er.status===401){doLogout();return}fail(errTh(er,"อัปเดตงานไม่สำเร็จ"));loadAll().then(draw,function(){})});return}
+  (kind==="ns"?rpc("staff_mark_no_show",{p_item:id}):rpc("set_job_status",{p_item:id,p_status:kind==="fin"?"done":el.dataset.job})).then(function(){S.busy=false;S.cfm=null;S.ok=okT+" "+it.customer;S.qt=kind==="ns"?"cx":kind==="fin"?"done":(el.dataset.job==="accepted"?"wait":S.qt);return loadAll(true)}).then(function(){draw();focusJob(id)},function(er){S.busy=false;S.cfm=null;if(er&&er.status===401){doLogout();return}fail(errTh(er,"อัปเดตงานไม่สำเร็จ"));loadAll().then(draw,function(){})});return}
  if(a==="wd"||a==="wdset"){var cur=(ME.work_days||[]).slice(),msg="";
   if(a==="wd"){var dn=+el.dataset.d,ix=cur.indexOf(dn);if(ix>-1){if(cur.length===1){msg="ต้องเลือกวันทำงานอย่างน้อย 1 วัน"}else{cur.splice(ix,1);var up=JOBS.filter(function(j){return j.active&&j.bstatus==="confirmed"&&dow(bkDate(Date.parse(j.starts_at)))===dn&&bkDate(Date.parse(j.starts_at))>=today()}).length;if(up)msg="วัน"+DAYF[dn]+"ยังมี "+up+" คิวที่จองไว้แล้ว ยังต้องให้บริการตามเดิม"}}else cur.push(dn)}
   else{cur=id==="all"?[0,1,2,3,4,5,6]:[1,2,3,4,5]}

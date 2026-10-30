@@ -448,9 +448,14 @@ function hrs(t){var a=String(t||"").split(":");return(+a[0]||0)+(+a[1]||0)/60}
 function pubUrl(b,p){if(!p)return null;return SB.url+"/storage/v1/object/public/"+(/^(avatars|place-images)\//.test(p)?p:b+"/"+p)}
 function uniq(a){return a.filter(function(x,i){return a.indexOf(x)===i})}
 function mapSvc(x){return{id:x.id,name:x.name,min:x.minutes,price:+x.price,on:1,img:pubUrl("place-images",x.image_path)}}
-function loadCatalog(){var t=iso(new Date()),g=function(p){return sbApi(p)};
+function loadCatalog(){return fetchCatalog().then(function(R){applyCatalog(R);catSave(R)})}
+/* แคตตาล็อก (ร้าน บริการ พนักงาน โปรโมชั่น ประกาศ) เก็บสำเนาไว้ในเครื่อง เปิดครั้งถัดไปแสดงทันทีแล้วโหลดใหม่ตามหลัง ไม่เก็บข้อมูลส่วนตัวของผู้ใช้ */
+var CATK="catCache_v1";
+function catSave(R){try{var j=JSON.stringify({t:Date.now(),R:R});if(j.length<1500000)localStorage.setItem(CATK,j)}catch(e){}}
+function catLoad(){try{var o=JSON.parse(localStorage.getItem(CATK));if(o&&o.R&&Date.now()-o.t<7*864e5&&Array.isArray(o.R.places))return o.R}catch(e){}return null}
+function fetchCatalog(){var t=iso(new Date()),g=function(p){return sbApi(p)};
  return Promise.all([g("/rest/v1/places?select=*&status=eq.approved&active=eq.true"),g("/rest/v1/services?select=*&active=eq.true"),g("/rest/v1/service_places?select=*"),g("/rest/v1/staff_public?select=*"),g("/rest/v1/staff_services?select=*"),g("/rest/v1/place_staff?select=*"),g("/rest/v1/staff_days_off?select=*&day=gte."+t),g("/rest/v1/promotions?select=*&active=eq.true&end_date=gte."+t),g("/rest/v1/promotion_services?select=*"),g("/rest/v1/place_day_overrides?select=*&closed=eq.true&day=gte."+t),g("/rest/v1/app_settings?select=*"),g("/rest/v1/announcements?select=*&active=eq.true")])
- .then(function(r){applyCatalog({places:r[0],services:r[1],service_places:r[2],staff:r[3],staff_services:r[4],place_staff:r[5],days_off:r[6],promos:r[7],promo_services:r[8],overrides:r[9],settings:r[10]&&r[10][0],ann:r[11]})})}
+ .then(function(r){return{places:r[0],services:r[1],service_places:r[2],staff:r[3],staff_services:r[4],place_staff:r[5],days_off:r[6],promos:r[7],promo_services:r[8],overrides:r[9],settings:r[10]&&r[10][0],ann:r[11]}})}
 function applyCatalog(R){
  var sv=R.services||[],sps=R.service_places||[],ssm={},pss=R.place_staff||[],stf=R.staff||[];
  (R.staff_services||[]).forEach(function(x){(ssm[x.staff_id]=ssm[x.staff_id]||[]).push(x.service_id)});
@@ -496,8 +501,10 @@ function catRender(){var a=document.getElementById("app"),b=document.getElementB
  if(CAT.state==="err"){a.innerHTML='<h1>โหลดข้อมูลไม่สำเร็จ</h1><div class="err" role="alert">'+esc(CAT.msg)+'</div><button class="btn wide" id="cretry">ลองใหม่</button><div class="alinks"><button class="lb" data-auth="out">ออกจากระบบ</button></div>';
   document.getElementById("cretry").onclick=startApp;document.querySelectorAll("[data-auth=out]").forEach(function(e){e.onclick=logout});return}
  a.innerHTML='<p class="sub" role="status">กำลังโหลดข้อมูลร้านและบริการ…</p>'}
-function startApp(){CAT.state="loading";CAT.msg="";render();
- return loadCatalog().then(function(){CAT.state="ok";CAT.at=Date.now();render();return Promise.all([loadBookings().catch(function(){}),loadNotes().catch(function(){}),loadPoints(),loadReviews(),loadFavs()])}).then(function(){if(CAT.state==="ok")render(true)},function(e){if(e&&e.status===401){logout();return}CAT.state="err";CAT.msg=errTh(e,"โหลดข้อมูลไม่สำเร็จ");render()})}
+function startApp(){CAT.state="loading";CAT.msg="";var hit=false,c0=catLoad();
+ if(c0){try{applyCatalog(c0);hit=true;CAT.state="ok";CAT.at=0}catch(e){hit=false;CAT.state="loading"}}
+ render();
+ return fetchCatalog().then(function(R){catSave(R);if(!(hit&&S.step>0&&!S.view))applyCatalog(R);CAT.state="ok";CAT.at=Date.now();render(hit);return Promise.all([loadBookings().catch(function(){}),loadNotes().catch(function(){}),loadPoints(),loadReviews(),loadFavs()])}).then(function(){if(CAT.state==="ok")render(true)},function(e){if(e&&e.status===401){logout();return}if(hit&&CAT.state==="ok")return;CAT.state="err";CAT.msg=errTh(e,"โหลดข้อมูลไม่สำเร็จ");render()})}
 document.addEventListener("visibilitychange",function(){if(document.visibilityState!=="visible"||!ME||CAT.state!=="ok"||Date.now()-CAT.at<60000||(S.step>0&&!S.view))return;CAT.at=Date.now();
  Promise.all([loadCatalog(),loadBookings(),loadNotes()]).then(function(){if(CAT.state==="ok")render(true)},function(){})});
 

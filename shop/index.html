@@ -576,15 +576,15 @@ function g1(path){return sbApi("/rest/v1/"+path)}
 function loadCatalog(){var pid=WID;
  return Promise.all([g1("places?select=*&id=eq."+pid),g1("services?select=*&place_id=eq."+pid+"&order=created_at"),g1("staff?select=*,staff_services(service_id)&place_id=eq."+pid+"&order=created_at"),g1("promotions?select=*,promotion_services(service_id)&place_id=eq."+pid+"&order=created_at")]).then(function(r){
   if(!r[0]||!r[0][0])throw new Error("ไม่พบข้อมูลร้าน");
-  D.shop=mapPlace(r[0][0]);D.svc=r[1].map(mapSvc);D.staff=r[2].filter(function(x){return !(x.phone==null&&!x.active&&x.name==="พนักงานที่ออกจากระบบ")}).map(mapStaff);D.promo=r[3].map(mapPromo)}).then(loadRates).then(loadSdr)}
+  D.shop=mapPlace(r[0][0]);D.svc=r[1].map(mapSvc);D.staff=r[2].filter(function(x){return !(x.phone==null&&!x.active&&x.name==="พนักงานที่ออกจากระบบ")}).map(mapStaff);D.promo=r[3].map(mapPromo)}).then(function(){return Promise.all([loadRates(),loadSdr()])})}
 function loadSdr(){return rpc("shop_staff_delete_requests",{p_place:WID}).then(function(a){D.sdr=a||[];D.sdrOff=false},function(){D.sdr=[];D.sdrOff=true})}
 function annRead(){return rd("shopAnnRead_"+WHO.id,[])}
 function loadBk(){var pid=WID,from=new Date(Date.now()-30*864e5).toISOString();
  return g1("bookings?select=id,ref,customer_name,phone,status,starts_at,ends_at,total_price,promo_title,moved_to,created_at,booking_items(id,service_name,minutes,price,starts_at,ends_at,active,job,staff_id)&place_id=eq."+pid+"&ends_at=gte."+from+"&order=starts_at.asc&limit=500").then(function(r){D.bk=r||[]},function(){})}
 function loadLive(){return Promise.all([loadLive0(),loadBk(),loadChatUnread()])}
 function loadLive0(){var pid=WID;
- return Promise.all([g1("places?select=*&id=eq."+pid),g1("wallet_tx?select=*&place_id=eq."+pid+"&order=created_at.desc&limit=300"),g1("topup_requests?select=*&place_id=eq."+pid+"&order=created_at.desc&limit=100"),g1("notifications?select=*&audience=eq.shop&place_id=eq."+pid+"&order=created_at.desc&limit=100"),g1("notification_reads?select=notification_id&limit=1000"),g1("announcements?select=*&active=eq.true&order=created_at.desc&limit=50"),g1("app_settings?select=*&limit=1")]).then(function(r){
-  if(r[0]&&r[0][0]){var sh=mapPlace(r[0][0]);["gp","on","autoClosed"].forEach(function(k){D.shop[k]=sh[k]})}
+ return Promise.all([D.shop?g1("places?select=*&id=eq."+pid):Promise.resolve([]),g1("wallet_tx?select=*&place_id=eq."+pid+"&order=created_at.desc&limit=300"),g1("topup_requests?select=*&place_id=eq."+pid+"&order=created_at.desc&limit=100"),g1("notifications?select=*&audience=eq.shop&place_id=eq."+pid+"&order=created_at.desc&limit=100"),g1("notification_reads?select=notification_id&limit=1000"),g1("announcements?select=*&active=eq.true&order=created_at.desc&limit=50"),g1("app_settings?select=*&limit=1")]).then(function(r){
+  if(r[0]&&r[0][0]&&D.shop){var sh=mapPlace(r[0][0]);["gp","on","autoClosed"].forEach(function(k){D.shop[k]=sh[k]})}
   var tx=[];
   r[1].forEach(function(w){tx.push({id:w.id,type:w.type,amt:+w.amount,note:w.note,at:w.created_at,ref:w.ref||"",st:w.status==="success"?"สำเร็จ":w.status==="pending"?"รอยืนยัน":"ยกเลิก"})});
   r[2].forEach(function(q){if(q.status==="confirmed")return;tx.push({id:q.id,rid:q.id,type:"topup",amt:+q.amount,ref:q.ref,note:"เติมเงินผ่านพร้อมเพย์ (อ้างอิง "+q.ref+")",at:q.created_at,st:q.status==="pending"?"รอยืนยัน":q.status==="rejected"?"ปฏิเสธ":"ยกเลิก",slipPath:q.slip_path||null,slipAt:q.slip_at||null})});
@@ -594,7 +594,7 @@ function loadLive0(){var pid=WID;
   r[5].forEach(function(a){if((a.audiences||[]).indexOf("ร้านค้า")>-1)nt.push({id:"an-"+a.id,from:"admin",title:"ประกาศ: "+a.title,text:a.body||"",at:a.created_at||(a.day+"T00:00:00")})});
   D.nt=nt;D.ntRead=r[4].map(function(x){return x.notification_id}).concat(annRead());
   var s=r[6]&&r[6][0];if(s){CT={name:s.association_name||"",addr:s.address||"",phone:s.phone||"",line:s.line_url||"",hours:s.hours_text||"",staff:/^https:\/\//i.test(s.staff_url||"")?s.staff_url:""};CFG.pp=s.promptpay_id?{on:s.promptpay_on!==false,type:s.promptpay_type,id:s.promptpay_id,name:s.promptpay_name}:{on:false,none:true};CFG.w1=+s.wallet_warn1||100;CFG.w2=+s.wallet_warn2||50}})}
-function loadShop(pid){WID=pid;D={shop:null,svc:[],staff:[],promo:[],tx:[],nt:[],ntRead:[],bk:[]};return loadCatalog().then(loadLive)}
+function loadShop(pid){WID=pid;D={shop:null,svc:[],staff:[],promo:[],tx:[],nt:[],ntRead:[],bk:[]};return Promise.all([loadCatalog(),loadLive()])}
 var S={tab:"q",mg:"svc",qt:"wait",form:null,del:null,saved:false,wmode:null,werr:"",busy:false,hmsg:""};
 function balance(){return D.tx.filter(function(t){return t.st==="สำเร็จ"}).reduce(function(a,t){return a+t.amt},0)}
 function owed(){var b=balance();return b<0?-b:0}
