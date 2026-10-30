@@ -367,19 +367,21 @@ function view(){var t=today(),h="";
    cx=function(j){return j.bstatus==="cancelled"||j.bstatus==="rescheduled"||j.bstatus==="no_show"||!j.active},
    NEW=JOBS.filter(function(j){return live(j)&&j.job==="pending"}),
    WAIT=JOBS.filter(function(j){return live(j)&&(j.job==="accepted"||j.job==="in_progress")}),
-   DONE=JOBS.filter(function(j){return fin(j)&&!cx(j)}),
-   CXL=JOBS.filter(function(j){return fin(j)&&cx(j)}),
+   DONE=JOBS.filter(function(j){return fin(j)&&!cx(j)&&bkDate(Date.parse(j.starts_at))===t}),
+   CXL=JOBS.filter(function(j){return fin(j)&&cx(j)&&bkDate(Date.parse(j.starts_at))>=addDays(t,-6)}),
    asc=function(a,b){return a.starts_at<b.starts_at?-1:1},qt=S.qt||"new",
    TAB=[["new","งานใหม่",NEW],["wait","งานที่รออยู่",WAIT],["done","งานที่เสร็จสิ้น",DONE],["cx","งานถูกยกเลิก",CXL]],
    cur=(TAB.filter(function(x){return x[0]===qt})[0]||TAB[0]),
    nowI=new Date().toISOString(),ended=function(j){return j.ends_at<nowI},
    list=cur[2].slice().sort(cur[0]==="done"||cur[0]==="cx"?function(a,b){return asc(b,a)}:function(a,b){var ea=ended(a),eb=ended(b);return ea!==eb?(ea?1:-1):asc(a,b)}),
-   EM={new:"ยังไม่มีงานใหม่ งานที่ลูกค้าจองเข้ามาจะขึ้นที่นี่ กดรับงานเพื่อย้ายไปที่ \"งานที่รออยู่\"",wait:"ไม่มีงานที่รออยู่ งานที่คุณรับแล้วและยังไม่เสร็จจะขึ้นที่นี่",done:"ยังไม่มีงานที่เสร็จสิ้น (แสดงย้อนหลัง 30 วัน)"},
+   EM={new:"ยังไม่มีงานใหม่ งานที่ลูกค้าจองเข้ามาจะขึ้นที่นี่ กดรับงานเพื่อย้ายไปที่ \"งานที่รออยู่\"",wait:"ไม่มีงานที่รออยู่ งานที่คุณรับแล้วและยังไม่เสร็จจะขึ้นที่นี่",done:"วันนี้ยังไม่มีงานที่เสร็จสิ้น"},
    groups="",last=null,lateShown=false;
-  EM.cx="ไม่มีงานที่ถูกยกเลิก (แสดงย้อนหลัง 30 วัน)";
+  EM.cx="ไม่มีงานที่ถูกยกเลิกใน 7 วันล่าสุด";
   list.forEach(function(j){if(cur[0]!=="done"&&cur[0]!=="cx"&&ended(j)&&!lateShown){lateShown=true;last=null;groups+='<h2 style="margin-top:20px">เลยเวลานัดแล้ว</h2>'}var d=bkDate(Date.parse(j.starts_at));if(d!==last){last=d;groups+='<h3 style="margin:14px 0 6px;font-size:1rem">'+(d===t?"วันนี้, ":"")+thD(d)+'</h3>'}groups+=jobCard(j,false)});
   h=banner()+'<h1>คิวงาน</h1><p class="sub">'+esc(ME.place)+'</p><div class="nf" role="tablist" aria-label="หมวดคิวงาน">'+TAB.map(function(x){return'<button type="button" role="tab" data-a="qt" data-id="'+x[0]+'" class="'+(x[0]===cur[0]?"on":"")+'" aria-selected="'+(x[0]===cur[0])+'">'+x[1]+' ('+x[2].length+')</button>'}).join("")+'</div>'+
-   (list.length?groups:'<div class="empty">'+EM[cur[0]]+'</div>')}
+   (list.length?groups:'<div class="empty">'+EM[cur[0]]+'</div>')+
+   (cur[0]==="done"?'<p class="sub" style="text-align:center;margin-top:12px">แสดงเฉพาะงานของวันนี้ ดูงานวันอื่นและยอดส่วนแบ่งย้อนหลังได้ที่เมนูรายได้</p><button type="button" class="btn g" data-a="tab" data-id="inc">ไปที่เมนูรายได้</button>'
+    :cur[0]==="cx"?'<p class="sub" style="text-align:center;margin-top:12px">แสดงเฉพาะงานที่ถูกยกเลิกหรือเลื่อนคิวใน 7 วันล่าสุด</p>':"")}
  if(S.tab==="sc"){h=banner()+'<h1>ตารางงาน</h1><p class="sub">'+esc(ME.place)+'</p>'+daysCard()+'<h2 style="margin-top:18px">7 วันข้างหน้า</h2>';
   for(var i=0;i<7;i++){var k=addDays(t,i),open=workOn(k),L2=mine(k),off=OFFS.indexOf(k)>-1;
    h+='<div class="day"><h2>'+(i===0?"วันนี้, ":i===1?"พรุ่งนี้, ":"")+thD(k)+'</h2>'+(!open?'<span class="mute">'+(off?"วันหยุดที่ร้านตั้งไว้":"วันหยุดของคุณ")+'</span>':(L2.length?L2.map(function(j){return'<div class="item"><b>'+rng(j)+'</b> '+esc(j.customer)+'<small class="mute" style="display:block">'+esc(j.service)+'</small></div>'}).join(""):'<span class="mute">ไม่มีคิว</span>'))+'</div>'}}
