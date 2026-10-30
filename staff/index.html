@@ -183,8 +183,8 @@ function pvBody(nm,tel){var L=function(a){return '<ul class="pvl">'+a.map(functi
   S2("ใครเห็นข้อมูลของคุณ",L(["ลูกค้าเห็นชื่อและรูปโปรไฟล์ของคุณที่ให้บริการ","ร้านที่คุณสังกัดเห็นข้อมูลพนักงาน คิวงาน รีวิว และยอดส่วนแบ่งในรายงานของร้าน","แอดมินของสมาคมเห็นข้อมูลเท่าที่จำเป็นต่อการดูแลระบบ รวมถึงตรวจรีวิวที่คุณแจ้ง","รีวิวที่ลูกค้าให้คุณ เห็นเฉพาะคุณ ร้านที่สังกัด และสมาคม","พนักงานคนอื่นไม่เห็นคิว รายได้ หรือข้อมูลลูกค้าของคุณ","เราไม่ขายข้อมูลของคุณให้ใคร"]))+
   S2("หน้าที่ของคุณต่อข้อมูลลูกค้า",L(["คุณเห็นชื่อและเบอร์ของลูกค้าเฉพาะคิวของคุณ","ใช้เพื่อให้บริการและติดต่อเรื่องคิวนั้นเท่านั้น","ห้ามนำไปใช้ทำการตลาด เปิดเผยให้ผู้อื่น หรือคัดลอกเก็บไว้นอกระบบ"]))+
   S2("เราเก็บนานแค่ไหน",L(["ชื่อและเบอร์โทรของลูกค้าในคิวงานถูกลบหลังให้บริการผ่านไป 12 เดือน","ข้อความแชตถูกลบอัตโนมัติหลัง 90 วัน","การแจ้งเตือนในแอปถูกลบอัตโนมัติทุกวัน","ข้อมูลบัญชีของคุณเก็บไว้ตราบที่บัญชียังใช้งานอยู่ ส่วนเมื่อออกจากระบบแล้วเก็บตามที่สมาคมกำหนด"]))+
-  S2("การลบบัญชีพนักงาน",L(["ตอนนี้ลบบัญชีเองในแอปไม่ได้ ให้ติดต่อสมาคมหรือร้านที่สังกัดเพื่อขอลบ","เมื่อลบแล้ว คุณจะไม่ปรากฏให้ลูกค้าเลือกจอง ข้อมูลรายการเงินและรายงานของร้านเก็บตามที่ระบุข้างต้น"]))+
-  S2("สิทธิ์ของคุณ",L(["ดูข้อมูลของตัวเอง เปลี่ยนรูปโปรไฟล์ และเปลี่ยนรหัสผ่านได้ในเมนู &quot;บัญชี&quot;","เปิดหรือปิดรับงาน และเลือกวันทำงานได้เอง","ปิดการแจ้งเตือนได้ในการตั้งค่าของมือถือ","ขอแก้ไขชื่อ เบอร์โทร หรือขอลบข้อมูลได้โดยติดต่อสมาคม"]))+
+  S2("การลบบัญชีพนักงาน",L(["กดปุ่ม &quot;ขอลบบัญชี&quot; ในเมนู &quot;บัญชี&quot; ได้ เมื่อไม่มีคิวที่ยังไม่เสร็จ แล้วร้านที่สังกัด (หรือสมาคม ถ้าเป็นพนักงานส่วนกลาง) จะตรวจสอบและอนุมัติ ยกเลิกคำขอได้ตราบที่ยังรออยู่","เมื่อลบแล้ว ชื่อ เบอร์โทร รูปโปรไฟล์ ข้อความแชต และการแจ้งเตือนของคุณถูกลบ และคุณจะไม่ปรากฏให้ลูกค้าเลือกจอง","คิวงาน รีวิว และยอดส่วนแบ่งที่ร้านใช้ทำรายงานยังอยู่ แต่ไม่ระบุว่าเป็นของคุณ"]))+
+  S2("สิทธิ์ของคุณ",L(["ดูข้อมูลของตัวเอง เปลี่ยนรูปโปรไฟล์ และเปลี่ยนรหัสผ่านได้ในเมนู &quot;บัญชี&quot;","เปิดหรือปิดรับงาน และเลือกวันทำงานได้เอง","ปิดการแจ้งเตือนได้ในการตั้งค่าของมือถือ","ขอแก้ไขชื่อหรือเบอร์โทรได้โดยติดต่อสมาคม"]))+
   S2("ติดต่อเรา",'<p>'+esc(nm)+(tel?' โทร '+esc(tel):'')+'</p>')+'</div>'}
 function ctPub(){if(AG.ct===undefined&&!AG.ctL){AG.ctL=true;sbReq("/rest/v1/rpc/public_contact",{method:"POST",json:1,auth:false,body:"{}"}).then(function(j){AG.ct=j||null},function(){AG.ct=null}).then(function(){AG.ctL=false;if(AG.step==="pv")gateDraw()})}}
 function gateDraw(){document.getElementById("hdr").innerHTML="";document.getElementById("nav").innerHTML="";document.getElementById("navb").style.display="none";
@@ -330,9 +330,21 @@ function pwSave(){if(S.pwBusy)return;var g=function(i){var e=document.getElement
  S.pwBusy=true;er("");
  sbReq("/auth/v1/token?grant_type=password",{method:"POST",json:1,auth:false,body:JSON.stringify({email:em,password:o})}).then(sbSet).then(function(){return sbApi("/auth/v1/user",{method:"PUT",json:1,body:JSON.stringify({password:n})})}).then(function(){S.pwBusy=false;S.pwOpen=false;S.pwOk="เปลี่ยนรหัสผ่านแล้ว ครั้งต่อไปเข้าสู่ระบบด้วยรหัสผ่านใหม่";draw()},function(e){S.pwBusy=false;
   var m=String(e&&e.message||"");er(e&&(e.code==="invalid_credentials"||/invalid login/i.test(m))?"รหัสผ่านเดิมไม่ถูกต้อง":e&&(e.code==="same_password"||/different from the old/i.test(m))?"รหัสผ่านใหม่ต้องไม่ซ้ำกับรหัสเดิม":e&&(e.code==="weak_password"||/weak|least/i.test(m))?"รหัสผ่านใหม่ง่ายเกินไป ลองตั้งให้ยาวขึ้นหรือผสมตัวอักษรกับตัวเลข":errTh(e,"เปลี่ยนรหัสผ่านไม่สำเร็จ"));var b=document.querySelector('[data-a="pwsave"]');if(b)b.disabled=false})}
+/* ===== ขอลบบัญชี ===== */
+var DL={loaded:false,off:false,st:"none",note:"",open:0,by:"",confirm:false,busy:false,err:"",ok:""};
+function dlLoad(){if(!ME)return;rpc("staff_delete_status").then(function(j){DL.loaded=true;DL.off=false;DL.st=j&&j.status||"none";DL.note=j&&j.note||"";DL.open=j&&j.open_jobs||0;DL.by=j&&j.by||"";if(S.tab==="ac"&&!S.pwOpen&&!S.pv)draw()},function(e){if(e&&e.status===401){doLogout();return}DL.loaded=true;DL.off=true;if(S.tab==="ac")draw()})}
+function dlView(){if(!DL.loaded||DL.off)return"";
+ var who=DL.by==="shop"?"ร้านที่สังกัด":"สมาคม";
+ var h='<div class="ctc"><b>ลบบัญชี</b>'+(DL.ok?'<div class="okb" role="status" style="margin-top:8px">'+esc(DL.ok)+'</div>':'');
+ if(DL.err)h+='<div class="toast" role="alert" style="margin-top:8px">'+esc(DL.err)+'</div>';
+ if(DL.st==="pending")return h+'<p>ส่งคำขอลบบัญชีแล้ว รอ'+who+'ตรวจสอบและอนุมัติ ระหว่างนี้ยังใช้งานได้ตามปกติ</p><button type="button" class="btn g" data-a="dlcancel"'+(DL.busy?" disabled":"")+'>ยกเลิกคำขอลบบัญชี</button></div>';
+ if(DL.st==="rejected")h+='<div class="offb" role="status" style="margin-top:8px">คำขอลบบัญชีครั้งก่อนไม่ได้รับการอนุมัติ'+(DL.note?': '+esc(DL.note):'')+'</div>';
+ if(!DL.confirm)return h+'<p>ถ้าไม่ต้องการใช้งานอีก ขอลบบัญชีได้ '+who+'จะตรวจสอบและอนุมัติ</p>'+(DL.open>0?'<p>ตอนนี้ยังมีคิวที่ยังไม่เสร็จ '+DL.open+' คิว ต้องทำให้เสร็จหรือแจ้งร้านให้ยกเลิกก่อน จึงจะขอลบได้</p>':'')+'<button type="button" class="btn g" data-a="dlask"'+(DL.open>0?" disabled":"")+'>ขอลบบัญชี</button></div>';
+ return h+'<p><b>ก่อนยืนยัน โปรดทราบ</b></p><ul class="pvl"><li>ชื่อ เบอร์โทร รูปโปรไฟล์ ข้อความแชต และการแจ้งเตือนของคุณจะถูกลบ</li><li>คุณจะเข้าสู่ระบบด้วยบัญชีนี้ไม่ได้อีก และไม่ปรากฏให้ลูกค้าเลือกจอง</li><li>คิวงาน รีวิว และยอดส่วนแบ่งที่ร้านใช้ทำรายงานยังอยู่ แต่ไม่ระบุว่าเป็นของคุณ</li><li>กู้คืนไม่ได้เมื่อ'+who+'อนุมัติแล้ว</li></ul><div class="mini" style="display:flex;gap:6px"><button type="button" class="btn" data-a="dlok"'+(DL.busy?" disabled":"")+'>ยืนยันขอลบบัญชี</button><button type="button" class="btn g" data-a="dlno">ยกเลิก</button></div></div>'}
+function dlDo(fn,ok){if(DL.busy)return;DL.busy=true;DL.err="";DL.ok="";draw();fn().then(function(){DL.busy=false;DL.confirm=false;DL.ok=ok;return rpc("staff_delete_status")}).then(function(j){DL.st=j&&j.status||"none";DL.note=j&&j.note||"";DL.open=j&&j.open_jobs||0;DL.by=j&&j.by||DL.by;draw()},function(e){DL.busy=false;if(e&&e.status===401){doLogout();return}DL.err=errTh(e,"ทำรายการไม่สำเร็จ");DL.confirm=false;draw()})}
 function acView(){var ph=ME.photo_path?pubUrl(ME.photo_path):null;
  if(S.pv)return'<div style="margin-bottom:10px"><button type="button" class="btn g" data-a="pvno">← กลับ</button></div><h1 id="pvt" tabindex="-1">นโยบายความเป็นส่วนตัว (พนักงาน)</h1>'+pvBody(CT.name||"สมาคมวิทยากรฝึกอาชีพคนตาบอด",CT.phone);
- return'<h1>บัญชี</h1><div class="ctc"><div class="prof"><span class="av" aria-hidden="true">'+(ph?'<img loading="lazy" decoding="async" src="'+esc(ph)+'" alt="">':esc(ini(ME.name)))+'</span><div class="pn"><b>'+esc(ME.name)+'</b><small>'+esc(ME.place)+'</small><small>'+esc(ME.phone||"")+'</small></div></div><button type="button" class="btn g" id="avb" style="margin-top:10px">เปลี่ยนรูปโปรไฟล์</button><input type="file" id="photo" accept="image/*" hidden></div>'+pwView()+rvView()+ctView()+'<button type="button" class="btn g" data-a="pv" style="margin-top:14px">นโยบายความเป็นส่วนตัว</button><button type="button" class="btn g" id="logout" style="margin-top:14px">ออกจากระบบ</button>'}
+ return'<h1>บัญชี</h1><div class="ctc"><div class="prof"><span class="av" aria-hidden="true">'+(ph?'<img loading="lazy" decoding="async" src="'+esc(ph)+'" alt="">':esc(ini(ME.name)))+'</span><div class="pn"><b>'+esc(ME.name)+'</b><small>'+esc(ME.place)+'</small><small>'+esc(ME.phone||"")+'</small></div></div><button type="button" class="btn g" id="avb" style="margin-top:10px">เปลี่ยนรูปโปรไฟล์</button><input type="file" id="photo" accept="image/*" hidden></div>'+pwView()+rvView()+dlView()+ctView()+'<button type="button" class="btn g" data-a="pv" style="margin-top:14px">นโยบายความเป็นส่วนตัว</button><button type="button" class="btn g" id="logout" style="margin-top:14px">ออกจากระบบ</button>'}
 function focusJob(id){var e=document.querySelector('[data-id="'+id+'"][data-a=job],[data-id="'+id+'"][data-a=fin]')||document.querySelector('[data-id="'+id+'"][data-a=ns]');if(e)e.focus()}
 function fail(t){S.err=t;draw()}
 function saveSelf(o){var acc=o.accepting==null?ME.accepting:o.accepting,wd=o.wd||ME.work_days,keep=o.photo==null;
@@ -388,7 +400,7 @@ function draw(){if(!ME)return;
 /* ===================== การกระทำ ===================== */
 document.addEventListener("click",function(e){
  var el=e.target.closest&&e.target.closest("[data-a]");if(!el||!ME)return;var a=el.dataset.a,id=el.dataset.id;
- if(a==="tab"){S.tab=id;S.err="";S.ok="";S.cfm=null;S.rvReply=null;if(id==="nt")openNt();if(id==="ac")rvLoad();S.pwOpen=false;S.pwErr="";S.pwOk="";S.pv=false;if(id==="nt")S.ntf="all";if(id==="inc"){INC.ym=today().slice(0,7);incLoad()}draw();return}
+ if(a==="tab"){S.tab=id;S.err="";S.ok="";S.cfm=null;S.rvReply=null;if(id==="nt")openNt();if(id==="ac"){rvLoad();DL.confirm=false;DL.err="";DL.ok="";dlLoad()}S.pwOpen=false;S.pwErr="";S.pwOk="";S.pv=false;if(id==="nt")S.ntf="all";if(id==="inc"){INC.ym=today().slice(0,7);incLoad()}draw();return}
  if(a==="rvreply"){S.rvReply=id;draw();var ta=document.getElementById("rvtxt");if(ta)ta.focus();return}
  if(a==="rvno"){S.rvReply=null;draw();return}
  if(a==="rvsend"){rvSend(id);return}
@@ -398,6 +410,10 @@ document.addEventListener("click",function(e){
  if(a==="incprev"||a==="incnext"){var cm=today().slice(0,7),nm=ymAdd(INC.ym||cm,a==="incprev"?-1:1);if(nm>cm||nm<ymAdd(cm,-11))return;INC.ym=nm;incLoad();draw();var fb=document.querySelector('[data-a="'+a+'"]:not([disabled])');if(fb)fb.focus();return}
  if(a==="incretry"){incLoad();draw();return}
  if(a==="pwopen"){S.pwOpen=true;S.pwErr="";S.pwOk="";draw();var f0=document.getElementById("pwo");if(f0)f0.focus();return}
+ if(a==="dlask"){DL.confirm=true;DL.err="";DL.ok="";draw();return}
+ if(a==="dlno"){DL.confirm=false;draw();return}
+ if(a==="dlok"){dlDo(function(){return rpc("staff_request_delete")},"ส่งคำขอลบบัญชีแล้ว รอการตรวจสอบและอนุมัติ");return}
+ if(a==="dlcancel"){dlDo(function(){return rpc("staff_cancel_delete")},"ยกเลิกคำขอลบบัญชีแล้ว");return}
  if(a==="pv"){S.pv=true;draw();var tp=document.getElementById("pvt");if(tp)tp.focus();window.scrollTo(0,0);return}
  if(a==="pvno"){S.pv=false;draw();return}
  if(a==="pwno"){S.pwOpen=false;S.pwErr="";draw();return}

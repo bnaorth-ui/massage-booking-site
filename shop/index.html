@@ -541,8 +541,14 @@ function stShare(id){var p=byId(D.staff,id);if(!p)return;
   if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){done("คัดลอกข้อความและลิงก์ของ "+p.name+" แล้ว นำไปวางส่งใน LINE หรือ SMS ได้เลย")},function(){S.stmsg="คัดลอกไม่สำเร็จ ลองกดอีกครั้ง";S.stok=false;draw()})}
   else{S.stmsg="เครื่องนี้คัดลอกอัตโนมัติไม่ได้ ลิงก์คือ "+stLink(p);S.stok=false;draw()}};
  if(navigator.share){navigator.share({title:"ลิงก์แอปรับงานพนักงาน",text:t}).then(function(){done("เปิดเมนูแชร์ให้แล้ว")},function(e){if(e&&e.name==="AbortError")return;copy()})}else copy()}
+function sdrCard(){if(D.sdrOff||!(D.sdr||[]).length)return"";
+ return '<div class="card" style="border:2px solid var(--bad)"><b>คำขอลบบัญชีพนักงาน ('+D.sdr.length+')</b><p class="hint2" style="margin:2px 0 8px">เมื่ออนุมัติ ระบบจะลบชื่อ เบอร์ รูป แชต และบัญชีเข้าสู่ระบบของพนักงาน คิวงานและรีวิวเก่ายังอยู่ในรายงานของร้านแต่ไม่ระบุตัวพนักงาน กู้คืนไม่ได้</p>'+D.sdr.map(function(r){
+  return '<div class="item" style="padding:8px 0;border-top:1px solid var(--line)"><b>'+esc(r.name)+'</b><small style="display:block;color:var(--mute)">เบอร์ '+esc(r.phone||"-")+' · ขอเมื่อ '+new Date(r.requested_at).toLocaleDateString("th-TH",{day:"numeric",month:"short",year:"numeric",timeZone:"Asia/Bangkok"})+'</small>'+
+  (r.open_jobs>0?'<p style="color:var(--bad);margin:6px 0">ยังมีคิวที่ยังไม่เสร็จ '+r.open_jobs+' คิว อนุมัติไม่ได้จนกว่าจะเสร็จหรือยกเลิก</p>':'')+
+  (S.sdn===r.id?'<div style="margin-top:8px"><label for="sdn_'+r.id+'">เหตุผลที่ไม่อนุมัติ (พนักงานจะเห็นข้อความนี้)</label><input class="in" id="sdn_'+r.id+'" maxlength="200"></div>':'')+
+  '<div class="acts"><button type="button" class="btn d" data-a="sdrok" data-id="'+r.id+'"'+(r.open_jobs>0?" disabled":"")+'>'+(S.sdc===r.id?"กดอีกครั้งเพื่อยืนยันลบ":"อนุมัติ (ลบบัญชี)")+'</button><button type="button" class="btn g" data-a="sdrno" data-id="'+r.id+'">'+(S.sdn===r.id?"บันทึกการไม่อนุมัติ":"ไม่อนุมัติ")+'</button>'+(S.sdc===r.id||S.sdn===r.id?'<button type="button" class="btn g" data-a="sdrx">ยกเลิก</button>':'')+'</div></div>'}).join("")+'</div>'}
 function listStaff(){var nw=S.stnew?D.staff.filter(function(x){return x.phone===S.stnew})[0]:null;
- return '<div class="head"><h1>พนักงานทั้งหมด ('+D.staff.length+')</h1></div>'+(S.stmsg?'<div class="'+(S.stok?"saved":"closed")+'" role="status">'+esc(S.stmsg)+'</div>':'')+
+ return sdrCard()+'<div class="head"><h1>พนักงานทั้งหมด ('+D.staff.length+')</h1></div>'+(S.stmsg?'<div class="'+(S.stok?"saved":"closed")+'" role="status">'+esc(S.stmsg)+'</div>':'')+
  (nw&&!nw.linked?'<div class="card"><b>เพิ่ม'+esc(nw.name)+'แล้ว</b><p class="hint2" style="margin:4px 0 8px">ส่งลิงก์ให้พนักงานสร้างบัญชีและติดตั้งแอปรับงานบนโทรศัพท์ได้เลย</p><div class="acts"><button type="button" class="btn" data-a="stshare" data-id="'+nw.id+'">ส่งลิงก์ให้'+esc(nw.name)+'</button><button type="button" class="btn g" data-a="stnewno">ไว้ทีหลัง</button></div></div>':'')+'<div class="card">'+(D.staff.length?D.staff.map(function(p){return '<div class="row"><div style="display:flex;gap:10px;align-items:center">'+stImg(p.img,p.name,40)+'<div><b>'+esc(p.name)+'</b><small>บริการที่รับ: '+esc(svcNames(p.svcs))+'</small><small>เบอร์มือถือ: '+(p.phone?esc(p.phone):"ยังไม่ตั้งเบอร์")+(p.linked?", เชื่อมบัญชีแล้ว":", รอพนักงานสมัครสมาชิกด้วยเบอร์นี้")+'</small></div></div><div class="acts">'+(p.linked||!p.on?"":'<button class="btn g" data-a="stshare" data-id="'+p.id+'" aria-label="ส่งลิงก์แอปรับงานให้'+esc(p.name)+'">ส่งลิงก์ให้พนักงาน</button>')+'<span class="tag '+(p.on?"":"o")+'">'+(p.on?"ใช้งาน":"ระงับ")+'</span><button class="btn g" data-a="tog" data-t="staff" data-id="'+p.id+'">'+(p.on?"ระงับ":"เปิดใช้งาน")+'</button><button class="btn g" data-a="edit" data-t="staff" data-id="'+p.id+'">แก้ไข</button>'+delBtn("staff",p.id)+'</div></div>'}).join(""):'<div class="empty">ยังไม่มีพนักงาน</div>')+'</div>'}
 function walletMsg(){var b=balance(),lv=warnLv(),o=owed(),m="";
  if(o>0)m='ค้างชำระค่า GP '+baht(o)+' ร้านถูกปิดชั่วคราว เติมเงินอย่างน้อย '+baht(Math.max(100,-b+1))+' เพื่อชำระและเปิดร้านอีกครั้ง';
@@ -570,7 +576,8 @@ function g1(path){return sbApi("/rest/v1/"+path)}
 function loadCatalog(){var pid=WID;
  return Promise.all([g1("places?select=*&id=eq."+pid),g1("services?select=*&place_id=eq."+pid+"&order=created_at"),g1("staff?select=*,staff_services(service_id)&place_id=eq."+pid+"&order=created_at"),g1("promotions?select=*,promotion_services(service_id)&place_id=eq."+pid+"&order=created_at")]).then(function(r){
   if(!r[0]||!r[0][0])throw new Error("ไม่พบข้อมูลร้าน");
-  D.shop=mapPlace(r[0][0]);D.svc=r[1].map(mapSvc);D.staff=r[2].map(mapStaff);D.promo=r[3].map(mapPromo)}).then(loadRates)}
+  D.shop=mapPlace(r[0][0]);D.svc=r[1].map(mapSvc);D.staff=r[2].filter(function(x){return !(x.phone==null&&!x.active&&x.name==="พนักงานที่ออกจากระบบ")}).map(mapStaff);D.promo=r[3].map(mapPromo)}).then(loadRates).then(loadSdr)}
+function loadSdr(){return rpc("shop_staff_delete_requests",{p_place:WID}).then(function(a){D.sdr=a||[];D.sdrOff=false},function(){D.sdr=[];D.sdrOff=true})}
 function annRead(){return rd("shopAnnRead_"+WHO.id,[])}
 function loadBk(){var pid=WID,from=new Date(Date.now()-30*864e5).toISOString();
  return g1("bookings?select=id,ref,customer_name,phone,status,starts_at,ends_at,total_price,promo_title,moved_to,created_at,booking_items(id,service_name,minutes,price,starts_at,ends_at,active,job,staff_id)&place_id=eq."+pid+"&ends_at=gte."+from+"&order=starts_at.asc&limit=500").then(function(r){D.bk=r||[]},function(){})}
@@ -694,7 +701,7 @@ document.addEventListener("click",function(e){
   if(!navigator.geolocation){ps.innerHTML='<p class="hint2" style="color:var(--bad)">อุปกรณ์นี้ไม่รองรับ ใช้การวางลิงก์หรือพิกัดแทน</p>';return}
   ps.innerHTML='<p class="hint2">กำลังหาตำแหน่ง...</p>';
   navigator.geolocation.getCurrentPosition(function(p){setPin(p.coords.latitude.toFixed(6),p.coords.longitude.toFixed(6))},function(){ps.innerHTML='<p class="hint2" style="color:var(--bad)">ใช้ตำแหน่งปัจจุบันไม่ได้ ตรวจสอบสิทธิ์ตำแหน่ง หรือวางลิงก์/พิกัดแทน</p>'},{timeout:10000});return}
- if(a==="tab"){if(id==="mg")id=S.mg;if(inMg(id))S.mg=id;if(id==="nt"){S.ntf=null;S.ntNew=[];openNt()}if(id==="rv")rvLoad();S.tab=id;S.form=null;S.del=null;S.saved=false;S.pwdone=false;S.shareok=false;S.stmsg="";S.stnew=null;S.pv=false;S.wmode=null;S.werr="";S.hmsg="";draw();if(id==="wal"||id==="nt"||id==="q")refresh();return}
+ if(a==="tab"){if(id==="mg")id=S.mg;if(inMg(id))S.mg=id;if(id==="nt"){S.ntf=null;S.ntNew=[];openNt()}if(id==="rv")rvLoad();S.tab=id;S.form=null;S.del=null;S.saved=false;S.pwdone=false;S.shareok=false;S.sdc=null;S.sdn=null;S.stmsg="";S.stnew=null;S.pv=false;S.wmode=null;S.werr="";S.hmsg="";draw();if(id==="wal"||id==="nt"||id==="q")refresh();return}
  if(a==="rvreply"){S.rvReply=id;draw();var ta=document.getElementById("rvtxt");if(ta)ta.focus();return}
  if(a==="rvno"){S.rvReply=null;draw();return}
  if(a==="rvsend"){rvSend(id);return}
@@ -757,6 +764,11 @@ document.addEventListener("click",function(e){
  if(a==="logout"){doLogout();return}
  if(a==="pwsave"){pwChange();return}
  if(a==="sharesave"){shareSave();return}
+ if(a==="sdrx"){S.sdc=null;S.sdn=null;draw();return}
+ if(a==="sdrok"){if(S.sdc!==id){S.sdc=id;S.sdn=null;draw();return}
+  act(function(){return rpc("shop_staff_delete_resolve",{p_place:WID,p_req:id,p_approve:true,p_note:null}).then(loadCatalog)},function(){S.sdc=null;S.sdn=null;S.stmsg="ลบบัญชีพนักงานแล้ว";S.stok=true});return}
+ if(a==="sdrno"){if(S.sdn!==id){S.sdn=id;S.sdc=null;draw();return}var sr=val("sdn_"+id).trim();
+  act(function(){return rpc("shop_staff_delete_resolve",{p_place:WID,p_req:id,p_approve:false,p_note:sr||null}).then(loadSdr)},function(){S.sdc=null;S.sdn=null;S.stmsg="บันทึกการไม่อนุมัติแล้ว";S.stok=true});return}
  if(a==="stshare"){stShare(id);return}
  if(a==="stnewno"){S.stnew=null;S.stmsg="";draw();return}
  if(a==="gprpt"){RP.kind="gp";RP.data=null;RP.err="";S.tab="rp";S.form=null;S.del=null;S.saved=false;draw();window.scrollTo(0,0);return}
