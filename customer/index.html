@@ -790,7 +790,7 @@ function pvHtml(){var c=(typeof SET!=="undefined"&&SET.ct)||{},tel=String(c.phon
   S2("เราเก็บนานแค่ไหน",L(["ชื่อและเบอร์โทรในรายการจองถูกลบหลังการใช้บริการผ่านไป 12 เดือน","ข้อความแชตถูกลบอัตโนมัติหลัง 90 วัน","เมื่อคุณลบบัญชี โปรไฟล์ รูป แต้มสะสม การแจ้งเตือน รายการโปรด และข้อความแชตที่คุณส่งจะถูกลบทันที รายการจองจะถูกล้างชื่อและเบอร์โทร","ข้อมูลอื่นเก็บไว้ตราบที่บัญชียังอยู่"]))+
   S2("สิทธิ์ของคุณ",L(["ปิดการใช้ตำแหน่งได้ทุกเมื่อ (ปุ่ม &quot;ไม่ใช้ตำแหน่ง&quot; หน้าเลือกร้าน)","ลบบัญชีและข้อมูลของคุณได้เองที่ปุ่ม &quot;ลบบัญชีของฉัน&quot; ในหน้าบัญชี (ต้องไม่มีการจองที่ยังไม่เสร็จสิ้น)","ขอดูหรือแก้ไขข้อมูลได้โดยติดต่อสมาคม"]))+
   S2("ติดต่อเรา",'<p>'+esc(nm)+(tel?' โทร '+esc(tel):' (เบอร์โทรดูได้ที่หน้าบัญชี หลังเข้าสู่ระบบ)')+'</p>')+'</div>'}
-function seoSet(on){var s=document.getElementById("seo");if(s)s.hidden=!on}
+function seoSet(on){var s=document.getElementById("seo"),sa=false;try{sa=!!((window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone)}catch(e){}if(s)s.hidden=!on||sa}
 function authRender(){var tb=document.getElementById("tabs");if(tb)tb.style.display="none";
  var a=document.getElementById("app"),b=document.getElementById("bar"),h="",st=AU.step;b.innerHTML="";b.style.display="none";
  seoSet(AU.loading||st==="login"||st==="ins");
