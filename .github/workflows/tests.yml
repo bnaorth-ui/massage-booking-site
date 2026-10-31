@@ -1,0 +1,45 @@
+name: tests
+
+# รันเทสต์ Playwright เมื่อมีการ push หรือเปิด pull request ที่แตะเว็บหรือเทสต์
+# ไม่มีผลต่อการ deploy ของ Cloudflare Pages (Cloudflare ดึงโค้ดไปเองโดยไม่รอผลเทสต์นี้)
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'customer/**'
+      - 'shop/**'
+      - 'staff/**'
+      - 'admin/**'
+      - 'tests/**'
+      - '.github/workflows/tests.yml'
+  pull_request:
+    paths:
+      - 'customer/**'
+      - 'shop/**'
+      - 'staff/**'
+      - 'admin/**'
+      - 'tests/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  playwright:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: ติดตั้ง Playwright และเบราว์เซอร์
+        working-directory: tests
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: รันเทสต์ทั้งหมด
+        working-directory: tests
+        env:
+          JOBS: 3
+        run: node run-all.js

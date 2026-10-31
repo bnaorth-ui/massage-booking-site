@@ -1,0 +1,127 @@
+const {chromium}=require('playwright');
+const bkk=(n=0)=>{const d=new Date(Date.now()+7*3600000+n*86400000);return d.toISOString().slice(0,10)};
+(async()=>{const b=await chromium.launch(require('./config').launch);
+const ctx=await b.newContext({timezoneId:'Asia/Bangkok',locale:'th-TH'});const errs=[],calls=[];
+let mode={cat:true,rpcMissing:false};let PTS={on:true,baht_per:10,per_baht:10,min:100,expire_months:12,balance:450,next_expiry:new Date(Date.now()+30*86400000).toISOString(),next_expiry_points:100,history:[{kind:'earn',points:450,note:'ได้แต้มจากการใช้บริการ MS1',at:new Date().toISOString()}]};let lastCB=null;let MSGS=[{id:'m1',booking_id:'bid-MS1',room_key:'shop',sender_id:'shopuser',sender_role:'shop',sender_name:'ร้านสบายดี สปา',body:'ยินดีต้อนรับค่ะ',created_at:'2026-10-29T10:00:00.000000+00:00'}];let UNR=[{booking_id:'bid-MS1',room:'shop',n:1}];let marks=[];let sendErr=null;let seq=100000;const BKS=[];const NOTES=[];
+const UID='uuid-1';const REVD=[];let delMode='ok';const dels=[],avdel=[];const subs=[];let subErr=null;
+const places=[
+ {id:'sh1',type:'shop',name:'ร้านสบายดี สปา',area:'สุขุมวิท',lat:13.76,lng:100.51,open_days:[0,1,2,3,4,5,6],open_time:'10:00:00',close_time:'21:00:00',fixed_date:null,advance_days:14,cancel_hours:24,image_path:null,status:'approved',active:true},
+ {id:'og1',type:'org',name:'สำนักงานพัฒนาสังคม',area:'พญาไท',lat:13.758,lng:100.509,open_days:[0,1,2,3,4,5,6],open_time:'09:00:00',close_time:'17:00:00',fixed_date:bkk(3),advance_days:14,cancel_hours:24,image_path:null,status:'approved',active:true},
+ {id:'cp1',type:'company',name:'บริษัท ไทยออฟฟิศ',area:'ปทุมวัน',lat:13.7635,lng:100.5018,open_days:[1,2,3,4,5],open_time:'09:00:00',close_time:'18:00:00',fixed_date:null,advance_days:14,cancel_hours:24,image_path:null,status:'approved',active:true}];
+const services=[
+ {id:'ga',place_id:null,name:'นวดไทยแผนโบราณ',minutes:60,price:400,applies_all:true,active:true},
+ {id:'sa',place_id:'sh1',name:'นวดไทย',minutes:60,price:400,applies_all:false,active:true},
+ {id:'sb',place_id:'sh1',name:'นวดเท้า',minutes:60,price:350,applies_all:false,active:true}];
+const staff=[{id:'st1',name:'คุณวิภา',place_id:'sh1',photo_path:null},{id:'st2',name:'คุณสมศรี',place_id:'sh1',photo_path:null},{id:'st3',name:'คุณนุ่น',place_id:null,photo_path:null},{id:'st4',name:'คุณมะลิ',place_id:null,photo_path:null}];
+const ss=[['st1','sa'],['st1','sb'],['st2','sa'],['st3','ga'],['st4','ga']].map(x=>({staff_id:x[0],service_id:x[1]}));
+const ps=[{place_id:'og1',staff_id:'st3',weekdays:[]},{place_id:'cp1',staff_id:'st4',weekdays:[1,2,3,4,5]}];
+const promos=[{id:'pm1',place_id:'sh1',title:'ลดราคานวดเท้า',description:'',type:'percent',value:10,applies_all:false,start_date:bkk(-1),end_date:bkk(30),image_path:null,active:true}];
+const pms=[{promotion_id:'pm1',service_id:'sb'}];
+const nm=id=>(staff.find(s=>s.id===id)||{}).name;
+const busyItems=()=>BKS.filter(x=>x.status==='confirmed').flatMap(x=>x.items.filter(i=>i.active));
+const fmt=b=>({ref:b.ref,place_id:b.place_id,place_name:b.place_name,place_type:b.place_type,cancel_hours:24,phone:b.phone,customer_name:'สมชาย ใจดี',starts_at:new Date(b.s).toISOString(),ends_at:new Date(b.e).toISOString(),total:b.total,discount:b.discount,promo:b.promo,status:b.status,moved_from:b.moved_from,moved_to:b.moved_to,id:'bid-'+b.ref,points_used:b.pu||0,points_discount:b.pd||0,created_at:new Date().toISOString(),items:b.items.map(i=>({id:i.id,service_id:i.service_id,service_name:i.service_name,staff_id:i.staff_id,staff_name:nm(i.staff_id),minutes:i.minutes,price:i.price,starts_at:new Date(i.s).toISOString(),ends_at:new Date(i.e).toISOString(),active:i.active,job:i.job||'pending'}))});
+await ctx.route('**/*supabase.co/**',async r=>{const q=r.request(),u=new URL(q.url()),m=q.method(),path=u.pathname,body=(()=>{try{return JSON.parse(q.postData()||'null')}catch(e){return null}})();
+ calls.push({m,path,body,auth:q.headers()['authorization']||''});
+ const J=(s,o)=>r.fulfill({status:s,contentType:'application/json',body:JSON.stringify(o)});
+ const sess=()=>({access_token:'at',refresh_token:'rt',expires_in:3600,user:{id:UID,user_metadata:{first_name:'สมชาย',last_name:'ใจดี',phone:'0811111111'}}});
+ if(path==='/auth/v1/token'&&u.search.includes('password')&&body&&body.password==='wrong')return J(400,{error_code:'invalid_credentials',msg:'Invalid login credentials'});
+ if(path==='/auth/v1/signup'||(path==='/auth/v1/token'&&u.search.includes('password')))return J(200,sess());
+ if(path==='/auth/v1/token')return J(200,sess());
+ if(path==='/rest/v1/profiles')return J(200,[{first_name:'สมชาย',last_name:'ใจดี',phone:'0811111111',avatar_path:null}]);
+ if(!mode.cat&&path.startsWith('/rest/v1/places'))return r.abort();
+ const T={places:places,services:services,service_places:[],staff_public:staff,staff_services:ss,place_staff:ps,staff_days_off:[],promotions:promos,promotion_services:pms,place_day_overrides:[],app_settings:[process.env.EMPTY?{shop_radius_km:10,org_radius_km:10,notify_user:true,notify_staff:true}:{shop_radius_km:10,org_radius_km:10,notify_user:true,notify_staff:true,association_name:'สมาคมทดสอบ',address:'เลขที่ 1 ถนนทดสอบ',phone:'02-123 4567',line_url:'https://line.me/R/ti/p/@test',hours_text:'จันทร์ – ศุกร์ 08:30 – 16:30 น.\nเสาร์ – อาทิตย์ ปิด',register_url:'https://shop.example.com/'}],announcements:[{title:'ประกาศทดสอบ',body:'สวัสดี',audiences:['ผู้ใช้งาน'],active:true}],notifications:NOTES};
+ const t=path.replace('/rest/v1/','');
+ if(m==='GET'&&T[t]!==undefined)return J(200,T[t]);
+ if(mode.rpcMissing&&path.startsWith('/rest/v1/rpc/'))return J(404,{code:'PGRST202',message:'Could not find the function public.'+path.split('/').pop()+' in the schema cache'});
+ if(path==='/rest/v1/rpc/busy_slots'){const f=Date.parse(body.p_from),to=Date.parse(body.p_to);return J(200,busyItems().filter(i=>body.p_staff.includes(i.staff_id)&&i.s<to&&i.e>f).map(i=>({staff_id:i.staff_id,starts_at:new Date(i.s).toISOString(),ends_at:new Date(i.e).toISOString()})))}
+ if(path==='/rest/v1/rpc/chat_unread')return J(200,UNR);
+ if(path==='/rest/v1/rpc/chat_mark_read'){marks.push(body);UNR=UNR.filter(x=>!(x.booking_id===body.p_booking&&x.room===body.p_room));return J(204,null)}
+ if(path==='/rest/v1/rpc/chat_send'){if(sendErr)return J(400,{code:'P0001',message:sendErr});MSGS.push({id:'m'+(MSGS.length+1),booking_id:body.p_booking,room_key:body.p_room,sender_id:UID,sender_role:'user',sender_name:'สมชาย ใจดี',body:body.p_body,created_at:new Date().toISOString().replace('Z','000+00:00')});return J(200,'x')}
+ if(path==='/rest/v1/chat_messages'){const b=u.searchParams.get('booking_id').replace('eq.',''),r=u.searchParams.get('room_key').replace('eq.',''),gt=u.searchParams.get('created_at');let L=MSGS.filter(m=>m.booking_id===b&&m.room_key===r);if(gt)L=L.filter(m=>m.created_at>gt.replace('gt.',''));return J(200,L)}
+ if(path==='/rest/v1/rpc/place_ratings'){if(mode.noRv)return J(404,{code:'PGRST202',message:'Could not find the function'});return J(200,[{place_id:'sh1',avg_rating:4.6,fresh:false}])}
+ if(path==='/rest/v1/reviews'&&m==='GET')return J(200,REVD.map(x=>({booking_id:x})));
+ if(path==='/rest/v1/rpc/submit_review'){subs.push(body);if(subErr)return J(400,{code:'P0001',message:subErr});REVD.push(body.p_booking);return J(200,'rid')}
+ if(path==='/rest/v1/rpc/place_reviews'){const off=body.p_offset;const all=Array.from({length:13},(_,i)=>({id:'r'+i,first:'คุณ'+i,rating:5-(i%3),comment:i===0?'บริการดีมาก':'',reply:i===0?'ขอบคุณค่ะ':null,at:new Date(Date.now()-i*86400000).toISOString()}));return J(200,{n:13,avg:4.6,items:all.slice(off,off+10),more:off+10<13})}
+ if(path==='/rest/v1/rpc/delete_my_account'){dels.push(body);if(delMode==='blocked')return J(400,{code:'P0001',message:'มีการจองที่ยังไม่เสร็จสิ้น กรุณายกเลิกหรือรอให้เสร็จก่อนลบบัญชี'});return J(204,null)}
+ if(path==='/storage/v1/object/list/avatars')return J(200,[{name:'a1.jpg'},{name:'a2.jpg'}]);
+ if(path==='/storage/v1/object/avatars'&&m==='DELETE'){avdel.push(body);return J(200,[])}
+ if(path==='/rest/v1/rpc/my_points')return J(200,PTS);
+ if(path==='/rest/v1/rpc/my_bookings')return J(200,BKS.slice().sort((a,b)=>b.s-a.s).map(fmt));
+ if(path==='/rest/v1/rpc/cancel_booking'){const b=BKS.find(x=>x.ref===body.p_ref);if(Date.now()>b.s-24*3600000)return J(400,{code:'P0001',message:'ยกเลิกไม่ได้ เกินเวลาที่ยกเลิกได้'});b.status='cancelled';b.items.forEach(i=>i.active=false);return r.fulfill({status:204,body:''})}
+ if(path==='/rest/v1/rpc/create_booking'){const pl=places.find(p=>p.id===body.p_place);const start=Date.parse(body.p_start);let old=null;
+   if(body.p_moved_from){old=BKS.find(x=>x.ref===body.p_moved_from&&x.status==='confirmed');if(!old)return J(400,{code:'P0001',message:'ไม่พบการจองเดิมที่จะเลื่อน'})}
+   const its=[];let tot=0,dis=0,promo=null;
+   for(const it of body.p_items){const sv=services.find(s=>s.id===it.service_id);const s=start+it.offset_min*60000,e=s+sv.minutes*60000;
+     const pool=busyItems().filter(i=>!(old&&old.items.includes(i)));
+     if(pool.some(i=>i.staff_id===it.staff_id&&i.s<e&&i.e>s))return J(400,{code:'P0001',message:'คิวนี้เพิ่งเต็ม กรุณาเลือกเวลาหรือพนักงานใหม่'});
+     let d=0;const pm=promos.find(p=>p.place_id===pl.id&&(pms.some(q=>q.promotion_id===p.id&&q.service_id===sv.id)));if(pm){d=Math.round(sv.price*pm.value)/100;promo=pm.title}
+     tot+=sv.price-d;dis+=d;its.push({id:'it'+Math.random(),service_id:sv.id,service_name:sv.name,staff_id:it.staff_id,minutes:sv.minutes,price:sv.price-d,s,e,active:true})}
+   if(old){old.status='rescheduled';old.items.forEach(i=>i.active=false)}
+   const ref='MS'+(seq++);if(old)old.moved_to=ref;
+   BKS.push({ref,place_id:pl.id,place_name:pl.name,place_type:pl.type,phone:body.p_phone,s:Math.min(...its.map(i=>i.s)),e:Math.max(...its.map(i=>i.e)),total:tot,discount:dis,promo,status:'confirmed',moved_from:body.p_moved_from,moved_to:null,items:its});
+   NOTES.unshift({id:'n'+seq,title:'จองสำเร็จ',body:'เลขที่ '+ref,created_at:new Date().toISOString(),booking_id:'x'});
+   if(body.p_points){lastCB=body;const pd=body.p_points/10;BKS[BKS.length-1].total-=pd;BKS[BKS.length-1].pu=body.p_points;BKS[BKS.length-1].pd=pd;PTS.balance-=body.p_points}
+   return J(200,ref)}
+ return J(404,{message:'nf '+path})});
+const p=await ctx.newPage();p.on('pageerror',e=>errs.push(e.message));p.on('dialog',d=>{errs.push('DIALOG '+d.message());d.dismiss()});
+const store=[];await ctx.route('**/storage/v1/object/avatars/**',r=>{store.push({m:r.request().method(),u:new URL(r.request().url()).pathname,auth:r.request().headers()['authorization']||''});r.fulfill({status:200,contentType:'application/json',body:'{}'})});
+const patches=[];await ctx.route('**/rest/v1/profiles?id=eq.*',async r=>{if(r.request().method()==='PATCH'){patches.push(JSON.parse(r.request().postData()||'{}'));return r.fulfill({status:204,body:''})}return r.fallback()});
+const URL_=require('./config').page('customer-booking.html');
+const UA={and:'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Mobile Safari/537.36',line:'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 Chrome/120.0 Mobile Safari/537.36 Line/13.5.0',ios:'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',iosl:'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148 Line/13.5.0',desk:'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120.0 Safari/537.36'};
+const ok=(n,c)=>console.log((c?'PASS ':'FAIL ')+n);
+async function open(ua,standalone){const pg=await ctx.newPage();pg.on('pageerror',e=>errs.push(e.message));
+ await pg.addInitScript(([u,st])=>{Object.defineProperty(navigator,'userAgent',{get:()=>u});if(st){const o=window.matchMedia.bind(window);window.matchMedia=q=>q.includes('standalone')?{matches:true,addListener(){},removeListener(){},addEventListener(){}}:o(q)}},[ua,!!standalone]);
+ await pg.goto(URL_);await pg.evaluate(()=>localStorage.clear());await pg.reload();await pg.waitForTimeout(400);return pg}
+const T=pg=>pg.textContent('#app');
+// android
+let pg=await open(UA.and);let t=await T(pg);
+ok('android: intro first',t.includes('ติดตั้งแอปจองคิวนวด')&&!(await pg.$('#lph')));
+ok('NEW intro on install page above skip btn; features after steps',await pg.evaluate(()=>{const a=document.getElementById('app');const i=a.querySelector('.seoin'),sk=a.querySelector('[data-ins=skip]'),st=a.querySelector('.insst'),ft=a.querySelector('.insft');return !!i&&i.innerText.includes('จองนวดออนไลน์ ร้านนวดใกล้ฉัน')&&i.innerText.includes('กรมสนับสนุนบริการสุขภาพ')&&!!sk&&!!st&&!!ft&&(i.compareDocumentPosition(sk)&4)&&(st.compareDocumentPosition(ft)&4)}));
+ok('NEW both skip buttons same label',await pg.evaluate(()=>[...document.querySelectorAll('#app [data-ins=skip]')].length===2&&[...document.querySelectorAll('#app [data-ins=skip]')].every(b=>b.textContent.trim()==='ใช้งานต่อโดยไม่ติดตั้ง')));
+ok('skip is first button',await pg.evaluate(()=>document.querySelector('#app button').textContent.includes('ใช้งานต่อโดยไม่ติดตั้ง')));
+ok('heading focused',await pg.evaluate(()=>document.activeElement.id==='inst'));
+ok('manual steps w/o event',t.includes('เมนู')&&!t.includes('กดปุ่มด้านบน')&&!(await pg.$('[data-ins=go]')));
+await pg.evaluate(()=>{window.__p=0;const e=new Event('beforeinstallprompt');e.prompt=()=>{window.__p++};e.userChoice=Promise.resolve({outcome:'accepted'});window.dispatchEvent(e)});await pg.waitForTimeout(300);
+ok('install button after event',!!(await pg.$('[data-ins=go]')));
+await pg.click('[data-ins=go]');await pg.waitForTimeout(400);
+ok('prompt called + done msg',(await pg.evaluate(()=>window.__p))===1&&(await T(pg)).includes('ติดตั้งแล้ว'));
+await pg.close();
+// android skip + remembered
+pg=await open(UA.and);await pg.click('[data-ins=skip]');await pg.waitForTimeout(300);
+ok('skip -> login',!!(await pg.$('#lph')));
+await pg.reload();await pg.waitForTimeout(400);ok('remembered: login directly',!!(await pg.$('#lph'))&&!(await T(pg)).includes('ติดตั้งแอปจองคิวนวด'));
+ok('NEW SEO: head tags',await pg.evaluate(()=>{const g=s=>document.querySelector(s);return document.title.includes('จองนวดออนไลน์ ร้านนวดใกล้ฉัน')&&g('meta[name=description]').content.includes('กรมสนับสนุนบริการสุขภาพ')&&g('link[rel=canonical]').href==='https://massage-customer-bna.pages.dev/'&&g('meta[property="og:url"]').content==='https://massage-customer-bna.pages.dev/'&&!document.querySelector('meta[name=robots][content*=noindex]')&&JSON.parse(g('script[type="application/ld+json"]').textContent).url==='https://bna.or.th'}));
+ok('NEW intro on login above h1',await pg.evaluate(()=>{const i=document.querySelector('#app .seoin'),h=document.querySelector('#app h1');return !!i&&!!h&&h.textContent==='เข้าสู่ระบบ'&&(i.compareDocumentPosition(h)&4)}));
+ok('NEW SEO: section visible on login with content',await pg.evaluate(()=>{const s=document.getElementById('seo');return !!s&&!s.hidden&&s.getBoundingClientRect().height>100&&s.innerText.includes('ทำไมต้องจองกับเรา')&&s.innerText.includes('กรมสนับสนุนบริการสุขภาพ')&&!/ทุกคน/.test(s.innerText)}));
+ok('NEW SEO: about link to bna.or.th',await pg.evaluate(()=>{const a=document.querySelector('#seo a');return a&&a.href==='https://bna.or.th/'&&a.rel.includes('noopener')}));
+ok('NEW SEO: install button on login (mobile)',!!(await pg.$('button[data-ag=ins].btn')));
+await pg.click('[data-ag=reg]');await pg.waitForTimeout(200);ok('NEW SEO hidden on register step',await pg.evaluate(()=>document.getElementById('seo').hidden));await pg.click('[data-ag=login]');await pg.waitForTimeout(200);ok('NEW SEO back on login',await pg.evaluate(()=>!document.getElementById('seo').hidden));
+ok('login has how-to link',!!(await pg.$('[data-ag=ins]')));
+await pg.click('[data-ag=ins]');await pg.waitForTimeout(300);ok('link reopens intro',(await T(pg)).includes('ติดตั้งแอปจองคิวนวด'));
+await pg.click('[data-ins=skip]');await pg.waitForTimeout(200);ok('back to login',!!(await pg.$('#lph')));
+await pg.close();
+// line
+pg=await open(UA.line);t=await T(pg);ok('line: open in chrome',t.includes('เปิดใน Chrome')&&t.includes('LINE'));
+ok('NEW open button label = ติดตั้งแอป',((await pg.textContent('[data-ins=open]'))||'').trim()==='ติดตั้งแอป');
+ok('NEW cust LINE: copy+open + features 5 + 3 icons',!!(await pg.$('[data-ins=copy]'))&&!!(await pg.$('[data-ins=open]'))&&(await pg.$$('.insft li')).length===5&&(await pg.$$('.insst li svg')).length===3&&t.includes('แอปนี้ทำอะไรได้'));
+await pg.evaluate(()=>{Object.defineProperty(navigator,'clipboard',{value:{writeText:t=>{window.__cp=t;return Promise.resolve()}},configurable:true})});
+await pg.click('[data-ins=copy]');await pg.waitForTimeout(200);ok('NEW cust copy ok + msg',!!(await pg.evaluate(()=>window.__cp))&&(await pg.textContent('#insmsg')).includes('คัดลอกลิงก์แล้ว'));
+await pg.close();
+pg=await open(UA.ios);t=await T(pg);ok('ios: share steps',t.includes('แชร์')&&t.includes('เพิ่มไปยังหน้าจอโฮม')&&t.includes('รับแจ้งเตือนบน iPhone')&&!(await pg.$('[data-ins=go]')));await pg.close();
+pg=await open(UA.iosl);t=await T(pg);ok('ios in LINE: safari first',t.includes('เปิดใน Safari')&&t.includes('เพิ่มไปยังหน้าจอโฮม'));await pg.close();
+pg=await open(UA.desk);ok('desktop: login directly, no link',!!(await pg.$('#lph'))&&!(await pg.$('[data-ag=ins]')));await pg.close();
+pg=await open(UA.and,true);ok('standalone: login directly, no link',!!(await pg.$('#lph'))&&!(await pg.$('[data-ag=ins]')));ok('NEW intro absent in installed app',!(await pg.$('#app .seoin')));
+ok('NEW SEO hidden in installed (standalone) app',await pg.evaluate(()=>document.getElementById('seo').hidden));await pg.close();
+pg=await open(UA.and);await pg.click('[data-ins=skip]');await pg.waitForTimeout(200);ok('NEW SEO visible in normal browser login',await pg.evaluate(()=>!document.getElementById('seo').hidden));await pg.close();
+// logged in account
+pg=await open(UA.and);await pg.click('[data-ins=skip]');await pg.fill('#lph','0811111111');await pg.fill('#lpw','abc123');await pg.click('button[type=submit]');await pg.waitForSelector('[data-pl]',{timeout:4000});
+await pg.click('[data-tab="ac"]');await pg.waitForTimeout(300);
+ok('account: how-to button',!!(await pg.$('[data-insp=open]')));
+await pg.click('[data-insp=open]');await pg.waitForTimeout(300);
+ok('account: page + focus + tabs',(await T(pg)).includes('ติดตั้งแอปจองคิวนวด')&&await pg.evaluate(()=>document.activeElement.id==='inst'&&getComputedStyle(document.getElementById('tabs')).display!=='none'));
+await pg.click('[data-insp=no]');await pg.waitForTimeout(200);ok('back to account',(await T(pg)).includes('ออกจากระบบ'));
+// reload logged in: no intro
+await pg.evaluate(()=>localStorage.removeItem('insSeen'));await pg.reload();await pg.waitForTimeout(1200);
+ok('logged-in reload: no intro',!(await pg.$('[data-ins=skip]')));
+console.log('errs',JSON.stringify(errs));await b.close();
+})();

@@ -1,0 +1,7 @@
+{
+  "name": "massage-booking-tests",
+  "private": true,
+  "description": "เทสต์ Playwright ของเว็บ 4 หน้า (ใช้ข้อมูลจำลอง ไม่เรียก Supabase จริง)",
+  "scripts": { "test": "node run-all.js" },
+  "devDependencies": { "playwright": "1.56.0" }
+}
