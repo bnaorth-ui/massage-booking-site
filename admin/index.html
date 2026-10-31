@@ -542,8 +542,8 @@ function setPin(la,lo){document.getElementById("olat").value=la;document.getElem
 /* ---- เลือกจุดบนแผนที่ (OpenStreetMap + Leaflet โหลดเมื่อกดเท่านั้น) ---- */
 var LFQ=null,MP=null;
 function loadLeaflet(cb){if(window.L&&window.L.map){cb(true);return}if(LFQ){LFQ.push(cb);return}LFQ=[cb];var fin=function(ok){var q=LFQ;LFQ=null;if(!ok&&sc.parentNode)sc.parentNode.removeChild(sc);q.forEach(function(f){f(ok)})},tm=setTimeout(function(){fin(!(window.L&&window.L.map))},12000),
- l=document.createElement("link");l.rel="stylesheet";l.href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css";document.head.appendChild(l);
- var sc=document.createElement("script");sc.src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js";sc.onload=function(){clearTimeout(tm);if(LFQ)fin(!!(window.L&&window.L.map))};sc.onerror=function(){clearTimeout(tm);if(LFQ)fin(false)};document.head.appendChild(sc)}
+ l=document.createElement("link");l.rel="stylesheet";l.href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";l.integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=";l.crossOrigin="";document.head.appendChild(l);
+ var sc=document.createElement("script");sc.src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";sc.integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=";sc.crossOrigin="";sc.onload=function(){clearTimeout(tm);if(LFQ)fin(!!(window.L&&window.L.map))};sc.onerror=function(){clearTimeout(tm);if(LFQ)fin(false)};document.head.appendChild(sc)}
 function mpStart(){var a=parseFloat(String(document.getElementById("olat").value).replace(",",".")),b=parseFloat(String(document.getElementById("olng").value).replace(",","."));if(!isNaN(a)&&!isNaN(b)&&a>=-90&&a<=90&&b>=-180&&b<=180)return{lat:a,lng:b,z:16};return{lat:13.75,lng:100.5,z:6}}
 function mpSet(lat,lng,pan){if(!MP)return;MP.lat=lat;MP.lng=lng;if(MP.mk)MP.mk.setLatLng([lat,lng]);if(pan&&MP.map)MP.map.panTo([lat,lng]);var a=document.getElementById("mp_lat"),b=document.getElementById("mp_lng");if(a)a.value=lat.toFixed(6);if(b)b.value=lng.toFixed(6)}
 function mpMsg(t){var m=document.getElementById("mp_msg");if(m)m.textContent=t||""}
