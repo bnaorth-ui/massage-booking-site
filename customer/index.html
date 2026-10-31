@@ -124,7 +124,7 @@ var SHOPSVC={};
 function svcList(p){return p.type==="shop"?(SHOPSVC[p.id]||[]):(p.svcs||[]).map(function(i){return find(SVC,i)}).filter(Boolean)}
 function svcOf(p,id){return find(svcList(p),id)}
 var BASE={lat:13.7563,lng:100.5018},RADIUS={get shop(){return SET.defShop.radius},get org(){return SET.defOrg.radius}}; /* รัศมีที่แสดง (กม.) ตั้งในแอดมิน */
-var V={pmsg:"",kind:"shop",loc:null,manual:false,msg:"",cfm:null,flash:"",moving:null,moveKeys:[],moveItems:[],prevSeen:null}; /* หน้าแรก: ประเภทเริ่มต้น = ร้านค้า */
+var V={pmsg:"",kind:"shop",loc:null,locName:"",manual:false,msg:"",cfm:null,flash:"",moving:null,moveKeys:[],moveItems:[],prevSeen:null}; /* หน้าแรก: ประเภทเริ่มต้น = ร้านค้า */
 function pos(p){if(p.lat!=null&&p.lng!=null)return{lat:p.lat,lng:p.lng};var r=Math.PI/180;return{lat:BASE.lat+p.km*Math.cos(p.ang*r)/111,lng:BASE.lng+p.km*Math.sin(p.ang*r)/(111*Math.cos(BASE.lat*r))}}
 function hav(a,b){var r=Math.PI/180,dl=(b.lat-a.lat)*r,dn=(b.lng-a.lng)*r,x=Math.sin(dl/2)*Math.sin(dl/2)+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin(dn/2)*Math.sin(dn/2);return 6371*2*Math.asin(Math.sqrt(x))}
 function hasPin(p){return p.lat!=null&&p.lng!=null}
@@ -248,24 +248,36 @@ function saveLoc(){try{if(!V.loc||!ME||V.manual)return;var n=Date.now();if(LOCSE
 function nearbyCheck(force){saveLoc()}
 
 /* ---- เลือกจุดบนแผนที่ (OpenStreetMap + Leaflet โหลดเมื่อกดเท่านั้น) ---- */
+
+/* ---- ชื่อสถานที่จากพิกัด (OpenStreetMap Nominatim) เรียกเมื่อผู้ใช้กดเองเท่านั้น จำผลไว้ และเว้นช่วง >= 1.1 วินาที ---- */
+var RGC={},RGT=0,RGQ=null,RGTM=null;
+function nmFmt(j){var a=(j&&j.address)||{},nm=j&&j.name&&j.name!==a.road?String(j.name):"",P=[nm,a.road||a.pedestrian||"",a.suburb||a.quarter||a.neighbourhood||a.village||a.hamlet||"",a.city_district||a.district||a.county||a.town||a.city||"",a.state||a.province||""].filter(Boolean),O=[];P.forEach(function(x){if(O.indexOf(x)<0)O.push(x)});
+ return O.length?(nm?"":"ใกล้ ")+O.join(" · "):(j&&j.display_name?String(j.display_name).slice(0,120):"")}
+function revGeo(lat,lng,cb){var k=lat.toFixed(5)+","+lng.toFixed(5);if(RGC[k]!==undefined){cb(RGC[k]);return}
+ RGQ={k:k,lat:lat,lng:lng,cb:cb};if(RGTM)return;
+ RGTM=setTimeout(function(){RGTM=null;var q=RGQ;RGQ=null;if(!q)return;RGT=Date.now();
+  try{var ac=window.AbortController?new AbortController():null,tm=ac?setTimeout(function(){ac.abort()},8000):0;
+   fetch("https://nominatim.openstreetmap.org/reverse?format=jsonv2&addressdetails=1&zoom=18&accept-language=th&lat="+q.lat.toFixed(6)+"&lon="+q.lng.toFixed(6),ac?{signal:ac.signal}:{}).then(function(r){clearTimeout(tm);return r.ok?r.json():Promise.reject()}).then(function(j){var n=nmFmt(j);if(n)RGC[q.k]=n;q.cb(n)},function(){clearTimeout(tm);q.cb("")})}catch(e){q.cb("")}},Math.max(0,RGT+1100-Date.now()))}
 var LFQ=null,MP=null;
 function loadLeaflet(cb){if(window.L&&window.L.map){cb(true);return}if(LFQ){LFQ.push(cb);return}LFQ=[cb];var fin=function(ok){var q=LFQ;LFQ=null;if(!ok&&sc.parentNode)sc.parentNode.removeChild(sc);q.forEach(function(f){f(ok)})},tm=setTimeout(function(){fin(!(window.L&&window.L.map))},12000),
  l=document.createElement("link");l.rel="stylesheet";l.href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";l.integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=";l.crossOrigin="";document.head.appendChild(l);
  var sc=document.createElement("script");sc.src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";sc.integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=";sc.crossOrigin="";sc.onload=function(){clearTimeout(tm);if(LFQ)fin(!!(window.L&&window.L.map))};sc.onerror=function(){clearTimeout(tm);if(LFQ)fin(false)};document.head.appendChild(sc)}
-function mpStart(){if(V.loc)return{lat:V.loc.lat,lng:V.loc.lng,z:15};var a=0,b=0,n=0;try{visible(V.kind).forEach(function(p){if(hasPin(p)){a+=p.lat;b+=p.lng;n++}})}catch(e){}return n?{lat:a/n,lng:b/n,z:11}:{lat:13.75,lng:100.5,z:6}}
-function mpSet(lat,lng,pan){if(!MP)return;MP.lat=lat;MP.lng=lng;if(MP.mk)MP.mk.setLatLng([lat,lng]);if(pan&&MP.map)MP.map.panTo([lat,lng]);var a=document.getElementById("mp_lat"),b=document.getElementById("mp_lng");if(a)a.value=lat.toFixed(6);if(b)b.value=lng.toFixed(6)}
+function mpStart(){if(V.loc)return{lat:V.loc.lat,lng:V.loc.lng,z:15,known:1};var a=0,b=0,n=0;try{visible(V.kind).forEach(function(p){if(hasPin(p)){a+=p.lat;b+=p.lng;n++}})}catch(e){}return n?{lat:a/n,lng:b/n,z:11}:{lat:13.75,lng:100.5,z:6}}
+function mpSet(lat,lng,pan,noName){if(!MP)return;MP.lat=lat;MP.lng=lng;if(MP.mk)MP.mk.setLatLng([lat,lng]);if(pan&&MP.map)MP.map.panTo([lat,lng]);var a=document.getElementById("mp_lat"),b=document.getElementById("mp_lng");if(a)a.value=lat.toFixed(6);if(b)b.value=lng.toFixed(6);if(!noName)mpName()}
+function mpPlace(t){var e=document.getElementById("mp_place");if(e)e.textContent=t}
+function mpName(){if(!MP)return;clearTimeout(MP.nt);var la=MP.lat,ln=MP.lng;mpPlace("กำลังหาชื่อสถานที่...");MP.nt=setTimeout(function(){revGeo(la,ln,function(n){if(!MP||MP.lat!==la||MP.lng!==ln)return;MP.name=n;MP.nameFor=la+","+ln;mpPlace(n||("ไม่พบชื่อสถานที่ (พิกัด "+la.toFixed(5)+", "+ln.toFixed(5)+")"))})},600)}
 function mpMsg(t){var m=document.getElementById("mp_msg");if(m)m.textContent=t||""}
-function closePicker(){var o=document.getElementById("mpov");if(o)o.remove();document.body.style.overflow="";document.removeEventListener("keydown",mpKey);if(MP&&MP.map){try{MP.map.remove()}catch(e){}}MP=null}
+function closePicker(){if(MP)clearTimeout(MP.nt);var o=document.getElementById("mpov");if(o)o.remove();document.body.style.overflow="";document.removeEventListener("keydown",mpKey);if(MP&&MP.map){try{MP.map.remove()}catch(e){}}MP=null}
 function mpKey(ev){if(ev.key==="Escape")closePicker()}
 function openPicker(){closePicker();var st=mpStart();MP={lat:st.lat,lng:st.lng,map:null,mk:null};
  var o=document.createElement("div");o.id="mpov";o.className="mpov";o.setAttribute("role","dialog");o.setAttribute("aria-modal","true");o.setAttribute("aria-label","เลือกจุดบนแผนที่");
- o.innerHTML='<header><b id="mp_h" tabindex="-1">เลือกจุดบนแผนที่</b><button type="button" class="mpx" data-mp="x" aria-label="ปิดแผนที่">✕</button></header><p class="hint" style="margin:8px 16px 0">แตะหรือลากหมุดไปที่พักของคุณ แล้วกด "ยืนยันจุดนี้" ระบบจะเรียงร้านที่ใกล้จุดนี้ให้ (จุดนี้ใช้ในเครื่องของคุณเท่านั้น ไม่ถูกส่งไปเก็บ)</p><div id="mpm" class="mpm"><div class="mpe">กำลังโหลดแผนที่...</div></div>'+
+ o.innerHTML='<header><b id="mp_h" tabindex="-1">เลือกจุดบนแผนที่</b><button type="button" class="mpx" data-mp="x" aria-label="ปิดแผนที่">✕</button></header><p class="hint" style="margin:8px 16px 0">แตะหรือลากหมุดไปที่พักของคุณ แล้วกด "ยืนยันจุดนี้" ระบบจะเรียงร้านที่ใกล้จุดนี้ให้ (จุดนี้ใช้ในเครื่องของคุณเท่านั้น ไม่ถูกส่งไปเก็บ)</p><div id="mp_place" class="hint2" role="status" aria-live="polite" style="margin:6px 16px 0;font-weight:600">แตะหรือลากหมุดเพื่อดูชื่อสถานที่</div><div id="mpm" class="mpm"><div class="mpe">กำลังโหลดแผนที่...</div></div>'+
  '<div class="mpc"><div class="mpn" role="group" aria-label="ขยับหมุด"><button type="button" data-mp="u" aria-label="ขยับหมุดขึ้น">▲</button><button type="button" data-mp="l" aria-label="ขยับหมุดไปซ้าย">◀</button><button type="button" data-mp="r" aria-label="ขยับหมุดไปขวา">▶</button><button type="button" data-mp="d" aria-label="ขยับหมุดลง">▼</button></div>'+
  '<div class="mpg"><div><label for="mp_lat">ละติจูด</label><input id="mp_lat" inputmode="decimal" autocomplete="off"></div><div><label for="mp_lng">ลองจิจูด</label><input id="mp_lng" inputmode="decimal" autocomplete="off"></div></div>'+
  '<button type="button" class="mpb" data-mp="go">ย้ายหมุดไปตามพิกัดนี้</button><div id="mp_msg" role="status" style="color:var(--bad);min-height:1.2em"></div>'+
  '<div class="mpa"><button type="button" class="mpb" data-mp="x">ยกเลิก</button><button type="button" class="mpb pri" data-mp="ok">ยืนยันจุดนี้</button></div></div>';
  document.body.appendChild(o);document.body.style.overflow="hidden";document.addEventListener("keydown",mpKey);
- mpSet(st.lat,st.lng,false);
+ mpSet(st.lat,st.lng,false,!st.known);
  o.querySelectorAll("[data-mp]").forEach(function(e){e.onclick=function(){var k=e.dataset.mp;
   if(k==="x"){closePicker();return}
   if(k==="u"||k==="d"||k==="l"||k==="r"){if(!MP)return;var dx=k==="l"?-1:k==="r"?1:0,dy=k==="u"?-1:k==="d"?1:0;
@@ -273,7 +285,7 @@ function openPicker(){closePicker();var st=mpStart();MP={lat:st.lat,lng:st.lng,m
   if(k==="go"||k==="ok"){var la=parseFloat(document.getElementById("mp_lat").value.replace(",",".")),ln=parseFloat(document.getElementById("mp_lng").value.replace(",","."));
    if(isNaN(la)||isNaN(ln)||la<-90||la>90||ln<-180||ln>180){mpMsg("พิกัดไม่ถูกต้อง กรอกละติจูดและลองจิจูดเป็นตัวเลข");return}
    if(k==="go"){mpSet(la,ln,true);mpMsg("");return}
-   V.loc={lat:la,lng:ln};V.manual=true;V.msg="";closePicker();if(!S.view&&S.step===0)render(true)}}});
+   var nmk=(MP.nameFor===la+","+ln&&MP.name)?MP.name:"";V.loc={lat:la,lng:ln};V.manual=true;V.msg="";V.locName=nmk;closePicker();if(!S.view&&S.step===0)render(true);if(!nmk)locName(la,ln)}}});
  ["mp_lat","mp_lng"].forEach(function(id){document.getElementById(id).onchange=function(){var la=parseFloat(document.getElementById("mp_lat").value),ln=parseFloat(document.getElementById("mp_lng").value);if(!isNaN(la)&&!isNaN(ln)&&la>=-90&&la<=90&&ln>=-180&&ln<=180){MP.lat=la;MP.lng=ln}}});
  document.getElementById("mp_h").focus();
  loadLeaflet(function(ok){var box=document.getElementById("mpm");if(!MP||!box)return;
@@ -283,9 +295,10 @@ function openPicker(){closePicker();var st=mpStart();MP={lat:st.lat,lng:st.lng,m
   var mk=L.marker([MP.lat,MP.lng],{draggable:true,keyboard:false,icon:L.divIcon({className:"mpin",html:"📍",iconSize:[30,30],iconAnchor:[15,28]})}).addTo(m);
   MP.map=m;MP.mk=mk;mk.on("dragend",function(){var ll=mk.getLatLng();mpSet(ll.lat,ll.lng,false);mpMsg("")});
   m.on("click",function(ev){mpSet(ev.latlng.lat,ev.latlng.lng,false);mpMsg("")});setTimeout(function(){if(MP&&MP.map)MP.map.invalidateSize()},50)})}
+function locName(la,ln){revGeo(la,ln,function(n){if(V.loc&&Math.abs(V.loc.lat-la)<1e-6&&Math.abs(V.loc.lng-ln)<1e-6){V.locName=n;if(!S.view&&S.step===0)render(true)}})}
 var watching=false;
 function watchLoc(){if(watching||!navigator.geolocation||!navigator.geolocation.watchPosition)return;watching=true;
- navigator.geolocation.watchPosition(function(p){if(V.manual)return;var n={lat:p.coords.latitude,lng:p.coords.longitude},moved=!V.loc||hav(V.loc,n)>0.05;V.loc=n;nearbyCheck(true);if(moved&&!S.view&&S.step===0)render(true)},function(){},{maximumAge:60000,timeout:20000})}
+ navigator.geolocation.watchPosition(function(p){if(V.manual)return;var n={lat:p.coords.latitude,lng:p.coords.longitude},moved=!V.loc||hav(V.loc,n)>0.05;if(moved)V.locName="";V.loc=n;nearbyCheck(true);if(moved&&!S.view&&S.step===0)render(true)},function(){},{maximumAge:60000,timeout:20000})}
 function autoWatch(){try{if(!navigator.geolocation)return;var ask=function(){navigator.geolocation.getCurrentPosition(function(p){if(V.manual)return;V.loc={lat:p.coords.latitude,lng:p.coords.longitude};V.msg="";nearbyCheck(true);watchLoc();if(!S.view&&S.step===0)render(true)},function(){},{timeout:15000,maximumAge:300000})};
  if(navigator.permissions&&navigator.permissions.query)navigator.permissions.query({name:"geolocation"}).then(function(r){if(r.state==="granted")watchLoc();else if(r.state==="prompt")ask()},function(){ask()});else ask()}catch(e){}}
 function tabsRender(){var t=document.getElementById("tabs");if(!t)return;if(!ME||CAT.state!=="ok"){t.style.display="none";return}
@@ -353,7 +366,7 @@ function render(keep){
   if(S.step===0){
    syncAdmin();nearbyCheck();CLSIG=PLACES.map(function(p){return shopClosed(p)?1:0}).join("");var kd=V.kind,KT=kd==="shop"?"ร้านนวด":"หน่วยงาน",R=RADIUS[kd],near=visible(kd).filter(function(p){return dist(p)===Infinity||dist(p)<=R}),shown=(V.favOnly&&FVOK&&kd==="shop"?near.filter(isFavP):near).slice().sort(function(a,b){var ga=isFavP(a)?0:1,gb=isFavP(b)?0:1;if(ga!==gb)return ga-gb;var fa=isFresh(a)?0:1,fb=isFresh(b)?0:1;if(fa!==fb)return fa-fb;return(dist(a)===Infinity?1e9:dist(a))-(dist(b)===Infinity?1e9:dist(b))});
    h+='<h1>เลือกสถานที่</h1>'+
-   '<div class="loc">📍 '+(V.loc?(V.manual?"จุดที่คุณเลือก":"ตำแหน่งของคุณ"):"ยังไม่ได้ระบุตำแหน่ง")+'<button class="lb" data-loc="gps">'+(V.manual?"กลับไปใช้ตำแหน่งของฉัน":V.loc?"อัปเดตตำแหน่ง":"ใช้ตำแหน่งของฉัน")+'</button><button class="lb" data-loc="map">'+(V.manual?"เปลี่ยนจุดบนแผนที่":"เลือกจุดบนแผนที่")+'</button>'+(V.loc?'<button class="lb" data-loc="reset">ไม่ใช้ตำแหน่ง</button>':'')+'</div>'+(V.msg?'<p class="hint">'+V.msg+'</p>':'')+
+   '<div class="loc">📍 '+(V.loc?(V.manual?"จุดที่คุณเลือก":"ตำแหน่งของคุณ"):"ยังไม่ได้ระบุตำแหน่ง")+'<button class="lb" data-loc="gps">'+(V.manual?"กลับไปใช้ตำแหน่งของฉัน":V.loc?"อัปเดตตำแหน่ง":"ใช้ตำแหน่งของฉัน")+'</button><button class="lb" data-loc="map">'+(V.manual?"เปลี่ยนจุดบนแผนที่":"เลือกจุดบนแผนที่")+'</button>'+(V.loc&&V.locName?'<small id="locnm" style="flex-basis:100%;color:var(--mute)">'+esc(V.locName)+'</small>':"")+(V.loc?'<button class="lb" data-loc="reset">ไม่ใช้ตำแหน่ง</button>':'')+'</div>'+(V.msg?'<p class="hint">'+V.msg+'</p>':'')+
    '<div class="tg" role="group" aria-label="ประเภท">'+[["shop","เลือกร้านนวด"],["org","เลือกหน่วยงาน"]].map(function(k){var n=visible(k[0]).filter(function(p){return dist(p)===Infinity||dist(p)<=RADIUS[k[0]]}).length;return '<button data-kind="'+k[0]+'" class="'+(k[0]===kd?"on":"")+'" aria-pressed="'+(k[0]===kd)+'">'+k[1]+' ('+n+')</button>'}).join("")+'</div>'+
    '<p class="sub">'+(V.loc?'แสดง'+KT+'ในรัศมี '+R+' กม. จาก'+(V.manual?'จุดที่คุณเลือก':'ตำแหน่งของคุณ')+', พบ '+shown.length+' แห่ง เรียงจากใกล้ไปไกล (ร้านใหม่ขึ้นก่อน)':'แสดง'+KT+'ทั้งหมด '+shown.length+' แห่ง, กด "ใช้ตำแหน่งของฉัน" เพื่อดูเฉพาะที่อยู่ใกล้และเรียงตามระยะทาง')+'</p>'+
    (FVOK&&kd==="shop"?'<button type="button" class="lb" data-favonly aria-pressed="'+!!V.favOnly+'">'+(V.favOnly?'♥ แสดงเฉพาะร้านโปรด (กดเพื่อดูทั้งหมด)':'♡ แสดงเฉพาะร้านโปรด')+'</button>':'')+
@@ -454,11 +467,11 @@ function bind(){
  q("[data-kind]").forEach(function(e){e.onclick=function(){V.kind=e.dataset.kind;render(true)}});
  q("[data-loc]").forEach(function(e){e.onclick=function(){
   if(e.dataset.loc==="map"){openPicker();return}
-  if(e.dataset.loc==="reset"){V.manual=false;V.loc=null;V.msg="";LOCSENT=null;try{if(ME)sbApi("/rest/v1/rpc/clear_my_location",{method:"POST",json:1,body:"{}"}).catch(function(){})}catch(x){}render(true);return}
+  if(e.dataset.loc==="reset"){V.manual=false;V.loc=null;V.locName="";V.msg="";LOCSENT=null;try{if(ME)sbApi("/rest/v1/rpc/clear_my_location",{method:"POST",json:1,body:"{}"}).catch(function(){})}catch(x){}render(true);return}
   if(!navigator.geolocation){V.msg="อุปกรณ์นี้ไม่รองรับตำแหน่ง ระบบจะแสดงทุกแห่งแทน";render(true);return}
-  if(V.manual){V.manual=false;V.loc=null}
+  if(V.manual){V.manual=false;V.loc=null;V.locName=""}
   V.msg="กำลังหาตำแหน่ง...";render(true);
-  navigator.geolocation.getCurrentPosition(function(p){V.loc={lat:p.coords.latitude,lng:p.coords.longitude};V.msg="";nearbyCheck(true);watchLoc();if(!S.view&&S.step===0)render(true)},function(){V.msg="ใช้ตำแหน่งของคุณไม่ได้ กรุณาอนุญาตการเข้าถึงตำแหน่งในเบราว์เซอร์ ระบบจะแสดงทุกแห่งแทน";if(!S.view&&S.step===0)render(true)},{timeout:10000})}});
+  navigator.geolocation.getCurrentPosition(function(p){V.loc={lat:p.coords.latitude,lng:p.coords.longitude};V.locName="";V.msg="";nearbyCheck(true);watchLoc();if(!S.view&&S.step===0)render(true);locName(V.loc.lat,V.loc.lng)},function(){V.msg="ใช้ตำแหน่งของคุณไม่ได้ กรุณาอนุญาตการเข้าถึงตำแหน่งในเบราว์เซอร์ ระบบจะแสดงทุกแห่งแทน";if(!S.view&&S.step===0)render(true)},{timeout:10000})}});
  q("[data-pl]").forEach(function(e){e.onclick=function(){S=fresh();S.place=find(PLACES,e.dataset.pl);if(fixedDate(S.place))S.date=S.place.sdate;S.step=1;render()}});
  q("[data-qty]").forEach(function(e){e.onclick=function(){var id=e.dataset.qty,d=+e.dataset.dir,q=(S.qty[id]||0)+d;if(q<0||(d>0&&totalQty()>=MAXU))return;S.qty[id]=q;rebuild();S.date=null;S.time=null;S.sts=[];S.asg={};render(true)}});
  if(g("sim"))g("sim").onchange=function(){S.sim=this.checked;comb();S.date=null;S.time=null;S.sts=[];S.asg={};render(true)};
@@ -735,7 +748,7 @@ function pvHtml(){var c=(typeof SET!=="undefined"&&SET.ct)||{},tel=String(c.phon
  return '<div class="pv"><p>'+esc(nm)+' เป็นผู้ดูแลข้อมูลของคุณในระบบจองคิวนวดนี้</p>'+
   S2("เราเก็บข้อมูลอะไร",L(["ชื่อ เบอร์โทรศัพท์ และรูปโปรไฟล์ (ถ้าคุณเพิ่ม)","รายการจอง แต้มสะสม ข้อความแชต รีวิวที่คุณเขียน และร้านกับพนักงานที่คุณกดโปรด","ตำแหน่งโดยประมาณ เก็บเฉพาะเมื่อคุณกดอนุญาต"]))+
   S2("เราใช้ข้อมูลทำอะไร",L(["ให้คุณจองคิว ยกเลิก เลื่อนคิว และคุยกับร้านหรือพนักงาน","แสดงร้านที่อยู่ใกล้ และแจ้งเตือนเรื่องการจอง โปรโมชั่น หรือร้านใหม่ใกล้คุณ","คำนวณแต้มสะสม และตรวจสอบรีวิวที่ถูกแจ้ง"]))+
-  S2("ใครเห็นข้อมูลของคุณ",L(["ร้านและพนักงานที่คุณจอง เห็นชื่อ เบอร์โทร และรายละเอียดของการจองนั้น","รีวิวของคุณแสดงเฉพาะชื่อต้น","ผู้ดูแลของสมาคมเห็นข้อมูลเท่าที่จำเป็นต่อการดูแลระบบ","เราไม่ขายข้อมูลของคุณให้ใคร"]))+
+  S2("ใครเห็นข้อมูลของคุณ",L(["ร้านและพนักงานที่คุณจอง เห็นชื่อ เบอร์โทร และรายละเอียดของการจองนั้น","รีวิวของคุณแสดงเฉพาะชื่อต้น","ผู้ดูแลของสมาคมเห็นข้อมูลเท่าที่จำเป็นต่อการดูแลระบบ","เมื่อคุณกดเลือกจุดบนแผนที่หรือใช้ตำแหน่งของฉัน พิกัดนั้นจะถูกส่งไปยังบริการแผนที่ OpenStreetMap เพื่อหาชื่อสถานที่ โดยไม่ระบุชื่อหรือเบอร์ของคุณ","เราไม่ขายข้อมูลของคุณให้ใคร"]))+
   S2("เราเก็บนานแค่ไหน",L(["ชื่อและเบอร์โทรในรายการจองถูกลบหลังการใช้บริการผ่านไป 12 เดือน","ข้อความแชตถูกลบอัตโนมัติหลัง 90 วัน","เมื่อคุณลบบัญชี โปรไฟล์ รูป แต้มสะสม การแจ้งเตือน รายการโปรด และข้อความแชตที่คุณส่งจะถูกลบทันที รายการจองจะถูกล้างชื่อและเบอร์โทร","ข้อมูลอื่นเก็บไว้ตราบที่บัญชียังอยู่"]))+
   S2("สิทธิ์ของคุณ",L(["ปิดการใช้ตำแหน่งได้ทุกเมื่อ (ปุ่ม &quot;ไม่ใช้ตำแหน่ง&quot; หน้าเลือกร้าน)","ลบบัญชีและข้อมูลของคุณได้เองที่ปุ่ม &quot;ลบบัญชีของฉัน&quot; ในหน้าบัญชี (ต้องไม่มีการจองที่ยังไม่เสร็จสิ้น)","ขอดูหรือแก้ไขข้อมูลได้โดยติดต่อสมาคม"]))+
   S2("ติดต่อเรา",'<p>'+esc(nm)+(tel?' โทร '+esc(tel):' (เบอร์โทรดูได้ที่หน้าบัญชี หลังเข้าสู่ระบบ)')+'</p>')+'</div>'}
