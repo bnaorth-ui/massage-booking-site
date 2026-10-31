@@ -104,6 +104,7 @@ h1{font-size:1.4rem;margin:8px 0 4px}
 .insol{padding-left:26px;margin:8px 0 14px}.insol li{padding:7px 0;font-size:1.05rem}.insic{width:72px;height:72px;border-radius:16px;display:block;margin:6px 0 10px}.insst{list-style:none;margin:8px 0 14px;padding:0}.insst li{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:1.05rem}.insn{flex:none;width:26px;height:26px;border-radius:50%;background:var(--main);color:var(--main-ink);font-size:.9rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center}.insi{flex:none;width:36px;height:36px;border-radius:10px;background:var(--soft);color:var(--main);display:inline-flex;align-items:center;justify-content:center}.insi svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.insi svg .f{fill:currentColor;stroke:none}.insft{background:var(--soft);border-radius:14px;padding:12px 14px;margin:6px 0 14px}.insft h2{font-size:1.05rem;margin:0 0 6px}.insft ul{list-style:none;margin:0;padding:0}.insft li{display:flex;gap:10px;padding:4px 0;font-size:1rem}.insft li span:first-child{flex:none;width:1.6em;text-align:center}.insbt{margin:8px 0}.insbt .btn{margin-top:8px}.insmsg{min-height:1.4em;color:var(--main);font-size:.95rem;margin:4px 0}.insurl{word-break:break-all;color:var(--mute);font-size:.85rem;margin:4px 0 12px;user-select:all}
 .mpov{position:fixed;inset:0;z-index:60;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}.mpov header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--line)}.mpov header b{font-size:1.05rem}.mpx{font:inherit;min-width:44px;min-height:44px;border:2px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);cursor:pointer}.mpm{flex:1;min-height:200px;position:relative;background:var(--off)}.mpm .mpe{padding:16px;color:var(--mute)}.mpc{padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);display:grid;gap:8px;background:var(--bg)}.mpn{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.mpn button,.mpc .mpb{font:inherit;min-height:44px;min-width:44px;padding:6px 12px;border:2px solid var(--main);border-radius:10px;background:transparent;color:var(--main);cursor:pointer}.mpc .mpb.pri{background:var(--main);color:var(--main-ink)}.mpc input{font:inherit;min-height:44px;width:100%;border:2px solid var(--line);border-radius:10px;padding:6px 10px;background:var(--card);color:var(--ink)}.mpg{display:grid;grid-template-columns:1fr 1fr;gap:8px}.mpa{display:flex;gap:8px}.mpa .mpb{flex:1}.mpin{font-size:28px;line-height:30px;text-align:center;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}
 .seo{max-width:480px;margin:0 auto;padding:8px 16px 48px;border-top:1px solid var(--line);color:var(--ink)}.seo h2{font-size:1.25rem;margin:18px 0 8px}.seo h3{font-size:1.08rem;margin:18px 0 6px}.seo p,.seo li{line-height:1.7}.seo ul,.seo ol{padding-left:22px;margin:6px 0}.seo a{color:var(--main)}.seo[hidden]{display:none}
+.seoin{margin:0 0 14px}.seoin .seoh{font-size:1.15rem;font-weight:700;margin:0 0 4px}.seoin p{margin:0;color:var(--mute);font-size:.95rem;line-height:1.6}
 </style>
 </head>
 <body>
@@ -698,13 +699,12 @@ function insBt(){var u=insUrl().replace(/&/g,"&amp;").replace(/</g,"&lt;").repla
 function insBody(){var k=insKind(),h='<img class="insic" src="icon-192.png" alt=""><h1 id="inst" tabindex="-1">ติดตั้งแอปจองคิวนวด</h1>';
  if(INS.done||!k)return h+'<div class="flash" role="status">ติดตั้งแล้ว เปิดแอปจากหน้าจอโฮมได้เลย</div>';
  h+='<p class="sub">ติดตั้งไว้ที่หน้าจอโฮม เปิดได้เหมือนแอป และรับแจ้งเตือนเรื่องการจองได้</p>';
- h+=insFt();
  if(k==="android"){if(INS.ev)h+='<button type="button" class="btn wide" data-ins="go">ติดตั้งแอปไว้ที่หน้าจอโฮม</button>'+insSt([["","กดปุ่มด้านบน"],["inst","เมื่อมีหน้าต่างถาม ให้กด <b>ติดตั้ง</b>"],["ok","เปิดแอป &quot;จองคิวนวด&quot; จากหน้าจอโฮมได้เลย"]]);
   else h+=insSt([["dots","กดเมนู <b>⋮</b> มุมขวาบนของเบราว์เซอร์"],["inst","เลือก <b>ติดตั้งแอป</b> หรือ <b>เพิ่มลงในหน้าจอหลัก</b>"],["ok","กด <b>ติดตั้ง</b> แล้วเปิดแอป &quot;จองคิวนวด&quot; จากหน้าจอโฮม"]])}
  if(k==="app")h+='<p>หน้านี้เปิดอยู่ในแอปอื่น (เช่น LINE) ซึ่งติดตั้งไม่ได้ ให้ทำตามนี้</p>'+insBt()+insSt([["dots","กดเมนูมุมขวาบนของหน้านี้ (จุดสามจุด หรือปุ่มแชร์)"],["ext","เลือก <b>เปิดใน Chrome</b> หรือ <b>เปิดด้วยเบราว์เซอร์อื่น</b>"],["inst","เมื่อเปิดแล้ว กดปุ่ม <b>ติดตั้งแอปไว้ที่หน้าจอโฮม</b>"]]);
  if(k==="ios"||k==="ios-app"){if(k==="ios-app")h+='<p>หน้านี้เปิดอยู่ในแอปอื่น (เช่น LINE) ให้กดเมนูแล้วเลือก <b>เปิดใน Safari</b> ก่อน แล้วทำตามขั้นตอนนี้</p>'+insBt();
   h+=insSt([["share","กดปุ่ม <b>แชร์</b> (รูปสี่เหลี่ยมมีลูกศรชี้ขึ้น) ที่แถบด้านล่างของ Safari"],["add","เลื่อนหาและเลือก <b>เพิ่มไปยังหน้าจอโฮม</b>"],["ok","กด <b>เพิ่ม</b> ที่มุมขวาบน แล้วเปิดแอปจากหน้าจอโฮม"]])+'<p class="hint">ต้องติดตั้งไว้ที่หน้าจอโฮมก่อน จึงจะรับแจ้งเตือนบน iPhone ได้</p>'}
- return h}
+ return h+insFt()}
 function insGo(){var e=INS.ev;if(!e)return;INS.ev=null;try{e.prompt();e.userChoice.then(function(r){if(r&&r.outcome==="accepted")INS.done=true;insRefresh()},function(){insRefresh()})}catch(x){insRefresh()}}
 function insRefresh(){if(!ME&&AU.step==="ins")authRender();else if(ME&&V.insp)render(true)}
 window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();INS.ev=e;insRefresh()});
@@ -790,13 +790,14 @@ function pvHtml(){var c=(typeof SET!=="undefined"&&SET.ct)||{},tel=String(c.phon
   S2("เราเก็บนานแค่ไหน",L(["ชื่อและเบอร์โทรในรายการจองถูกลบหลังการใช้บริการผ่านไป 12 เดือน","ข้อความแชตถูกลบอัตโนมัติหลัง 90 วัน","เมื่อคุณลบบัญชี โปรไฟล์ รูป แต้มสะสม การแจ้งเตือน รายการโปรด และข้อความแชตที่คุณส่งจะถูกลบทันที รายการจองจะถูกล้างชื่อและเบอร์โทร","ข้อมูลอื่นเก็บไว้ตราบที่บัญชียังอยู่"]))+
   S2("สิทธิ์ของคุณ",L(["ปิดการใช้ตำแหน่งได้ทุกเมื่อ (ปุ่ม &quot;ไม่ใช้ตำแหน่ง&quot; หน้าเลือกร้าน)","ลบบัญชีและข้อมูลของคุณได้เองที่ปุ่ม &quot;ลบบัญชีของฉัน&quot; ในหน้าบัญชี (ต้องไม่มีการจองที่ยังไม่เสร็จสิ้น)","ขอดูหรือแก้ไขข้อมูลได้โดยติดต่อสมาคม"]))+
   S2("ติดต่อเรา",'<p>'+esc(nm)+(tel?' โทร '+esc(tel):' (เบอร์โทรดูได้ที่หน้าบัญชี หลังเข้าสู่ระบบ)')+'</p>')+'</div>'}
+function seoIntro(){var sa=false;try{sa=!!((window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone)}catch(e){}return sa?"":'<div class="seoin"><h2 class="seoh">จองนวดออนไลน์ ร้านนวดใกล้ฉัน</h2><p>บริการโดยคนพิการทางการเห็น ผู้ให้บริการขึ้นทะเบียนกับกรมสนับสนุนบริการสุขภาพ กระทรวงสาธารณสุข</p></div>'}
 function seoSet(on){var s=document.getElementById("seo"),sa=false;try{sa=!!((window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone)}catch(e){}if(s)s.hidden=!on||sa}
 function authRender(){var tb=document.getElementById("tabs");if(tb)tb.style.display="none";
  var a=document.getElementById("app"),b=document.getElementById("bar"),h="",st=AU.step;b.innerHTML="";b.style.display="none";
  seoSet(AU.loading||st==="login"||st==="ins");
  if(AU.loading){a.innerHTML='<p class="sub" role="status">กำลังตรวจสอบการเข้าสู่ระบบ…</p>';return}
  if(st==="login"){
-  h='<h1>เข้าสู่ระบบ</h1><p class="sub">เข้าใช้งานด้วยเบอร์มือถือและรหัสผ่าน</p>'+(insKind()?'<button type="button" class="btn wide ghost" data-ag="ins" style="margin:0 0 12px">ติดตั้งแอป</button>':'')+(AU.ok?'<div class="flash" role="status">'+esc(AU.ok)+'</div>':'')+
+  h=seoIntro()+'<h1>เข้าสู่ระบบ</h1><p class="sub">เข้าใช้งานด้วยเบอร์มือถือและรหัสผ่าน</p>'+(insKind()?'<button type="button" class="btn wide ghost" data-ag="ins" style="margin:0 0 12px">ติดตั้งแอป</button>':'')+(AU.ok?'<div class="flash" role="status">'+esc(AU.ok)+'</div>':'')+
   '<form id="authf" novalidate>'+fld("lph","เบอร์มือถือ","tel",'inputmode="tel" autocomplete="tel" placeholder="เช่น 0812345678"')+fld("lpw","รหัสผ่าน","password",'autocomplete="current-password"')+
   '<p class="aerr" id="aerr" role="alert"></p><button class="btn wide" type="submit">เข้าสู่ระบบ</button></form>'+
   '<div class="alinks"><button class="lb" data-ag="fp">ลืมรหัสผ่าน</button><button class="lb" data-ag="reg">ลงทะเบียนสมาชิกใหม่</button><button class="lb" data-ag="pv">นโยบายความเป็นส่วนตัว</button>'+'</div>'}
@@ -809,7 +810,7 @@ function authRender(){var tb=document.getElementById("tabs");if(tb)tb.style.disp
   '<p class="aerr" id="aerr" role="alert"></p><button class="btn wide" type="submit">ลงทะเบียน</button></form>'+
   '<div class="alinks"><button class="lb" data-ag="login">มีบัญชีแล้ว? เข้าสู่ระบบ</button></div>'}
  if(st==="ins"){
-  h='<button type="button" class="btn ghost wide" data-ins="skip">ข้าม ใช้ต่อในเบราว์เซอร์</button>'+insBody()+'<button type="button" class="btn wide ghost" data-ins="skip" style="margin-top:8px">ไปหน้าเข้าสู่ระบบ</button>'}
+  h=seoIntro()+'<button type="button" class="btn ghost wide" data-ins="skip">ใช้งานต่อโดยไม่ติดตั้ง</button>'+insBody()+'<button type="button" class="btn wide ghost" data-ins="skip" style="margin-top:8px">ใช้งานต่อโดยไม่ติดตั้ง</button>'}
  if(st==="pv"){
   h='<div class="alinks"><button class="lb" data-ag="'+(AU.pvBack==="reg"?"reg":"login")+'">← กลับ</button></div><h1 id="pvt" tabindex="-1">นโยบายความเป็นส่วนตัว</h1>'+pvHtml()}
  if(st==="fp"){

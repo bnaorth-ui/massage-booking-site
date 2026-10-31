@@ -197,7 +197,7 @@ function insRefresh(){if(G.mode==="ins"&&!WHO)gRender()}
 window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();INS.ev=e;insRefresh()});
 window.addEventListener("appinstalled",function(){INS.done=true;wr("insSeen",true);insRefresh()});
 function gRender(){var h=gateTitle();
- if(G.mode==="ins"){box.innerHTML='<div style="margin-bottom:10px"><button type="button" class="btn g" data-g="insskip">ข้าม ใช้ต่อในเบราว์เซอร์</button></div><div class="card">'+insBody()+'<button type="button" class="btn g" data-g="insskip" style="width:100%;margin-top:8px">ไปหน้าเข้าสู่ระบบ</button></div>';if(!INS.fd){INS.fd=true;var ti=document.getElementById("inst");if(ti)ti.focus()}return}
+ if(G.mode==="ins"){box.innerHTML='<div style="margin-bottom:10px"><button type="button" class="btn g" data-g="insskip">ใช้งานต่อโดยไม่ติดตั้ง</button></div><div class="card">'+insBody()+'<button type="button" class="btn g" data-g="insskip" style="width:100%;margin-top:8px">ใช้งานต่อโดยไม่ติดตั้ง</button></div>';if(!INS.fd){INS.fd=true;var ti=document.getElementById("inst");if(ti)ti.focus()}return}
  if(G.mode==="load")h+='<p class="hint2" style="text-align:center" role="status">กำลังโหลดข้อมูลร้าน…</p>';
  else if(G.mode==="loaderr")h+='<div class="card form"><b>โหลดข้อมูลไม่สำเร็จ</b><div role="alert" style="color:var(--bad)">'+esc(G.err)+'</div><button type="button" class="btn" data-g="retry">ลองใหม่</button><button type="button" class="btn g" data-g="logout">ออกจากระบบ</button></div>';
  else if(G.mode==="in"){if(G.ok)h+='<div class="saved" role="status">'+esc(G.ok)+'</div>';
