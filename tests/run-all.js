@@ -6,10 +6,11 @@ const dir = path.resolve(process.argv[2] || __dirname), filter = process.argv[3]
 const jobs = +process.env.JOBS || 4, limit = +process.env.TIMEOUT_MS || 300000;
 const only = (process.env.ONLY || '').split(',').filter(Boolean);
 const files = fs.readdirSync(dir).filter(f => /^t_.*\.js$/.test(f) && f.includes(filter) && (!only.length || only.includes(f))).sort();
+const scratch = fs.mkdtempSync(path.join(require('os').tmpdir(), 'tests-run-')); // เทสต์เขียนภาพหน้าจอลงที่นี่ ไม่ปนใน repository
 const res = []; let next = 0, running = 0;
 function runOne(f) {
   return new Promise(done => {
-    const p = spawn('node', [path.join(dir, f)], { cwd: dir, env: process.env });
+    const p = spawn('node', [path.join(dir, f)], { cwd: scratch, env: process.env });
     let out = '', killed = false;
     const to = setTimeout(() => { killed = true; p.kill('SIGKILL'); }, limit);
     p.stdout.on('data', d => out += d); p.stderr.on('data', d => out += d);
