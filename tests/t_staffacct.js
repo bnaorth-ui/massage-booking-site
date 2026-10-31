@@ -1,6 +1,6 @@
 const {chromium}=require('playwright');
 const PNG=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==','base64');
-(async()=>{const b=await chromium.launch(require('../config').launch);
+(async()=>{const b=await chromium.launch(require('./config').launch);
 const ctx=await b.newContext({timezoneId:'Asia/Bangkok',locale:'th-TH'});const errs=[],calls=[],stor=[];
 const H7=7*3600000,bkDate=t=>new Date(t+H7).toISOString().slice(0,10);
 const todayS=bkDate(Date.now()),addD=(d,n)=>new Date(Date.parse(d+'T00:00:00Z')+n*86400000).toISOString().slice(0,10);
@@ -48,7 +48,7 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
  return J(404,{message:'nf '+path})});
 const p=await ctx.newPage();await p.setViewportSize({width:420,height:900});p.on('pageerror',e=>errs.push(e.message));p.on('dialog',d=>{errs.push('DIALOG '+d.message());d.dismiss()});
 const ok=(nm,c)=>console.log((c?'PASS ':'FAIL ')+nm);const txt=async s=>await p.textContent(s||'body');const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-await p.goto(require('../config').page('staff-app.html'));await sleep(300);
+await p.goto(require('./config').page('staff-app.html'));await sleep(300);
 ok('login gate shown',(await txt()).includes('เข้าสู่ระบบพนักงาน'));
 ok('nav hidden at gate',await p.$eval('#navb',e=>getComputedStyle(e).display)==='none');
 // bad password
@@ -59,9 +59,9 @@ await p.fill('#lph','0899999999');await p.fill('#lpw','nopass111');await p.click
 ok('non-staff -> denied',(await txt()).includes('ยังไม่ผูกกับพนักงาน'));
 await p.click('[data-ag=logout]');await sleep(400);
 // register path validation
-await p.click('[data-ag=reg]');await p.fill('#rfn','ใหม่');await p.fill('#rph','0877777777');await p.fill('#rpw','abc');await p.fill('#rpw2','abc');await p.click('#agf .btn');
+await p.click('[data-ag=reg]');await p.fill('#rfn','ใหม่');await p.fill('#rph','0877777777');await p.fill('#rpw','abc');await p.fill('#rpw2','abc');await p.click('#agf .btn[type=submit]');
 ok('reg short pw rejected',(await txt()).includes('อย่างน้อย 6'));
-await p.fill('#rph','0844444444');await p.fill('#rpw','abcdef');await p.fill('#rpw2','abcdef');await p.click('#agf .btn');await sleep(300);
+await p.fill('#rph','0844444444');await p.fill('#rpw','abcdef');await p.fill('#rpw2','abcdef');await p.check('#rpv');await p.click('#agf .btn[type=submit]');await sleep(500);
 ok('reg duplicate phone message',(await txt()).includes('เบอร์นี้มีบัญชีอยู่แล้ว'));
 ok('duplicate phone -> login page with phone prefilled',(await p.$('#lph'))&&(await p.inputValue('#lph'))==='0844444444');
 // real login
@@ -72,7 +72,7 @@ await p.click('#onsw',{force:true});await sleep(300);ok('accept switch off',(awa
 await p.click('#onsw',{force:true});await sleep(300);ok('accept switch on',(await txt('#hdr')).includes('เปิดรับงาน'));}
 
 const labs=await p.$$eval('#nav button',b=>b.map(x=>x.textContent.replace(/\d+$/,'').trim()));
-ok('4 bottom tabs ('+labs.join('|')+')',labs.join('|')==='🏠หน้าหลัก|📅ตารางงาน|🔔การแจ้งเตือน|👤บัญชี');
+ok('5 bottom tabs ('+labs.join('|')+')',labs.join('|')==='🏠หน้าหลัก|📅ตารางงาน|💰รายได้|🔔การแจ้งเตือน|👤บัญชี');
 ok('no <nav> landmark, no aria-current',(await p.$$('nav')).length===0&&(await p.$$('#navb [aria-current]')).length===0);
 ok('first tab active, h1 still คิวงาน',(await txt('#nav button.on')).includes('หน้าหลัก')&&(await p.textContent('h1'))==='คิวงาน');
 const bd=await p.$$eval('#navb .bdg',b=>b.map(x=>x.getAttribute('aria-label')));console.log('badges',JSON.stringify(bd));

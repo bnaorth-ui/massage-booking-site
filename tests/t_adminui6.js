@@ -166,7 +166,7 @@ await p.click('.spk[value=p2]');await p.click('[data-a=save]');ok('server confli
 await p.click('#tabs [data-id=pl]');await p.click('[data-a=tab][data-id=comp]');await p.click('[data-a=new][data-t=comp]');await p.fill('#on','บริษัทใหม่');await p.click('.spk >> nth=0');
 ok('weekday buttons appear',!!(await p.$('[data-a=sday]')));await p.click('[data-a=save]');ok('days required per staff',await has('เลือกวันที่ให้บริการของพนักงาน'));
 await p.click('[data-a=sday][data-d="1"]');await p.click('[data-a=sday][data-d="3"]');ok('name kept after weekday toggles',(await p.inputValue('#on'))==='บริษัทใหม่');
-await p.click('[data-a=save]');await has('บริษัทใหม่');const c2=T.places.find(x=>x.name==='บริษัทใหม่');
+await p.click('[data-a=save]');await has('บริษัทใหม่');await p.waitForTimeout(800);const c2=T.places.find(x=>x.name==='บริษัทใหม่');
 ok('company rpc with weekdays',c2&&c2.type==='company'&&c2.fixed_date===null&&T.place_staff.some(x=>x.place_id===c2.id&&x.weekdays.join()==='1,3'));
 ok('company list shows weekdays',(await txt('#lst')).includes('จ พ'));
 await p.click(`[data-a=tog][data-t=comp][data-id=${c2.id}]`);await wait(150);ok('toggle company',T.places.find(x=>x.id===c2.id).active===false);

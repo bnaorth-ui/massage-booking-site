@@ -1,9 +1,10 @@
+// RUN-ENV: FRESH=1
 const {chromium}=require('playwright');
 const bkk=(n=0)=>{const d=new Date(Date.now()+7*3600000+n*86400000);return d.toISOString().slice(0,10)};
-(async()=>{const b=await chromium.launch(require('../config').launch);
+(async()=>{const b=await chromium.launch(require('./config').launch);
 const ctx=await b.newContext({timezoneId:'Asia/Bangkok',locale:'th-TH'});const errs=[],calls=[];
-let mode={cat:true,rpcMissing:false};let PTS={on:true,baht_per:10,per_baht:10,min:100,expire_months:12,balance:450,next_expiry:new Date(Date.now()+30*86400000).toISOString(),next_expiry_points:100,history:[{kind:'earn',points:450,note:'ได้แต้มจากการใช้บริการ MS1',at:new Date().toISOString()}]};let lastCB=null;let seq=100000;const BKS=[];const NOTES=[];
-const UID='uuid-1';
+let mode={cat:true,rpcMissing:false,noRv:!!process.env.NORV};let PTS={on:true,baht_per:10,per_baht:10,min:100,expire_months:12,balance:450,next_expiry:new Date(Date.now()+30*86400000).toISOString(),next_expiry_points:100,history:[{kind:'earn',points:450,note:'ได้แต้มจากการใช้บริการ MS1',at:new Date().toISOString()}]};let lastCB=null;let MSGS=[{id:'m1',booking_id:'bid-MS1',room_key:'shop',sender_id:'shopuser',sender_role:'shop',sender_name:'ร้านสบายดี สปา',body:'ยินดีต้อนรับค่ะ',created_at:'2026-10-29T10:00:00.000000+00:00'}];let UNR=[{booking_id:'bid-MS1',room:'shop',n:1}];let marks=[];let sendErr=null;let seq=100000;const BKS=[];const NOTES=[];
+const UID='uuid-1';const REVD=[];const subs=[];let subErr=null;
 const places=[
  {id:'sh1',type:'shop',name:'ร้านสบายดี สปา',area:'สุขุมวิท',lat:13.76,lng:100.51,open_days:[0,1,2,3,4,5,6],open_time:'10:00:00',close_time:'21:00:00',fixed_date:null,advance_days:14,cancel_hours:24,image_path:null,status:'approved',active:true},
  {id:'og1',type:'org',name:'สำนักงานพัฒนาสังคม',area:'พญาไท',lat:13.758,lng:100.509,open_days:[0,1,2,3,4,5,6],open_time:'09:00:00',close_time:'17:00:00',fixed_date:bkk(3),advance_days:14,cancel_hours:24,image_path:null,status:'approved',active:true},
@@ -19,7 +20,7 @@ const promos=[{id:'pm1',place_id:'sh1',title:'ลดราคานวดเท�
 const pms=[{promotion_id:'pm1',service_id:'sb'}];
 const nm=id=>(staff.find(s=>s.id===id)||{}).name;
 const busyItems=()=>BKS.filter(x=>x.status==='confirmed').flatMap(x=>x.items.filter(i=>i.active));
-const fmt=b=>({ref:b.ref,place_id:b.place_id,place_name:b.place_name,place_type:b.place_type,cancel_hours:24,phone:b.phone,customer_name:'สมชาย ใจดี',starts_at:new Date(b.s).toISOString(),ends_at:new Date(b.e).toISOString(),total:b.total,discount:b.discount,promo:b.promo,status:b.status,moved_from:b.moved_from,moved_to:b.moved_to,points_used:b.pu||0,points_discount:b.pd||0,created_at:new Date().toISOString(),items:b.items.map(i=>({id:i.id,service_id:i.service_id,service_name:i.service_name,staff_id:i.staff_id,staff_name:nm(i.staff_id),minutes:i.minutes,price:i.price,starts_at:new Date(i.s).toISOString(),ends_at:new Date(i.e).toISOString(),active:i.active,job:i.job||'pending'}))});
+const fmt=b=>({ref:b.ref,place_id:b.place_id,place_name:b.place_name,place_type:b.place_type,cancel_hours:24,phone:b.phone,customer_name:'สมชาย ใจดี',starts_at:new Date(b.s).toISOString(),ends_at:new Date(b.e).toISOString(),total:b.total,discount:b.discount,promo:b.promo,status:b.status,moved_from:b.moved_from,moved_to:b.moved_to,id:'bid-'+b.ref,points_used:b.pu||0,points_discount:b.pd||0,created_at:new Date().toISOString(),items:b.items.map(i=>({id:i.id,service_id:i.service_id,service_name:i.service_name,staff_id:i.staff_id,staff_name:nm(i.staff_id),minutes:i.minutes,price:i.price,starts_at:new Date(i.s).toISOString(),ends_at:new Date(i.e).toISOString(),active:i.active,job:i.job||'pending'}))});
 await ctx.route('**/*supabase.co/**',async r=>{const q=r.request(),u=new URL(q.url()),m=q.method(),path=u.pathname,body=(()=>{try{return JSON.parse(q.postData()||'null')}catch(e){return null}})();
  calls.push({m,path,body,auth:q.headers()['authorization']||''});
  const J=(s,o)=>r.fulfill({status:s,contentType:'application/json',body:JSON.stringify(o)});
@@ -33,6 +34,14 @@ await ctx.route('**/*supabase.co/**',async r=>{const q=r.request(),u=new URL(q.u
  if(m==='GET'&&T[t]!==undefined)return J(200,T[t]);
  if(mode.rpcMissing&&path.startsWith('/rest/v1/rpc/'))return J(404,{code:'PGRST202',message:'Could not find the function public.'+path.split('/').pop()+' in the schema cache'});
  if(path==='/rest/v1/rpc/busy_slots'){const f=Date.parse(body.p_from),to=Date.parse(body.p_to);return J(200,busyItems().filter(i=>body.p_staff.includes(i.staff_id)&&i.s<to&&i.e>f).map(i=>({staff_id:i.staff_id,starts_at:new Date(i.s).toISOString(),ends_at:new Date(i.e).toISOString()})))}
+ if(path==='/rest/v1/rpc/chat_unread')return J(200,UNR);
+ if(path==='/rest/v1/rpc/chat_mark_read'){marks.push(body);UNR=UNR.filter(x=>!(x.booking_id===body.p_booking&&x.room===body.p_room));return J(204,null)}
+ if(path==='/rest/v1/rpc/chat_send'){if(sendErr)return J(400,{code:'P0001',message:sendErr});MSGS.push({id:'m'+(MSGS.length+1),booking_id:body.p_booking,room_key:body.p_room,sender_id:UID,sender_role:'user',sender_name:'สมชาย ใจดี',body:body.p_body,created_at:new Date().toISOString().replace('Z','000+00:00')});return J(200,'x')}
+ if(path==='/rest/v1/chat_messages'){const b=u.searchParams.get('booking_id').replace('eq.',''),r=u.searchParams.get('room_key').replace('eq.',''),gt=u.searchParams.get('created_at');let L=MSGS.filter(m=>m.booking_id===b&&m.room_key===r);if(gt)L=L.filter(m=>m.created_at>gt.replace('gt.',''));return J(200,L)}
+ if(path==='/rest/v1/rpc/place_ratings'){if(mode.noRv)return J(404,{code:'PGRST202',message:'Could not find the function'});return J(200,[{place_id:'sh1',avg_rating:process.env.FRESH?4.6:4.6,fresh:!!process.env.FRESH}])}
+ if(path==='/rest/v1/reviews'&&m==='GET')return J(200,REVD.map(x=>({booking_id:x})));
+ if(path==='/rest/v1/rpc/submit_review'){subs.push(body);if(subErr)return J(400,{code:'P0001',message:subErr});REVD.push(body.p_booking);return J(200,'rid')}
+ if(path==='/rest/v1/rpc/place_reviews'){const off=body.p_offset;const all=Array.from({length:13},(_,i)=>({id:'r'+i,first:'คุณ'+i,rating:5-(i%3),comment:i===0?'บริการดีมาก':'',reply:i===0?'ขอบคุณค่ะ':null,at:new Date(Date.now()-i*86400000).toISOString()}));return J(200,{n:13,avg:4.6,items:all.slice(off,off+10),more:off+10<13})}
  if(path==='/rest/v1/rpc/my_points')return J(200,PTS);
  if(path==='/rest/v1/rpc/my_bookings')return J(200,BKS.slice().sort((a,b)=>b.s-a.s).map(fmt));
  if(path==='/rest/v1/rpc/cancel_booking'){const b=BKS.find(x=>x.ref===body.p_ref);if(Date.now()>b.s-24*3600000)return J(400,{code:'P0001',message:'ยกเลิกไม่ได้ เกินเวลาที่ยกเลิกได้'});b.status='cancelled';b.items.forEach(i=>i.active=false);return r.fulfill({status:204,body:''})}
@@ -54,34 +63,17 @@ await ctx.route('**/*supabase.co/**',async r=>{const q=r.request(),u=new URL(q.u
 const p=await ctx.newPage();p.on('pageerror',e=>errs.push(e.message));p.on('dialog',d=>{errs.push('DIALOG '+d.message());d.dismiss()});
 const store=[];await ctx.route('**/storage/v1/object/avatars/**',r=>{store.push({m:r.request().method(),u:new URL(r.request().url()).pathname,auth:r.request().headers()['authorization']||''});r.fulfill({status:200,contentType:'application/json',body:'{}'})});
 const patches=[];await ctx.route('**/rest/v1/profiles?id=eq.*',async r=>{if(r.request().method()==='PATCH'){patches.push(JSON.parse(r.request().postData()||'{}'));return r.fulfill({status:204,body:''})}return r.fallback()});
-await p.goto(require('../config').page('customer-booking.html'));
+await p.goto(require('./config').page('customer-booking.html'));
 const A=async()=>await p.textContent('#app');const home=async()=>{if(await p.$('#home'))await p.click('#home');if(await p.$('#again'))await p.click('#again')};const ok=(n,c)=>console.log((c?'PASS ':'FAIL ')+n);
 const H=3600000,mk=(ref,off,st,job)=>({ref,place_id:'sh1',place_name:'ร้านสบายดี สปา',place_type:'shop',phone:'0811111111',s:Date.now()+off*H,e:Date.now()+off*H+H,total:400,discount:0,promo:null,status:st,moved_from:null,moved_to:null,items:[{id:'it'+ref,service_id:'v1',service_name:'นวดไทย',staff_id:'st1',minutes:60,price:400,s:Date.now()+off*H,e:Date.now()+off*H+H,active:st==='confirmed',job:job||'pending'}]});
 BKS.push(mk('MS1',72,'confirmed'),mk('MS2',-48,'confirmed','done'),mk('MS3',96,'cancelled'),mk('MS4',120,'rescheduled'),mk('MS5',-72,'completed','done'));
 
 await p.fill('#lph','0811111111');await p.fill('#lpw','abc123');await p.click('button[type=submit]');await p.waitForSelector('[data-pl]',{timeout:4000});
 
-// account card
-await p.click('[data-tab="ac"]');await p.waitForTimeout(300);
-let t=await A();ok('points card shows 450',t.includes('แต้มสะสม')&&t.includes('450'));ok('redeem value 45 baht',t.includes('45 บาท'));ok('expiry line',t.includes('แต้มที่จะหมดอายุก่อน 100'));
-await p.click('#pthist');await p.waitForTimeout(200);ok('history shown',(await A()).includes('ได้รับ 450'));ok('aria-expanded true',(await p.getAttribute('#pthist','aria-expanded'))==='true');
-PTS.balance=60;await p.click('[data-tab=""]');await p.waitForTimeout(200);await p.click('[data-tab="ac"]');await p.waitForTimeout(500);t=await A();ok('below min sentence',t.includes('อีก 40 แต้ม'));
-PTS.balance=450;await p.click('[data-tab="bk"]').catch(()=>{});await p.click('[data-tab="ac"]');await p.waitForTimeout(500);
-// booking flow
-async function toStep4(){await p.click('[data-tab=""]');for(let i=0;i<5&&!(await p.$('[data-pl]'));i++){await p.click('#back');await p.waitForTimeout(150)}await p.waitForSelector('[data-pl]');
- await p.click('[data-pl="sh1"]');await p.waitForSelector('[data-qty]');await p.click('[data-qty]:not([disabled]) >> nth=0');await p.click('#next');await p.waitForSelector('#selT');await p.waitForTimeout(500);
- await p.selectOption('#selD',await p.$eval('#selD',e=>e.options[2].value));await p.waitForTimeout(400);await p.selectOption('#selT','900');await p.waitForTimeout(400);
- await p.click('[data-st]');await p.waitForTimeout(200);await p.click('#next');await p.waitForSelector('#ph');}
-await toStep4();
-t=await A();ok('step4 has points box',t.includes('ใช้แต้มสะสมเป็นส่วนลด'));ok('no select before tick',!(await p.$('#ptsamt')));
-await p.click('#ptson');await p.waitForTimeout(200);t=await A();ok('select shown',!!(await p.$('#ptsamt')));
-const opts=await p.$$eval('#ptsamt option',o=>o.map(x=>x.value));console.log('options',opts.join(','));ok('options 100..max 400',opts[0]==='100'&&opts[opts.length-1]==='400');
-// price 400 -> max by price = 400 points (40 baht)? balance 450, cap 400*10=4000 so max 450
-ok('max=450 (balance, multiple of 10)',opts[opts.length-1]==='450'||opts[opts.length-1]==='400');
-await p.selectOption('#ptsamt','200');await p.waitForTimeout(200);t=await A();ok('summary shows points row -20',t.includes('ใช้แต้มสะสม 200 แต้ม')&&t.includes('-20 บาท'));ok('total 380',/ราคารวม380 บาท/.test(t.replace(/\s/g,'')));
-ok('sentence before/after',t.includes('ราคาจาก 400 บาท เหลือ 380 บาท'));
-await p.fill('#ph','0811111111');await p.click('#ok');await p.waitForTimeout(900);
-ok('sent p_points=200',lastCB&&lastCB.p_points===200);t=await A();ok('final total 380 + points row',t.includes('380 บาท')&&t.includes('ใช้แต้มสะสม 200 แต้ม'));
-ok('final before-discount 400',t.includes('ราคาก่อนลด')&&t.includes('400 บาท'));
-await p.click('[data-tab="bk"]').catch(()=>{});
+
+
+if(!process.env.NORV)await p.waitForSelector('.tag.nw,.sc',{timeout:5000}).catch(()=>{});
+const t0=await A();
+if(process.env.NORV){ok('no review UI when part 23 missing',!t0.includes('ดูรีวิว')&&!t0.includes('ร้านใหม่')&&!!(await p.$('[data-pl]')));await p.click('[data-tab="bk"]');await p.click('[data-bt=hist]');await p.waitForTimeout(300);ok('no rate btn',(await p.$$('[data-rate]')).length===0)}
+else ok('fresh badge instead of score',t0.includes('ร้านใหม่')&&!t0.includes('คะแนน 4.6'));
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)})();

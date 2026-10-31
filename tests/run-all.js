@@ -10,7 +10,9 @@ const scratch = fs.mkdtempSync(path.join(require('os').tmpdir(), 'tests-run-'));
 const res = []; let next = 0, running = 0;
 function runOne(f) {
   return new Promise(done => {
-    const p = spawn('node', [path.join(dir, f)], { cwd: scratch, env: process.env });
+    const head = fs.readFileSync(path.join(dir, f), 'utf8').split('\n').slice(0, 5).join('\n');
+    const extra = {}; (head.match(/^\/\/ RUN-ENV: (.*)$/m) || [, ''])[1].split(/\s+/).filter(Boolean).forEach(kv => { const i = kv.indexOf('='); extra[kv.slice(0, i)] = kv.slice(i + 1); });
+    const p = spawn('node', [path.join(dir, f)], { cwd: scratch, env: Object.assign({}, process.env, extra) });
     let out = '', killed = false;
     const to = setTimeout(() => { killed = true; p.kill('SIGKILL'); }, limit);
     p.stdout.on('data', d => out += d); p.stderr.on('data', d => out += d);
