@@ -180,8 +180,8 @@ function insCopy(){var u=insUrl(),ok=function(){insMsg("คัดลอกลิ
 function insOpen(){var u=insUrl(),k=insKind();
  try{if(k==="ios-app")location.href="x-safari-"+u;else if(k==="app")location.href="intent://"+u.replace(/^https?:\/\//,"")+"#Intent;scheme="+(/^http:/.test(u)?"http":"https")+";package=com.android.chrome;end"}catch(x){}
  setTimeout(function(){insMsg("ถ้าไม่เปิด ให้กดปุ่มคัดลอกลิงก์ แล้วนำไปวางในเบราว์เซอร์")},1500)}
-function insBt(){var u=insUrl().replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");return '<div class="insbt"><button type="button" class="btn" style="width:100%" data-g="inscopy">คัดลอกลิงก์</button><button type="button" class="btn g" style="width:100%" data-g="insopen">ลองเปิดในเบราว์เซอร์</button></div><p class="insmsg" id="insmsg" role="status" aria-live="polite"></p><p class="insurl">'+u+'</p>'}
-function insBody(){var k=insKind(),h='<img class="insic" src="icon-192.png" alt=""><h1 id="inst" tabindex="-1" style="margin:0 0 8px">ติดตั้งแอปร้านค้า</h1>';
+function insBt(){var u=insUrl().replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");return '<div class="insbt"><button type="button" class="btn" style="width:100%" data-g="inscopy">คัดลอกลิงก์</button><button type="button" class="btn g" style="width:100%" data-g="insopen">ติดตั้งแอป</button></div><p class="insmsg" id="insmsg" role="status" aria-live="polite"></p><p class="insurl">'+u+'</p>'}
+function insBody(){var k=insKind(),h='<img class="insic" src="icon-192.png" alt=""><h1 id="inst" tabindex="-1" style="margin:0 0 8px">ติดตั้งแอปร้านนวด</h1>';
  if(INS.done||!k)return h+'<div class="flash" role="status">ติดตั้งแล้ว เปิดแอปจากหน้าจอโฮมได้เลย</div>';
  h+='<p class="hint2">ติดตั้งไว้ที่หน้าจอโฮม เปิดได้เหมือนแอป และรับแจ้งเตือนเรื่องการจองและยอดเงินได้</p>';
  h+=insFt();
