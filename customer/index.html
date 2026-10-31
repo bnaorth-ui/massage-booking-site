@@ -304,7 +304,7 @@ function autoWatch(){try{if(!navigator.geolocation)return;var ask=function(){nav
 function tabsRender(){var t=document.getElementById("tabs");if(!t)return;if(!ME||CAT.state!=="ok"){t.style.display="none";return}
  var u=unread(),up=allBk().filter(isUp).length,cur=S.view==="pv"?"ac":(S.view||""),T=[["","🏠","หน้าหลัก",0,""],["bk","📋","รายการ",up,"กำลังจะถึง "+up+" รายการ"],["nt","🔔","แจ้งเตือน",u,"ยังไม่ได้อ่าน "+u+" รายการ"],["ac","👤","บัญชี",0,""]];
  t.innerHTML="<div>"+T.map(function(x){return '<button type="button" data-tab="'+x[0]+'"'+(cur===x[0]?' class="on"':'')+'><span aria-hidden="true">'+x[1]+'</span><b>'+x[2]+'</b>'+(x[3]?'<i class="bdg'+(x[0]==="bk"?" b2":"")+'" aria-label="'+x[4]+'">'+x[3]+'</i>':'')+'</button>'}).join("")+"</div>";t.style.display="";
- t.querySelectorAll("[data-tab]").forEach(function(e){e.onclick=function(){var v=e.dataset.tab;V.del=false;V.pwc=false;V.pwok="";V.fvp=false;V.insp=false;RF=null;RL=null;V.rv=false;V.cfm=null;V.prevSeen=null;if(v){S.view=v;render();refreshUser()}else{S.view=null;V.flash="";if(S.step===5)S=fresh();render()}}})}
+ t.querySelectorAll("[data-tab]").forEach(function(e){e.onclick=function(){var v=e.dataset.tab;V.del=false;V.pwc=false;V.pwok="";V.fvp=false;V.insp=false;RF=null;RL=null;V.rv=false;V.cfm=null;V.prevSeen=null;var was=S.view;if(v){S.view=v;render();refreshUser()}else{S.view=null;V.flash="";if(S.step===5||(!was&&S.step>=1&&S.step<=4))S=fresh();render();window.scrollTo(0,0)}}})}
 function okUrl(u){return /^https?:\/\//i.test(u||"")}
 function ctHtml(){var c=SET.ct||{},tel=String(c.phone||"").replace(/[^0-9+]/g,""),h='<h2 class="stl">ติดต่อเรา</h2>';
  h+='<div class="ct"><b>'+esc(c.name||"สมาคมวิทยากรฝึกอาชีพคนตาบอด")+'</b>'+(c.addr?'<p>'+esc(c.addr)+'</p>':'')+'</div>';
