@@ -144,7 +144,7 @@ function pvBody(nm,tel){var L=function(a){return '<ul class="pvl">'+a.map(functi
   S2("ใครเห็นข้อมูลของร้าน",L(["ลูกค้าเห็นชื่อร้าน ที่ตั้ง บริการ ราคา โปรโมชั่น รีวิว และชื่อกับรูปของพนักงานที่ให้บริการ","แอดมินของสมาคมเห็นข้อมูลร้านเท่าที่จำเป็นต่อการดูแลระบบ รวมถึงใบอนุญาตและรายการเงิน","เราไม่ขายข้อมูลของร้านให้ใคร"]))+
   S2("หน้าที่ของร้านต่อข้อมูลลูกค้า",L(["ร้านเห็นชื่อและเบอร์โทรของลูกค้าเฉพาะการจองของร้านตัวเอง","ใช้เพื่อให้บริการและติดต่อเรื่องการจองนั้นเท่านั้น","ห้ามนำไปใช้ทำการตลาด เปิดเผยให้ผู้อื่น หรือคัดลอกเก็บไว้นอกระบบ","ร้านต้องแจ้งพนักงานของร้านให้ทราบและปฏิบัติตามด้วย"]))+
   S2("เราเก็บนานแค่ไหน",L(["ชื่อและเบอร์โทรของลูกค้าในรายการจองถูกลบหลังการใช้บริการผ่านไป 12 เดือน","ข้อความแชตถูกลบอัตโนมัติหลัง 90 วัน","รูปสลิปการโอนเก็บไม่เกิน 1 ปี แล้วถูกลบ","รายการเงิน (เติมเงิน ยอดกระเป๋าเงิน ค่า GP) เก็บไว้เพื่อการบัญชีตามที่สมาคมกำหนด","ข้อมูลอื่นเก็บไว้ตราบที่ร้านยังเปิดบัญชีอยู่"]))+
-  S2("การปิดบัญชีร้าน",L(["ร้านลบบัญชีเองในระบบไม่ได้ เพราะเกี่ยวข้องกับกระเป๋าเงินและยอดค้างชำระ","ถ้าต้องการปิดบัญชีให้ติดต่อสมาคม โดยต้องไม่มียอดค้างชำระและไม่มีการจองที่ยังไม่เสร็จสิ้น","เมื่อปิดบัญชี ร้านจะไม่แสดงให้ลูกค้าเห็น ข้อมูลทางการเงินเก็บตามที่ระบุข้างต้น"]))+
+  S2("การปิดบัญชีร้าน",L(["ร้านลบบัญชีเองทันทีไม่ได้ เพราะเกี่ยวข้องกับกระเป๋าเงินและยอดค้างชำระ","ขอปิดบัญชีได้ที่ ตั้งค่าร้าน > ปิดบัญชีร้าน แล้วสมาคมจะตรวจสอบและอนุมัติ โดยต้องไม่มียอดค้างชำระและไม่มีการจองที่ยังไม่เสร็จสิ้น","เมื่อปิดบัญชี ร้านจะไม่แสดงให้ลูกค้าเห็น ข้อมูลทางการเงินเก็บตามที่ระบุข้างต้น"]))+
   S2("สิทธิ์ของร้าน",L(["ดูและแก้ไขข้อมูลร้านได้เองในหน้า &quot;ตั้งค่าร้าน&quot; ส่วนข้อมูลที่แก้เองไม่ได้ (เช่น เบอร์มือถือเข้าสู่ระบบ) ติดต่อสมาคม","ขอให้ลบหรือแก้ไขข้อมูลอื่นได้โดยติดต่อสมาคม"]))+
   S2("ติดต่อเรา",'<p>'+esc(nm)+(tel?' โทร '+esc(tel):' (เบอร์โทรดูได้หลังเข้าสู่ระบบ)')+'</p>')+'</div>'}
 function ctLoad(){if(G.ct===undefined&&!G.ctL){G.ctL=true;sbReq("/rest/v1/rpc/public_contact",{method:"POST",json:1,auth:false,body:"{}"}).then(function(j){G.ct=j||null},function(){G.ct=null}).then(function(){G.ctL=false;if(G.mode==="forgot"||G.mode==="pv")gRender()})}}
@@ -280,7 +280,7 @@ function byId(a,id){return a.filter(function(x){return x.id===id})[0]}
 function num(id,l,v,ph){return '<div><label for="'+id+'">'+l+'</label><input class="in" id="'+id+'" type="number" inputmode="numeric" value="'+(v==null?"":v)+'"'+(ph!=null?' placeholder="'+ph+'"':"")+'></div>'}
 function svcNames(ids){var n=(ids||[]).map(function(i){var v=byId(D.svc,i);return v&&v.name}).filter(Boolean);return n.length?n.join(", "):"ยังไม่ได้เลือกบริการ"}
 function avatar(sz){var s=D.shop;return '<span class="av" style="width:'+sz+'px;height:'+sz+'px;font-size:'+Math.round(sz*.45)+'px" aria-hidden="true">'+(s.img?'<img loading="lazy" decoding="async" alt="" src="'+s.img+'">':esc((s.name||"ร").trim().charAt(0)))+'</span>'}
-function drawHeader(){var s=D.shop;document.getElementById("hdr").innerHTML='<div class="hav">'+avatar(72)+'</div><div class="hn"><b>'+esc(s.name)+'</b><small>'+(s.on?"เปิดรับจอง":"ปิดชั่วคราว")+'</small></div><button class="sw'+(s.on?" on":"")+'" role="switch" aria-checked="'+(s.on?"true":"false")+'" aria-label="เปิดหรือปิดร้านชั่วคราว" data-a="toggle"><span></span></button>'+(s.on||s.autoClosed?"":'<p class="closed">ร้านปิดรับจองชั่วคราว ลูกค้าจะไม่เห็นร้านนี้ในหน้าจอง</p>')+walletBanner()+(S.hmsg?'<p class="closed" role="alert">'+esc(S.hmsg)+'</p>':'')}
+function drawHeader(){var s=D.shop;document.getElementById("hdr").innerHTML='<div class="hav">'+avatar(72)+'</div><div class="hn"><b>'+esc(s.name)+'</b><small>'+(s.closedAt?"ปิดบัญชีแล้ว":s.on?"เปิดรับจอง":"ปิดชั่วคราว")+'</small></div>'+(s.closedAt?"":'<button class="sw'+(s.on?" on":"")+'" role="switch" aria-checked="'+(s.on?"true":"false")+'" aria-label="เปิดหรือปิดร้านชั่วคราว" data-a="toggle"><span></span></button>')+(s.closedAt?'<p class="closed">ร้านปิดบัญชีแล้ว ลูกค้าจะไม่เห็นร้านนี้ หากต้องการเปิดกลับ กรุณาติดต่อสมาคม</p>':s.on||s.autoClosed?"":'<p class="closed">ร้านปิดรับจองชั่วคราว ลูกค้าจะไม่เห็นร้านนี้ในหน้าจอง</p>')+walletBanner()+(S.hmsg?'<p class="closed" role="alert">'+esc(S.hmsg)+'</p>':'')}
 function walletBanner(){var b=balance(),lv=warnLv(),o=owed();
  if(D.shop.autoClosed||o>0)return'<p class="closed">ร้านถูกปิดชั่วคราวอัตโนมัติ เพราะยอดกระเป๋าเงินไม่พอหักค่า GP'+(o>0?' (ค้างชำระ '+baht(o)+')':'')+' เติมเงินแล้วระบบเปิดร้านให้อัตโนมัติ</p>';
  if(b<lv[1])return'<p class="closed">ยอดกระเป๋าเงินเหลือต่ำกว่า '+baht(lv[1])+' ใกล้ถูกปิดร้านชั่วคราว กรุณาเติมเงิน</p>';
@@ -556,11 +556,26 @@ function walletMsg(){var b=balance(),lv=warnLv(),o=owed(),m="";
  else if(b<lv[0])m='ยอดเหลือต่ำกว่า '+baht(lv[0])+' ควรเติมเงิน';
  return m?'<small><b style="font-size:1rem">'+m+'</b></small>':''}
 function tpPanel(x){var pi=ppInfo();return '<div class="card form"><b>โอนเงินผ่านพร้อมเพย์ '+baht(x.amt)+'</b>'+(pi.on?'<div id="qrbox" class="qrbox" role="img" aria-label="QR พร้อมเพย์ ยอด '+x.amt+' บาท"></div><div class="acts"><button class="btn g" type="button" data-a="qrsave" data-id="'+x.id+'">บันทึก QR ลงโทรศัพท์</button></div><div id="qrmsg" class="hint2" role="status"></div><div class="ppinfo"><small>พร้อมเพย์ ('+esc(ppTypeName(pi.type))+')</small><b>'+esc(pi.id)+'</b><small>ชื่อบัญชี '+esc(pi.name||"-")+'</small><small>ยอดที่ต้องโอน <b>'+baht(x.amt)+'</b></small><small>รหัสอ้างอิง <b>'+esc(x.ref)+'</b> (ใส่ในบันทึกช่วยจำตอนโอน)</small></div>':'<p class="hint2" style="margin:0;color:var(--bad)">ตอนนี้สมาคมปิดรับเติมเงินชั่วคราว</p>')+'<div class="slipbox"><label for="slipf">แนบสลิปการโอนเงิน แล้วกดส่งให้แอดมิน</label>'+(x.slipPath?'<div class="slipsent"><div id="slipcur"><small>กำลังโหลดสลิป...</small></div><small>ส่งสลิปให้แอดมินแล้ว'+(x.slipAt?', '+fmtAt(x.slipAt):'')+' (แนบใหม่เพื่อแทนที่ได้)</small></div>':'')+'<input type="file" id="slipf" accept="image/*"><div id="slipprev">'+(S.slipDraft?'<img loading="lazy" decoding="async" class="slipth" src="'+S.slipDraft+'" alt="สลิปที่เลือก">':'')+'</div><div class="acts"><button class="btn" id="slipsend" data-a="slipsend" data-id="'+x.id+'"'+(S.slipDraft?'':' disabled')+'>'+(S.slipAsk?'ยืนยันส่งสลิปให้แอดมิน':'ส่งสลิปให้แอดมิน')+'</button>'+(S.slipAsk?'<button class="btn g" type="button" data-a="slipno">ยกเลิก</button>':'')+'</div>'+(S.slipAsk?'<p class="hint2" style="margin:6px 0 0;color:var(--main)">ตรวจสอบรูปสลิปและยอดโอนให้ถูกต้อง แล้วกดยืนยัน ระบบจะแจ้งเตือนไปยังแอดมินเพื่ออนุมัติการเติมเงิน</p>':'')+'<div id="slipmsg" class="hint2" role="status">'+esc(S.slipMsg||"")+'</div></div><p class="hint2" style="margin:0">โอนแล้วรอแอดมินตรวจสอบยอดเข้าบัญชีและกดยืนยัน ยอดจะเข้ากระเป๋าเงินให้อัตโนมัติ ไม่ต้องกดอะไรเพิ่ม</p><div class="acts"><button class="btn g" data-a="tpclose">ปิด</button><button class="btn g" data-a="tpcancel" data-id="'+x.id+'">ยกเลิกรายการ</button></div></div>'}
+function clsCard(){var s=D.shop,c=D.cls,h='<div class="card form"><b>ปิดบัญชีร้าน</b>';
+ if(s.closedAt)return h+'<p class="hint2" style="margin:0">ร้านนี้ปิดบัญชีแล้ว ลูกค้าไม่เห็นร้าน ข้อมูลการจอง รีวิว และรายการเงินยังเก็บไว้ทำรายงาน หากต้องการเปิดกลับให้ติดต่อสมาคม</p></div>';
+ if(D.clsOff||!c)return h+'<p class="hint2" style="margin:0">ถ้าต้องการปิดบัญชีร้าน ให้ติดต่อสมาคม โดยต้องไม่มียอดค้างชำระและไม่มีการจองที่ยังไม่เสร็จสิ้น</p></div>';
+ var msg=S.clmsg?'<div class="'+(S.clok?"saved":"closed")+'" role="'+(S.clok?"status":"alert")+'">'+esc(S.clmsg)+'</div>':"";
+ if(c.status==="pending")return h+msg+'<p class="hint2" style="margin:0 0 8px">ส่งคำขอปิดบัญชีแล้ว รอสมาคมตรวจสอบและอนุมัติ ระหว่างนี้ร้านยังใช้งานตามปกติ</p><button type="button" class="btn g" data-a="clscancel">ยกเลิกคำขอ</button></div>';
+ var bal=+c.balance||0,bl=[];
+ if(c.open_bookings>0)bl.push("ยังมีการจองที่ยังไม่เสร็จสิ้น "+c.open_bookings+" คิว");
+ if(bal<0)bl.push("ยังมียอดค้างชำระ "+baht(-bal));
+ if(c.pending_topups>0)bl.push("มีคำขอเติมเงินที่รอสมาคมยืนยัน "+c.pending_topups+" รายการ");
+ return h+msg+'<p class="hint2" style="margin:0 0 8px">ขอปิดบัญชีได้เมื่อไม่มียอดค้างชำระและไม่มีการจองที่ยังไม่เสร็จสิ้น เมื่อสมาคมอนุมัติ ร้านจะไม่แสดงให้ลูกค้าเห็น ข้อมูลการจอง รีวิว และรายการเงินยังเก็บไว้ทำรายงาน</p>'+
+  (c.status==="rejected"?'<p style="color:var(--bad);margin:0 0 8px">คำขอครั้งก่อนไม่ได้รับการอนุมัติ'+(c.note?': '+esc(c.note):'')+'</p>':'')+
+  '<p class="hint2" style="margin:0 0 8px">ยอดกระเป๋าเงินตอนนี้ '+baht(bal)+(bal>0?' (ยอดคงเหลือจัดการกับสมาคมก่อนปิดบัญชี)':'')+'</p>'+
+  (bl.length?'<p style="color:var(--bad);margin:0 0 8px">ขอปิดบัญชีไม่ได้ในตอนนี้: '+bl.map(esc).join(", ")+'</p>':'')+
+  '<div><label for="clr">เหตุผล (ไม่บังคับ)</label><input class="in" id="clr" maxlength="200"></div>'+
+  '<button type="button" class="btn d" id="clsask" data-a="clsask"'+(bl.length?" disabled":"")+'>ขอปิดบัญชีร้าน</button></div>'}
 function setView(){var s=D.shop,o=s.ov||{};
  return '<div class="head"><h1>ตั้งค่าร้าน</h1></div>'+(S.saved?'<div class="saved" role="status">บันทึกการตั้งค่าแล้ว</div>':'')+
  '<div class="card form"><b>ข้อมูลร้าน</b><div><label for="s1">ชื่อร้าน</label><input class="in" id="s1" value="'+esc(s.name)+'"></div><div><label for="s2">คำอธิบายร้าน (ไม่บังคับ)</label><input class="in" id="s2" value="'+esc(s.desc||"")+'"></div><div><label for="s5">พื้นที่/ที่ตั้ง (เช่น เขต อำเภอ)</label><input class="in" id="s5" value="'+esc(s.area||"")+'"></div><div><label for="pimg">รูปโปรไฟล์ร้าน</label><div class="pimgrow"><span id="imgprev">'+avatar(56)+'</span><input class="in" type="file" id="pimg" accept="image/*"></div><p class="hint2" style="margin:6px 0 0">ระบบครอปเป็นรูปสี่เหลี่ยมจัตุรัสและย่อขนาดให้อัตโนมัติ รูปจะเปลี่ยนทันทีที่เลือก</p><div id="imgerr" style="color:var(--bad)"></div></div></div>'+
  '<div class="card form"><b>เวลาทำการ</b><div><label>วันที่เปิดให้บริการ</label><div class="dchk">'+DAYN.map(function(n,i){return '<label><input type="checkbox" class="fd" value="'+i+'"'+(s.days.indexOf(i)>-1?" checked":"")+'> '+n+'</label>'}).join("")+'</div></div><div class="two"><div><label for="s3">เวลาเปิด</label><select class="in" id="s3">'+hsel(s.open)+'</select></div><div><label for="s4">เวลาปิด</label><select class="in" id="s4">'+hsel(s.close)+'</select></div></div></div>'+
- loginCard()+pwCard()+pinHtml(s)+
+ loginCard()+pwCard()+pinHtml(s)+clsCard()+
  '<div class="card form"><b>กฎการจองของร้าน</b><p class="hint2" style="margin:0">เว้นว่าง = ใช้ค่าเริ่มต้นของสมาคม (ตัวเลขจางๆ คือค่าเริ่มต้น)</p><div class="two">'+num("r2","จองล่วงหน้า (วัน)",o.adv,DEF.adv)+num("r3","ยกเลิกก่อนนัด (ชม.)",o.cancelH,DEF.cancelH)+'</div></div>'+
  '<div id="err" style="color:var(--bad);margin-bottom:10px"></div><button class="btn w" data-a="setsave">บันทึกการตั้งค่า</button><div style="margin-top:18px"><button class="btn g" data-a="logout">ออกจากระบบ</button></div>'}
 /* ===================== ข้อมูลร้าน (โหลดจาก Supabase) ===================== */
@@ -568,7 +583,7 @@ var D=null,WID=null,CFG={pp:{on:false,none:true},w1:100,w2:50},CT={},started=fal
 var DEF={adv:14,cancelH:24};
 function tmin(t){var p=String(t||"0:0").split(":");return (+p[0])*60+(+p[1]||0)}
 function hm(h){return String(h).padStart(2,"0")+":00"}
-function mapPlace(p){return{placeId:p.id,gp:p.gp_percent==null?10:+p.gp_percent,name:p.name,img:pubUrl(p.image_path),imgPath:p.image_path||null,desc:p.description||"",area:p.area||"",on:p.active?1:0,autoClosed:!!p.auto_closed,days:(p.open_days||[]).map(Number),open:Math.round(tmin(p.open_time)/60),close:Math.round(tmin(p.close_time)/60)||24,lat:p.lat,lng:p.lng,adv:p.advance_days,cancelH:p.cancel_hours,ov:{adv:p.advance_days,cancelH:p.cancel_hours}}}
+function mapPlace(p){return{placeId:p.id,gp:p.gp_percent==null?10:+p.gp_percent,name:p.name,img:pubUrl(p.image_path),imgPath:p.image_path||null,desc:p.description||"",area:p.area||"",on:p.active?1:0,autoClosed:!!p.auto_closed,closedAt:p.closed_at||null,days:(p.open_days||[]).map(Number),open:Math.round(tmin(p.open_time)/60),close:Math.round(tmin(p.close_time)/60)||24,lat:p.lat,lng:p.lng,adv:p.advance_days,cancelH:p.cancel_hours,ov:{adv:p.advance_days,cancelH:p.cancel_hours}}}
 function mapSvc(x){return{id:x.id,name:x.name,min:x.minutes,price:+x.price,desc:x.description||"",on:x.active?1:0,img:pubUrl(x.image_path),imgPath:x.image_path||null}}
 function mapStaff(x){return{id:x.id,name:x.name,phone:x.phone||"",img:pubUrl(x.photo_path),imgPath:x.photo_path||null,on:x.active?1:0,linked:!!x.user_id,svcs:(x.staff_services||[]).map(function(q){return q.service_id})}}
 function mapPromo(x){return{id:x.id,title:x.title,desc:x.description||"",type:x.type==="amount"?"baht":"percent",value:+x.value,all:!!x.applies_all,svcs:(x.promotion_services||[]).map(function(q){return q.service_id}),start:x.start_date,end:x.end_date,on:x.active?1:0,img:pubUrl(x.image_path),imgPath:x.image_path||null}}
@@ -577,14 +592,15 @@ function loadCatalog(){var pid=WID;
  return Promise.all([g1("places?select=*&id=eq."+pid),g1("services?select=*&place_id=eq."+pid+"&order=created_at"),g1("staff?select=*,staff_services(service_id)&place_id=eq."+pid+"&order=created_at"),g1("promotions?select=*,promotion_services(service_id)&place_id=eq."+pid+"&order=created_at")]).then(function(r){
   if(!r[0]||!r[0][0])throw new Error("ไม่พบข้อมูลร้าน");
   D.shop=mapPlace(r[0][0]);D.svc=r[1].map(mapSvc);D.staff=r[2].filter(function(x){return !(x.phone==null&&!x.active&&x.name==="พนักงานที่ออกจากระบบ")}).map(mapStaff);D.promo=r[3].map(mapPromo)}).then(function(){return Promise.all([loadRates(),loadSdr()])})}
+function loadCls(){return rpc("shop_close_status",{p_place:WID}).then(function(a){D.cls=a||null;D.clsOff=false},function(){D.cls=null;D.clsOff=true})}
 function loadSdr(){return rpc("shop_staff_delete_requests",{p_place:WID}).then(function(a){D.sdr=a||[];D.sdrOff=false},function(){D.sdr=[];D.sdrOff=true})}
 function annRead(){return rd("shopAnnRead_"+WHO.id,[])}
 function loadBk(){var pid=WID,from=new Date(Date.now()-30*864e5).toISOString();
  return g1("bookings?select=id,ref,customer_name,phone,status,starts_at,ends_at,total_price,promo_title,moved_to,created_at,booking_items(id,service_name,minutes,price,starts_at,ends_at,active,job,staff_id)&place_id=eq."+pid+"&ends_at=gte."+from+"&order=starts_at.asc&limit=500").then(function(r){D.bk=r||[]},function(){})}
-function loadLive(){return Promise.all([loadLive0(),loadBk(),loadChatUnread()])}
+function loadLive(){return Promise.all([loadLive0(),loadBk(),loadChatUnread(),loadCls()])}
 function loadLive0(){var pid=WID;
  return Promise.all([D.shop?g1("places?select=*&id=eq."+pid):Promise.resolve([]),g1("wallet_tx?select=*&place_id=eq."+pid+"&order=created_at.desc&limit=300"),g1("topup_requests?select=*&place_id=eq."+pid+"&order=created_at.desc&limit=100"),g1("notifications?select=*&audience=eq.shop&place_id=eq."+pid+"&order=created_at.desc&limit=100"),g1("notification_reads?select=notification_id&limit=1000"),g1("announcements?select=*&active=eq.true&order=created_at.desc&limit=50"),g1("app_settings?select=*&limit=1")]).then(function(r){
-  if(r[0]&&r[0][0]&&D.shop){var sh=mapPlace(r[0][0]);["gp","on","autoClosed"].forEach(function(k){D.shop[k]=sh[k]})}
+  if(r[0]&&r[0][0]&&D.shop){var sh=mapPlace(r[0][0]);["gp","on","autoClosed","closedAt"].forEach(function(k){D.shop[k]=sh[k]})}
   var tx=[];
   r[1].forEach(function(w){tx.push({id:w.id,type:w.type,amt:+w.amount,note:w.note,at:w.created_at,ref:w.ref||"",st:w.status==="success"?"สำเร็จ":w.status==="pending"?"รอยืนยัน":"ยกเลิก"})});
   r[2].forEach(function(q){if(q.status==="confirmed")return;tx.push({id:q.id,rid:q.id,type:"topup",amt:+q.amount,ref:q.ref,note:"เติมเงินผ่านพร้อมเพย์ (อ้างอิง "+q.ref+")",at:q.created_at,st:q.status==="pending"?"รอยืนยัน":q.status==="rejected"?"ปฏิเสธ":"ยกเลิก",slipPath:q.slip_path||null,slipAt:q.slip_at||null})});
@@ -695,6 +711,7 @@ document.addEventListener("click",function(e){
  var el=e.target.closest("[data-a]");if(!el||!D)return;
  var a=el.dataset.a,id=el.dataset.id,t=el.dataset.t,g=function(i){return document.getElementById(i)},L=({svc:D.svc,staff:D.staff,promo:D.promo})[t];
  if(S.busy)return;
+ if(a!=="clsask"&&S.clc){S.clc=0;var cb=document.getElementById("clsask");if(cb)cb.textContent="ขอปิดบัญชีร้าน"}
  if(a==="toggle"){if(!D.shop.on&&D.shop.autoClosed){S.hmsg="เปิดร้านไม่ได้ เพราะยอดกระเป๋าเงินไม่พอหักค่า GP"+(owed()>0?" (ค้างชำระ "+baht(owed())+")":"")+" เติมเงินแล้วระบบเปิดให้อัตโนมัติ";drawHeader();return}
   var nv=D.shop.on?0:1;act(function(){return patch("places",WID,{active:!!nv})},function(){D.shop.on=nv});return}
  if(a==="geo"){var ps=g("pinst");
@@ -764,6 +781,10 @@ document.addEventListener("click",function(e){
  if(a==="logout"){doLogout();return}
  if(a==="pwsave"){pwChange();return}
  if(a==="sharesave"){shareSave();return}
+ if(a==="clsask"){if(S.clc!==1){S.clc=1;el.textContent="กดอีกครั้งเพื่อยืนยันขอปิดบัญชี";return}
+  S.clc=0;var rs=val("clr").trim();S.clmsg="";
+  act(function(){return rpc("shop_request_close",{p_place:WID,p_reason:rs||null}).then(loadCls)},function(){S.clmsg="ส่งคำขอปิดบัญชีแล้ว รอสมาคมตรวจสอบ";S.clok=true});return}
+ if(a==="clscancel"){act(function(){return rpc("shop_cancel_close",{p_place:WID}).then(loadCls)},function(){S.clmsg="ยกเลิกคำขอปิดบัญชีแล้ว";S.clok=true});return}
  if(a==="sdrx"){S.sdc=null;S.sdn=null;draw();return}
  if(a==="sdrok"){if(S.sdc!==id){S.sdc=id;S.sdn=null;draw();return}
   act(function(){return rpc("shop_staff_delete_resolve",{p_place:WID,p_req:id,p_approve:true,p_note:null}).then(loadCatalog)},function(){S.sdc=null;S.sdn=null;S.stmsg="ลบบัญชีพนักงานแล้ว";S.stok=true});return}
