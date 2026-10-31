@@ -260,9 +260,10 @@ document.addEventListener("click",function(e){var el=e.target.closest&&e.target.
   .catch(function(e){G.busy=false;G.err=errTh(e,"ส่งคำขอไม่สำเร็จ");gRender()});return}
 });
 
-var DAYN=["อา","จ","อ","พ","พฤ","ศ","ส"],TABS=[["q","หน้าหลัก","🏠"],["wal","กระเป๋าเงิน","💰"],["rp","รายงาน","📊"],["nt","การแจ้งเตือน","🔔"],["mg","จัดการร้าน","⚙️"]],MGS=[["svc","เพิ่มบริการ"],["staff","เพิ่มพนักงาน"],["promo","โปรโมชั่น"],["share","ส่วนแบ่ง"],["rv","รีวิว"],["set","ตั้งค่าร้าน"],["ct","ติดต่อเรา"]];
+var DAYN=["อา","จ","อ","พ","พฤ","ศ","ส"],TABS=[["q","หน้าหลัก","🏠"],["wal","กระเป๋าเงิน","💰"],["rp","รายงาน","📊"],["nt","การแจ้งเตือน","🔔"],["mg","จัดการร้าน","⚙️"]],MGS=[["svc","เพิ่มบริการ"],["staff","เพิ่มพนักงาน"],["promo","โปรโมชั่น"],["share","ส่วนแบ่ง"],["rv","รีวิว"],["set","ตั้งค่าร้าน"],["cls","ปิดบัญชีร้าน"],["ct","ติดต่อเรา"]];
 function inMg(t){return MGS.some(function(x){return x[0]===t})}
-function mgBar(){return '<div class="nf" role="tablist" aria-label="หมวดจัดการร้าน">'+MGS.map(function(x){var on=x[0]===S.tab;return'<button type="button" role="tab" data-a="tab" data-id="'+x[0]+'" class="'+(on?"on":"")+'" aria-selected="'+on+'">'+x[1]+'</button>'}).join("")+'</div>'}
+function mgBar(){return '<div class="nf" role="tablist" aria-label="หมวดจัดการร้าน">'+MGS.map(function(x){var on=x[0]===S.tab;return'<button type="button" role="tab" data-a="tab" data-id="'+x[0]+'" class="'+(on?"on":"")+'" aria-selected="'+on+'">'+x[1]+(x[0]==="cls"?clsTag():"")+'</button>'}).join("")+'</div>'}
+function clsTag(){try{if(D&&D.shop&&D.shop.closedAt)return" (ปิดแล้ว)";if(D&&D.cls&&D.cls.status==="pending")return" (รอตรวจ)"}catch(e){}return""}
 function okUrl(u){return /^https?:\/\//i.test(u||"")}
 function ctView(){if(S.pv)return '<div style="margin-bottom:10px"><button type="button" class="btn g" data-a="pvno">← กลับ</button></div><div class="card"><h1 id="pvt" tabindex="-1" style="font-size:1.3rem;margin:0 0 8px">นโยบายความเป็นส่วนตัว (ร้านค้า)</h1>'+pvBody(CT.name||"สมาคมวิทยากรฝึกอาชีพคนตาบอด",CT.phone)+'</div>';var c=CT,tel=String(c.phone||"").replace(/[^0-9+]/g,""),h='<div class="head"><h1>ติดต่อเรา</h1></div>';
  h+='<div class="ctc"><b>'+esc(c.name||"สมาคมวิทยากรฝึกอาชีพคนตาบอด")+'</b>'+(c.addr?'<p>'+esc(c.addr)+'</p>':"")+'</div>';
@@ -515,6 +516,7 @@ function view(){var t=S.tab,f=S.form&&S.form.t===t;
  if(t==="nt")return listNt();
  if(t==="q")return qView();
  if(t==="ct")return mgBar()+ctView();
+ if(t==="cls")return mgBar()+clsCard();
  if(t==="rv")return mgBar()+rvView();
  if(t==="svc")return mgBar()+'<div class="head"><h1>เพิ่มบริการ</h1>'+addBtn("svc")+'</div>'+(f?svcForm():listSvc());
  if(t==="staff")return mgBar()+'<div class="head"><h1>เพิ่มพนักงาน</h1>'+addBtn("staff")+'</div>'+(f?staffForm():listStaff());
@@ -625,7 +627,7 @@ function setView(){var s=D.shop,o=s.ov||{};
  return '<div class="head"><h1>ตั้งค่าร้าน</h1></div>'+(S.saved?'<div class="saved" role="status">บันทึกการตั้งค่าแล้ว</div>':'')+
  '<div class="card form"><b>ข้อมูลร้าน</b><div><label for="s1">ชื่อร้าน</label><input class="in" id="s1" value="'+esc(s.name)+'"></div><div><label for="s2">คำอธิบายร้าน (ไม่บังคับ)</label><input class="in" id="s2" value="'+esc(s.desc||"")+'"></div><div><label for="s5">พื้นที่/ที่ตั้ง (เช่น เขต อำเภอ)</label><input class="in" id="s5" value="'+esc(s.area||"")+'"></div><div><label for="pimg">รูปโปรไฟล์ร้าน</label><div class="pimgrow"><span id="imgprev">'+avatar(56)+'</span><input class="in" type="file" id="pimg" accept="image/*"></div><p class="hint2" style="margin:6px 0 0">ระบบครอปเป็นรูปสี่เหลี่ยมจัตุรัสและย่อขนาดให้อัตโนมัติ รูปจะเปลี่ยนทันทีที่เลือก</p><div id="imgerr" style="color:var(--bad)"></div></div></div>'+
  '<div class="card form"><b>เวลาทำการ</b><div><label>วันที่เปิดให้บริการ</label><div class="dchk">'+DAYN.map(function(n,i){return '<label><input type="checkbox" class="fd" value="'+i+'"'+(s.days.indexOf(i)>-1?" checked":"")+'> '+n+'</label>'}).join("")+'</div></div><div class="two"><div><label for="s3">เวลาเปิด</label><select class="in" id="s3">'+hsel(s.open)+'</select></div><div><label for="s4">เวลาปิด</label><select class="in" id="s4">'+hsel(s.close)+'</select></div></div></div>'+
- loginCard()+pwCard()+pinHtml(s)+clsCard()+
+ loginCard()+pwCard()+pinHtml(s)+
  '<div class="card form"><b>กฎการจองของร้าน</b><p class="hint2" style="margin:0">เว้นว่าง = ใช้ค่าเริ่มต้นของสมาคม (ตัวเลขจางๆ คือค่าเริ่มต้น)</p><div class="two">'+num("r2","จองล่วงหน้า (วัน)",o.adv,DEF.adv)+num("r3","ยกเลิกก่อนนัด (ชม.)",o.cancelH,DEF.cancelH)+'</div></div>'+
  '<div id="err" style="color:var(--bad);margin-bottom:10px"></div><button class="btn w" data-a="setsave">บันทึกการตั้งค่า</button><div style="margin-top:18px"><button class="btn g" data-a="logout">ออกจากระบบ</button></div>'}
 /* ===================== ข้อมูลร้าน (โหลดจาก Supabase) ===================== */
@@ -733,7 +735,7 @@ function draw(){drawHeader();
 /* รีเฟรชเบื้องหลัง: ไม่ล้างฟอร์มที่กำลังกรอกอยู่ */
 function softDraw(){drawHeader();
  navDraw();
- var busyForm=S.form||S.wmode||S.slipDraft||S.tab==="set"||S.tab==="share"||S.tab==="rp"||S.busy||S.chat||S.rvReply;
+ var busyForm=S.form||S.wmode||S.slipDraft||S.tab==="set"||S.tab==="cls"||S.tab==="share"||S.tab==="rp"||S.busy||S.chat||S.rvReply;
  if(!busyForm){document.getElementById("main").innerHTML=view();
   if(S.tab==="wal"&&S.tpshow){var tq=byId(D.tx,S.tpshow),pq=ppInfo();if(tq&&tq.st==="รอยืนยัน"){if(pq.on)drawQr("qrbox",ppPayload(pq.type,pq.id,tq.amt));var sc=document.getElementById("slipcur");if(sc&&tq.slipPath)loadSlip(tq.slipPath,sc)}}}}
 function refresh(){if(!D||S.busy)return Promise.resolve();return loadLive().then(function(){if(S.tab==="nt"){openNt()}if(S.tab==="rv"&&!S.rvReply)rvLoad();softDraw()},function(e){if(e&&e.status===401)doLogout()})}
@@ -770,7 +772,7 @@ document.addEventListener("click",function(e){
   if(!navigator.geolocation){ps.innerHTML='<p class="hint2" style="color:var(--bad)">อุปกรณ์นี้ไม่รองรับ ใช้การวางลิงก์หรือพิกัดแทน</p>';return}
   ps.innerHTML='<p class="hint2">กำลังหาตำแหน่ง...</p>';
   navigator.geolocation.getCurrentPosition(function(p){setPin(p.coords.latitude.toFixed(6),p.coords.longitude.toFixed(6))},function(){ps.innerHTML='<p class="hint2" style="color:var(--bad)">ใช้ตำแหน่งปัจจุบันไม่ได้ ตรวจสอบสิทธิ์ตำแหน่ง หรือวางลิงก์/พิกัดแทน</p>'},{timeout:10000});return}
- if(a==="tab"){if(id==="mg")id=S.mg;if(inMg(id))S.mg=id;if(id==="nt"){S.ntf=null;S.ntNew=[];openNt()}if(id==="rv")rvLoad();S.tab=id;S.form=null;S.del=null;S.saved=false;S.pwdone=false;S.shareok=false;S.sdc=null;S.sdn=null;S.stmsg="";S.stnew=null;S.pv=false;S.wmode=null;S.werr="";S.hmsg="";draw();if(id==="wal"||id==="nt"||id==="q")refresh();return}
+ if(a==="tab"){if(id==="mg")id=S.mg;if(inMg(id))S.mg=id;if(id==="nt"){S.ntf=null;S.ntNew=[];openNt()}if(id==="rv")rvLoad();S.clmsg="";S.clc=0;S.tab=id;S.form=null;S.del=null;S.saved=false;S.pwdone=false;S.shareok=false;S.sdc=null;S.sdn=null;S.stmsg="";S.stnew=null;S.pv=false;S.wmode=null;S.werr="";S.hmsg="";draw();if(id==="wal"||id==="nt"||id==="q")refresh();return}
  if(a==="rvreply"){S.rvReply=id;draw();var ta=document.getElementById("rvtxt");if(ta)ta.focus();return}
  if(a==="rvno"){S.rvReply=null;draw();return}
  if(a==="rvsend"){rvSend(id);return}
