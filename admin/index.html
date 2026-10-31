@@ -406,8 +406,8 @@ function sdrCard(){if(D.sdrOff||!(D.sdr||[]).length)return"";
   (r.open_jobs>0?'<p style="color:var(--bad);margin:6px 0">ยังมีคิวที่ยังไม่เสร็จ '+r.open_jobs+' คิว อนุมัติไม่ได้จนกว่าจะเสร็จหรือยกเลิก</p>':'')+
   (S.sdn===r.id?'<div style="margin-top:8px"><label for="sdn_'+r.id+'" style="font-size:.9rem;color:var(--mute)">เหตุผลที่ไม่อนุมัติ (พนักงานจะเห็นข้อความนี้)</label><input class="in" id="sdn_'+r.id+'" maxlength="200"></div>':'')+
   '<div class="acts"><button class="btn d" data-a="sdrok" data-id="'+r.id+'"'+(r.open_jobs>0?" disabled":"")+'>'+(S.sdc===r.id?"กดอีกครั้งเพื่อยืนยันลบ":"อนุมัติ (ลบบัญชี)")+'</button><button class="btn g" data-a="sdrno" data-id="'+r.id+'">'+(S.sdn===r.id?"บันทึกการไม่อนุมัติ":"ไม่อนุมัติ")+'</button>'+(S.sdc===r.id||S.sdn===r.id?'<button class="btn g" data-a="sdrx">ยกเลิก</button>':'')+'</div></div>'}).join("")+'</div>'}
-function stLink(p){var b=(D.set&&D.set.staff)||"";if(!b||!p||!p.phone)return"";return b+(b.indexOf("?")>-1?"&":"?")+"join="+encodeURIComponent(p.phone)}
-function stMsg(p){return"สวัสดีค่ะ/ครับ คุณ"+p.name+" สมาคมเพิ่มคุณเข้าระบบรับงานแล้ว เปิดลิงก์นี้เพื่อสร้างบัญชีและติดตั้งแอป: "+stLink(p)+"\nใช้เบอร์ "+p.phone+" ตอนสร้างบัญชี แล้วตั้งรหัสผ่านเอง"}
+function stLink(p){var b=(D.set&&D.set.staff)||"";if(!b||!p||!p.phone)return"";return b+(b.indexOf("?")>-1?"&":"?")+"join="+encodeURIComponent(p.phone)+"&openExternalBrowser=1"}
+function stMsg(p){return"สวัสดีค่ะ/ครับ คุณ"+p.name+" สมาคมเพิ่มคุณเข้าระบบรับงานแล้ว\nกดลิงก์ แล้วทำตามขั้นตอนติดตั้งในหน้านั้น: "+stLink(p)+"\nสมัครด้วยเบอร์ "+p.phone+" แล้วตั้งรหัสผ่านเอง"}
 function stNewCard(){var nw=S.stnew?D.staff.filter(function(x){return x.phone===S.stnew})[0]:null;if(!nw||nw.linked)return"";
  return '<div class="card"><b>เพิ่ม'+esc(nw.name)+'แล้ว</b><p class="hint2" style="margin:4px 0 8px">ส่งลิงก์ให้พนักงานสร้างบัญชีและติดตั้งแอปรับงานบนโทรศัพท์ได้เลย</p><div class="acts"><button type="button" class="btn" data-a="stshare" data-id="'+nw.id+'">ส่งลิงก์ให้'+esc(nw.name)+'</button><button type="button" class="btn g" data-a="stnewno">ไว้ทีหลัง</button></div></div>'}
 function stShare(id){var p=byId(D.staff,id);if(!p)return;
