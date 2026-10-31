@@ -80,6 +80,7 @@ a{color:var(--main)}
 .agate{max-width:420px;margin:24px auto}.agate h1{font-size:1.4rem;margin:0 0 4px}.asub{color:var(--mute);margin:0 0 14px}.agl{display:block;margin:0 0 10px}.agl span{display:block;margin-bottom:4px;font-weight:600}
 .aerr{color:var(--bad);font-weight:600;margin:4px 0 10px;min-height:1.4em}.awide{width:100%;padding:12px}.alinks{display:flex;gap:10px;margin-top:12px}.aok{background:var(--soft);color:var(--main);border-radius:10px;padding:10px 12px;margin-bottom:12px}
 .licimg{display:block;max-width:100%;max-height:420px;margin-top:8px;border-radius:8px;border:2px solid var(--line);background:#fff}.err{font-weight:600}
+.mpov{position:fixed;inset:0;z-index:60;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}.mpov header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--line)}.mpov header b{font-size:1.05rem}.mpx{font:inherit;min-width:44px;min-height:44px;border:2px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);cursor:pointer}.mpm{flex:1;min-height:200px;position:relative;background:var(--off)}.mpm .mpe{padding:16px;color:var(--mute)}.mpc{padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);display:grid;gap:8px;background:var(--bg)}.mpn{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.mpn button,.mpc .mpb{font:inherit;min-height:44px;min-width:44px;padding:6px 12px;border:2px solid var(--main);border-radius:10px;background:transparent;color:var(--main);cursor:pointer}.mpc .mpb.pri{background:var(--main);color:var(--main-ink)}.mpc input{font:inherit;min-height:44px;width:100%;border:2px solid var(--line);border-radius:10px;padding:6px 10px;background:var(--card);color:var(--ink)}.mpg{display:grid;grid-template-columns:1fr 1fr;gap:8px}.mpa{display:flex;gap:8px}.mpa .mpb{flex:1}.mpin{font-size:28px;line-height:30px;text-align:center;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
@@ -159,7 +160,7 @@ function pinStatus(a,b){
  return '<p class="pinok">📍 ปักหมุดแล้ว '+la.toFixed(6)+', '+lo.toFixed(6)+', <a href="https://www.google.com/maps?q='+la+','+lo+'" target="_blank" rel="noopener">เปิดตรวจสอบบน Google Maps</a></p>'}
 function parsePin(t){t=(t||"").trim();var m=t.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/)||t.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/)||t.match(/[?&](?:q|ll|query)=(-?\d+\.\d+)(?:,|%2C)\s*(-?\d+\.\d+)/)||t.match(/^(-?\d+(?:\.\d+)?)\s*[, ]\s*(-?\d+(?:\.\d+)?)$/);return m?[m[1],m[2]]:null}
 function pinHtml(s){var has=s.lat!=null&&s.lng!=null;
- return '<div class="pinbox"><b>ปักหมุดจุดให้บริการนวด</b><p class="hint2" style="margin:0">ค้นหาสถานที่ใน Google Maps แล้ววางลิงก์หรือพิกัดด้านล่าง หรือกดใช้ตำแหน่งปัจจุบันถ้าอยู่ที่จุดให้บริการ</p><button type="button" class="btn g" data-a="geo" style="width:100%">📍 ใช้ตำแหน่งปัจจุบัน</button><div><label for="opin">วางลิงก์ Google Maps หรือพิกัด</label><input class="in" id="opin" placeholder="https://www.google.com/maps/@13.7563,100.5018 หรือ 13.7563, 100.5018" autocomplete="off"></div><div class="two"><div><label for="olat">ละติจูด</label><input class="in" id="olat" inputmode="decimal" value="'+(has?s.lat:"")+'"></div><div><label for="olng">ลองจิจูด</label><input class="in" id="olng" inputmode="decimal" value="'+(has?s.lng:"")+'"></div></div><div id="pinst" role="status">'+pinStatus(has?String(s.lat):"",has?String(s.lng):"")+'</div></div>'}
+ return '<div class="pinbox"><b>ปักหมุดจุดให้บริการนวด</b><p class="hint2" style="margin:0">ค้นหาสถานที่ใน Google Maps แล้ววางลิงก์หรือพิกัดด้านล่าง หรือกดใช้ตำแหน่งปัจจุบันถ้าอยู่ที่จุดให้บริการ</p><button type="button" class="btn g" data-a="geo" style="width:100%">📍 ใช้ตำแหน่งปัจจุบัน</button><button type="button" class="btn g" data-a="pkmap" style="width:100%;margin-top:6px">🗺️ เลือกจุดบนแผนที่</button><div><label for="opin">วางลิงก์ Google Maps หรือพิกัด</label><input class="in" id="opin" placeholder="https://www.google.com/maps/@13.7563,100.5018 หรือ 13.7563, 100.5018" autocomplete="off"></div><div class="two"><div><label for="olat">ละติจูด</label><input class="in" id="olat" inputmode="decimal" value="'+(has?s.lat:"")+'"></div><div><label for="olng">ลองจิจูด</label><input class="in" id="olng" inputmode="decimal" value="'+(has?s.lng:"")+'"></div></div><div id="pinst" role="status">'+pinStatus(has?String(s.lat):"",has?String(s.lng):"")+'</div></div>'}
 function crc16(s){var c=0xFFFF;for(var i=0;i<s.length;i++){c^=s.charCodeAt(i)<<8;for(var j=0;j<8;j++)c=(c&0x8000)?((c<<1)^0x1021):(c<<1);c&=0xFFFF}return c.toString(16).toUpperCase().padStart(4,"0")}
 function tlv(t,v){return t+String(v.length).padStart(2,"0")+v}
 function ppPayload(type,id,amt){id=String(id).replace(/[-\s]/g,"");var acc=type==="mobile"?tlv("01","0066"+id.replace(/^0/,"")):type==="ewallet"?tlv("03",id):tlv("02",id);
@@ -538,6 +539,42 @@ function refresh(){if(!D||S.busy)return Promise.resolve();if(S.tab==="rvw"||RW.l
 
 /* ===================== เหตุการณ์ ===================== */
 function setPin(la,lo){document.getElementById("olat").value=la;document.getElementById("olng").value=lo;document.getElementById("pinst").innerHTML=pinStatus(String(la),String(lo))}
+/* ---- เลือกจุดบนแผนที่ (OpenStreetMap + Leaflet โหลดเมื่อกดเท่านั้น) ---- */
+var LFQ=null,MP=null;
+function loadLeaflet(cb){if(window.L&&window.L.map){cb(true);return}if(LFQ){LFQ.push(cb);return}LFQ=[cb];var fin=function(ok){var q=LFQ;LFQ=null;if(!ok&&sc.parentNode)sc.parentNode.removeChild(sc);q.forEach(function(f){f(ok)})},tm=setTimeout(function(){fin(!(window.L&&window.L.map))},12000),
+ l=document.createElement("link");l.rel="stylesheet";l.href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css";document.head.appendChild(l);
+ var sc=document.createElement("script");sc.src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js";sc.onload=function(){clearTimeout(tm);if(LFQ)fin(!!(window.L&&window.L.map))};sc.onerror=function(){clearTimeout(tm);if(LFQ)fin(false)};document.head.appendChild(sc)}
+function mpStart(){var a=parseFloat(String(document.getElementById("olat").value).replace(",",".")),b=parseFloat(String(document.getElementById("olng").value).replace(",","."));if(!isNaN(a)&&!isNaN(b)&&a>=-90&&a<=90&&b>=-180&&b<=180)return{lat:a,lng:b,z:16};return{lat:13.75,lng:100.5,z:6}}
+function mpSet(lat,lng,pan){if(!MP)return;MP.lat=lat;MP.lng=lng;if(MP.mk)MP.mk.setLatLng([lat,lng]);if(pan&&MP.map)MP.map.panTo([lat,lng]);var a=document.getElementById("mp_lat"),b=document.getElementById("mp_lng");if(a)a.value=lat.toFixed(6);if(b)b.value=lng.toFixed(6)}
+function mpMsg(t){var m=document.getElementById("mp_msg");if(m)m.textContent=t||""}
+function closePicker(){var o=document.getElementById("mpov");if(o)o.remove();document.body.style.overflow="";document.removeEventListener("keydown",mpKey);if(MP&&MP.map){try{MP.map.remove()}catch(e){}}MP=null}
+function mpKey(ev){if(ev.key==="Escape")closePicker()}
+function openPicker(){closePicker();var st=mpStart();MP={lat:st.lat,lng:st.lng,map:null,mk:null};
+ var o=document.createElement("div");o.id="mpov";o.className="mpov";o.setAttribute("role","dialog");o.setAttribute("aria-modal","true");o.setAttribute("aria-label","เลือกจุดบนแผนที่");
+ o.innerHTML='<header><b id="mp_h" tabindex="-1">เลือกจุดบนแผนที่</b><button type="button" class="mpx" data-mp="x" aria-label="ปิดแผนที่">✕</button></header><p class="hint2" style="margin:8px 16px 0">แตะหรือลากหมุดไปที่ตั้งของสถานที่ แล้วกด "ยืนยันจุดนี้" ค่าจะถูกใส่ในช่องละติจูดและลองจิจูด (ยังต้องกดบันทึกฟอร์มอีกครั้ง)</p><div id="mpm" class="mpm"><div class="mpe">กำลังโหลดแผนที่...</div></div>'+
+ '<div class="mpc"><div class="mpn" role="group" aria-label="ขยับหมุด"><button type="button" data-mp="u" aria-label="ขยับหมุดขึ้น">▲</button><button type="button" data-mp="l" aria-label="ขยับหมุดไปซ้าย">◀</button><button type="button" data-mp="r" aria-label="ขยับหมุดไปขวา">▶</button><button type="button" data-mp="d" aria-label="ขยับหมุดลง">▼</button></div>'+
+ '<div class="mpg"><div><label for="mp_lat">ละติจูด</label><input id="mp_lat" inputmode="decimal" autocomplete="off"></div><div><label for="mp_lng">ลองจิจูด</label><input id="mp_lng" inputmode="decimal" autocomplete="off"></div></div>'+
+ '<button type="button" class="mpb" data-mp="go">ย้ายหมุดไปตามพิกัดนี้</button><div id="mp_msg" role="status" style="color:var(--bad);min-height:1.2em"></div>'+
+ '<div class="mpa"><button type="button" class="mpb" data-mp="x">ยกเลิก</button><button type="button" class="mpb pri" data-mp="ok">ยืนยันจุดนี้</button></div></div>';
+ document.body.appendChild(o);document.body.style.overflow="hidden";document.addEventListener("keydown",mpKey);
+ mpSet(st.lat,st.lng,false);
+ o.querySelectorAll("[data-mp]").forEach(function(e){e.onclick=function(){var k=e.dataset.mp;
+  if(k==="x"){closePicker();return}
+  if(k==="u"||k==="d"||k==="l"||k==="r"){if(!MP)return;var dx=k==="l"?-1:k==="r"?1:0,dy=k==="u"?-1:k==="d"?1:0;
+   if(MP.map){var p=MP.map.latLngToContainerPoint([MP.lat,MP.lng]);p.x+=dx*16;p.y+=dy*16;var ll=MP.map.containerPointToLatLng(p);mpSet(ll.lat,ll.lng,true)}else mpSet(Math.max(-90,Math.min(90,MP.lat-dy*0.001)),Math.max(-180,Math.min(180,MP.lng+dx*0.001)),false);mpMsg("");return}
+  if(k==="go"||k==="ok"){var la=parseFloat(document.getElementById("mp_lat").value.replace(",",".")),ln=parseFloat(document.getElementById("mp_lng").value.replace(",","."));
+   if(isNaN(la)||isNaN(ln)||la<-90||la>90||ln<-180||ln>180){mpMsg("พิกัดไม่ถูกต้อง กรอกละติจูดและลองจิจูดเป็นตัวเลข");return}
+   if(k==="go"){mpSet(la,ln,true);mpMsg("");return}
+   closePicker();setPin(la.toFixed(6),ln.toFixed(6))}}});
+ document.getElementById("mp_h").focus();
+ loadLeaflet(function(ok){var box=document.getElementById("mpm");if(!MP||!box)return;
+  if(!ok){box.innerHTML='<div class="mpe">โหลดแผนที่ไม่สำเร็จ (ตรวจสอบอินเทอร์เน็ต) ยังกรอกละติจูดและลองจิจูดด้านล่างได้</div>';return}
+  box.innerHTML="";var m=L.map(box,{zoomControl:true}).setView([MP.lat,MP.lng],st.z);
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(m);
+  var mk=L.marker([MP.lat,MP.lng],{draggable:true,keyboard:false,icon:L.divIcon({className:"mpin",html:"📍",iconSize:[30,30],iconAnchor:[15,28]})}).addTo(m);
+  MP.map=m;MP.mk=mk;mk.on("dragend",function(){var ll=mk.getLatLng();mpSet(ll.lat,ll.lng,false);mpMsg("")});
+  m.on("click",function(ev){mpSet(ev.latlng.lat,ev.latlng.lng,false);mpMsg("")});setTimeout(function(){if(MP&&MP.map)MP.map.invalidateSize()},50)})}
+
 document.addEventListener("keydown",function(e){if(e.key==="Enter"&&e.target&&e.target.id==="usq"){e.preventDefault();usrFind()}});
 document.addEventListener("input",function(e){var t=e.target;if(!t||!D)return;
  if(t.id==="uspw"){US.pw=t.value;return}
@@ -576,7 +613,8 @@ document.addEventListener("click",function(e){
  if(a==="new"){S.form={t:t,id:null,sel:[],sd:{},date:"",spq:""};S.saved=false;draw();return}
  if(a==="edit"){var o=byId(listOf(t),id);S.form={t:t,id:id,sel:(o.staff&&t!=="staff"?o.staff.slice():[]),sd:JSON.parse(JSON.stringify(o.sd||{})),date:o.date||"",spq:""};draw();return}
  if(a==="cancel"){S.form=null;draw();return}
- if(a==="geo"){var ps=g("pinst");
+ if(a==="pkmap"){openPicker();return}
+  if(a==="geo"){var ps=g("pinst");
   if(!navigator.geolocation){ps.innerHTML='<p class="hint2" style="color:var(--bad)">อุปกรณ์นี้ไม่รองรับ ใช้การวางลิงก์หรือพิกัดแทน</p>';return}
   ps.innerHTML='<p class="hint2">กำลังหาตำแหน่ง...</p>';
   navigator.geolocation.getCurrentPosition(function(p){setPin(p.coords.latitude.toFixed(6),p.coords.longitude.toFixed(6))},function(){ps.innerHTML='<p class="hint2" style="color:var(--bad)">ใช้ตำแหน่งปัจจุบันไม่ได้ ตรวจสอบสิทธิ์ตำแหน่ง หรือวางลิงก์/พิกัดแทน</p>'},{timeout:10000});return}
