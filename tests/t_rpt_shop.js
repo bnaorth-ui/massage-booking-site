@@ -105,10 +105,13 @@ const tabs=await p.$$eval('#tabs button',b=>b.map(x=>x.textContent.replace(/[^�
 ok('nav order wal,rp',tabs.join('|').includes('กระเป๋าเงิน|รายงาน|การแจ้งเตือน'));
 // wallet: GP success hidden, balance unchanged, link
 await p.click('#tabs [data-id=wal]');await sleep(400);
+let w0=await p.textContent('#main');
+const lnkRp=!!(await p.$('#main [data-a=tab][data-id=rp]'));
+await p.click('[role=tab][data-a=wt][data-id=his]');
 let w=await p.textContent('#main');
 ok('wallet hides paid gp rows',!w.includes('หักค่า GP งาน MS2')&&!w.includes('หักค่า GP งาน MS1')&&w.includes('เครดิตวงเงินเบื้องต้น'));
-ok('wallet balance 880',w.includes('880'));
-ok('wallet link to report',!!(await p.$('#main [data-a=tab][data-id=rp]')));
+ok('wallet balance 880',w0.includes('880'));
+ok('wallet link to report',lnkRp);
 // settings
 await p.click('#tabs [data-id=mg]');await sleep(300);await p.click('[role=tab][data-id=share]');await sleep(400);
 if(process.env.NOSHARE){ok('share card not ready msg',(await p.textContent('#main')).includes('ยังไม่พร้อมใช้งาน'))}

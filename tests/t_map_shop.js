@@ -188,7 +188,8 @@ await p.click('[data-a=slipno]');await sleep(200);ok('cancel confirm',!(await ha
 await p.click('#slipsend');await sleep(200);await p.click('#slipsend');ok('slip sent',await has('ส่งสลิปให้แอดมินแล้ว'));ok('admin-notified message',await has('แอดมินได้รับแจ้งเตือน'));
 ok('slip stored in slips bucket under place',stor.some(s=>new RegExp('^slips/sh1/'+tp.ref+'-').test(s.path))&&/^sh1\//.test(tp.slip_path));
 ok('slip preview loaded via authenticated read',await until(()=>document.querySelector('#slipcur img')));
-ok('topup in history waiting',(await txt('#main')).includes('รอยืนยัน')&&(await txt('#main')).includes('แนบสลิปแล้ว'));
+await p.click('[role=tab][data-a=wt][data-id=his]');ok('topup in history waiting',(await txt('#main')).includes('รอยืนยัน')&&(await txt('#main')).includes('แนบสลิปแล้ว'));
+await p.click('[role=tab][data-a=wt][data-id=bal]');
 await p.click('[data-a=tpcancel]');await has('ยกเลิก');ok('topup cancelled',T.topup_requests[0].status==='cancelled');
 // admin confirms another topup -> server side adds wallet row; client sees after refresh
 T.wallet_tx.push({id:'w9',place_id:'sh1',type:'topup',amount:500,note:'เติมเงินผ่านพร้อมเพย์ (อ้างอิง TPX)',ref:'TPX',status:'success',created_at:now()});

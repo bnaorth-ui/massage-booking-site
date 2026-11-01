@@ -422,14 +422,16 @@ function gpView(){
  '<div class="card form"><b>มีข้อสงสัย</b><p class="hint2" style="margin:0">ติดต่อสมาคมได้ตามช่องทางด้านล่างนี้</p>'+(tel?'<div class="acts"><a class="btn" href="tel:'+esc(tel)+'" style="text-align:center;text-decoration:none">โทร '+esc(CT.phone)+'</a></div>':'')+(/^https?:\/\//i.test(CT.line||'')?'<div class="acts"><a class="btn g" href="'+esc(CT.line)+'" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">แชตกับสมาคมทาง LINE</a></div>':'')+(CT.hours?'<p class="hint2" style="margin:8px 0 0">เวลาทำการ '+esc(CT.hours)+'</p>':'')+'</div>'}
 function walView(){
  if(S.wmode)return walMain();
- var wt=S.wt==="gp"?"gp":"bal";
- return '<div class="nf" role="tablist" aria-label="หมวดกระเป๋าเงิน">'+[["bal","ยอดและประวัติ"],["gp","ค่า GP"]].map(function(x){return '<button type="button" role="tab" data-a="wt" data-id="'+x[0]+'" class="'+(x[0]===wt?"on":"")+'" aria-selected="'+(x[0]===wt)+'">'+x[1]+'</button>'}).join('')+'</div>'+(wt==="gp"?gpView():walMain())}
-function walMain(){
+ var wt=S.wt==="gp"||S.wt==="his"?S.wt:"bal",ow=D.tx.filter(function(t){return t.st==="ค้างชำระ"}).length;
+ return '<div class="nf" role="tablist" aria-label="หมวดกระเป๋าเงิน">'+[["bal","ยอดเงิน"],["gp","ค่า GP"],["his","ประวัติ"+(ow>0?" ("+ow+")":"")]].map(function(x){return '<button type="button" role="tab" data-a="wt" data-id="'+x[0]+'" class="'+(x[0]===wt?"on":"")+'" aria-selected="'+(x[0]===wt)+'">'+x[1]+'</button>'}).join('')+'</div>'+(wt==="gp"?gpView():walMain(wt==="his"?"his":"bal"))}
+function walMain(part){
  if(S.wmode)return '<div class="head"><h1>เติมเงินเข้ากระเป๋าระบบ</h1></div><div class="card form"><p class="hint2" style="margin:0">ยอดคงเหลือ '+baht(balance())+', เงินในกระเป๋านี้ใช้ให้ระบบหักค่า GP เมื่อพนักงานกดนวดเสร็จ</p>'+num("wa","จำนวนเงิน (บาท) ขั้นต่ำ 100",null)+'<p class="hint2" style="margin:0">ระบบจะแสดง QR พร้อมเพย์ของสมาคมตามยอดที่ระบุ โอนแล้วรอแอดมินตรวจสอบและยืนยัน ยอดจะเข้ากระเป๋าเงินอัตโนมัติ</p><div class="acts"><button class="btn" data-a="wsave">สร้างรายการเติมเงิน</button><button class="btn g" data-a="wcancel">ยกเลิก</button></div><div id="err" style="color:var(--bad)">'+esc(S.werr)+'</div></div>';
  var mo=iso(new Date()).slice(0,7),gpm=-D.tx.filter(function(t){return t.type==="gp"&&t.at.slice(0,7)===mo&&t.st==="สำเร็จ"}).reduce(function(a,t){return a+t.amt},0);
  var L=D.tx.filter(function(t){return!(t.type==="gp"&&t.st==="สำเร็จ")}).sort(function(a,b){return a.at<b.at?1:-1});
- return '<div class="bal'+(balance()<warnLv()[0]||owed()>0?" low":"")+'"><small>ยอดคงเหลือสำหรับหักค่า GP</small><b>'+baht(balance())+'</b><small>ค่า GP '+GPR()+'% ของราคาบริการ, หักเดือนนี้ '+baht(gpm)+'</small><button type="button" class="btn g" data-a="tab" data-id="rp" style="margin-top:8px">ดูรายละเอียดค่า GP ในเมนูรายงาน</button>'+walletMsg()+'<div class="acts"><button class="btn" data-a="wnew">เติมเงิน</button></div></div>'+(S.tpshow&&byId(D.tx,S.tpshow)&&byId(D.tx,S.tpshow).st==="รอยืนยัน"?tpPanel(byId(D.tx,S.tpshow)):"")+
- '<div class="head"><h1>ประวัติรายการ</h1></div><p class="hint2" style="margin:0 0 8px">แสดงการเติมเงิน เครดิต ปรับยอด และค่า GP ที่ค้างชำระ รายการหักค่า GP ที่ชำระแล้วดูได้ที่เมนูรายงาน</p><div class="card">'+(L.length?L.map(function(t){var tag=t.st==="สำเร็จ"?"":(t.st==="ยกเลิก"||t.st==="ปฏิเสธ"||t.st==="ค้างชำระ")?"b":"w";return '<div class="row"><div><b>'+esc(t.note)+'</b><small>'+fmtAt(t.at)+(t.reason?', '+esc(t.reason):'')+'</small></div><div class="acts"><span class="'+(t.amt>=0?"plus":"minus")+'">'+(t.amt>=0?"+":"-")+Math.abs(t.amt).toLocaleString("th-TH")+'</span>'+(t.slipAt&&t.st==="รอยืนยัน"?'<span class="tag">แนบสลิปแล้ว</span>':'')+'<span class="tag '+tag+'">'+t.st+'</span>'+(t.type==="topup"&&t.st==="รอยืนยัน"?'<button class="btn g" data-a="tpview" data-id="'+t.id+'">ดูวิธีโอน</button>':'')+'</div></div>'}).join(""):'<div class="empty">ยังไม่มีรายการ</div>')+'</div>'}
+ var BAL='<div class="bal'+(balance()<warnLv()[0]||owed()>0?" low":"")+'"><small>ยอดคงเหลือสำหรับหักค่า GP</small><b>'+baht(balance())+'</b><small>ค่า GP '+GPR()+'% ของราคาบริการ, หักเดือนนี้ '+baht(gpm)+'</small><button type="button" class="btn g" data-a="tab" data-id="rp" style="margin-top:8px">ดูรายละเอียดค่า GP ในเมนูรายงาน</button>'+walletMsg()+'<div class="acts"><button class="btn" data-a="wnew">เติมเงิน</button></div></div>'+(S.tpshow&&byId(D.tx,S.tpshow)&&byId(D.tx,S.tpshow).st==="รอยืนยัน"?tpPanel(byId(D.tx,S.tpshow)):"");
+ var HI=""+
+ '<div class="head"><h1>ประวัติรายการ</h1></div><p class="hint2" style="margin:0 0 8px">แสดงการเติมเงิน เครดิต ปรับยอด และค่า GP ที่ค้างชำระ รายการหักค่า GP ที่ชำระแล้วดูได้ที่เมนูรายงาน</p><div class="card">'+(L.length?L.map(function(t){var tag=t.st==="สำเร็จ"?"":(t.st==="ยกเลิก"||t.st==="ปฏิเสธ"||t.st==="ค้างชำระ")?"b":"w";return '<div class="row"><div><b>'+esc(t.note)+'</b><small>'+fmtAt(t.at)+(t.reason?', '+esc(t.reason):'')+'</small></div><div class="acts"><span class="'+(t.amt>=0?"plus":"minus")+'">'+(t.amt>=0?"+":"-")+Math.abs(t.amt).toLocaleString("th-TH")+'</span>'+(t.slipAt&&t.st==="รอยืนยัน"?'<span class="tag">แนบสลิปแล้ว</span>':'')+'<span class="tag '+tag+'">'+t.st+'</span>'+(t.type==="topup"&&t.st==="รอยืนยัน"?'<button class="btn g" data-a="tpview" data-id="'+t.id+'">ดูวิธีโอน</button>':'')+'</div></div>'}).join(""):'<div class="empty">ยังไม่มีรายการ</div>')+'</div>';
+ return part==="his"?HI:BAL}
 /* ===== ส่วนแบ่งพนักงาน + รายงานของร้าน ===== */
 var RP={kind:"use",mode:"m",mon:"",from:"",to:"",staff:"",svc:"",busy:false,err:"",data:null};
 function rpMonths(){var o=[],n=new Date(Date.now()+H7Q),y=n.getUTCFullYear(),m=n.getUTCMonth();for(var i=0;i<12;i++){var v=y+"-"+String(m+1).padStart(2,"0");o.push({v:v,t:new Date(v+"-01T00:00:00Z").toLocaleDateString("th-TH",{month:"long",year:"numeric",timeZone:"UTC"})});m--;if(m<0){m=11;y--}}return o}
@@ -816,7 +818,7 @@ document.addEventListener("click",function(e){
  if(a==="rvmore"){RV.show+=20;draw();return}
  if(a==="ntf"){S.ntf=id;draw();return}
  if(a==="qt"){S.qt=id;draw();return}
- if(a==="wt"){S.wt=id==="gp"?"gp":"bal";draw();return}
+ if(a==="wt"){S.wt=id==="gp"||id==="his"?id:"bal";draw();return}
  if(a==="new"){S.form={t:t,id:null};draw();return}
  if(a==="edit"){S.form={t:t,id:id};draw();return}
  if(a==="cancel"){S.form=null;draw();return}
@@ -856,8 +858,8 @@ document.addEventListener("click",function(e){
   if(!(g("wa").value!==""&&amt>=100&&amt===Math.floor(amt))){S.werr="ใส่จำนวนเงินเป็นจำนวนเต็ม ขั้นต่ำ 100 บาท";draw();return}
   if(amt>50000){S.werr="เติมเงินครั้งละไม่เกิน 50,000 บาท";draw();return}
   var newId=null;
-  act(function(){return sbApi("/rest/v1/topup_requests",{method:"POST",json:1,headers:{Prefer:"return=representation"},body:JSON.stringify({place_id:WID,amount:amt})}).then(function(r){newId=r&&r[0]&&r[0].id;return loadLive()})},function(){S.tpshow=newId;S.slipDraft=null;S.slipMsg="";S.wmode=null;S.werr=""});return}
- if(a==="tpview"){S.tpshow=id;S.slipDraft=null;S.slipAsk=false;S.slipMsg="";draw();return}
+  act(function(){return sbApi("/rest/v1/topup_requests",{method:"POST",json:1,headers:{Prefer:"return=representation"},body:JSON.stringify({place_id:WID,amount:amt})}).then(function(r){newId=r&&r[0]&&r[0].id;return loadLive()})},function(){S.wt="bal";S.tpshow=newId;S.slipDraft=null;S.slipMsg="";S.wmode=null;S.werr=""});return}
+ if(a==="tpview"){S.wt="bal";S.tpshow=id;S.slipDraft=null;S.slipAsk=false;S.slipMsg="";draw();return}
  if(a==="slipsend"){var sx=byId(D.tx,id);
   if(!sx||sx.st!=="รอยืนยัน"){S.slipMsg="รายการนี้ปิดแล้ว ส่งสลิปไม่ได้";draw();return}
   if(!S.slipDraft){S.slipMsg="เลือกรูปสลิปก่อน";draw();return}

@@ -80,8 +80,8 @@ await until(()=>document.querySelector('#gph'));await p.fill('#gph','0811111111'
 ok('app opens',await until(()=>!document.getElementById('main').hidden));
 await p.click('[data-a=tab][data-id=wal]');await has('960');
 const tabs=await p.$$eval('#main [role=tab][data-a=wt]',b=>b.map(x=>x.textContent.trim()+(x.classList.contains('on')?'*':'')));
-ok('wallet has 2 sub tabs, balance first ('+tabs.join('|')+')',tabs.join('|')==='ยอดและประวัติ*|ค่า GP');
-ok('default tab shows balance and topup button',(await txt('#main')).includes('960 บาท')&&!!(await p.$('[data-a=wnew]')));
+ok('wallet has 3 sub tabs, balance first ('+tabs.join('|')+')',tabs.join('|')==='ยอดเงิน*|ค่า GP|ประวัติ');
+ok('default tab shows balance and topup button, no history list',(await txt('#main')).includes('960 บาท')&&!!(await p.$('[data-a=wnew]'))&&!(await txt('#main')).includes('ประวัติรายการ'));
 await p.click('[role=tab][data-a=wt][data-id=gp]');
 const t=await txt('#main');
 ok('GP tab selected',await p.$eval('[role=tab][data-a=wt][data-id=gp]',e=>e.classList.contains('on')&&e.getAttribute('aria-selected')==='true'));
@@ -94,6 +94,9 @@ await p.click('#main [data-a=tab][data-id=rp]');
 ok('link goes to report menu',await until(()=>document.querySelector('#main h1')&&document.querySelector('#main h1').textContent.includes('รายงาน')));
 await p.click('#tabs [data-a=tab][data-id=wal]').catch(async()=>{await p.click('[data-a=tab][data-id=wal]')});
 ok('back to wallet keeps GP tab selection',await until(()=>{const e=document.querySelector('[role=tab][data-a=wt][data-id=gp]');return e&&e.classList.contains('on')}));
+await p.click('[role=tab][data-a=wt][data-id=his]');
+ok('history tab: shows history, no balance box',(await txt('#main')).includes('ประวัติรายการ')&&(await txt('#main')).includes('เครดิตวงเงินเบื้องต้น')&&!(await p.$('[data-a=wnew]')));
+ok('history tab selected',await p.$eval('[role=tab][data-a=wt][data-id=his]',e=>e.classList.contains('on')));
 await p.click('[role=tab][data-a=wt][data-id=bal]');
 ok('switch back to balance tab',await until(()=>!!document.querySelector('[data-a=wnew]')));
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)
