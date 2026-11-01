@@ -10,7 +10,8 @@ function pageFile(name) {
   return path.join(ROOT, DIR[name], 'index.html');
 }
 exports.page = name => 'file://' + pageFile(name);
-exports.launch = process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {};
+// ไม่ตั้ง CHROMIUM_PATH = ใช้ headless แบบใหม่ (channel chromium) เพราะแบบเก่ารายงานสิทธิ์แจ้งเตือนเป็น denied ทำให้เทสต์ push ล้มเอง
+exports.launch = process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : { channel: 'chromium' };
 exports.tmp = name => path.join(os.tmpdir(), name);
 // โฟลเดอร์ชั่วคราวที่มีไฟล์ 4 หน้าตามชื่อเดิม สำหรับเทสต์ที่ต้องใช้เว็บเซิร์ฟเวอร์
 exports.serveDir = () => {

@@ -63,7 +63,7 @@ ok('category buttons renamed ('+kinds.join(',')+')',kinds.join()==='เลือ
 const mn=await p.$$eval('#tabs button',b=>b.map(x=>x.textContent.replace(/[^ก-๙]/g,'')));console.log('MN',mn.join('|'));ok('menu label "รายการ"',mn.includes('รายการ')&&!mn.includes('รายการจอง'));
 await p.click('#tabs [data-tab=bk]');
 ok('title รายการ',(await p.textContent('h1'))==='รายการ');
-const tabs=async()=>await p.$$eval('[data-bt]',b=>b.map(x=>x.textContent.trim()));
+await p.waitForFunction(()=>[...document.querySelectorAll('[data-bt]')].some(x=>/\(1\)/.test(x.textContent)),null,{timeout:4000}).catch(()=>{});const tabs=async()=>await p.$$eval('[data-bt]',b=>b.map(x=>x.textContent.trim()));
 ok('3 sub tabs ('+(await tabs()).join('|')+')',(await tabs()).join('|')==='รายการจอง (1)|ประวัติ (2)|งานถูกยกเลิก (2)');
 let t=await A();ok('up: MS1 only',t.includes('MS1')&&!t.includes('MS2')&&!t.includes('MS3'));
 await p.click('[data-bt=hist]');t=await A();ok('hist: MS2+MS5, not cancelled',t.includes('MS2')&&t.includes('MS5')&&!t.includes('MS3')&&!t.includes('MS1'));
