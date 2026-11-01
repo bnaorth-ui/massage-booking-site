@@ -77,7 +77,7 @@ if(await p.$('[data-ag=login]'))await p.click('[data-ag=login]');
 await p.waitForSelector('#lph');await p.fill('#lph','0811111111');await p.fill('#lpw','abc123');await p.click('button[type=submit]');
 await p.waitForSelector('#orqf',{timeout:6000});
 ok('after login goes straight to the org form',(await p.textContent('#app')).includes('ขอบริการสำหรับหน่วยงาน')&&!!(await p.$('#orqf')));
-ok('form shows Bangkok-only + rate notice',await p.$eval('.orqn',e=>e.textContent.includes('กรุงเทพมหานคร')&&e.textContent.includes('400')&&e.textContent.includes('ไม่รวมช่วงพักเที่ยง')));
+ok('form shows Bangkok-only + rate notice',await p.$$eval('.orqn',L=>L.some(e=>e.textContent.includes('กรุงเทพมหานคร')&&e.textContent.includes('400')&&e.textContent.includes('ไม่รวมช่วงพักเที่ยง'))&&L.some(e=>e.textContent.includes('ขั้นตอนง่าย ๆ 4 ข้อ')&&e.querySelectorAll('ol li').length===4)));
 ok('districts from server only',JSON.stringify(await p.$$eval('#orq_dist option',o=>o.map(x=>x.value).filter(Boolean)))===JSON.stringify(['ปทุมวัน','พญาไท','บางรัก','ดุสิต']));
 ok('only central therapists listed',JSON.stringify(await p.$$eval('[data-orqs]',o=>o.map(x=>x.dataset.orqs)))===JSON.stringify(['st3','st4']));
 // ---- ตรวจความถูกต้อง
