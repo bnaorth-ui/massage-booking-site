@@ -33,7 +33,7 @@ await ctx.route('**/*supabase.co/**',async r=>{const q=r.request(),u=new URL(q.u
  const t=path.replace('/rest/v1/','');
  if(m==='GET'&&T[t]!==undefined)return J(200,T[t]);
  if(mode.rpcMissing&&path.startsWith('/rest/v1/rpc/'))return J(404,{code:'PGRST202',message:'Could not find the function public.'+path.split('/').pop()+' in the schema cache'});
- if(path==='/rest/v1/rpc/public_catalog'){CATCALLS++;return J(200,{places,services,service_places:[],staff:staff,staff_services:ss,place_staff:ps,days_off:[],promos:promos,promo_services:pms,overrides:[],settings:{association_name:'สมาคมทดสอบ',address:'1 ถนนทดสอบ <b>x</b> กรุงเทพ',phone:'02-123-4567',email:'info@example.org',line_url:'https://line.me/R/ti/p/@test',hours_text:'จ-ศ 9:00-17:00',shop_radius_km:10,org_radius_km:1,notify_user:true,notify_staff:true},ann:[]})}
+ if(path==='/rest/v1/rpc/public_catalog'){CATCALLS++;return J(200,{places,services,service_places:[],staff:staff,staff_services:ss,place_staff:ps,days_off:[],promos:promos,promo_services:pms,overrides:[],settings:{association_name:'สมาคมทดสอบ',address:'1 ถนนทดสอบ <b>x</b> กรุงเทพ',phone:'02-123-4567',email:'info@example.org',line_url:'https://line.me/R/ti/p/@test',hours_text:'จ-ศ 9:00-17:00',register_url:'https://shop.example.org/',shop_radius_km:10,org_radius_km:1,notify_user:true,notify_staff:true},ann:[]})}
  if(path==='/rest/v1/rpc/place_ratings')return J(200,[]);
  if(path==='/rest/v1/rpc/busy_slots'){const f=Date.parse(body.p_from),to=Date.parse(body.p_to);return J(200,busyItems().filter(i=>body.p_staff.includes(i.staff_id)&&i.s<to&&i.e>f).map(i=>({staff_id:i.staff_id,starts_at:new Date(i.s).toISOString(),ends_at:new Date(i.e).toISOString()})))}
  if(path==='/rest/v1/rpc/my_bookings')return J(200,BKS.slice().sort((a,b)=>b.s-a.s).map(fmt));
@@ -67,6 +67,9 @@ ok('guest bar login btn',!!(await p.$('[data-gb=login]')));
 ok('guest sees association contact at bottom',ct.vis&&ct.t.includes('ติดต่อสมาคม')&&ct.t.includes('02-123-4567')&&ct.t.includes('info@example.org')&&ct.t.includes('จ-ศ 9:00-17:00'));
 ok('tel/mailto/line links',ct.tel==='tel:021234567'&&ct.mail==='mailto:info@example.org'&&ct.line);
 ok('address is escaped text (no injected tag)',ct.b===1&&ct.t.includes('<b>x</b>'));}
+{const rb=await p.$eval('.regbar',e=>({t:e.innerText,href:(e.querySelector('a')||{}).href,tgt:(e.querySelector('a')||{}).target,afterList:!!(document.querySelector('.list')&&(document.querySelector('.list').compareDocumentPosition(e)&4))}));
+ok('register-shop bar after list',rb.t.includes('ลงทะเบียนร้านนวด')&&rb.href==='https://shop.example.org/'&&rb.tgt==='_blank'&&rb.afterList);
+ok('register-shop link in about section',await p.$eval('#seoct',e=>[...e.querySelectorAll('a')].some(a=>a.textContent==='ลงทะเบียนร้านนวด'&&a.href==='https://shop.example.org/')));}
 await p.click('[data-pl="sh1"]');await p.waitForSelector('.opt');await p.click('.qb[data-dir="1"] >> nth=0');await p.click('#next');
 await p.waitForSelector('#selD');const dates=await p.$$eval('#selD option',o=>o.map(x=>x.value).filter(Boolean));await p.selectOption('#selD',dates[1]||dates[0]);
 await p.waitForFunction(()=>{const s=document.getElementById('selT');return s&&!s.disabled},null,{timeout:4000});
