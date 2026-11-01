@@ -19,7 +19,7 @@ node t_ins_cust.js               # รันไฟล์เดียว ดู�
 | ตัวแปร | ความหมาย | ค่าเริ่มต้น |
 |---|---|---|
 | `PAGES_DIR` | โฟลเดอร์ที่มี `customer-booking.html` ฯลฯ | ใช้ `customer/index.html`, `shop/index.html`, `staff/index.html`, `admin/index.html` ใน repository |
-| `CHROMIUM_PATH` | ตำแหน่งเบราว์เซอร์ | ใช้ตัวที่ Playwright ติดตั้งให้ |
+| `CHROMIUM_PATH` | ตำแหน่งเบราว์เซอร์ | ใช้ Chromium ของ Playwright ในโหมด headless แบบใหม่ (`channel: 'chromium'`) เพราะโหมดเก่ารายงานสิทธิ์แจ้งเตือนเป็น denied ทำให้เทสต์ push ล้มเอง |
 | `JOBS` | จำนวนไฟล์ที่รันพร้อมกัน | 4 |
 | `TIMEOUT_MS` | เวลาสูงสุดต่อไฟล์ | 300000 |
 
