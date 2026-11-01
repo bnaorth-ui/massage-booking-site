@@ -98,7 +98,7 @@ ok('logout at top (header)',await p.$eval('#hacts',e=>e.textContent.includes('�
 ok('no nav landmark',(await p.$$('nav,[aria-current]')).length===0);
 ok('home active; queue shown',(await onNav())==='หน้าหลัก'&&!!(await p.$('#main')));
 await p.click('#tabs [data-id=nt]');ok('nt active',(await onNav())==='การแจ้งเตือน');
-await p.click('#tabs [data-id=pl]');await p.waitForTimeout(300);ok('pl: subs '+(await sub()).join('|'),(await sub()).join()==='ร้านนวด,หน่วยงาน,บริษัท,พนักงาน'&&(await onSub())==='ร้านนวด'&&(await onNav())==='สถานที่และคน');
+await p.click('#tabs [data-id=pl]');await p.waitForTimeout(300);ok('pl: subs '+(await sub()).join('|'),(await sub()).join()==='ร้านนวด,หน่วยงาน,คำขอหน่วยงาน,บริษัท,พนักงาน'&&(await onSub())==='ร้านนวด'&&(await onNav())==='สถานที่และคน');
 for(const [id,nm] of [['org','หน่วยงาน'],['comp','บริษัท'],['staff','พนักงาน']]){await p.click('#main .subtabs[aria-label] [data-id='+id+']');await p.waitForTimeout(200);ok('pl sub '+id,(await onSub())===nm&&(await onNav())==='สถานที่และคน')}
 await p.click('#tabs [data-id=fin]');await p.waitForTimeout(300);ok('fin: subs '+(await sub()).join('|'),(await sub()).join()==='คำขอเติมเงิน,บัญชีรับเงิน,รายงาน'&&(await onSub())==='คำขอเติมเงิน'&&(await onNav())==='การเงิน');
 const shown=async()=>await p.$$eval('[data-pg]',x=>x.filter(e=>!e.hidden).map(e=>e.dataset.pg).join());
