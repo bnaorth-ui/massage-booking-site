@@ -76,7 +76,7 @@ const T=pg=>pg.textContent('#app');
 // android
 let pg=await open(UA.and);let t=await T(pg);
 ok('android: intro first',t.includes('ติดตั้งแอปจองคิวนวด')&&!(await pg.$('#lph')));
-ok('NEW intro on install page above skip btn; features after steps',await pg.evaluate(()=>{const a=document.getElementById('app');const i=a.querySelector('.seoin'),sk=a.querySelector('[data-ins=skip]'),st=a.querySelector('.insst'),ft=a.querySelector('.insft');return !!i&&i.innerText.includes('จองนวดออนไลน์ ร้านนวดใกล้ฉัน')&&i.innerText.includes('กรมสนับสนุนบริการสุขภาพ')&&!!sk&&!!st&&!!ft&&(i.compareDocumentPosition(sk)&4)&&(st.compareDocumentPosition(ft)&4)}));
+ok('NEW install page: no intro, steps and features remain',await pg.evaluate(()=>{const a=document.getElementById('app');return !a.querySelector('.seoin')&&!!a.querySelector('[data-ins=skip]')&&!!a.querySelector('.insst')&&!!a.querySelector('.insft')&&document.getElementById('seo').hidden}));
 ok('NEW both skip buttons same label',await pg.evaluate(()=>[...document.querySelectorAll('#app [data-ins=skip]')].length===2&&[...document.querySelectorAll('#app [data-ins=skip]')].every(b=>b.textContent.trim()==='ใช้งานต่อโดยไม่ติดตั้ง')));
 ok('skip is first button',await pg.evaluate(()=>document.querySelector('#app button').textContent.includes('ใช้งานต่อโดยไม่ติดตั้ง')));
 ok('heading focused',await pg.evaluate(()=>document.activeElement.id==='inst'));
@@ -91,11 +91,11 @@ pg=await open(UA.and);await pg.click('[data-ins=skip]');await pg.waitForTimeout(
 await pg.waitForSelector('[data-pl]',{timeout:4000});ok('skip -> shop list (guest)',!!(await pg.$('[data-pl]'))&&!(await pg.$('#lph')));
 await pg.reload();await pg.waitForSelector('[data-pl]',{timeout:4000});ok('remembered: shop list directly',!!(await pg.$('[data-pl]'))&&!(await T(pg)).includes('ติดตั้งแอปจองคิวนวด'));await pg.click('[data-gb=login]');await pg.waitForSelector('#lph');
 ok('NEW SEO: head tags',await pg.evaluate(()=>{const g=s=>document.querySelector(s);return document.title.includes('จองนวดออนไลน์ ร้านนวดใกล้ฉัน')&&g('meta[name=description]').content.includes('กรมสนับสนุนบริการสุขภาพ')&&g('link[rel=canonical]').href==='https://massage-customer-bna.pages.dev/'&&g('meta[property="og:url"]').content==='https://massage-customer-bna.pages.dev/'&&!document.querySelector('meta[name=robots][content*=noindex]')&&JSON.parse(g('script[type="application/ld+json"]').textContent).url==='https://bna.or.th'}));
-ok('NEW intro on login above h1',await pg.evaluate(()=>{const i=document.querySelector('#app .seoin'),h=document.querySelector('#app h1');return !!i&&!!h&&h.textContent==='เข้าสู่ระบบ'&&(i.compareDocumentPosition(h)&4)}));
-ok('NEW SEO: section visible on login with content',await pg.evaluate(()=>{const s=document.getElementById('seo');return !!s&&!s.hidden&&s.getBoundingClientRect().height>100&&s.innerText.includes('ทำไมต้องจองกับเรา')&&s.innerText.includes('กรมสนับสนุนบริการสุขภาพ')&&!/ทุกคน/.test(s.innerText)}));
+ok('NEW login: no intro above h1',await pg.evaluate(()=>{const h=document.querySelector('#app h1');return !document.querySelector('#app .seoin')&&!!h&&h.textContent==='เข้าสู่ระบบ'}));
+ok('NEW SEO: section hidden on login',await pg.evaluate(()=>document.getElementById('seo').hidden));
 ok('NEW SEO: about link to bna.or.th',await pg.evaluate(()=>{const a=document.querySelector('#seo a');return a&&a.href==='https://bna.or.th/'&&a.rel.includes('noopener')}));
 ok('NEW SEO: install button on login (mobile)',!!(await pg.$('button[data-ag=ins].btn')));
-await pg.click('[data-ag=reg]');await pg.waitForTimeout(200);ok('NEW SEO hidden on register step',await pg.evaluate(()=>document.getElementById('seo').hidden));await pg.click('[data-ag=login]');await pg.waitForTimeout(200);ok('NEW SEO back on login',await pg.evaluate(()=>!document.getElementById('seo').hidden));
+await pg.click('[data-ag=reg]');await pg.waitForTimeout(200);ok('NEW SEO hidden on register step',await pg.evaluate(()=>document.getElementById('seo').hidden));await pg.click('[data-ag=login]');await pg.waitForTimeout(200);ok('NEW SEO still hidden on login',await pg.evaluate(()=>document.getElementById('seo').hidden));
 ok('login has how-to link',!!(await pg.$('[data-ag=ins]')));
 await pg.click('[data-ag=ins]');await pg.waitForTimeout(300);ok('link reopens intro',(await T(pg)).includes('ติดตั้งแอปจองคิวนวด'));
 await pg.click('[data-ins=skip]');await pg.waitForTimeout(200);await pg.waitForSelector('[data-pl]',{timeout:4000});ok('back to shop list',!!(await pg.$('[data-pl]')));
@@ -112,7 +112,7 @@ pg=await open(UA.iosl);t=await T(pg);ok('ios in LINE: safari first',t.includes('
 pg=await open(UA.desk);ok('desktop: shop list, no install button',!!(await pg.$('[data-pl]'))&&!(await pg.$('[data-gb=ins]'))&&!!(await pg.$('[data-gb=login]')));await pg.click('[data-gb=login]');await pg.waitForSelector('#lph');ok('desktop: login has no link',!(await pg.$('[data-ag=ins]')));await pg.close();
 pg=await open(UA.and,true);ok('standalone: shop list, no install button',!!(await pg.$('[data-pl]'))&&!(await pg.$('[data-gb=ins]')));await pg.click('[data-gb=login]');await pg.waitForSelector('#lph');ok('standalone: login has no link',!(await pg.$('[data-ag=ins]')));ok('NEW intro absent in installed app',!(await pg.$('#app .seoin')));
 ok('NEW SEO hidden in installed (standalone) app',await pg.evaluate(()=>document.getElementById('seo').hidden));await pg.close();
-pg=await open(UA.and);await pg.click('[data-ins=skip]');await pg.waitForTimeout(200);ok('NEW SEO visible in normal browser login',await pg.evaluate(()=>!document.getElementById('seo').hidden));await pg.close();
+pg=await open(UA.and);await pg.click('[data-ins=skip]');await pg.waitForTimeout(200);await pg.waitForSelector('[data-pl]');ok('NEW SEO visible on guest home with content',await pg.evaluate(()=>{const s=document.getElementById('seo');return !s.hidden&&s.getBoundingClientRect().height>100&&s.innerText.includes('ทำไมต้องจองกับเรา')&&s.innerText.includes('กรมสนับสนุนบริการสุขภาพ')&&!/ทุกคน/.test(s.innerText)}));await pg.close();
 // logged in account
 pg=await open(UA.and);await pg.click('[data-ins=skip]');await pg.waitForSelector('[data-gb=login]');await pg.click('[data-gb=login]');await pg.fill('#lph','0811111111');await pg.fill('#lpw','abc123');await pg.click('button[type=submit]');await pg.waitForSelector('[data-pl]',{timeout:4000});
 await pg.click('[data-tab="ac"]');await pg.waitForTimeout(300);

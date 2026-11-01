@@ -800,14 +800,13 @@ function seoCt(){var el=document.getElementById("seoct");if(!el)return;var c=(ty
  if(okUrl(c.line))h+='<p><a href="'+esc(c.line)+'" target="_blank" rel="noopener">แชตกับสมาคมทาง LINE</a></p>';
  if(c.hours)h+='<p>เวลาทำการ '+esc(c.hours)+'</p>';
  el.innerHTML=h?'<h3>ติดต่อสมาคม</h3>'+h:""}
-function seoIntro(){var sa=false;try{sa=!!((window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone)}catch(e){}return sa?"":'<div class="seoin"><h2 class="seoh">จองนวดออนไลน์ ร้านนวดใกล้ฉัน</h2><p>บริการโดยคนพิการทางการเห็น ผู้ให้บริการขึ้นทะเบียนกับกรมสนับสนุนบริการสุขภาพ กระทรวงสาธารณสุข</p></div>'}
 function seoSet(on){var s=document.getElementById("seo"),sa=false;try{sa=!!((window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone)}catch(e){}if(s)s.hidden=!on||sa}
 function authRender(){var tb=document.getElementById("tabs");if(tb)tb.style.display="none";
  var a=document.getElementById("app"),b=document.getElementById("bar"),h="",st=AU.step;b.innerHTML="";b.style.display="none";
- seoSet(AU.loading||st==="login"||st==="ins");
+ seoSet(false);
  if(AU.loading){a.innerHTML='<p class="sub" role="status">กำลังตรวจสอบการเข้าสู่ระบบ…</p>';return}
  if(st==="login"){
-  h='<div class="alinks"><button type="button" class="lb" data-gb="browse">← กลับไปดูร้านและบริการ</button></div>'+seoIntro()+'<h1>เข้าสู่ระบบ</h1><p class="sub">เข้าใช้งานด้วยเบอร์มือถือและรหัสผ่าน</p>'+(insKind()?'<button type="button" class="btn wide ghost" data-ag="ins" style="margin:0 0 12px">ติดตั้งแอป</button>':'')+(AU.ok?'<div class="flash" role="status">'+esc(AU.ok)+'</div>':'')+
+  h='<div class="alinks"><button type="button" class="lb" data-gb="browse">← กลับไปดูร้านและบริการ</button></div><h1>เข้าสู่ระบบ</h1><p class="sub">เข้าใช้งานด้วยเบอร์มือถือและรหัสผ่าน</p>'+(insKind()?'<button type="button" class="btn wide ghost" data-ag="ins" style="margin:0 0 12px">ติดตั้งแอป</button>':'')+(AU.ok?'<div class="flash" role="status">'+esc(AU.ok)+'</div>':'')+
   '<form id="authf" novalidate>'+fld("lph","เบอร์มือถือ","tel",'inputmode="tel" autocomplete="tel" placeholder="เช่น 0812345678"')+fld("lpw","รหัสผ่าน","password",'autocomplete="current-password"')+
   '<p class="aerr" id="aerr" role="alert"></p><button class="btn wide" type="submit">เข้าสู่ระบบ</button></form>'+
   '<div class="alinks"><button class="lb" data-ag="fp">ลืมรหัสผ่าน</button><button class="lb" data-ag="reg">ลงทะเบียนสมาชิกใหม่</button><button class="lb" data-ag="pv">นโยบายความเป็นส่วนตัว</button>'+'</div>'}
@@ -820,7 +819,7 @@ function authRender(){var tb=document.getElementById("tabs");if(tb)tb.style.disp
   '<p class="aerr" id="aerr" role="alert"></p><button class="btn wide" type="submit">ลงทะเบียน</button></form>'+
   '<div class="alinks"><button class="lb" data-ag="login">มีบัญชีแล้ว? เข้าสู่ระบบ</button><button type="button" class="lb" data-gb="browse">กลับไปดูร้านและบริการ</button></div>'}
  if(st==="ins"){
-  h=seoIntro()+'<button type="button" class="btn ghost wide" data-ins="skip">ใช้งานต่อโดยไม่ติดตั้ง</button>'+insBody()+'<button type="button" class="btn wide ghost" data-ins="skip" style="margin-top:8px">ใช้งานต่อโดยไม่ติดตั้ง</button>'}
+  h='<button type="button" class="btn ghost wide" data-ins="skip">ใช้งานต่อโดยไม่ติดตั้ง</button>'+insBody()+'<button type="button" class="btn wide ghost" data-ins="skip" style="margin-top:8px">ใช้งานต่อโดยไม่ติดตั้ง</button>'}
  if(st==="pv"){
   h='<div class="alinks"><button class="lb" data-ag="'+(AU.pvBack==="reg"?"reg":"login")+'">← กลับ</button></div><h1 id="pvt" tabindex="-1">นโยบายความเป็นส่วนตัว</h1>'+pvHtml()}
  if(st==="fp"){
