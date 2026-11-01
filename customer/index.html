@@ -131,6 +131,7 @@ h1{font-size:1.4rem;margin:8px 0 4px}
 <ol><li>เลือกร้านและบริการนวดที่ต้องการ</li><li>เลือกวันเวลาและพนักงาน</li><li>สมัครสมาชิกหรือเข้าสู่ระบบด้วยเบอร์โทร แล้วกดยืนยัน</li></ol>
 <h3>เกี่ยวกับสมาคม</h3>
 <p>ระบบนี้จัดทำโดย <a href="https://bna.or.th" target="_blank" rel="noopener">สมาคมวิทยากรฝึกอาชีพคนตาบอด</a> เพื่อให้คนพิการทางการเห็นมีช่องทางประกอบอาชีพนวดและเข้าถึงลูกค้าได้ง่ายขึ้น</p>
+<div id="seoct"></div>
 </section>
 <div class="bar" id="bar"></div>
 <div class="tabs" id="tabs" style="display:none"></div>
@@ -556,8 +557,8 @@ function applyCatalog(R){
  PROMOS=(R.promos||[]).map(function(m){return{id:m.id,shop:m.place_id,title:m.title,desc:m.description||"",type:m.type==="percent"?"percent":"baht",value:+m.value,all:!!m.applies_all,svcs:(R.promo_services||[]).filter(function(q){return q.promotion_id===m.id}).map(function(q){return q.service_id}),start:m.start_date,end:m.end_date,on:1,img:pubUrl("place-images",m.image_path)}});
  OFF={};(R.days_off||[]).forEach(function(x){(OFF[x.staff_id]=OFF[x.staff_id]||[]).push(x.day)});
  CLOSED={};(R.overrides||[]).forEach(function(x){(CLOSED[x.place_id]=CLOSED[x.place_id]||{})[x.day]=true});
- var st=R.settings;if(st){SET.defShop.radius=+st.shop_radius_km;SET.defOrg.radius=+st.org_radius_km;SET.nUser=st.notify_user?1:0;if(st.book_open_min!=null)SET.defOrg.openAt=+st.book_open_min;SET.nStaff=st.notify_staff?1:0;SET.ct={name:st.association_name||"",addr:st.address||"",phone:st.phone||"",line:st.line_url||"",hours:st.hours_text||"",reg:st.register_url||""}}
- ANN=(R.ann||[]).map(function(x){return{title:x.title,body:x.body||"",auds:x.audiences||[],on:1}})}
+ var st=R.settings;if(st){SET.defShop.radius=+st.shop_radius_km;SET.defOrg.radius=+st.org_radius_km;SET.nUser=st.notify_user?1:0;if(st.book_open_min!=null)SET.defOrg.openAt=+st.book_open_min;SET.nStaff=st.notify_staff?1:0;SET.ct={name:st.association_name||"",addr:st.address||"",phone:st.phone||"",email:st.email||"",line:st.line_url||"",hours:st.hours_text||"",reg:st.register_url||""}}
+ ANN=(R.ann||[]).map(function(x){return{title:x.title,body:x.body||"",auds:x.audiences||[],on:1}});seoCt()}
 var JOBTH={pending:"รอรับงาน",accepted:"รับงานแล้ว",in_progress:"กำลังนวด",done:"นวดเสร็จ"},STTH={confirmed:"ยืนยันแล้ว",cancelled:"ยกเลิก",rescheduled:"เลื่อนแล้ว",no_show:"ยกเลิก",completed:"ยืนยันแล้ว"};
 function mapBk(r){var all=r.items||[],its=all.filter(function(i){return i.active}),use=its.length?its:all,t0=Date.parse(r.starts_at),s=bdate(t0),
  asg=use.map(function(i){return{uid:i.id,svc:i.service_id,svcName:i.service_name,staff:i.staff_id,staffName:i.staff_name,off:Math.round((Date.parse(i.starts_at)-t0)/60000),min:i.minutes,net:+i.price}}),jobs={};
@@ -791,6 +792,14 @@ function pvHtml(){var c=(typeof SET!=="undefined"&&SET.ct)||{},tel=String(c.phon
   S2("เราเก็บนานแค่ไหน",L(["ชื่อและเบอร์โทรในรายการจองถูกลบหลังการใช้บริการผ่านไป 12 เดือน","ข้อความแชตถูกลบอัตโนมัติหลัง 90 วัน","เมื่อคุณลบบัญชี โปรไฟล์ รูป แต้มสะสม การแจ้งเตือน รายการโปรด และข้อความแชตที่คุณส่งจะถูกลบทันที รายการจองจะถูกล้างชื่อและเบอร์โทร","ข้อมูลอื่นเก็บไว้ตราบที่บัญชียังอยู่"]))+
   S2("สิทธิ์ของคุณ",L(["ปิดการใช้ตำแหน่งได้ทุกเมื่อ (ปุ่ม &quot;ไม่ใช้ตำแหน่ง&quot; หน้าเลือกร้าน)","ลบบัญชีและข้อมูลของคุณได้เองที่ปุ่ม &quot;ลบบัญชีของฉัน&quot; ในหน้าบัญชี (ต้องไม่มีการจองที่ยังไม่เสร็จสิ้น)","ขอดูหรือแก้ไขข้อมูลได้โดยติดต่อสมาคม"]))+
   S2("ติดต่อเรา",'<p>'+esc(nm)+(tel?' โทร '+esc(tel):' (เบอร์โทรดูได้ที่หน้าบัญชี หลังเข้าสู่ระบบ)')+'</p>')+'</div>'}
+function seoCt(){var el=document.getElementById("seoct");if(!el)return;var c=(typeof SET!=="undefined"&&SET.ct)||null;if(!c){el.innerHTML="";return}
+ var tel=String(c.phone||"").replace(/[^0-9+]/g,""),em=String(c.email||"").trim(),h="";
+ if(c.name||c.addr)h+='<p><b>'+esc(c.name||"สมาคมวิทยากรฝึกอาชีพคนตาบอด")+'</b>'+(c.addr?'<br>'+esc(c.addr):'')+'</p>';
+ if(tel)h+='<p>โทร <a href="tel:'+esc(tel)+'">'+esc(c.phone)+'</a></p>';
+ if(/^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/.test(em))h+='<p>อีเมล <a href="mailto:'+esc(em)+'">'+esc(em)+'</a></p>';
+ if(okUrl(c.line))h+='<p><a href="'+esc(c.line)+'" target="_blank" rel="noopener">แชตกับสมาคมทาง LINE</a></p>';
+ if(c.hours)h+='<p>เวลาทำการ '+esc(c.hours)+'</p>';
+ el.innerHTML=h?'<h3>ติดต่อสมาคม</h3>'+h:""}
 function seoIntro(){var sa=false;try{sa=!!((window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone)}catch(e){}return sa?"":'<div class="seoin"><h2 class="seoh">จองนวดออนไลน์ ร้านนวดใกล้ฉัน</h2><p>บริการโดยคนพิการทางการเห็น ผู้ให้บริการขึ้นทะเบียนกับกรมสนับสนุนบริการสุขภาพ กระทรวงสาธารณสุข</p></div>'}
 function seoSet(on){var s=document.getElementById("seo"),sa=false;try{sa=!!((window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone)}catch(e){}if(s)s.hidden=!on||sa}
 function authRender(){var tb=document.getElementById("tabs");if(tb)tb.style.display="none";
