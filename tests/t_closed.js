@@ -80,7 +80,8 @@ console.log(JSON.stringify(sec));console.log((await p.textContent('#app')).repla
 const txt=await p.textContent('#app');
 const wrap=nowH>=15?'skip-time-edge':'ok';
 ok('open list has A and soon-shop',sec[0]&&sec[0].includes('ร้านเปิดอยู่')&&sec[0].includes('ร้านใกล้เปิด'));
-ok('closed list has far + holiday',sec[1]&&sec[1].includes('ร้านเปิดอีกนาน')&&sec[1].includes('ร้านหยุดวันนี้'));
+// หลัง 15:00 ร้าน "เปิดอีกนาน" ที่สร้างจากเวลาปัจจุบัน +5 ชม. ข้ามเที่ยงคืน จึงตรวจแค่ร้านหยุดวันนี้ (เหมือนที่ข้อ skip-time-edge ทำ)
+ok('closed list has far + holiday',!!(sec[1]&&sec[1].includes('ร้านหยุดวันนี้')&&(nowH>=15||sec[1].includes('ร้านเปิดอีกนาน'))));
 ok('no heading',!txt.includes('ปิดอยู่ตอนนี้')&&!(await p.$('h2.clh')));
 console.log('SEC',JSON.stringify(sec),(txt.match(/ร้านเปิดอีกนาน.{0,60}/)||[])[0]);console.log('CT',(txt.match(/ปิดอยู่ เปิด[^ ]* [0-9:]*/g)||[]).join(' ; '),'| now',nowH.toFixed(2));ok('closed text',(txt.match(/ปิดอยู่ เปิด(วันนี้|พรุ่งนี้|วัน)/g)||[]).length===2&&txt.includes('ปิดอยู่ เปิดพรุ่งนี้ 08:00 น.')||txt.includes('08:00'));
 

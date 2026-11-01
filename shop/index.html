@@ -405,7 +405,26 @@ function saveQr(x,pi){var msg=document.getElementById("qrmsg"),say=function(t){i
  }catch(e){say("บันทึกไม่สำเร็จ กดค้างที่ QR แล้วเลือกบันทึกรูปภาพ")}}
 function slipRead(file,cb){if(!file||!/^image\//.test(file.type)){cb(null,"เลือกไฟล์รูปภาพเท่านั้น");return}if(file.size>10*1024*1024){cb(null,"ไฟล์ใหญ่เกิน 10 MB");return}
  var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var m=Math.max(im.width,im.height),k=m>1000?1000/m:1,w=Math.round(im.width*k),h=Math.round(im.height*k),cv=document.createElement("canvas");cv.width=w;cv.height=h;cv.getContext("2d").drawImage(im,0,0,w,h);var q=.72,d=cv.toDataURL("image/jpeg",q);while(d.length>600000&&q>.35){q-=.1;d=cv.toDataURL("image/jpeg",q)}cb(d,"")};im.onerror=function(){cb(null,"อ่านรูปไม่สำเร็จ")};im.src=r.result};r.onerror=function(){cb(null,"อ่านไฟล์ไม่สำเร็จ")};r.readAsDataURL(file)}
+function gpView(){
+ var g=GPR(),w=warnLv(),ac=CFG.ac>0?CFG.ac+' ชั่วโมง':'ตามเวลาที่ระบบกำหนด',tel=String(CT.phone||'').replace(/[^0-9+]/g,'');
+ var li=function(a){return '<li style="margin:0 0 8px">'+a+'</li>'};
+ return '<div class="head"><h1>ค่า GP</h1></div><div class="card form"><b>ร้านของคุณถูกหักค่า GP '+g+'%</b><p class="hint2" style="margin:0">ค่า GP คือค่าบริการระบบจองคิวที่ร้านจ่ายให้สมาคม คิดเป็นเปอร์เซ็นต์ของราคาบริการ</p></div>'+
+ '<div class="card form"><b>วิธีคิดและเวลาที่หัก</b><ol style="margin:0;padding-left:22px">'+
+ li('คิดจากราคาบริการที่ลูกค้าจ่ายจริง หลังหักโปรโมชั่นของร้านแล้ว')+
+ li('ระบบหักจากกระเป๋าเงินของร้านเมื่อการจองนั้นเสร็จสิ้น คือพนักงานกดเสร็จสิ้นงานครบทุกบริการในการจอง')+
+ li('ถ้าพนักงานไม่กดเสร็จสิ้นงาน ระบบจะปิดงานให้เองหลังคิวจบ '+ac+' และคิดค่า GP ตามปกติ')+
+ li('ไม่คิดค่า GP เมื่อการจองถูกยกเลิก และเมื่อกด "ลูกค้าไม่มา" ถ้าลูกค้าไม่มา ให้พนักงานกดปุ่มนี้ตั้งแต่เนิ่น ๆ')+'</ol></div>'+
+ '<div class="card form"><b>เงินในกระเป๋าและการเติมเงิน</b><ol style="margin:0;padding-left:22px">'+
+ li('ร้านต้องเติมเงินไว้ในกระเป๋าเงินล่วงหน้า กดปุ่ม "เติมเงิน" ในแถบ "ยอดและประวัติ" ระบบจะแสดง QR พร้อมเพย์ โอนแล้วรอแอดมินตรวจสอบ ยอดจะเข้ากระเป๋าให้อัตโนมัติ')+
+ li('เมื่อยอดต่ำกว่า '+baht(w[0])+' และต่ำกว่า '+baht(w[1])+' ระบบแจ้งเตือนถึงร้าน')+
+ li('ถ้ายอดไม่พอหักค่า GP ร้านจะถูกปิดรับจองชั่วคราว และเปิดรับจองให้เองเมื่อเติมเงินและชำระค่าค้างครบ')+'</ol></div>'+
+ '<div class="card form"><b>ตรวจสอบย้อนหลัง</b><p class="hint2" style="margin:0">ทุกครั้งที่หักค่า GP จะมีแจ้งเตือนในหมวด "ค่า GP" และดูประวัติการหักของแต่ละงานได้ในเมนู "รายงาน"</p><div class="acts"><button type="button" class="btn g" data-a="tab" data-id="rp">ไปที่เมนูรายงาน</button></div></div>'+
+ '<div class="card form"><b>มีข้อสงสัย</b><p class="hint2" style="margin:0">ติดต่อสมาคมได้ตามช่องทางด้านล่างนี้</p>'+(tel?'<div class="acts"><a class="btn" href="tel:'+esc(tel)+'" style="text-align:center;text-decoration:none">โทร '+esc(CT.phone)+'</a></div>':'')+(/^https?:\/\//i.test(CT.line||'')?'<div class="acts"><a class="btn g" href="'+esc(CT.line)+'" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">แชตกับสมาคมทาง LINE</a></div>':'')+(CT.hours?'<p class="hint2" style="margin:8px 0 0">เวลาทำการ '+esc(CT.hours)+'</p>':'')+'</div>'}
 function walView(){
+ if(S.wmode)return walMain();
+ var wt=S.wt==="gp"?"gp":"bal";
+ return '<div class="nf" role="tablist" aria-label="หมวดกระเป๋าเงิน">'+[["bal","ยอดและประวัติ"],["gp","ค่า GP"]].map(function(x){return '<button type="button" role="tab" data-a="wt" data-id="'+x[0]+'" class="'+(x[0]===wt?"on":"")+'" aria-selected="'+(x[0]===wt)+'">'+x[1]+'</button>'}).join('')+'</div>'+(wt==="gp"?gpView():walMain())}
+function walMain(){
  if(S.wmode)return '<div class="head"><h1>เติมเงินเข้ากระเป๋าระบบ</h1></div><div class="card form"><p class="hint2" style="margin:0">ยอดคงเหลือ '+baht(balance())+', เงินในกระเป๋านี้ใช้ให้ระบบหักค่า GP เมื่อพนักงานกดนวดเสร็จ</p>'+num("wa","จำนวนเงิน (บาท) ขั้นต่ำ 100",null)+'<p class="hint2" style="margin:0">ระบบจะแสดง QR พร้อมเพย์ของสมาคมตามยอดที่ระบุ โอนแล้วรอแอดมินตรวจสอบและยืนยัน ยอดจะเข้ากระเป๋าเงินอัตโนมัติ</p><div class="acts"><button class="btn" data-a="wsave">สร้างรายการเติมเงิน</button><button class="btn g" data-a="wcancel">ยกเลิก</button></div><div id="err" style="color:var(--bad)">'+esc(S.werr)+'</div></div>';
  var mo=iso(new Date()).slice(0,7),gpm=-D.tx.filter(function(t){return t.type==="gp"&&t.at.slice(0,7)===mo&&t.st==="สำเร็จ"}).reduce(function(a,t){return a+t.amt},0);
  var L=D.tx.filter(function(t){return!(t.type==="gp"&&t.st==="สำเร็จ")}).sort(function(a,b){return a.at<b.at?1:-1});
@@ -678,7 +697,7 @@ function loadLive0(){var pid=WID;
   var nt=r[3].filter(function(n){return n.kind!=="announce"}).map(function(n){return{id:n.id,db:1,from:n.title==="ระบบยกเลิกคิวอัตโนมัติ"?"admin":(KM[n.kind]||"admin"),title:n.title,text:n.body||"",at:n.created_at}});
   r[5].forEach(function(a){if((a.audiences||[]).indexOf("ร้านค้า")>-1)nt.push({id:"an-"+a.id,from:"admin",title:"ประกาศ: "+a.title,text:a.body||"",at:a.created_at||(a.day+"T00:00:00")})});
   D.nt=nt;D.ntRead=r[4].map(function(x){return x.notification_id}).concat(annRead());
-  var s=r[6]&&r[6][0];if(s){CT={name:s.association_name||"",addr:s.address||"",phone:s.phone||"",line:s.line_url||"",hours:s.hours_text||"",staff:/^https:\/\//i.test(s.staff_url||"")?s.staff_url:""};CFG.pp=s.promptpay_id?{on:s.promptpay_on!==false,type:s.promptpay_type,id:s.promptpay_id,name:s.promptpay_name}:{on:false,none:true};CFG.w1=+s.wallet_warn1||100;CFG.w2=+s.wallet_warn2||50}})}
+  var s=r[6]&&r[6][0];if(s){CT={name:s.association_name||"",addr:s.address||"",phone:s.phone||"",line:s.line_url||"",hours:s.hours_text||"",staff:/^https:\/\//i.test(s.staff_url||"")?s.staff_url:""};CFG.pp=s.promptpay_id?{on:s.promptpay_on!==false,type:s.promptpay_type,id:s.promptpay_id,name:s.promptpay_name}:{on:false,none:true};CFG.w1=+s.wallet_warn1||100;CFG.w2=+s.wallet_warn2||50;CFG.ac=+s.auto_close_hours||0}})}
 function loadShop(pid){WID=pid;D={shop:null,svc:[],staff:[],promo:[],tx:[],nt:[],ntRead:[],bk:[]};return Promise.all([loadCatalog(),loadLive()])}
 var S={tab:"q",mg:"svc",qt:"wait",form:null,del:null,saved:false,wmode:null,werr:"",busy:false,hmsg:""};
 function balance(){return D.tx.filter(function(t){return t.st==="สำเร็จ"}).reduce(function(a,t){return a+t.amt},0)}
@@ -797,6 +816,7 @@ document.addEventListener("click",function(e){
  if(a==="rvmore"){RV.show+=20;draw();return}
  if(a==="ntf"){S.ntf=id;draw();return}
  if(a==="qt"){S.qt=id;draw();return}
+ if(a==="wt"){S.wt=id==="gp"?"gp":"bal";draw();return}
  if(a==="new"){S.form={t:t,id:null};draw();return}
  if(a==="edit"){S.form={t:t,id:id};draw();return}
  if(a==="cancel"){S.form=null;draw();return}
