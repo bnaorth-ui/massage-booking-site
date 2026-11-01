@@ -107,10 +107,14 @@ ok('blocked w/o consent',(await p.textContent('body')).includes('ติ๊กย
 await p.click('[data-g=pv]');await sleep(300);ok('read policy from reg',(await p.textContent('body')).includes('เราเก็บข้อมูลอะไร'));
 await p.click('[data-g=pvback]');await until(()=>document.querySelector('#rn'));await sleep(200);
 ok('draft restored',(await p.inputValue('#rn'))==='ร้านใหม่'&&(await p.inputValue('#rph'))==='0833333333'&&(await p.inputValue('#rpw'))==='abc123');
-await p.setInputFiles('#rlic',{name:'l.png',mimeType:'image/png',buffer:PNG});await sleep(500);await p.check('#rpv');await p.click('[data-g=pv]');await sleep(200);await p.click('[data-g=pvback]');await sleep(300);
-ok('checkbox kept',await p.isChecked('#rpv'));
-await p.click('[data-g=regsend]');await sleep(900);
+await p.setInputFiles('#rlic',{name:'l.png',mimeType:'image/png',buffer:PNG});await sleep(500);await p.check('#rpv');await p.check('#rgp');await p.click('[data-g=pv]');await sleep(200);await p.click('[data-g=pvback]');await sleep(300);
+ok('checkbox kept',await p.isChecked('#rpv')&&await p.isChecked('#rgp'));
+ok('gp box shows rate + terms',await p.$eval('.gpbox',e=>e.textContent.includes('10%')&&e.textContent.includes('ปิดร้านชั่วคราว')&&e.textContent.includes('ต่ำกว่า 100 บาท')));
+await p.uncheck('#rgp');await p.click('[data-g=regsend]');await sleep(400);
+ok('blocked w/o gp consent',(await p.textContent('body')).includes('ยอมรับเงื่อนไขค่า GP ก่อนส่งคำขอ')&&!T.shop_registrations.some(x=>x.name==='ร้านใหม่'));
+await p.check('#rgp');await p.click('[data-g=regsend]');await sleep(900);
 ok('registration sent',T.shop_registrations.some(x=>x.name==='ร้านใหม่'));
+ok('gp acceptance sent with registration',T.shop_registrations.some(x=>x.name==='ร้านใหม่'&&+x.gp_accepted_percent===10));
 await p.goto(require('./config').page('shop-owner.html'));await p.evaluate(()=>localStorage.clear());
 await p.goto(require('./config').page('shop-owner.html'));await until(()=>document.querySelector('#gph'));
 await p.fill('#gph','0811111111');await p.fill('#gpw','abc123');await p.click('[data-g=login]');

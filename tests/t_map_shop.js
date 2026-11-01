@@ -101,7 +101,7 @@ await p.click('[data-g=reg]');await until(()=>document.querySelector('#rc option
 ok('categories loaded anon',(await p.$$eval('#rc option',o=>o.map(x=>x.textContent))).join()==='ร้านนวดแผนไทย,สปา');
 ok('category fetch without bearer',calls.find(c=>c.path.endsWith('/categories')).auth==='');
 await p.fill('#rn','ร้านใหม่ทดสอบ');await p.fill('#rph','0833333333');await p.fill('#rpw','secret1');await p.fill('#rpw2','secret1');
-await p.check('#rpv');await p.click('[data-g=regsend]');ok('licence required',await has('กรุณาแนบรูปใบอนุญาต'));
+await p.check('#rpv');await p.check('#rgp');await p.click('[data-g=regsend]');ok('licence required',await has('กรุณาแนบรูปใบอนุญาต'));
 await p.fill('#rn','ร้านใหม่ทดสอบ');await p.fill('#rph','0833333333');await p.fill('#rpw','secret1');await p.fill('#rpw2','secret2');
 await p.setInputFiles('#rlic',{name:'l.png',mimeType:'image/png',buffer:PNG});await until(()=>document.querySelector('#glicprev img'));
 await p.click('[data-g=regsend]');ok('password mismatch',await has('รหัสผ่านสองช่องไม่ตรงกัน'));
