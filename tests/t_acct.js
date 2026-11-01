@@ -49,7 +49,7 @@ await ctx.route('**/*supabase.co/**',async r=>{const q=r.request(),u=new URL(q.u
    NOTES.unshift({id:'n'+seq,title:'จองสำเร็จ',body:'เลขที่ '+ref,created_at:new Date().toISOString(),booking_id:'x'});
    return J(200,ref)}
  return J(404,{message:'nf '+path})});
-const p=await ctx.newPage();p.on('pageerror',e=>errs.push(e.message));p.on('dialog',d=>{errs.push('DIALOG '+d.message());d.dismiss()});
+const p=await ctx.newPage();await ctx.route('**/rest/v1/rpc/public_catalog',async r=>{try{const o=new URL(r.request().url()).origin;const g=t=>p.evaluate(async u=>{try{const x=await fetch(u);return x.ok?await x.json():null}catch(e){return null}},o+'/rest/v1/'+t+'?select=*');const R={};for(const [k,t] of [['places','places'],['services','services'],['service_places','service_places'],['staff','staff_public'],['staff_services','staff_services'],['place_staff','place_staff'],['days_off','staff_days_off'],['promos','promotions'],['promo_services','promotion_services'],['overrides','place_day_overrides'],['settings','app_settings'],['ann','announcements']])R[k]=await g(t);if(R.places===null)return r.fulfill({status:500,contentType:'application/json',body:'{"message":"fail"}'});for(const k in R)if(R[k]===null)R[k]=[];R.settings=R.settings&&R.settings[0];r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(R)})}catch(e){}});{const _w=p.waitForSelector.bind(p);p.waitForSelector=async(s,o)=>{if(s==='#lph'){await _w('#lph,[data-gb=login]',o);if(!(await p.$('#lph')))await p.click('[data-gb=login]')}return _w(s,o)}}{const _f=p.fill.bind(p);p.fill=async(s,v,o)=>{if(s==='#lph'){await p.waitForSelector('#lph,[data-gb=login]',{timeout:8000});if(!(await p.$('#lph')))await p.click('[data-gb=login]')}return _f(s,v,o)}};p.on('pageerror',e=>errs.push(e.message));p.on('dialog',d=>{errs.push('DIALOG '+d.message());d.dismiss()});
 const store=[];await ctx.route('**/storage/v1/object/avatars/**',r=>{store.push({m:r.request().method(),u:new URL(r.request().url()).pathname,auth:r.request().headers()['authorization']||''});r.fulfill({status:200,contentType:'application/json',body:'{}'})});
 const patches=[];await ctx.route('**/rest/v1/profiles?id=eq.*',async r=>{if(r.request().method()==='PATCH'){patches.push(JSON.parse(r.request().postData()||'{}'));return r.fulfill({status:204,body:''})}return r.fallback()});
 await p.goto(require('./config').page('customer-booking.html'));
@@ -66,7 +66,7 @@ ok('old top menu gone',!(await p.$('.mn')));
 ok('no aria-current / no nav landmark / no aria-label on tabs',(await p.$$('#tabs [aria-current]')).length===0&&(await p.$$('nav')).length===0&&!(await p.getAttribute('#tabs','aria-label')));
 const cur=async()=>await p.$$eval('#tabs button.on b',b=>b.map(x=>x.textContent).join());
 ok('home active',(await cur())==='หน้าหลัก');
-const badge=await p.$$eval('#tabs .bdg',b=>b.map(x=>x.textContent));ok('upcoming badge 1 ('+badge+')',badge.includes('1'));
+await p.waitForSelector('#tabs .bdg',{timeout:3000}).catch(()=>{});const badge=await p.$$eval('#tabs .bdg',b=>b.map(x=>x.textContent));ok('upcoming badge 1 ('+badge+')',badge.includes('1'));
 ok('home has no profile/logout',!(await p.$('.prof'))&&!(await p.$('[data-auth=out]')));
 await p.click('[data-tab=ac]');await p.waitForSelector('h1');{const t=await p.textContent('body');
 ok('account view',(await p.textContent('h1'))==='บัญชี'&&(await cur())==='บัญชี'&&await vis());

@@ -63,7 +63,7 @@ await ctx.route('**/*supabase.co/**',async r=>{const q=r.request(),u=new URL(q.u
    if(body.p_points){lastCB=body;const pd=body.p_points/10;BKS[BKS.length-1].total-=pd;BKS[BKS.length-1].pu=body.p_points;BKS[BKS.length-1].pd=pd;PTS.balance-=body.p_points}
    return J(200,ref)}
  return J(404,{message:'nf '+path})});
-const p=await ctx.newPage();p.on('pageerror',e=>errs.push(e.message));p.on('dialog',d=>{errs.push('DIALOG '+d.message());d.dismiss()});
+const p=await ctx.newPage();await ctx.route('**/rest/v1/rpc/public_catalog',async r=>{try{const o=new URL(r.request().url()).origin;const g=t=>p.evaluate(async u=>{try{const x=await fetch(u);return x.ok?await x.json():null}catch(e){return null}},o+'/rest/v1/'+t+'?select=*');const R={};for(const [k,t] of [['places','places'],['services','services'],['service_places','service_places'],['staff','staff_public'],['staff_services','staff_services'],['place_staff','place_staff'],['days_off','staff_days_off'],['promos','promotions'],['promo_services','promotion_services'],['overrides','place_day_overrides'],['settings','app_settings'],['ann','announcements']])R[k]=await g(t);if(R.places===null)return r.fulfill({status:500,contentType:'application/json',body:'{"message":"fail"}'});for(const k in R)if(R[k]===null)R[k]=[];R.settings=R.settings&&R.settings[0];r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(R)})}catch(e){}});{const _w=p.waitForSelector.bind(p);p.waitForSelector=async(s,o)=>{if(s==='#lph'){await _w('#lph,[data-gb=login]',o);if(!(await p.$('#lph')))await p.click('[data-gb=login]')}return _w(s,o)}}{const _f=p.fill.bind(p);p.fill=async(s,v,o)=>{if(s==='#lph'){await p.waitForSelector('#lph,[data-gb=login]',{timeout:8000});if(!(await p.$('#lph')))await p.click('[data-gb=login]')}return _f(s,v,o)}};p.on('pageerror',e=>errs.push(e.message));p.on('dialog',d=>{errs.push('DIALOG '+d.message());d.dismiss()});
 const store=[];await ctx.route('**/storage/v1/object/avatars/**',r=>{store.push({m:r.request().method(),u:new URL(r.request().url()).pathname,auth:r.request().headers()['authorization']||''});r.fulfill({status:200,contentType:'application/json',body:'{}'})});
 const patches=[];await ctx.route('**/rest/v1/profiles?id=eq.*',async r=>{if(r.request().method()==='PATCH'){patches.push(JSON.parse(r.request().postData()||'{}'));return r.fulfill({status:204,body:''})}return r.fallback()});
 const URL_=require('./config').page('customer-booking.html');
@@ -71,7 +71,7 @@ const UA={and:'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTM
 const ok=(n,c)=>console.log((c?'PASS ':'FAIL ')+n);
 async function open(ua,standalone){const pg=await ctx.newPage();pg.on('pageerror',e=>errs.push(e.message));
  await pg.addInitScript(([u,st])=>{Object.defineProperty(navigator,'userAgent',{get:()=>u});if(st){const o=window.matchMedia.bind(window);window.matchMedia=q=>q.includes('standalone')?{matches:true,addListener(){},removeListener(){},addEventListener(){}}:o(q)}},[ua,!!standalone]);
- await pg.goto(URL_);await pg.evaluate(()=>localStorage.clear());await pg.reload();await pg.waitForTimeout(400);return pg}
+ await pg.goto(URL_);await pg.evaluate(()=>localStorage.clear());await pg.reload();await pg.waitForSelector('[data-gb=ins],[data-gb=login],[data-ins=skip],#lph',{timeout:4000}).catch(()=>{});await pg.waitForTimeout(300);if(await pg.$('[data-gb=ins]'))await pg.click('[data-gb=ins]');await pg.waitForTimeout(300);return pg}
 const T=pg=>pg.textContent('#app');
 // android
 let pg=await open(UA.and);let t=await T(pg);
@@ -88,8 +88,8 @@ ok('prompt called + done msg',(await pg.evaluate(()=>window.__p))===1&&(await T(
 await pg.close();
 // android skip + remembered
 pg=await open(UA.and);await pg.click('[data-ins=skip]');await pg.waitForTimeout(300);
-ok('skip -> login',!!(await pg.$('#lph')));
-await pg.reload();await pg.waitForTimeout(400);ok('remembered: login directly',!!(await pg.$('#lph'))&&!(await T(pg)).includes('ติดตั้งแอปจองคิวนวด'));
+await pg.waitForSelector('[data-pl]',{timeout:4000});ok('skip -> shop list (guest)',!!(await pg.$('[data-pl]'))&&!(await pg.$('#lph')));
+await pg.reload();await pg.waitForSelector('[data-pl]',{timeout:4000});ok('remembered: shop list directly',!!(await pg.$('[data-pl]'))&&!(await T(pg)).includes('ติดตั้งแอปจองคิวนวด'));await pg.click('[data-gb=login]');await pg.waitForSelector('#lph');
 ok('NEW SEO: head tags',await pg.evaluate(()=>{const g=s=>document.querySelector(s);return document.title.includes('จองนวดออนไลน์ ร้านนวดใกล้ฉัน')&&g('meta[name=description]').content.includes('กรมสนับสนุนบริการสุขภาพ')&&g('link[rel=canonical]').href==='https://massage-customer-bna.pages.dev/'&&g('meta[property="og:url"]').content==='https://massage-customer-bna.pages.dev/'&&!document.querySelector('meta[name=robots][content*=noindex]')&&JSON.parse(g('script[type="application/ld+json"]').textContent).url==='https://bna.or.th'}));
 ok('NEW intro on login above h1',await pg.evaluate(()=>{const i=document.querySelector('#app .seoin'),h=document.querySelector('#app h1');return !!i&&!!h&&h.textContent==='เข้าสู่ระบบ'&&(i.compareDocumentPosition(h)&4)}));
 ok('NEW SEO: section visible on login with content',await pg.evaluate(()=>{const s=document.getElementById('seo');return !!s&&!s.hidden&&s.getBoundingClientRect().height>100&&s.innerText.includes('ทำไมต้องจองกับเรา')&&s.innerText.includes('กรมสนับสนุนบริการสุขภาพ')&&!/ทุกคน/.test(s.innerText)}));
@@ -98,7 +98,7 @@ ok('NEW SEO: install button on login (mobile)',!!(await pg.$('button[data-ag=ins
 await pg.click('[data-ag=reg]');await pg.waitForTimeout(200);ok('NEW SEO hidden on register step',await pg.evaluate(()=>document.getElementById('seo').hidden));await pg.click('[data-ag=login]');await pg.waitForTimeout(200);ok('NEW SEO back on login',await pg.evaluate(()=>!document.getElementById('seo').hidden));
 ok('login has how-to link',!!(await pg.$('[data-ag=ins]')));
 await pg.click('[data-ag=ins]');await pg.waitForTimeout(300);ok('link reopens intro',(await T(pg)).includes('ติดตั้งแอปจองคิวนวด'));
-await pg.click('[data-ins=skip]');await pg.waitForTimeout(200);ok('back to login',!!(await pg.$('#lph')));
+await pg.click('[data-ins=skip]');await pg.waitForTimeout(200);await pg.waitForSelector('[data-pl]',{timeout:4000});ok('back to shop list',!!(await pg.$('[data-pl]')));
 await pg.close();
 // line
 pg=await open(UA.line);t=await T(pg);ok('line: open in chrome',t.includes('เปิดใน Chrome')&&t.includes('LINE'));
@@ -109,12 +109,12 @@ await pg.click('[data-ins=copy]');await pg.waitForTimeout(200);ok('NEW cust copy
 await pg.close();
 pg=await open(UA.ios);t=await T(pg);ok('ios: share steps',t.includes('แชร์')&&t.includes('เพิ่มไปยังหน้าจอโฮม')&&t.includes('รับแจ้งเตือนบน iPhone')&&!(await pg.$('[data-ins=go]')));await pg.close();
 pg=await open(UA.iosl);t=await T(pg);ok('ios in LINE: safari first',t.includes('เปิดใน Safari')&&t.includes('เพิ่มไปยังหน้าจอโฮม'));await pg.close();
-pg=await open(UA.desk);ok('desktop: login directly, no link',!!(await pg.$('#lph'))&&!(await pg.$('[data-ag=ins]')));await pg.close();
-pg=await open(UA.and,true);ok('standalone: login directly, no link',!!(await pg.$('#lph'))&&!(await pg.$('[data-ag=ins]')));ok('NEW intro absent in installed app',!(await pg.$('#app .seoin')));
+pg=await open(UA.desk);ok('desktop: shop list, no install button',!!(await pg.$('[data-pl]'))&&!(await pg.$('[data-gb=ins]'))&&!!(await pg.$('[data-gb=login]')));await pg.click('[data-gb=login]');await pg.waitForSelector('#lph');ok('desktop: login has no link',!(await pg.$('[data-ag=ins]')));await pg.close();
+pg=await open(UA.and,true);ok('standalone: shop list, no install button',!!(await pg.$('[data-pl]'))&&!(await pg.$('[data-gb=ins]')));await pg.click('[data-gb=login]');await pg.waitForSelector('#lph');ok('standalone: login has no link',!(await pg.$('[data-ag=ins]')));ok('NEW intro absent in installed app',!(await pg.$('#app .seoin')));
 ok('NEW SEO hidden in installed (standalone) app',await pg.evaluate(()=>document.getElementById('seo').hidden));await pg.close();
 pg=await open(UA.and);await pg.click('[data-ins=skip]');await pg.waitForTimeout(200);ok('NEW SEO visible in normal browser login',await pg.evaluate(()=>!document.getElementById('seo').hidden));await pg.close();
 // logged in account
-pg=await open(UA.and);await pg.click('[data-ins=skip]');await pg.fill('#lph','0811111111');await pg.fill('#lpw','abc123');await pg.click('button[type=submit]');await pg.waitForSelector('[data-pl]',{timeout:4000});
+pg=await open(UA.and);await pg.click('[data-ins=skip]');await pg.waitForSelector('[data-gb=login]');await pg.click('[data-gb=login]');await pg.fill('#lph','0811111111');await pg.fill('#lpw','abc123');await pg.click('button[type=submit]');await pg.waitForSelector('[data-pl]',{timeout:4000});
 await pg.click('[data-tab="ac"]');await pg.waitForTimeout(300);
 ok('account: how-to button',!!(await pg.$('[data-insp=open]')));
 await pg.click('[data-insp=open]');await pg.waitForTimeout(300);
