@@ -424,7 +424,7 @@ function render(keep){
    b='<button class="btn ghost" id="back">ย้อนกลับ</button><button class="btn" id="next"'+(asgDone()?"":" disabled")+'>ถัดไป</button>';
   }
   if(S.step===4){
-   h+='<h1>สรุปรายการ</h1><p class="sub">กรอกเบอร์โทรศัพท์ แล้วตรวจสอบรายการก่อนกดยืนยัน</p>'+(GUEST&&!ME?'<p class="note">เมื่อกดยืนยัน ระบบจะให้เข้าสู่ระบบหรือสมัครสมาชิกก่อน รายการที่เลือกไว้จะไม่หาย</p>':'')+(S.err?'<div class="err" role="alert">'+esc(S.err)+'</div>':'')+(S.place.type==="shop"?'<div class="card2"><label class="fl" for="ph">เบอร์โทรศัพท์ผู้จอง (จำเป็น)</label><input class="sel" id="ph" type="text" inputmode="tel" enterkeyhint="done" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="16" placeholder="เช่น 0812345678" value="'+esc(S.phone)+'"></div>':'')+ptsBox()+summary();
+   h+='<h1>สรุปรายการ</h1><p class="sub">ตรวจสอบรายการก่อนกดยืนยัน</p>'+(GUEST&&!ME?'<p class="note">เมื่อกดยืนยัน ระบบจะให้เข้าสู่ระบบหรือสมัครสมาชิกก่อน รายการที่เลือกไว้จะไม่หาย</p>':'')+(S.err?'<div class="err" role="alert">'+esc(S.err)+'</div>':'')+ptsBox()+summary();
    var bt='<button class="btn ghost" id="back"'+(S.saving?' disabled':'')+'>ย้อนกลับ</button><button class="btn" id="ok"'+(S.saving?' disabled':'')+'>'+(S.saving?'กำลังจอง…':'ยืนยันการจอง')+'</button>';
    if(S.place.type==="shop"){h+='<div class="inbtns">'+bt+'</div>';b=""}else b=bt;
   }
@@ -514,9 +514,8 @@ function bind(){
  if(g("ptson"))g("ptson").onchange=function(){S.ptsOn=this.checked;S.usePts=0;render(true);var e=g("ptson");if(e)e.focus()};
  if(g("ptsamt"))g("ptsamt").onchange=function(){S.usePts=+this.value;render(true);var e=g("ptsamt");if(e)e.focus()};
  if(g("pthist"))g("pthist").onclick=function(){V.pth=!V.pth;render(true);var e=g("pthist");if(e)e.focus()};
- if(g("ph")){var ip=g("ph");ip.oninput=ip.onchange=ip.onblur=function(){S.phone=this.value};ip.onkeydown=function(ev){if(ev&&ev.key==="Enter"&&this.blur)this.blur()}}
  if(g("ok"))g("ok").onclick=function(){
-  if(S.place.type==="shop"){var ph=normPhone(g("ph")?g("ph").value:S.phone);if(!/^0\d{8,9}$/.test(ph)){S.phone=g("ph")?g("ph").value:S.phone;S.err="กรอกเบอร์โทรศัพท์ให้ถูกต้อง (เช่น 0812345678 หรือ +66812345678)";render(true);return}S.phone=ph;S.err=""}
+  if(S.place.type==="shop"&&ME){var ph=normPhone(ME.phone||S.phone||"");if(!/^0\d{8,9}$/.test(ph)){S.err="เบอร์โทรในบัญชีไม่ถูกต้อง กรุณาติดต่อสมาคมเพื่อแก้ไขเบอร์";render(true);return}S.phone=ph;S.err=""}
   if(!S.svcs.every(function(v,i){var c=S.asg[v.uid];return c&&segFree(c,S.date,S.time+svcOff(i),v.min)})||(S.sim&&S.svcs.length>1&&S.sts.length<S.svcs.length)){alert("คิวนี้เพิ่งเต็ม กรุณาเลือกเวลาหรือพนักงานใหม่");S.step=2;S.time=null;S.sts=[];S.asg={};render();return}
   confirmBooking()};
  if(g("again"))g("again").onclick=function(){S=fresh();render()};
@@ -608,7 +607,7 @@ function avUrl(p){return p?SB.url+"/storage/v1/object/public/avatars/"+p:""}
 function loadProfile(){var uid=SBS.user.id,m=SBS.user.user_metadata||{};
  return sbApi("/rest/v1/profiles?id=eq."+uid+"&select=first_name,last_name,phone,avatar_path").then(function(a){var p=(a&&a[0])||{};
   return{id:uid,fn:p.first_name||m.first_name||"",ln:p.last_name||m.last_name||"",phone:p.phone||m.phone||"",img:avUrl(p.avatar_path),imgPath:p.avatar_path||null}})}
-function setMe(u){ME=u;if(u)GUEST=false;if(u)setTimeout(function(){try{saveLoc()}catch(e){}},800);CUSTOMER=u?(u.fn+" "+u.ln).trim():""}
+function setMe(u){ME=u;if(u){GUEST=false;wr("hadAcct",true)}if(u)setTimeout(function(){try{saveLoc()}catch(e){}},800);CUSTOMER=u?(u.fn+" "+u.ln).trim():""}
 function errTh(e,ctx){var m=String(e&&e.message||"");
  if(m==="NET")return"เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ ตรวจสอบอินเทอร์เน็ตแล้วลองใหม่";
  if(e&&e.code==="P0001")return m;
@@ -804,7 +803,7 @@ function authRender(){var tb=document.getElementById("tabs");if(tb)tb.style.disp
   '<p class="aerr" id="aerr" role="alert"></p><button class="btn wide" type="submit">เข้าสู่ระบบ</button></form>'+
   '<div class="alinks"><button class="lb" data-ag="fp">ลืมรหัสผ่าน</button><button class="lb" data-ag="reg">ลงทะเบียนสมาชิกใหม่</button><button class="lb" data-ag="pv">นโยบายความเป็นส่วนตัว</button>'+'</div>'}
  if(st==="reg"){
-  h='<h1>ลงทะเบียนสมาชิกใหม่</h1><p class="sub">กรอกข้อมูลเพื่อสร้างบัญชีผู้ใช้งาน</p>'+
+  h='<h1>ลงทะเบียนสมาชิกใหม่</h1><p class="sub">กรอกข้อมูลเพื่อสร้างบัญชีผู้ใช้งาน</p>'+(AU.ok?'<div class="flash" role="status">'+esc(AU.ok)+'</div>':'')+
   '<form id="authf" novalidate><div class="avrow"><span id="avprev">'+avHtml({fn:"?",img:AU.img},true)+'</span><label class="lb avbtn" for="rimg">เลือกรูปโปรไฟล์</label><input id="rimg" type="file" accept="image/*" class="vh"></div>'+
   fld("rfn","ชื่อ","text",'autocomplete="given-name"')+fld("rln","นามสกุล","text",'autocomplete="family-name"')+fld("rph","เบอร์มือถือ","tel",'inputmode="tel" autocomplete="tel" placeholder="เช่น 0812345678"')+
   fld("rpw","รหัสผ่าน (อย่างน้อย 6 ตัวอักษร)","password",'autocomplete="new-password"')+fld("rpw2","ยืนยันรหัสผ่าน","password",'autocomplete="new-password"')+
@@ -860,10 +859,10 @@ function authRender(){var tb=document.getElementById("tabs");if(tb)tb.style.disp
 }
 /* ===== โหมดผู้เยี่ยมชม: ดูร้าน/บริการ/เลือกเวลาได้ก่อน ล็อกอินหรือสมัครตอนกดยืนยันการจอง ===== */
 function guestBar(){return '<div class="gbar"><button type="button" class="btn" data-gb="login">เข้าสู่ระบบ / สมัครสมาชิก</button>'+(insKind()?'<button type="button" class="btn ghost" data-gb="ins">ติดตั้งแอป</button>':'')+'</div>'}
-function needLogin(msg){GUEST=false;AU.step="login";AU.ok=msg||"";authRender()}
+function needLogin(msg,reg){GUEST=false;AU.step=reg&&!rd("hadAcct",false)?"reg":"login";AU.ok=msg||"";authRender()}
 function goBrowse(){GUEST=true;AU.step="login";AU.ok="";if(ME||CAT.state==="ok")render();else startApp()}
 function savePend(){try{var c={};for(var k in S)c[k]=S[k];c.place={id:S.place.id,type:S.place.type};c.saving=false;c.err="";localStorage.setItem(PENDK,JSON.stringify({t:Date.now(),s:c}))}catch(e){}
- needLogin("เข้าสู่ระบบหรือสมัครสมาชิกเพื่อจองต่อ รายการที่เลือกไว้จะยังอยู่")}
+ needLogin("เข้าสู่ระบบหรือสมัครสมาชิกเพื่อจองต่อ รายการที่เลือกไว้จะยังอยู่",true)}
 function tryRestore(){if(!ME)return;var p=null;try{p=JSON.parse(localStorage.getItem(PENDK))}catch(e){}
  if(!p)return;try{localStorage.removeItem(PENDK)}catch(e){}
  try{if(!p.s||!p.s.place||Date.now()-p.t>30*60000)return;var pl=find(PLACES,p.s.place.id);if(!pl)return;

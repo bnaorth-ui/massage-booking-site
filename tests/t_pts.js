@@ -71,7 +71,7 @@ PTS.balance=450;await p.click('[data-tab="bk"]').catch(()=>{});await p.click('[d
 async function toStep4(){await p.click('[data-tab=""]');for(let i=0;i<5&&!(await p.$('[data-pl]'));i++){await p.click('#back');await p.waitForTimeout(150)}await p.waitForSelector('[data-pl]');
  await p.click('[data-pl="sh1"]');await p.waitForSelector('[data-qty]');await p.click('[data-qty]:not([disabled]) >> nth=0');await p.click('#next');await p.waitForSelector('#selT');await p.waitForTimeout(500);
  await p.selectOption('#selD',await p.$eval('#selD',e=>e.options[2].value));await p.waitForTimeout(400);await p.selectOption('#selT','900');await p.waitForTimeout(400);
- await p.click('[data-st]');await p.waitForTimeout(200);await p.click('#next');await p.waitForSelector('#ph');}
+ await p.click('[data-st]');await p.waitForTimeout(200);await p.click('#next');await p.waitForSelector('#ok');}
 await toStep4();
 t=await A();ok('step4 has points box',t.includes('ใช้แต้มสะสมเป็นส่วนลด'));ok('no select before tick',!(await p.$('#ptsamt')));
 await p.click('#ptson');await p.waitForTimeout(200);t=await A();ok('select shown',!!(await p.$('#ptsamt')));
@@ -80,7 +80,7 @@ const opts=await p.$$eval('#ptsamt option',o=>o.map(x=>x.value));console.log('op
 ok('max=450 (balance, multiple of 10)',opts[opts.length-1]==='450'||opts[opts.length-1]==='400');
 await p.selectOption('#ptsamt','200');await p.waitForTimeout(200);t=await A();ok('summary shows points row -20',t.includes('ใช้แต้มสะสม 200 แต้ม')&&t.includes('-20 บาท'));ok('total 380',t.replace(/\s/g,'').includes('380บาท'));
 ok('sentence before/after',t.includes('ราคาจาก 400 บาท เหลือ 380 บาท'));
-await p.fill('#ph','0811111111');await p.click('#ok');await p.waitForTimeout(900);
+await p.click('#ok');await p.waitForTimeout(900);
 ok('sent p_points=200',lastCB&&lastCB.p_points===200);t=await A();ok('final total 380 + points row',t.includes('380 บาท')&&t.includes('ใช้แต้มสะสม 200 แต้ม'));
 ok('final before-discount 400',t.includes('ราคาก่อนลด')&&t.includes('400 บาท'));
 await p.click('[data-tab="bk"]').catch(()=>{});

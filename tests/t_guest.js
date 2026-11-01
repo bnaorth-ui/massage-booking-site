@@ -71,17 +71,18 @@ await p.waitForSelector('button.opt[data-st]');await p.click('button.opt[data-st
 await p.waitForSelector('#next:not([disabled])');await p.click('#next');
 await p.waitForSelector('#ok');
 ok('reached confirm step as guest',true);
-await p.fill('#ph','0811111111');await p.click('#ok');await p.waitForSelector('#lph',{timeout:3000});
+ok('no phone field on summary',!(await p.$('#ph')));await p.click('#ok');await p.waitForSelector('#rph',{timeout:3000});
 const t=await p.textContent('#app');
-ok('login shown with flash',t.includes('รายการที่เลือกไว้จะยังอยู่'));
+ok('register shown first with flash',t.includes('รายการที่เลือกไว้จะยังอยู่'));
 ok('no create_booking before login',!calls.some(c=>c.path.endsWith('create_booking')));
-await p.fill('#lph','0811111111');await p.fill('#lpw','abc123');await p.click('button[type=submit]');
+await p.click('[data-ag=login]');await p.waitForSelector('#lph');await p.fill('#lph','0811111111');await p.fill('#lpw','abc123');await p.click('button[type=submit]');
 await p.waitForSelector('#ok',{timeout:5000});
 const t2=await p.textContent('#app');
 ok('restored to confirm step with shop',t2.includes('ร้านสบายดี'));
-ok('phone preserved',(await p.inputValue('#ph'))==='0811111111');
+
 await p.click('#ok');await p.waitForSelector('.done',{timeout:5000});
 ok('booking created after login',calls.some(c=>c.path.endsWith('create_booking'))&&BKS.length===1);
+ok('phone sent from account',(calls.find(c=>c.path.endsWith('create_booking')).body||{}).p_phone==='0811111111');
 
 // logout -> guest shop list (no login form)
 await p.click('[data-tab=ac]');await p.waitForSelector('[data-auth=out]');await p.click('[data-auth=out]');
@@ -95,5 +96,20 @@ await p.click('[data-gb=browse]');await p.waitForSelector('[data-pl]');
 ok('back-to-browse shows shops',true);
 // no phone/contact leakage in public catalog request body/response is server-side; ensure guest never sends auth header to catalog
 ok('catalog fetched without user token',calls.filter(c=>c.path.endsWith('public_catalog')).slice(0,1).every(c=>!/Bearer at$/.test(c.auth)));
+
+// returning device (hadAcct) -> login first; fresh device -> register first, then sign up and restore
+await p.evaluate(()=>localStorage.removeItem('hadAcct'));
+await p.reload();await p.waitForSelector('[data-pl]');
+await p.click('[data-pl="sh1"]');await p.waitForSelector('.opt');await p.click('.qb[data-dir="1"] >> nth=0');await p.click('#next');
+await p.waitForSelector('#selD');{const d=await p.$$eval('#selD option',o=>o.map(x=>x.value).filter(Boolean));await p.selectOption('#selD',d[1]||d[0])}
+await p.waitForFunction(()=>{const s=document.getElementById('selT');return s&&!s.disabled},null,{timeout:4000});
+{const t=await p.$$eval('#selT option',o=>o.map(x=>x.value).filter(Boolean));await p.selectOption('#selT',t[1]||t[0])}
+await p.waitForSelector('button.opt[data-st]');await p.click('button.opt[data-st] >> nth=0');await p.waitForSelector('#next:not([disabled])');await p.click('#next');
+await p.waitForSelector('#ok');await p.click('#ok');await p.waitForSelector('#rph',{timeout:3000});
+ok('fresh device: register first',!(await p.$('#lph')));
+await p.fill('#rfn','สมหญิง');await p.fill('#rln','ใจงาม');await p.fill('#rph','0822222222');await p.fill('#rpw','abc12345');await p.fill('#rpw2','abc12345');
+await p.check('#rpv').catch(()=>{});await p.click('button[type=submit]');
+await p.waitForSelector('#ok',{timeout:6000}).catch(()=>{});
+ok('after sign-up back at confirm step',!!(await p.$('#ok'))&&(await p.textContent('#app')).includes('ร้านสบายดี'));
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)
 })()
