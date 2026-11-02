@@ -106,10 +106,14 @@ await p.selectOption('#orq_ls','');await p.selectOption('#orq_le','');
 ok('estimate: no lunch -> 6 hrs',await p.$eval('#orq_est',e=>e.textContent.includes('6 ชั่วโมง')&&e.textContent.includes('2,400')));
 await p.selectOption('#orq_ls','12:00');await p.selectOption('#orq_le','13:00');
 await p.click('[data-orq=send]');ok('terms required',(await err()).includes('ยอมรับเงื่อนไข')&&SUBS.length===0);
+await p.evaluate(()=>Object.defineProperty(navigator,'userAgent',{get:()=>'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Safari/604.1',configurable:true}));
 await p.check('#orq_terms');await p.click('[data-orq=send]');await p.waitForSelector('.orqc',{timeout:4000});
 ok('submit payload correct',SUBS.length===1&&SUBS[0].name==='บริษัท ทดสอบ จำกัด'&&SUBS[0].district==='ปทุมวัน'&&SUBS[0].lat===13.7466&&SUBS[0].start==='09:00'&&SUBS[0].end==='15:00'&&SUBS[0].lunch_start==='12:00'&&SUBS[0].lunch_end==='13:00'&&SUBS[0].staff.length===2&&SUBS[0].terms===true&&SUBS[0].rate===400&&SUBS[0].contact_phone==='0899999999');
 ok('list shows pending request',await p.$eval('.orqc',e=>e.textContent.includes('รอสมาคมตรวจสอบ')&&e.textContent.includes('ORG-TEST-0001')));
 ok('flash after submit',(await p.textContent('.flash')).includes('ส่งคำขอแล้ว'));
+ok('install tip shown after submit (not installed)',await p.$eval('#orq_instip',e=>e.textContent.includes('48 ชั่วโมง')&&!!e.querySelector('[data-insp=open]')));
+await p.evaluate(()=>{delete navigator.userAgent});
+
 // ---- ยกเลิกคำขอ
 await p.click('[data-orq=cancel]');ok('cancel asks to confirm',(await p.textContent('.orqc')).includes('ยืนยันยกเลิก'));
 await p.click('[data-orq=cancelno]');ok('cancel can be dismissed',CANC.length===0);
