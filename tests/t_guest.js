@@ -68,6 +68,12 @@ ok('guest sees association contact at bottom',ct.vis&&ct.t.includes('ติด�
 ok('tel/mailto/line links',ct.tel==='tel:021234567'&&ct.mail==='mailto:info@example.org'&&ct.line);
 ok('address is escaped text (no injected tag)',ct.b===1&&ct.t.includes('<b>x</b>'));}
 {const rb=await p.$eval('.regbar',e=>({t:e.innerText,href:(e.querySelector('a')||{}).href,tgt:(e.querySelector('a')||{}).target,afterList:!!(document.querySelector('.list')&&(document.querySelector('.list').compareDocumentPosition(e)&4))}));
+{const f=await p.evaluate(()=>{const d=[...document.querySelectorAll('#seo .faq details')],ld=[...document.querySelectorAll('script[type="application/ld+json"]')].map(x=>JSON.parse(x.textContent)).find(x=>x['@type']==='FAQPage');return{n:d.length,closed:d.every(x=>!x.open),vis:!document.getElementById('seo').hidden,qs:d.map(x=>x.querySelector('summary').textContent),as:d.map(x=>x.querySelector('p').textContent),ld:ld&&ld.mainEntity.map(x=>[x.name,x.acceptedAnswer.text]),org:document.getElementById('seo').textContent.includes('บริการนวดนอกสถานที่สำหรับหน่วยงาน')}});
+ok('FAQ: 7 collapsed items visible to guest',f.n===7&&f.closed&&f.vis&&f.org);
+ok('FAQ JSON-LD matches visible text',!!f.ld&&f.ld.length===7&&f.ld.every((x,i)=>x[0]===f.qs[i]&&x[1]===f.as[i]));
+await p.evaluate(()=>{document.querySelector('#seo .faq details').open=true});
+ok('FAQ item opens',await p.$eval('#seo .faq details',e=>e.open&&e.querySelector('p').offsetHeight>0));
+await p.setViewportSize({width:420,height:900});await p.evaluate(()=>{document.querySelector('#seo h3:nth-of-type(3)').scrollIntoView()});await p.screenshot({path:'seo_faq.png'});}
 ok('register-shop bar after list',rb.t.includes('ลงทะเบียนร้านนวด')&&rb.href==='https://shop.example.org/'&&rb.tgt==='_blank'&&rb.afterList);
 ok('register-shop link in about section',await p.$eval('#seoct',e=>[...e.querySelectorAll('a')].some(a=>a.textContent==='ลงทะเบียนร้านนวด'&&a.href==='https://shop.example.org/')));}
 await p.click('[data-pl="sh1"]');await p.waitForSelector('.opt');await p.click('.qb[data-dir="1"] >> nth=0');await p.click('#next');
