@@ -70,9 +70,9 @@ const ok=(n,c)=>console.log((c?'PASS ':'FAIL ')+n);
 const PNG=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==','base64');
 await p.waitForSelector('[data-pl]',{timeout:5000});
 // ---- ผู้เยี่ยมชมเห็นปุ่มขอบริการสำหรับหน่วยงาน -> ต้องล็อกอินก่อน
-ok('guest home has no org-request bar (moved to account menu)',!(await p.$('[data-orq]')));
-await p.evaluate(()=>{const b=document.createElement('button');b.id='gtest';b.dataset.orq='guest';b.textContent='x';document.getElementById('app').appendChild(b);orqBind()});
-await p.click('#gtest');await p.waitForSelector('#rph,#lph',{timeout:3000});
+ok('guest home shows org invitation bar with button',await p.$eval('.regbar:has([data-orq=guest])',e=>e.textContent.includes('ให้หมอนวดไปดูแลคนในองค์กรของคุณถึงที่')&&e.textContent.includes('ขอบริการสำหรับหน่วยงาน')));
+ok('org bar sits after register-shop bar',await p.evaluate(()=>{const a=[...document.querySelectorAll('.regbar')];return a.length<2||a[a.length-1].querySelector('[data-orq=guest]')!==null}));
+await p.click('[data-orq=guest]');await p.waitForSelector('#rph,#lph',{timeout:3000});
 ok('login/register required first',!!(await p.$('#rph,#lph'))&&(await p.textContent('#app')).includes('ส่งคำขอสำหรับหน่วยงาน'));
 if(await p.$('[data-ag=login]'))await p.click('[data-ag=login]');
 await p.waitForSelector('#lph');await p.fill('#lph','0811111111');await p.fill('#lpw','abc123');await p.click('button[type=submit]');
