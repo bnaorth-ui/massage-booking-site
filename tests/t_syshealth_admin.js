@@ -42,7 +42,7 @@ const T={bookings:BKX.filter(b=>b.place_id!=='og1').concat(RPT),admins:[],
  org_invites:[{id:'iv1',request_id:'q3',staff_id:'p1',status:'pending',by_admin:false}]};
 const oqCalls=[],SDR=[],hlCalls=[];const NOWI=new Date().toISOString(),MIN=m=>new Date(Date.now()-m*60000).toISOString();
 const JB=(name,schedule,lastMin,f=0,msg='')=>({name,schedule,active:true,last_run:MIN(lastMin),last_status:f?'failed':'succeeded',failed_7d:f,last_fail_at:f?MIN(lastMin):null,last_fail_msg:msg});
-const hlMode={err:false,d:{now:NOWI,last_check:MIN(400),last_alert:null,issues:[],jobs:[JB('send-reminders','* * * * *',1),JB('health-check','0 21 * * *',420),JB('org-requests-tick','*/10 * * * *',4),JB('slip-clear-reminder','0 2 1 * *',9000)]}};
+const hlMode={err:false,d:{now:NOWI,last_check:MIN(400),last_alert:null,issues:[],jobs:[JB('send-reminders','* * * * *',1),JB('health-check','0 21 * * *',420),JB('org-requests-tick','*/10 * * * *',4),JB('slip-clear-reminder','0 2 1 * *',9000),{name:'audit-purge',schedule:'30 20 * * *',active:true,last_run:null,last_status:null,failed_7d:0,last_fail_at:null,last_fail_msg:''}]}};
 const bal={sh1:{balance:960,owner_phone:'0899111111',owner_name:'สมหมาย ใจดี'},sh2:{balance:-600,owner_phone:'0898',owner_name:''},og1:null};
 let mode={netDown:false};
 await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.protocol==='file:')return r.continue();if(!u.host.endsWith('supabase.co'))return r.abort();
@@ -118,6 +118,7 @@ ok('healthy banner',t.includes('ปกติ')&&t.includes('ไม่พบเ�
 ok('job Thai names + schedules',t.includes('ส่งเตือนก่อนถึงคิว')&&t.includes('รันทุกนาที')&&t.includes('รันทุก 10 นาที')&&t.includes('ทุกวัน 04:00 น.')&&t.includes('วันที่ 1 ของเดือน 09:00 น.'));
 ok('no warning chips when healthy',!/ล้มเหลว \d+ ครั้ง|ไม่รันตามกำหนด/.test(t));
 ok('status region present',!!(await p.$('#main [role=status]')));
+ok('never-run new job is waiting, not a warning',t.includes('ล้างประวัติการทำงานแอดมิน (12 เดือน)')&&t.includes('รอรอบแรก'));
 ok('job card detail on its own line',await p.$$eval('#main .hlc small',e=>e.length>0&&e.every(x=>getComputedStyle(x).display==='block')));
 // refresh button reloads, with new data: issue + failed job + late job
 hlMode.d={now:new Date().toISOString(),last_check:MIN(10),last_alert:MIN(5),issues:[{code:'org_slip',n:2,line:'• สลิปคำขอหน่วยงานรอตรวจนานเกิน 24 ชั่วโมง 2 รายการ: ORG000005, ORG000006'}],jobs:[JB('send-reminders','* * * * *',45),JB('chat-purge','20 20 * * *',60,2,'connection refused'),JB('points-expire','0 20 * * *',60)]};
