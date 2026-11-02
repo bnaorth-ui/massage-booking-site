@@ -118,6 +118,7 @@ ok('healthy banner',t.includes('ปกติ')&&t.includes('ไม่พบเ�
 ok('job Thai names + schedules',t.includes('ส่งเตือนก่อนถึงคิว')&&t.includes('รันทุกนาที')&&t.includes('รันทุก 10 นาที')&&t.includes('ทุกวัน 04:00 น.')&&t.includes('วันที่ 1 ของเดือน 09:00 น.'));
 ok('no warning chips when healthy',!/ล้มเหลว \d+ ครั้ง|ไม่รันตามกำหนด/.test(t));
 ok('status region present',!!(await p.$('#main [role=status]')));
+ok('job card detail on its own line',await p.$$eval('#main .hlc small',e=>e.length>0&&e.every(x=>getComputedStyle(x).display==='block')));
 // refresh button reloads, with new data: issue + failed job + late job
 hlMode.d={now:new Date().toISOString(),last_check:MIN(10),last_alert:MIN(5),issues:[{code:'org_slip',n:2,line:'• สลิปคำขอหน่วยงานรอตรวจนานเกิน 24 ชั่วโมง 2 รายการ: ORG000005, ORG000006'}],jobs:[JB('send-reminders','* * * * *',45),JB('chat-purge','20 20 * * *',60,2,'connection refused'),JB('points-expire','0 20 * * *',60)]};
 await p.click('[data-a=hlre]');await p.waitForTimeout(600);
