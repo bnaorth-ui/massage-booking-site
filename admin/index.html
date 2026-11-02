@@ -248,7 +248,7 @@ function enter(){AG.step="load";S.busy=false;gateDraw();whoAmI();
 
 /* ===================== หน้าจอ ===================== */
 var NAV=[["q","หน้าหลัก","🏠","คิวงานใหม่"],["pl","สถานที่และคน","🏪","ร้านและคำขอที่รอดำเนินการ"],["fin","การเงิน","💰","คำขอเติมเงินรอยืนยัน"],["nt","การแจ้งเตือน","🔔","ยังไม่ได้อ่าน"],["sys","จัดการระบบ","⚙️",""]],
-SUBM={pl:[["shop","ร้านนวด"],["org","หน่วยงาน"],["oreq","คำขอหน่วยงาน"],["comp","บริษัท"],["staff","พนักงาน"]],fin:[["pprq","คำขอเติมเงิน"],["ppac","บัญชีรับเงิน"],["rp","รายงาน"]],sys:[["svc","บริการกลาง"],["cat","หมวดหมู่"],["rvw","รีวิว"],["usr","ผู้ใช้งาน"],["ann","ประกาศ"],["set","การตั้งค่า"]]},
+SUBM={pl:[["shop","ร้านนวด"],["org","หน่วยงาน"],["oreq","คำขอหน่วยงาน"],["comp","บริษัท"],["staff","พนักงาน"]],fin:[["pprq","คำขอเติมเงิน"],["ppac","บัญชีรับเงิน"],["rp","รายงาน"]],sys:[["svc","บริการกลาง"],["cat","หมวดหมู่"],["rvw","รีวิว"],["usr","ผู้ใช้งาน"],["ann","ประกาศ"],["set","การตั้งค่า"],["hl","สถานะระบบ"]]},
 NAVN={pl:"สถานที่และคน",fin:"การเงิน",sys:"จัดการระบบ"};
 function groupOf(t){return t==="q"||t==="nt"?t:/^(shop|org|oreq|comp|staff)$/.test(t)?"pl":/^(pp|rp|pprq|ppac)$/.test(t)?"fin":"sys"}
 function curSub(){return S.tab==="pp"?"pp"+(S.pps==="ac"?"ac":"rq"):S.tab}
@@ -521,11 +521,28 @@ function setView(){var c=D.set,sb=S.sub||"g",grp=function(id,h){return '<div dat
  return '<div class="head"><h1>การตั้งค่า</h1></div><div class="subtabs">'+SUBS.map(function(x){return '<button data-a="sub" data-id="'+x[0]+'" class="'+(x[0]===sb?"on":"")+'">'+x[1]+'</button>'}).join("")+'</div>'+(S.saved?'<div class="saved" role="status">'+esc(S.saved)+'</div>':'')+body}
 var SUBS=[["g","ข้อมูลสมาคม"],["b","การจองและพนักงาน"],["n","การแจ้งเตือน"],["a","แอดมิน"],["c","ล้างข้อมูลเก่า"]];
 function subTo(id){S.sub=id;document.querySelectorAll("[data-sg]").forEach(function(e){e.hidden=e.dataset.sg!==id});document.querySelectorAll(".subtabs [data-a=sub]").forEach(function(e){e.classList.toggle("on",e.dataset.id===id)});var sb=document.getElementById("sbar");if(sb)sb.hidden=id==="a"||id==="c"}
+var HL={d:null,err:"",busy:false},HLJ={"auto-cancel-unaccepted":"ยกเลิกคิวที่ไม่มีคนรับ","auto-close-overdue":"ปิดงานที่เลยเวลา","booking-anonymize":"ล้างชื่อและเบอร์ในการจองเก่า (12 เดือน)","chat-purge":"ลบข้อความแชตเก่า (90 วัน)","cron-history-purge":"ล้างประวัติงานตั้งเวลา (7 วัน)","health-check":"ตรวจสุขภาพระบบรายวัน","org-requests-tick":"ตรวจกำหนดเวลาคำขอหน่วยงาน","points-expire":"แต้มสะสมหมดอายุ","purge-notifications":"ล้างการแจ้งเตือนเก่า","remind-overdue-jobs":"เตือนงานที่เลยเวลา","remind-unaccepted-jobs":"เตือนงานที่ยังไม่มีคนรับ","send-preopen-alerts":"แจ้งก่อนร้านเปิด","send-reminders":"ส่งเตือนก่อนถึงคิว","slip-clear-reminder":"เตือนล้างสลิปรายเดือน"};
+function hlN(){return HL.d&&HL.d.issues?HL.d.issues.length:0}
+function hlLoad(){if(HL.busy)return;HL.busy=true;HL.err="";if(S.tab==="hl")draw();return rpc("admin_system_status").then(function(d){HL.d=d&&typeof d==="object"?d:null;HL.busy=false;if(S.tab==="hl")draw()},function(e){HL.busy=false;HL.err=errTh(e,"โหลดสถานะระบบไม่สำเร็จ ตรวจสอบว่ารันไฟล์ SQL สถานะระบบแล้ว");if(S.tab==="hl")draw()})}
+function hlT(iso){if(!iso)return"-";var d=new Date(iso);return isNaN(d)?"-":d.toLocaleString("th-TH",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit",timeZone:"Asia/Bangkok"})+" น."}
+function hlSch(c){c=String(c||"");var m;if(c==="* * * * *")return"ทุกนาที";if((m=/^\*\/(\d+) \* \* \* \*$/.exec(c)))return"ทุก "+m[1]+" นาที";if((m=/^(\d+) (\d+) \* \* \*$/.exec(c))){var h=(+m[2]+7)%24,mi=+m[1];return"ทุกวัน "+(h<10?"0":"")+h+":"+(mi<10?"0":"")+mi+" น."}if((m=/^(\d+) (\d+) (\d+) \* \*$/.exec(c))){var h2=(+m[2]+7)%24,mi2=+m[1];return"วันที่ "+m[3]+" ของเดือน "+(h2<10?"0":"")+h2+":"+(mi2<10?"0":"")+mi2+" น."}return c}
+function hlLate(j,now){if(!j.active)return false;if(!j.last_run)return true;var age=(new Date(now)-new Date(j.last_run))/60000,c=String(j.schedule||""),m;if(c==="* * * * *")return age>10;if((m=/^\*\/(\d+) \* \* \* \*$/.exec(c)))return age>3*+m[1]+5;if(/^\d+ \d+ \* \* \*$/.test(c))return age>26*60;return false}
+function hlView(){var d=HL.d,h='<div class="head"><h1>สถานะระบบ</h1><button type="button" class="btn g" data-a="hlre"'+(HL.busy?' disabled':'')+'>'+(HL.busy?"กำลังตรวจ…":"ตรวจใหม่")+'</button></div><p class="hint2">ระบบตรวจตัวเองทุกวันเวลา 04:00 น. และแจ้งเตือนถึงแอดมินเมื่อพบเรื่องค้าง หน้านี้แสดงผลตรวจ ณ ตอนนี้และสถานะงานตั้งเวลา</p>';
+ if(HL.err)h+='<div class="err" role="alert">'+esc(HL.err)+'</div>';
+ if(!d){return h+(HL.err?"":'<div class="empty" role="status">'+(HL.busy?"กำลังโหลด…":"ยังไม่มีข้อมูล")+'</div>')}
+ var is=d.issues||[],jobs=d.jobs||[],late=jobs.filter(function(j){return hlLate(j,d.now)}),bad=jobs.filter(function(j){return +j.failed_7d>0});
+ if(!is.length&&!late.length&&!bad.length)h+='<div class="saved" role="status"><b>ปกติ</b> ไม่พบเรื่องค้างหรืองานตั้งเวลาที่ผิดปกติ</div>';
+ else h+='<div class="closed" role="status"><b>พบเรื่องที่ควรดู '+(is.length+late.length+bad.length)+' รายการ</b></div>';
+ h+='<div class="card"><b>เรื่องค้างที่ตรวจพบ</b>'+(is.length?'<ul>'+is.map(function(x){return'<li>'+esc(String(x.line||"").replace(/^•\s*/,""))+'</li>'}).join("")+'</ul>':'<small>ไม่มี</small>')+'<small>ตรวจรายวันล่าสุด '+esc(hlT(d.last_check))+' · แจ้งเตือนล่าสุด '+esc(hlT(d.last_alert))+'</small></div>';
+ h+='<h2 style="font-size:1.1rem;margin:16px 0 8px">งานตั้งเวลา ('+jobs.length+' งาน)</h2>';
+ h+=jobs.map(function(j){var nm=HLJ[j.name]||j.name,lt=hlLate(j,d.now),f=+j.failed_7d||0,st=!j.active?"ปิดอยู่":f>0?"ล้มเหลว "+f+" ครั้งใน 7 วัน":lt?"ไม่รันตามกำหนด":"ปกติ";
+  return'<div class="card"><b>'+esc(nm)+'</b> <span class="'+(f>0||lt?"closed":"saved")+'" style="padding:2px 8px;border-radius:99px;font-size:.85rem">'+esc(st)+'</span><small>รัน'+esc(hlSch(j.schedule))+' · ครั้งล่าสุด '+esc(hlT(j.last_run))+'</small>'+(f>0&&j.last_fail_msg?'<small>ข้อความล่าสุด: '+esc(j.last_fail_msg)+'</small>':'')+'</div>'}).join("");
+ return h}
 function view(){return subBar(groupOf(S.tab))+viewIn()}
 function viewIn(){var t=S.tab;
  if(t==="q")return qView();if(t==="rp")return rpView();if(t==="shop")return shopView();if(t==="org"||t==="comp")return orgView(t);if(t==="oreq")return oreqView();
  if(t==="staff")return (S.info?'<div class="saved" role="status">'+esc(S.info)+'</div>':'')+(S.stmsg?'<div class="'+(S.stok?"saved":"closed")+'" role="status">'+esc(S.stmsg)+'</div>':'')+stNewCard()+sdrCard()+'<div class="head"><h1>เพิ่มพนักงาน</h1>'+addBtn("staff")+'</div>'+(S.form&&S.form.t==="staff"?staffForm():searchBox("staff","ค้นหาชื่อหรือเบอร์พนักงาน")+'<div id="lst">'+staffList()+'</div>');
- if(t==="svc")return svcView();if(t==="cat")return catView();if(t==="ann")return annView();if(t==="rvw")return rvwView();if(t==="usr")return usrView();if(t==="nt")return ntView();if(t==="pp")return ppView();return setView()}
+ if(t==="svc")return svcView();if(t==="cat")return catView();if(t==="ann")return annView();if(t==="rvw")return rvwView();if(t==="usr")return usrView();if(t==="hl")return hlView();if(t==="nt")return ntView();if(t==="pp")return ppView();return setView()}
 var OQ_ST={pending:["รออนุมัติ","closed"],invited:["รอหมอนวดตอบรับ","saved"],awaiting_payment:["รอชำระเงิน","saved"],paid_review:["รอตรวจสลิป","closed"],confirmed:["ยืนยันแล้ว","saved"],rejected:["ไม่อนุมัติ",""],cancelled:["ยกเลิก",""],expired:["หมดเวลา",""],no_staff:["ไม่มีหมอนวดรับงาน",""]},OQ_IS={pending:"รอตอบ",accepted:"รับงาน",declined:"ปฏิเสธ",expired:"หมดเวลา",cancelled:"ยกเลิก"};
 function oqDate(d){var x=new Date(d+"T00:00:00");return x.toLocaleDateString("th-TH",{day:"numeric",month:"short",year:"numeric"})}
 function oqT(t){return t?String(t).slice(0,5):""}
@@ -554,7 +571,7 @@ function listHtml(tab){return tab==="org"||tab==="comp"?orgList(tab):tab==="shop
 function navDraw(){var g=groupOf(S.tab);document.getElementById("navb").hidden=false;
  document.getElementById("tabs").innerHTML=NAV.map(function(x){var u=x[0]==="nt"?ntUnread():x[0]==="pl"?plPending():x[0]==="fin"?tpPending():x[0]==="q"?qNew():0;return '<button type="button" data-a="tab" data-id="'+x[0]+'" class="'+(x[0]===g?"on":"")+'"><span aria-hidden="true">'+x[2]+'</span>'+x[1]+(u?'<i class="bdg" aria-label="'+x[3]+' '+u+' รายการ">'+u+'</i>':'')+'</button>'}).join("");
  document.getElementById("hacts").innerHTML='<button type="button" class="lgo" data-a="logout">ออกจากระบบ, '+esc(WHO.name)+'</button>'}
-function subBar(g){var L=SUBM[g];if(!L)return"";var cur=curSub();return '<div class="subtabs mgb" role="tablist" aria-label="'+NAVN[g]+'">'+L.map(function(x){var u=x[0]==="shop"?regPending():x[0]==="pprq"?tpPending():x[0]==="rvw"?rvwPending():x[0]==="oreq"?oreqPending():0;return '<button type="button" role="tab" data-a="tab" data-id="'+x[0]+'" class="'+(x[0]===cur?"on":"")+'" aria-selected="'+(x[0]===cur)+'">'+x[1]+(u?' ('+u+')':'')+'</button>'}).join("")+'</div>'}
+function subBar(g){var L=SUBM[g];if(!L)return"";var cur=curSub();return '<div class="subtabs mgb" role="tablist" aria-label="'+NAVN[g]+'">'+L.map(function(x){var u=x[0]==="shop"?regPending():x[0]==="pprq"?tpPending():x[0]==="rvw"?rvwPending():x[0]==="oreq"?oreqPending():x[0]==="hl"?hlN():0;return '<button type="button" role="tab" data-a="tab" data-id="'+x[0]+'" class="'+(x[0]===cur?"on":"")+'" aria-selected="'+(x[0]===cur)+'">'+x[1]+(u?' ('+u+')':'')+'</button>'}).join("")+'</div>'}
 function post(){var lg=document.getElementById("alogo");if(lg){if(!lg.dataset.o)lg.dataset.o=lg.getAttribute("src");lg.src=pubUrl(D.set.logo)||lg.dataset.o}
  if(S.tab==="pp"){if(D.pp.id&&ppValid(D.pp.type,D.pp.id))drawQr("ppqr",ppPayload(D.pp.type,D.pp.id,0));
   D.tp.forEach(function(t){var el=document.getElementById("slipth_"+t.id);if(el&&t.slipPath)loadBlobInto("/storage/v1/object/authenticated/slips/"+t.slipPath,el,"สลิปการโอน","slipth");var bg=document.getElementById("slipbig_"+t.id);if(bg&&t.slipPath)loadBlobInto("/storage/v1/object/authenticated/slips/"+t.slipPath,bg,"สลิปการโอนขยาย","slipbig")})}
@@ -646,7 +663,7 @@ document.addEventListener("click",function(e){
  if(a==="rpprint"){rpPrint();return}
  if(a==="rpcsv"){rpCsv();return}
  if(a==="ss"){S.ss=id;S.form=null;S.lic=null;S.rej=null;draw();return}
- if(a==="tab"){if(S.last[id])id=S.last[id];var gg=groupOf(id);if(S.last[gg])S.last[gg]=id;if(id==="pprq"||id==="ppac"){S.pps=id.slice(2);id="pp"}S.tab=id;S.sdc=null;S.sdn=null;S.ppsaved=false;S.form=null;S.del=null;S.saved=false;S.info="";S.stnew=null;S.stmsg="";S.hmsg="";S.rej=null;S.lic=null;S.tpc=null;S.tpr=null;S.slipv=null;S.oqr=null;draw();if(id==="nt"||id==="pp"||id==="shop"||id==="q")refresh();if(id==="rvw")rvwLoad();if(id==="usr")usrLogLoad();if(id==="set"&&S.sub==="a")loadAdmins().then(draw);return}
+ if(a==="tab"){if(S.last[id])id=S.last[id];var gg=groupOf(id);if(S.last[gg])S.last[gg]=id;if(id==="pprq"||id==="ppac"){S.pps=id.slice(2);id="pp"}S.tab=id;S.sdc=null;S.sdn=null;S.ppsaved=false;S.form=null;S.del=null;S.saved=false;S.info="";S.stnew=null;S.stmsg="";S.hmsg="";S.rej=null;S.lic=null;S.tpc=null;S.tpr=null;S.slipv=null;S.oqr=null;draw();if(id==="nt"||id==="pp"||id==="shop"||id==="q")refresh();if(id==="rvw")rvwLoad();if(id==="usr")usrLogLoad();if(id==="hl")hlLoad();if(id==="set"&&S.sub==="a")loadAdmins().then(draw);return}
  if(a==="sub"){S.saved=false;S.del=null;var sv=document.querySelector(".saved");if(sv)sv.remove();subTo(id);if(id==="c"){SLP.msg="";SLP.cfm=false;slipCount()}if(id==="a")loadAdmins().then(function(){var h=document.querySelector("[data-sg=a]");if(h&&S.sub==="a")h.innerHTML=adminHtml()},function(x){showErr(errTh(x))});return}
  if(a==="ntf"){S.ntf=id;draw();return}
   if(a==="ntc"){S.ntc=id;draw();return}
@@ -755,6 +772,7 @@ document.addEventListener("click",function(e){
  if(a==="uscancel"){US.sel=null;US.pw="";US.cfm=false;US.err="";draw();return}
  if(a==="usgo"){var tg=US.sel,pw2=US.pw;act(function(){return rpc("admin_reset_password",{p_user:tg.id,p_password:pw2}).then(function(){US.done={name:tg.name,phone:tg.phone,pw:pw2};US.sel=null;US.pw="";US.cfm=false;return usrLogLoad(true)})},function(){});return}
  if(a==="usdone"){US.done=null;draw();return}
+ if(a==="hlre"){hlLoad();return}
  if(a==="uscopy"){var tx=US.done&&US.done.pw;if(tx&&navigator.clipboard)navigator.clipboard.writeText(tx).then(function(){US.copied=true;draw()},function(){});return}
  if(a==="slipask"){SLP.cfm=true;slipRedraw();return}
  if(a==="slipno"){SLP.cfm=false;slipRedraw();return}
