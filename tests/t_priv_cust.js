@@ -90,7 +90,7 @@ await p.click('[data-ag=login]');await p.waitForTimeout(200);
 // ---- login
 await p.fill('#lph','0811111111');await p.fill('#lpw','abc123');await p.click('button[type=submit]');await p.waitForSelector('[data-pl]',{timeout:4000});
 await p.click('[data-tab="ac"]');await p.waitForTimeout(300);
-ok('account has policy button',(await p.$$('[data-view=pv]')).length===1);
+ok('account has policy button',(await p.$$('button.btn[data-view=pv]')).length===1);
 await p.click('[data-view=pv]');await p.waitForTimeout(300);
 ok('policy in account, tabs visible, ac highlighted',(await A()).includes('ผู้ดูแลข้อมูลของคุณ')&&await p.$eval('#tabs',e=>getComputedStyle(e).display!=='none')&&await p.$eval('#tabs .on',e=>e.dataset.tab==='ac'));
 await p.click('[data-view=ac]');await p.waitForTimeout(300);ok('back to account',(await A()).includes('บัญชี'));

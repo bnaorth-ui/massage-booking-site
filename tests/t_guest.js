@@ -74,6 +74,12 @@ ok('FAQ JSON-LD matches visible text',!!f.ld&&f.ld.length===7&&f.ld.every((x,i)=
 await p.evaluate(()=>{document.querySelector('#seo .faq details').open=true});
 ok('FAQ item opens',await p.$eval('#seo .faq details',e=>e.open&&e.querySelector('p').offsetHeight>0));
 await p.setViewportSize({width:420,height:900});await p.evaluate(()=>{document.querySelector('#seo h3:nth-of-type(3)').scrollIntoView()});await p.screenshot({path:'seo_faq.png'});}
+{const ft=await p.evaluate(()=>{const f=document.querySelector('#seo .seof');return{t:f.innerText,vis:!document.getElementById('seo').hidden,last:f.parentElement.lastElementChild===f}});
+ok('footer: © year + association name + privacy link, last in section',ft.vis&&ft.last&&ft.t.includes('© '+(new Date().getFullYear()+543)+' ')&&ft.t.includes('สมาคมทดสอบ')&&ft.t.includes('นโยบายความเป็นส่วนตัว'));
+await p.click('#seo .seof [data-view=pv]');await p.waitForSelector('.pv',{timeout:3000});
+ok('guest privacy page opens from footer with back-to-home',(await p.textContent('#app')).includes('นโยบายความเป็นส่วนตัว')&&(await p.textContent('#app')).includes('← กลับหน้าหลัก')&&await p.$eval('#seo',e=>e.hidden));
+await p.click('[data-view=""]');await p.waitForSelector('[data-pl]',{timeout:3000});
+ok('back returns to guest home with footer visible',await p.$eval('#seo',e=>!e.hidden)&&!!(await p.$('#seo .seof')));}
 ok('register-shop bar after list',rb.t.includes('ลงทะเบียนร้านนวด')&&rb.href==='https://shop.example.org/'&&rb.tgt==='_blank'&&rb.afterList);
 ok('register-shop link in about section',await p.$eval('#seoct',e=>[...e.querySelectorAll('a')].some(a=>a.textContent==='ลงทะเบียนร้านนวด'&&a.href==='https://shop.example.org/')));}
 await p.click('[data-pl="sh1"]');await p.waitForSelector('.opt');await p.click('.qb[data-dir="1"] >> nth=0');await p.click('#next');
