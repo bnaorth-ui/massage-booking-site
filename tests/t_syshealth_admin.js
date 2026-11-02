@@ -110,7 +110,7 @@ await p.waitForTimeout(800);
 await p.click('#tabs [data-id=sys]');await p.waitForTimeout(400);
 let t=await p.evaluate(()=>document.body.innerText);
 const subs=await p.$$eval('#main .subtabs [data-id]',e=>e.map(x=>x.textContent.trim()));
-ok('sys has tab สถานะระบบ last',subs[subs.length-1].startsWith('สถานะระบบ'));
+ok('sys has tab สถานะระบบ before ประวัติการทำงาน',subs[subs.length-1]==='ประวัติการทำงาน'&&subs[subs.length-2].startsWith('สถานะระบบ'));
 await p.click('#main .subtabs [data-id=hl]');await p.waitForTimeout(600);
 t=await p.evaluate(()=>document.body.innerText);
 ok('loads via rpc once',hlCalls.length===1);

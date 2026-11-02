@@ -109,7 +109,7 @@ await p.click('#main .subtabs[aria-label] [data-id=ppac]');await p.waitForTimeou
 await p.fill('#ppi','0812345678');await p.fill('#ppn','สมาคมฯ');await p.click('[data-a=ppsave]');await p.waitForTimeout(1500);ok('promptpay saved msg',!!(await p.$('.saved'))&&(await shown())==='ac');
 await p.click('#main .subtabs[aria-label] [data-id=rp]');await p.waitForTimeout(300);ok('รายงาน',(await onSub())==='รายงาน'&&(await onNav())==='การเงิน'&&!(await p.$('.saved')));
 await p.click('#tabs [data-id=q]');await p.click('#tabs [data-id=fin]');await p.waitForTimeout(200);ok('fin remembers last sub (รายงาน)',(await onSub())==='รายงาน');
-await p.waitForTimeout(1000);await p.click('#tabs [data-id=sys]');await p.waitForTimeout(500);ok('sys: subs '+(await sub()).join('|'),(await sub()).join()==='บริการกลาง,หมวดหมู่,รีวิว,ผู้ใช้งาน,ประกาศ,การตั้งค่า,สถานะระบบ'&&(await onNav())==='จัดการระบบ');
+await p.waitForTimeout(1000);await p.click('#tabs [data-id=sys]');await p.waitForTimeout(500);ok('sys: subs '+(await sub()).join('|'),(await sub()).join()==='บริการกลาง,หมวดหมู่,รีวิว,ผู้ใช้งาน,ประกาศ,การตั้งค่า,สถานะระบบ,ประวัติการทำงาน'&&(await onNav())==='จัดการระบบ');
 for(const [id,nm] of [['cat','หมวดหมู่'],['ann','ประกาศ'],['set','การตั้งค่า']]){await p.click('#main .subtabs[aria-label] [data-id='+id+']');await p.waitForTimeout(250);ok('sys sub '+id,(await onSub())===nm)}
 ok('settings keeps its own sub-tabs',(await p.$$('[data-a=sub]')).length>=4);
 await p.setViewportSize({width:390,height:844});await p.screenshot({path:'adnav_set.png'});

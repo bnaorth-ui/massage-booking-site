@@ -92,7 +92,7 @@ await until(()=>document.getElementById('hacts').textContent.includes('ออก
 
 await p.click('#tabs [data-id=sys]');await p.waitForTimeout(400);
 const subs=await p.$$eval('#main .subtabs[aria-label] button',b=>b.map(x=>x.textContent.replace(/\s*\(\d+\)/,'').trim()));
-ok('sys subs include รีวิว',subs.join()==='บริการกลาง,หมวดหมู่,รีวิว,ผู้ใช้งาน,ประกาศ,การตั้งค่า,สถานะระบบ');
+ok('sys subs include รีวิว',subs.join()==='บริการกลาง,หมวดหมู่,รีวิว,ผู้ใช้งาน,ประกาศ,การตั้งค่า,สถานะระบบ,ประวัติการทำงาน');
 const lab=await p.$eval('#main .subtabs[aria-label] [data-id=rvw]',e=>e.textContent);
 await p.click('#main .subtabs[aria-label] [data-id=rvw]');await p.waitForTimeout(600);
 let t=await p.textContent('#main');
