@@ -335,6 +335,11 @@ function openPicker(opt){closePicker();var st=(opt&&opt.start)||mpStart();MP={la
   m.on("click",function(ev){mpSet(ev.latlng.lat,ev.latlng.lng,false);mpMsg("")});setTimeout(function(){if(MP&&MP.map)MP.map.invalidateSize()},50)})}
 function locName(la,ln){revGeo(la,ln,function(n){if(V.loc&&Math.abs(V.loc.lat-la)<1e-6&&Math.abs(V.loc.lng-ln)<1e-6){V.locName=n;if(!S.view&&S.step===0)render(true)}})}
 var watching=false;
+function locErrMsg(er){var c=er&&er.code,ios=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1),tail=" ระบบจะแสดงทุกแห่งแทน";
+ if(c===1)return ios?"เบราว์เซอร์ยังไม่ได้รับอนุญาตให้ใช้ตำแหน่ง ไปที่ ตั้งค่า > ความเป็นส่วนตัวและความปลอดภัย > บริการตำแหน่ง เปิดบริการตำแหน่ง แล้วเลือกเบราว์เซอร์ที่ใช้ (เช่น Safari) ให้เป็น \"ขณะใช้แอป\" จากนั้นกลับมากดใหม่."+tail:"เบราว์เซอร์ยังไม่ได้รับอนุญาตให้ใช้ตำแหน่ง กรุณากดอนุญาตการเข้าถึงตำแหน่งของเว็บนี้ในการตั้งค่าเบราว์เซอร์ แล้วกดใหม่."+tail;
+ if(c===2)return "หาตำแหน่งของคุณไม่เจอในตอนนี้ ลองเปิด Wi-Fi หรือออกไปที่โล่ง แล้วกดใหม่อีกครั้ง."+tail;
+ if(c===3)return "หาตำแหน่งนานเกินไป ลองกดใหม่อีกครั้ง หรือเลือกจุดบนแผนที่เอง."+tail;
+ return "ใช้ตำแหน่งของคุณไม่ได้ ลองกดใหม่อีกครั้ง หรือเลือกจุดบนแผนที่เอง."+tail}
 function watchLoc(){if(watching||!navigator.geolocation||!navigator.geolocation.watchPosition)return;watching=true;
  navigator.geolocation.watchPosition(function(p){if(V.manual)return;var n={lat:p.coords.latitude,lng:p.coords.longitude},moved=!V.loc||hav(V.loc,n)>0.05;if(moved)V.locName="";V.loc=n;nearbyCheck(true);if(moved&&!S.view&&S.step===0)render(true)},function(){},{maximumAge:60000,timeout:20000})}
 function autoWatch(){try{if(!navigator.geolocation)return;var ask=function(){navigator.geolocation.getCurrentPosition(function(p){if(V.manual)return;V.loc={lat:p.coords.latitude,lng:p.coords.longitude};V.msg="";nearbyCheck(true);watchLoc();if(!S.view&&S.step===0)render(true)},function(){},{timeout:15000,maximumAge:300000})};
@@ -517,7 +522,7 @@ function bind(){
   if(!navigator.geolocation){V.msg="อุปกรณ์นี้ไม่รองรับตำแหน่ง ระบบจะแสดงทุกแห่งแทน";render(true);return}
   if(V.manual){V.manual=false;V.loc=null;V.locName=""}
   V.msg="กำลังหาตำแหน่ง...";render(true);
-  navigator.geolocation.getCurrentPosition(function(p){V.loc={lat:p.coords.latitude,lng:p.coords.longitude};V.locName="";V.msg="";nearbyCheck(true);watchLoc();if(!S.view&&S.step===0)render(true);locName(V.loc.lat,V.loc.lng)},function(){V.msg="ใช้ตำแหน่งของคุณไม่ได้ กรุณาอนุญาตการเข้าถึงตำแหน่งในเบราว์เซอร์ ระบบจะแสดงทุกแห่งแทน";if(!S.view&&S.step===0)render(true)},{timeout:10000})}});
+  navigator.geolocation.getCurrentPosition(function(p){V.loc={lat:p.coords.latitude,lng:p.coords.longitude};V.locName="";V.msg="";nearbyCheck(true);watchLoc();if(!S.view&&S.step===0)render(true);locName(V.loc.lat,V.loc.lng);ann("อัปเดตตำแหน่งของคุณแล้ว")},function(er){if(V.loc){V.msg="";if(!S.view&&S.step===0)render(true);ann("ตอนนี้อัปเดตตำแหน่งใหม่ไม่ได้ ระบบใช้ตำแหน่งล่าสุดที่ได้ไว้",1);return}V.msg=locErrMsg(er);if(!S.view&&S.step===0)render(true);ann(V.msg,1)},{timeout:15000})}});
  q("[data-pl]").forEach(function(e){e.onclick=function(){S=fresh();S.place=find(PLACES,e.dataset.pl);if(fixedDate(S.place))S.date=S.place.sdate;S.step=1;render()}});
  q("[data-qty]").forEach(function(e){e.onclick=function(){var id=e.dataset.qty,d=+e.dataset.dir,q=(S.qty[id]||0)+d;if(q<0||(d>0&&totalQty()>=MAXU))return;S.qty[id]=q;rebuild();S.date=null;S.time=null;S.sts=[];S.asg={};render(true)}});
  if(g("sim"))g("sim").onchange=function(){S.sim=this.checked;comb();S.date=null;S.time=null;S.sts=[];S.asg={};render(true)};
