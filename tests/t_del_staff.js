@@ -61,7 +61,7 @@ const UAS={desk:null,android:'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebK
 async function mk(ua,query,clear=true){const pg=await ctx.newPage();pg.on('pageerror',e=>errs.push(e.message));pg.on('dialog',d=>{errs.push('DIALOG '+d.message());d.dismiss()});
  if(ua)await pg.addInitScript(u=>{Object.defineProperty(navigator,'userAgent',{get:()=>u});},ua);
  await pg.goto(URLB+(query||''));if(clear){await pg.evaluate(()=>localStorage.clear());await pg.goto(URLB+(query||''))}await sleep(400);return pg}
-const T0=async pg=>await pg.evaluate(()=>document.body.innerText);
+const T0=async pg=>await pg.evaluate(()=>{const e=[...document.querySelectorAll('#atoast,#sr,#sra')],d=e.map(x=>x.style.display);e.forEach(x=>x.style.display='none');const t=document.body.innerText;e.forEach((x,i)=>x.style.display=d[i]);return t});
 
 let p=await mk(null,'');
 await p.fill('#lph','0844444444');await p.fill('#lpw','staffpass1');await p.click('#agf .btn');await sleep(700);

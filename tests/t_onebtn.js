@@ -74,7 +74,7 @@ ok('i1 has accept + no-show (started)',btns.filter(x=>x==='รับงาน').
 ok('aria-label on main button',(await p.$eval('[data-id=i1][data-a=job]',e=>e.getAttribute('aria-label'))).startsWith('รับงาน สมศรี นวดไทย'));
 // accept i1
 await p.click('[data-id=i1][data-a=job]');await sleep(400);
-ok('ok message',(await tabsTxt()).includes('รับงานแล้ว สมศรี'));ok('role=status banner',!!(await p.$('.okb[role=status]')));
+ok('ok message',(await tabsTxt()).includes('รับงานแล้ว สมศรี'));ok('banner shown + announced via live region',!!(await p.$('.okb'))&&(await p.evaluate(()=>document.getElementById('sr').textContent)).includes('รับงานแล้ว'));
 ok('moved to wait tab',(await p.$eval('[data-a=qt].on',e=>e.textContent)).includes('งานที่รออยู่'));
 ok('focus on next-step button',await p.evaluate(()=>document.activeElement&&document.activeElement.dataset.id==='i1'));
 let b2=await p.$eval('[data-id=i1][data-a=job]',e=>e.textContent);ok('button now เริ่มงาน',b2==='เริ่มงาน');
