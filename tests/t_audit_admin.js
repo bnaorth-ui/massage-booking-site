@@ -145,8 +145,13 @@ ok('empty search message',t.includes('ไม่พบรายการ')&&t.inc
 ok('search box keeps focus while typing',await p.evaluate(()=>document.activeElement&&document.activeElement.id==='auq'));
 await p.fill('#auq','');await p.waitForTimeout(150);
 // reload button
-await p.click('[data-a=aure]');await p.waitForTimeout(500);
+await p.focus('#aubtn');await p.click('[data-a=aure]');await p.waitForTimeout(700);
 ok('reload calls rpc again',auCalls.length===2);
+ok('screen reader gets completion message',(await p.textContent('#sr'))==='โหลดประวัติเสร็จแล้ว 8 รายการล่าสุด');
+ok('visible toast, hidden from SR',await p.$eval('#toast',e=>!e.hidden&&e.textContent==='โหลดประวัติเสร็จแล้ว 8 รายการล่าสุด'&&e.getAttribute('aria-hidden')==='true'));
+ok('focus stays on the same button element',await p.evaluate(()=>document.activeElement&&document.activeElement.id==='aubtn'));
+ok('button not busy after load',await p.$eval('#aubtn',e=>!e.hasAttribute('aria-busy')&&e.textContent==='โหลดใหม่'));
+ok('count line text correct after reload',(await p.textContent('#aucnt'))==='แสดง 8 จาก 8 รายการล่าสุด');
 // VoiceOver: auto-refresh must not rebuild this tab
 const noRedraw=async(label)=>{const before=calls.length;await p.evaluate(()=>{window.__mut=0;const m=document.getElementById('main');window.__mk=m.firstElementChild;window.__ob=new MutationObserver(r=>{window.__mut+=r.length});window.__ob.observe(m,{subtree:true,childList:true,characterData:true,attributes:true})});
  await p.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));await p.waitForTimeout(900);
@@ -155,9 +160,10 @@ const noRedraw=async(label)=>{const before=calls.length;await p.evaluate(()=>{wi
  await p.evaluate(()=>window.__ob.disconnect())};
 await noRedraw('ประวัติการทำงาน');
 // error path
-auMode.err=true;await p.click('[data-a=aure]');await p.waitForTimeout(500);
+auMode.err=true;await p.click('[data-a=aure]');await p.waitForTimeout(700);
 t=await p.evaluate(()=>document.body.innerText);
 ok('error shows SQL hint',t.includes('ฐานข้อมูลยังตั้งค่าไม่ครบ')&&t.includes('admin_audit'));
+ok('error announced via alert region',(await p.textContent('#sra')).includes('admin_audit'));
 // leave + return reloads
 auMode.err=false;await p.click('#main .subtabs [data-id=svc]');await p.waitForTimeout(300);await p.click('#main .subtabs [data-id=au]');await p.waitForTimeout(500);
 ok('return reloads (4)',auCalls.length===4);

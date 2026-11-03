@@ -117,15 +117,20 @@ ok('loads via rpc once',hlCalls.length===1);
 ok('healthy banner',t.includes('ปกติ')&&t.includes('ไม่พบเรื่องค้าง')&&t.includes('ไม่มี'));
 ok('job Thai names + schedules',t.includes('ส่งเตือนก่อนถึงคิว')&&t.includes('รันทุกนาที')&&t.includes('รันทุก 10 นาที')&&t.includes('ทุกวัน 04:00 น.')&&t.includes('วันที่ 1 ของเดือน 09:00 น.'));
 ok('no warning chips when healthy',!/ล้มเหลว \d+ ครั้ง|ไม่รันตามกำหนด/.test(t));
-ok('status region present',!!(await p.$('#main [role=status]')));
+ok('persistent live regions exist outside #main (status + alert)',!!(await p.$('body > #sr[role=status][aria-live=polite]'))&&!!(await p.$('body > #sra[role=alert]'))&&!(await p.$('#main #sr')));
+ok('no live regions inside redrawn body (no double announce)',(await p.$$('#hlbody [role=status],#hlbody [role=alert]')).length===0);
+ok('opening the tab does not announce by itself',(await p.textContent('#sr'))===''&&(await p.$eval('#toast',e=>e.hidden)));
 ok('no middle-dot separator read aloud by screen readers',!(await p.evaluate(()=>document.getElementById('main').innerText)).includes('·'));
 ok('never-run new job is waiting, not a warning',t.includes('ล้างประวัติการทำงานแอดมิน (12 เดือน)')&&t.includes('รอรอบแรก'));
 ok('job card detail on its own line',await p.$$eval('#main .hlc small',e=>e.length>0&&e.every(x=>getComputedStyle(x).display==='block')));
 // refresh button reloads, with new data: issue + failed job + late job
 hlMode.d={now:new Date().toISOString(),last_check:MIN(10),last_alert:MIN(5),issues:[{code:'org_slip',n:2,line:'• สลิปคำขอหน่วยงานรอตรวจนานเกิน 24 ชั่วโมง 2 รายการ: ORG000005, ORG000006'}],jobs:[JB('send-reminders','* * * * *',45),JB('chat-purge','20 20 * * *',60,2,'connection refused'),JB('points-expire','0 20 * * *',60)]};
-await p.click('[data-a=hlre]');await p.waitForTimeout(600);
+await p.focus('#hlbtn');await p.click('[data-a=hlre]');await p.waitForTimeout(700);
 t=await p.evaluate(()=>document.body.innerText);
 ok('refresh calls rpc again',hlCalls.length===2);
+ok('screen reader gets completion message',(await p.textContent('#sr'))==='ตรวจเสร็จแล้ว พบเรื่องที่ควรดู 3 รายการ');
+ok('visible toast shows same text, hidden from SR (no double reading)',await p.$eval('#toast',e=>!e.hidden&&e.textContent==='ตรวจเสร็จแล้ว พบเรื่องที่ควรดู 3 รายการ'&&e.getAttribute('aria-hidden')==='true'));
+ok('focus stays on the same button element',await p.evaluate(()=>document.activeElement&&document.activeElement.id==='hlbtn'));
 // VoiceOver: auto-refresh must not rebuild this tab
 const noRedraw=async(label)=>{const before=calls.length;await p.evaluate(()=>{window.__mut=0;const m=document.getElementById('main');window.__mk=m.firstElementChild;window.__ob=new MutationObserver(r=>{window.__mut+=r.length});window.__ob.observe(m,{subtree:true,childList:true,characterData:true,attributes:true})});
  await p.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));await p.waitForTimeout(900);
@@ -139,11 +144,12 @@ ok('failed job chip + message',t.includes('ล้มเหลว 2 ครั้�
 ok('late job chip',t.includes('ไม่รันตามกำหนด'));
 ok('subtab badge shows issue count (1)',/สถานะระบบ \(1\)/.test(t));
 // focus kept on refresh button? button exists and enabled after load
-ok('refresh button enabled after load',await p.$eval('[data-a=hlre]',e=>!e.disabled));
+ok('refresh button enabled, not busy after load',await p.$eval('[data-a=hlre]',e=>!e.disabled&&!e.hasAttribute('aria-busy')&&e.textContent==='ตรวจใหม่'));
 // error path: function missing
-hlMode.err=true;await p.click('[data-a=hlre]');await p.waitForTimeout(600);
+hlMode.err=true;await p.click('[data-a=hlre]');await p.waitForTimeout(700);
 t=await p.evaluate(()=>document.body.innerText);
 ok('error shown with SQL hint',t.includes('ฐานข้อมูลยังตั้งค่าไม่ครบ')&&t.includes('admin_system_status'));
+ok('error announced once via alert region + red toast',(await p.textContent('#sra')).includes('admin_system_status')&&await p.$eval('#toast',e=>!e.hidden&&e.classList.contains('bad')));
 // leaving and returning reloads
 hlMode.err=false;await p.click('#main .subtabs [data-id=svc]');await p.waitForTimeout(300);await p.click('#main .subtabs [data-id=hl]');await p.waitForTimeout(600);
 ok('returning reloads (calls 4)',hlCalls.length===4);
