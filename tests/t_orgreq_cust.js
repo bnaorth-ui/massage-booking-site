@@ -110,6 +110,7 @@ await p.evaluate(()=>Object.defineProperty(navigator,'userAgent',{get:()=>'Mozil
 await p.check('#orq_terms');await p.click('[data-orq=send]');await p.waitForSelector('.orqc',{timeout:4000});
 ok('submit payload correct',SUBS.length===1&&SUBS[0].name==='บริษัท ทดสอบ จำกัด'&&SUBS[0].district==='ปทุมวัน'&&SUBS[0].lat===13.7466&&SUBS[0].start==='09:00'&&SUBS[0].end==='15:00'&&SUBS[0].lunch_start==='12:00'&&SUBS[0].lunch_end==='13:00'&&SUBS[0].staff.length===2&&SUBS[0].terms===true&&SUBS[0].rate===400&&SUBS[0].contact_phone==='0899999999');
 ok('list shows pending request',await p.$eval('.orqc',e=>e.textContent.includes('รอสมาคมตรวจสอบ')&&e.textContent.includes('ORG-TEST-0001')));
+ok('SR announces org request sent',await p.waitForFunction(t=>document.getElementById('sr').textContent.includes(t),'ส่งคำขอแล้ว',{timeout:4000}).then(()=>true,()=>false));
 ok('flash after submit',(await p.textContent('.flash')).includes('ส่งคำขอแล้ว'));
 ok('install tip shown after submit (not installed)',await p.$eval('#orq_instip',e=>e.textContent.includes('48 ชั่วโมง')&&!!e.querySelector('[data-insp=open]')));
 await p.evaluate(()=>{delete navigator.userAgent});
@@ -133,6 +134,7 @@ ok('slip preview + send enabled',await p.$eval('[data-orq=slipsend]',e=>!e.disab
 await p.click('[data-orq=slipsend]');await p.waitForSelector('[data-orq=back]');await p.waitForFunction(()=>document.querySelector('.orqc')&&document.querySelector('.orqc').textContent.includes('รอสมาคมตรวจสลิป'),null,{timeout:4000});
 ok('slip uploaded to own folder',UPL.length===1&&UPL[0].path.startsWith('/storage/v1/object/licenses/uuid-1/orgslip-')&&/Bearer at$/.test(UPL[0].auth));
 ok('attach rpc sent with same path',ATT.length===1&&ATT[0].p_id==='rq1'&&UPL[0].path.endsWith(ATT[0].p_path));
+ok('SR announces slip sent',await p.waitForFunction(t=>document.getElementById('sr').textContent.includes(t),'ส่งสลิปแล้ว',{timeout:4000}).then(()=>true,()=>false));
 ok('status now awaiting review',(await p.textContent('.orqc')).includes('ส่งสลิปแล้ว รอสมาคมตรวจสอบ'));
 // ---- สมาคมปฏิเสธสลิป -> กลับมารอชำระเงินพร้อมหมายเหตุ
 ORL[0].status='awaiting_payment';ORL[0].note='ไม่พบยอดโอน';await p.click('[data-orq=open]').catch(()=>{});
@@ -140,6 +142,7 @@ await p.click('[data-tab=ac]');await p.click('[data-orq=open]');await p.waitForS
 ok('rejected slip shows note',(await p.textContent('.orqc')).includes('ไม่พบยอดโอน'));
 // ---- ยกเลิกจริง
 await p.click('[data-orq=cancel]');await p.click('[data-orq=cancelok]');await p.waitForFunction(()=>document.querySelector('.orqc')&&document.querySelector('.orqc').textContent.includes('ยกเลิกแล้ว'),null,{timeout:4000});
+ok('SR announces org request cancelled',await p.waitForFunction(t=>document.getElementById('sr').textContent.includes(t),'ยกเลิกคำขอแล้ว',{timeout:4000}).then(()=>true,()=>false));
 ok('cancel rpc sent',CANC.length===1&&CANC[0]==='rq1');
 // ---- ข้อผิดพลาดจากเซิร์ฟเวอร์แสดงให้ผู้ใช้เห็น
 await p.click('[data-orq=new]');await p.waitForSelector('#orqf');

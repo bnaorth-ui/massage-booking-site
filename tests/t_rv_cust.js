@@ -89,6 +89,7 @@ ok('server error shown, form stays',(await p.textContent('#rve')).includes('เ�
 subErr=null;await p.click('.rvs[data-k=s0] button[data-sc="4"]');await p.fill('#rcst0','สุภาพ');await p.click('#rvsend');await p.waitForTimeout(800);
 const sb=subs[subs.length-1];
 ok('payload',sb.p_booking==='bid-MS5'&&sb.p_shop_rating===5&&sb.p_shop_comment==='ดีมากครับ'&&sb.p_staff.length===1&&sb.p_staff[0].staff_id==='st1'&&sb.p_staff[0].rating===4&&sb.p_staff[0].comment==='สุภาพ');
+ok('SR announces review thanks',(await p.evaluate(()=>document.getElementById('sr').textContent)).includes('ขอบคุณสำหรับคะแนน'));
 ok('back on list with thanks, no rate button',(await A()).includes('ขอบคุณสำหรับคะแนน')&&(await p.$$('[data-rate]')).length===0&&(await A()).includes('ให้คะแนนบริการแล้ว'));
 await p.click('[data-tab=""]');await p.waitForTimeout(400);
 ok('place card shows score only',(await A()).includes('คะแนน 4.6 จาก 5')&&!(await A()).includes('จาก 13'));

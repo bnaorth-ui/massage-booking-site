@@ -89,16 +89,19 @@ ok('no hearts in upcoming tab',await (async()=>{await p.click('[data-bt=up]');aw
 ok('aria-label place',(await p.getAttribute('[data-fv="p:sh1"]','aria-label'))==='เพิ่มร้านร้านสบายดี สปา เป็นร้านโปรด');
 ok('aria-label staff',(await p.getAttribute('[data-fv="s:st1"]','aria-label'))==='เพิ่มคุณวิภา เป็นพนักงานโปรด');
 await p.click('[data-fv="p:sh1"]');await p.waitForTimeout(400);
+ok('SR announces added to favorites',(await p.evaluate(()=>document.getElementById('sr').textContent)).includes('เพิ่มเป็นรายการโปรดแล้ว'));
 ok('POST place sent',favcalls.length===1&&favcalls[0].body.place_id==='sh1'&&favcalls[0].body.user_id===UID&&FP.includes('sh1'));
 ok('pressed + focus kept',(await p.getAttribute('[data-fv="p:sh1"]','aria-pressed'))==='true'&&await p.evaluate(()=>document.activeElement.dataset.fv==='p:sh1'));
 ok('all cards of same place show pressed',await p.$$eval('[data-fv="p:sh1"]',a=>a.every(x=>x.getAttribute('aria-pressed')==='true')));
 await p.click('[data-fv="s:st1"]');await p.waitForTimeout(400);ok('POST staff',FS.includes('st1'));
 // remove then re-add
 await p.click('[data-fv="s:st1"]');await p.waitForTimeout(400);
+ok('SR announces removed from favorites',(await p.evaluate(()=>document.getElementById('sr').textContent)).includes('เอาออกจากรายการโปรดแล้ว'));
 ok('DELETE staff',favcalls[2].m==='DELETE'&&favcalls[2].q.includes('staff_id=eq.st1')&&!FS.length);
 await p.click('[data-fv="s:st1"]');await p.waitForTimeout(400);
 // error rollback
 favErr='บันทึกไม่ได้ทดสอบ';await p.click('[data-fv="p:sh1"]');await p.waitForTimeout(500);
+ok('SR announces favorite error urgently',(await p.evaluate(()=>document.getElementById('sra').textContent)).includes('บันทึกไม่ได้ทดสอบ'));
 ok('rollback on error + message',(await p.getAttribute('[data-fv="p:sh1"]','aria-pressed'))==='true'&&(await p.textContent('#app')).includes('บันทึกไม่ได้ทดสอบ')&&FP.includes('sh1'));
 favErr=null;
 // list: fav tag + sort + filter. make sh2 fav too then check order

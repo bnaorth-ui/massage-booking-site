@@ -70,6 +70,8 @@ await p.waitForSelector('#ok');
 await p.click('#ok');await p.waitForSelector('.done',{timeout:4000});
 let t=await A();
 ok('done page shows success',t.includes('จองสำเร็จแล้ว'));
+ok('booking done: SR announces with ref',await p.waitForFunction(t=>document.getElementById('sr').textContent.includes(t),'เลขที่การจอง',{timeout:4000}).then(()=>true,()=>false)&&(await p.evaluate(()=>document.getElementById('sr').textContent)).includes('จองสำเร็จแล้ว'));
+ok('booking done: focus on the success heading',await p.evaluate(()=>document.activeElement&&document.activeElement.tagName==='H1'&&document.activeElement.textContent.includes('จองสำเร็จแล้ว')));
 ok('"ดูรายการจองทั้งหมด" removed',!t.includes('ดูรายการจองทั้งหมด'));
 ok('"กลับหน้าหลัก" removed',!t.includes('กลับหน้าหลัก')&&!(await p.$('#again'))&&!(await p.$('#home')));
 ok('action bar hidden, tabs visible',await p.$eval('#bar',e=>getComputedStyle(e).display==='none')&&await p.$eval('#tabs',e=>getComputedStyle(e).display!=='none'));
