@@ -896,7 +896,7 @@ function authRender(){var tb=document.getElementById("tabs");if(tb)tb.style.disp
 function regShopBar(){var u=SET.ct&&SET.ct.reg;if(!okUrl(u))return"";return '<div class="regbar"><b>เป็นเจ้าของร้านนวด?</b><span>นำร้านเข้าร่วมระบบจองคิวกับสมาคม</span><a class="btn ghost" href="'+esc(u)+'" target="_blank" rel="noopener" aria-label="ลงทะเบียนร้านนวด เปิดหน้าสมัครร้านค้าในแท็บใหม่">ลงทะเบียนร้านนวด</a></div>'}
 function guestBar(){return '<div class="gbar"><button type="button" class="btn" data-gb="login">เข้าสู่ระบบ / สมัครสมาชิก</button>'+(insKind()?'<button type="button" class="btn ghost" data-gb="ins">ติดตั้งแอป</button>':'')+'</div>'}
 /* ===== ขอบริการสำหรับหน่วยงาน (คำขอ + ปักหมุด + ชำระเงินหลังอนุมัติ) ===== */
-var ORQ={info:null,list:null,mode:"list",d:null,busy:false,err:"",flash:"",pay:null,slip:null,slipMsg:"",pp:null,cfm:null,sb:false},CSTF=[];
+var ORQ={info:null,list:null,mode:"list",d:null,busy:false,err:"",flash:"",pay:null,slip:null,slipMsg:"",pp:null,cfm:null,sb:false,free:null,freeFor:""},CSTF=[];
 var ORQST={pending:"รอสมาคมตรวจสอบ",invited:"รอหมอนวดตอบรับ",awaiting_payment:"รอชำระเงิน",paid_review:"รอสมาคมตรวจสลิป",confirmed:"ยืนยันแล้ว",rejected:"ไม่ได้รับการอนุมัติ",cancelled:"ยกเลิกแล้ว",expired:"หมดอายุ",no_staff:"ไม่มีหมอนวดรับงาน"};
 function orqDay(n){return new Date(Date.now()+7*3600000+n*86400000).toISOString().slice(0,10)}
 function orqMin(t){var a=String(t||"").split(":");return a.length>1?(+a[0])*60+(+a[1]):NaN}
@@ -906,7 +906,7 @@ function orqD(s){var a=String(s||"").slice(0,10).split("-");return a.length<3?"-
 function orqT(s){return String(s||"").slice(0,5)}
 function orqDT(s){var d=new Date(s);return isNaN(d)?"-":d.toLocaleDateString("th-TH",{day:"numeric",month:"short",year:"2-digit"})+" "+d.toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"})+" น."}
 function orqTm(v,none){var o=none?'<option value="">'+none+'</option>':'';for(var m=360;m<=1320;m+=30){var t=("0"+Math.floor(m/60)).slice(-2)+":"+("0"+m%60).slice(-2);o+='<option value="'+t+'"'+(t===v?' selected':'')+'>'+t+' น.</option>'}return o}
-function orqNew(){ORQ.d={name:"",district:"",address:"",lat:null,lng:null,cn:ME?((ME.fn||"")+" "+(ME.ln||"")).trim():"",cp:ME&&ME.phone||"",date:"",start:"09:00",end:"15:00",ls:"12:00",le:"13:00",svc:"",staff:[],terms:false};ORQ.err=""}
+function orqNew(){ORQ.d={name:"",district:"",address:"",lat:null,lng:null,cn:ME?((ME.fn||"")+" "+(ME.ln||"")).trim():"",cp:ME&&ME.phone||"",date:"",start:"09:00",end:"15:00",ls:"12:00",le:"13:00",svc:"",staff:[],terms:false};ORQ.err="";ORQ.free=null;ORQ.freeFor=""}
 function orqBar(){return '<div class="regbar"><b>ให้หมอนวดไปดูแลคนในองค์กรของคุณถึงที่</b><span>ออฟฟิศ โรงงาน หรือหน่วยงานในกรุงเทพฯ จัดวันนวดคลายเมื่อยให้พนักงานได้ง่าย ๆ ฝีมือหมอนวดจากสมาคมวิทยากรฝึกอาชีพคนตาบอด ทุกค่าบริการช่วยสร้างอาชีพให้คนตาบอด</span><button type="button" class="btn ghost" data-orq="'+(ME?"open":"guest")+'">ขอบริการสำหรับหน่วยงาน'+orqBadge()+'</button></div>'}
 function orqBadge(){var n=(ORQ.list||[]).filter(function(r){return r.status==="awaiting_payment"}).length;return n?' <i class="bdg" aria-label="รอชำระเงิน '+n+' รายการ">'+n+'</i>':""}
 function orqLoad(){return Promise.all([ORQ.info?null:sbApi("/rest/v1/rpc/org_request_info",{method:"POST",json:1,body:"{}"}).then(function(r){ORQ.info=r}),sbApi("/rest/v1/rpc/my_org_requests",{method:"POST",json:1,body:"{}"}).then(function(r){ORQ.list=r||[]})]).then(function(){ORQ.err=""},function(e){ORQ.err=errTh(e,"โหลดข้อมูลไม่สำเร็จ")}).then(function(){if(V.orq&&S.view==="ac")render(true)})}
@@ -914,6 +914,21 @@ function orqGoCheck(){var f=null;try{f=sessionStorage.getItem("orqGo")}catch(e){
 function orqPage(){if(ORQ.mode==="form")return orqForm();if(ORQ.mode==="pay")return orqPayPage();return orqListPage()}
 function orqSvcLbl(x){return x.name+" "+x.minutes+" นาที"+(+x.rest_minutes>0?" พัก "+x.rest_minutes+" นาที":"")}
 function orqSvcOf(d){var l=(ORQ.info&&ORQ.info.services)||[];for(var i=0;i<l.length;i++)if(l[i].id===d.svc)return l[i];return null}
+function orqStf(){var d=ORQ.d,ok=ORQ.free&&ORQ.free.date===d.date&&d.date,l=CSTF.filter(function(x){return!ok||ORQ.free.ids.indexOf(x.id)>-1}),h='<legend>เลือกหมอนวดที่ต้องการ</legend>';
+ if(!CSTF.length)return h+'<p class="hint">ยังไม่มีรายชื่อหมอนวด</p>';
+ h+='<p class="hint">'+(ok?(l.length?'แสดงเฉพาะหมอนวดที่ว่างในวันที่เลือก '+l.length+' คน':'ไม่มีหมอนวดที่ว่างในวันที่เลือก กรุณาเลือกวันอื่น'):(d.date&&ORQ.freeFor===d.date?'กำลังตรวจหมอนวดที่ว่างในวันที่เลือก':'เลือกวันที่ก่อน เพื่อดูหมอนวดที่ว่างในวันนั้น'))+'</p>';
+ return h+l.map(function(x){return '<label class="ck"><input type="checkbox" data-orqs="'+esc(x.id)+'"'+(d.staff.indexOf(x.id)>-1?' checked':'')+'> <span>'+esc(x.name)+'</span></label>'}).join("")}
+function orqFreeKick(){var d=ORQ.d;if(!d||!document.getElementById("orqf"))return;var v=d.date;
+ if(!/^\d{4}-\d\d-\d\d$/.test(v||"")||v<orqDay(2)||v>orqDay(120)){if(ORQ.free||ORQ.freeFor){ORQ.free=null;ORQ.freeFor="";var e0=document.getElementById("orq_stf");if(e0)e0.innerHTML=orqStf()}return}
+ if(ORQ.freeFor===v)return;ORQ.freeFor=v;ORQ.free=null;var e1=document.getElementById("orq_stf");if(e1)e1.innerHTML=orqStf();
+ sbApi("/rest/v1/rpc/org_free_staff",{method:"POST",json:1,body:JSON.stringify({p_date:v})}).then(function(ids){
+  if(!ORQ.d||ORQ.d.date!==v||ORQ.freeFor!==v)return;ORQ.free={date:v,ids:ids||[]};
+  var gone=ORQ.d.staff.filter(function(i){return ORQ.free.ids.indexOf(i)<0}).map(function(i){var c=CSTF.filter(function(x){return x.id===i})[0];return c?c.name:""}).filter(Boolean);
+  ORQ.d.staff=ORQ.d.staff.filter(function(i){return ORQ.free.ids.indexOf(i)>-1});
+  var el=document.getElementById("orq_stf");if(el)el.innerHTML=orqStf();var es=document.getElementById("orq_est");if(es)es.innerHTML=orqEst();
+  var n=CSTF.filter(function(x){return ORQ.free.ids.indexOf(x.id)>-1}).length;
+  ann((n?"มีหมอนวดที่ว่างในวันที่เลือก "+n+" คน":"ไม่มีหมอนวดที่ว่างในวันที่เลือก กรุณาเลือกวันอื่น")+(gone.length?" หมอนวด "+gone.join(", ")+" ไม่ว่างในวันนี้ จึงถูกนำออกจากรายการที่เลือก":""))
+ },function(e){if(ORQ.freeFor===v){ORQ.freeFor="";ORQ.free=null;var el2=document.getElementById("orq_stf");if(el2)el2.innerHTML=orqStf()}})}
 function orqEst(){var d=ORQ.d,rate=+(ORQ.info&&ORQ.info.rate)||0,h=orqHrs(d),n=d.staff.length;
  if(!h)return"เลือกเวลาเริ่ม เวลาสิ้นสุด และช่วงพักเที่ยงให้ถูกต้องเพื่อดูประมาณราคา";
  var one=Math.round(h*rate*100)/100,sv=orqSvcOf(d),rounds=sv?Math.floor(h*60/((+sv.minutes)+(+sv.rest_minutes||0))):0;return (sv&&rounds?'รูปแบบ '+orqSvcLbl(sv)+' ประมาณ '+rounds+' รอบต่อหมอนวด 1 คน<br>':'')+'ให้บริการ '+h+' ชั่วโมง (ไม่รวมพักเที่ยง) × '+orqBaht(rate)+' = '+orqBaht(one)+' ต่อหมอนวด 1 คน'+(n?'<br>เลือกหมอนวด '+n+' คน ถ้าตอบรับครบ รวม '+orqBaht(one*n):"")+'<br><small>ยอดที่ชำระจริงคิดตามจำนวนหมอนวดที่ตอบรับ</small>'}
@@ -932,7 +947,7 @@ function orqForm(){var d=ORQ.d,inf=ORQ.info||{},rate=+inf.rate||0,dl=inf.distric
   '<div class="two"><label class="fld" for="orq_s"><span>เวลาเริ่ม</span><select class="sel" id="orq_s">'+orqTm(d.start)+'</select></label><label class="fld" for="orq_e"><span>เวลาสิ้นสุด</span><select class="sel" id="orq_e">'+orqTm(d.end)+'</select></label></div>'+
   '<div class="two"><label class="fld" for="orq_ls"><span>พักเที่ยง เริ่ม</span><select class="sel" id="orq_ls">'+orqTm(d.ls,"ไม่มีพักเที่ยง")+'</select></label><label class="fld" for="orq_le"><span>พักเที่ยง ถึง</span><select class="sel" id="orq_le">'+orqTm(d.le,"ไม่มีพักเที่ยง")+'</select></label></div>'+
   '<fieldset class="orqs"><legend>เลือกรูปแบบการนวด</legend>'+((inf.services||[]).length?inf.services.map(function(x){return '<label class="ck"><input type="radio" name="orq_svc" data-orqv="'+esc(x.id)+'"'+(d.svc===x.id?' checked':'')+'> <span>'+esc(orqSvcLbl(x))+'</span></label>'}).join(""):'<p class="hint">ยังไม่มีรูปแบบการนวดให้เลือก</p>')+'</fieldset>'+
-  '<fieldset class="orqs"><legend>เลือกหมอนวดที่ต้องการ</legend>'+(CSTF.length?CSTF.map(function(x){return '<label class="ck"><input type="checkbox" data-orqs="'+esc(x.id)+'"'+(d.staff.indexOf(x.id)>-1?' checked':'')+'> <span>'+esc(x.name)+'</span></label>'}).join(""):'<p class="hint">ยังไม่มีรายชื่อหมอนวด</p>')+'</fieldset>'+
+  '<fieldset class="orqs" id="orq_stf">'+orqStf()+'</fieldset>'+
   '<div class="orqe" id="orq_est" role="status" aria-live="polite">'+orqEst()+'</div>'+
   '<label class="ck" for="orq_terms" style="display:flex;gap:8px;align-items:flex-start;margin:10px 0"><input type="checkbox" id="orq_terms"'+(d.terms?' checked':'')+' style="margin-top:4px"><span>ข้าพเจ้ายอมรับเงื่อนไข: รับเฉพาะหน่วยงานในกรุงเทพมหานคร ค่าบริการ '+orqBaht(rate)+' ต่อหมอนวด 1 คน ต่อชั่วโมง ไม่รวมช่วงพักเที่ยง และชำระเงินหลังสมาคมอนุมัติ รวมถึงนโยบายความเป็นส่วนตัวของสมาคม (อ่านได้ที่เมนูบัญชี)</span></label>'+
   '<p class="aerr" id="orq_err" role="alert">'+esc(ORQ.err)+'</p><button type="button" class="btn wide" data-orq="send"'+(ORQ.busy?' disabled':'')+'>'+(ORQ.busy?'กำลังส่งคำขอ…':'ส่งคำขอ')+'</button></form>';return h}
@@ -940,7 +955,7 @@ function orqCollect(){var d=ORQ.d,g=function(i){var e=document.getElementById(i)
  d.name=g("orq_name");d.district=g("orq_dist");d.address=g("orq_addr");d.cn=g("orq_cn");d.cp=g("orq_cp");d.date=g("orq_date");d.start=g("orq_s");d.end=g("orq_e");d.ls=g("orq_ls");d.le=g("orq_le");
  var rv=document.querySelector("[data-orqv]:checked");d.svc=rv?rv.dataset.orqv:"";
  d.staff=[].slice.call(document.querySelectorAll("[data-orqs]")).filter(function(e){return e.checked}).map(function(e){return e.dataset.orqs});
- var t=document.getElementById("orq_terms");d.terms=!!(t&&t.checked);var es=document.getElementById("orq_est");if(es)es.innerHTML=orqEst()}
+ var t=document.getElementById("orq_terms");d.terms=!!(t&&t.checked);var es=document.getElementById("orq_est");if(es)es.innerHTML=orqEst();orqFreeKick()}
 function orqPin(){orqCollect();var d=ORQ.d,has=d.lat!=null;
  openPicker({start:has?{lat:d.lat,lng:d.lng,z:16,known:1}:{lat:13.7563,lng:100.5018,z:11,known:0},hint:'แตะหรือลากหมุดไปที่ตั้งของหน่วยงาน (ต้องอยู่ในกรุงเทพมหานคร) แล้วกด "ยืนยันจุดนี้"',
   cb:function(la,ln){if(la<13.49||la>13.96||ln<100.33||ln>100.94){ORQ.err="หมุดอยู่นอกพื้นที่กรุงเทพมหานคร ขณะนี้รับเฉพาะหน่วยงานในกรุงเทพฯ";var er=document.getElementById("orq_err");if(er)er.textContent=ORQ.err;return}
@@ -962,7 +977,7 @@ function orqSubmit(){if(ORQ.busy)return;orqCollect();var d=ORQ.d,inf=ORQ.info||{
  if(!d.terms)return bad("กรุณาติ๊กยอมรับเงื่อนไขก่อนส่งคำขอ");
  ORQ.err="";ORQ.busy=true;render(true);
  var pl={name:d.name.trim(),district:d.district,address:d.address.trim(),lat:d.lat,lng:d.lng,contact_name:d.cn.trim(),contact_phone:d.cp.replace(/[\s-]/g,""),date:d.date,start:d.start,end:d.end,lunch_start:hasL?d.ls:"",lunch_end:hasL?d.le:"",service:d.svc,staff:d.staff,terms:true,rate:+inf.rate};
- sbApi("/rest/v1/rpc/submit_org_request",{method:"POST",json:1,body:JSON.stringify({p:pl})}).then(function(){ORQ.busy=false;ORQ.d=null;ORQ.mode="list";ORQ.flash="ส่งคำขอแล้ว สมาคมจะตรวจสอบและแจ้งผลที่หน้านี้และในเมนู \"แจ้งเตือน\" "+(insKind()?"ติดตั้งแอปและเปิดการแจ้งเตือนเพื่อรับผลทันที":"");return orqLoad().then(function(){ann("ส่งคำขอแล้ว สมาคมจะตรวจสอบและแจ้งผล")})}).catch(function(e){ORQ.busy=false;ORQ.err=errTh(e,"ส่งคำขอไม่สำเร็จ");render(true)})}
+ sbApi("/rest/v1/rpc/submit_org_request",{method:"POST",json:1,body:JSON.stringify({p:pl})}).then(function(){ORQ.busy=false;ORQ.d=null;ORQ.mode="list";ORQ.flash="ส่งคำขอแล้ว สมาคมจะตรวจสอบและแจ้งผลที่หน้านี้และในเมนู \"แจ้งเตือน\" "+(insKind()?"ติดตั้งแอปและเปิดการแจ้งเตือนเพื่อรับผลทันที":"");return orqLoad().then(function(){ann("ส่งคำขอแล้ว สมาคมจะตรวจสอบและแจ้งผล")})}).catch(function(e){ORQ.busy=false;ORQ.err=errTh(e,"ส่งคำขอไม่สำเร็จ");ORQ.freeFor="";render(true)})}
 function orqListPage(){var L=ORQ.list,h='<button type="button" class="lb" data-orq="back">← กลับ</button><h1 id="orqt" tabindex="-1">ขอบริการสำหรับหน่วยงาน</h1>'+(ORQ.flash?'<div class="flash">'+esc(ORQ.flash)+'</div>':'')+(ORQ.flash&&ORQ.flash.indexOf("ส่งคำขอแล้ว")===0&&insKind()?'<div class="orqn" role="note" id="orq_instip"><b>ติดตั้งแอปเพื่อไม่พลาดการแจ้งเตือน</b><p style="margin:6px 0 8px">ติดตั้งแอปลงหน้าจอโฮมเพื่อรับแจ้งเตือนทันทีเมื่อสมาคมอนุมัติ เมื่อหมอนวดตอบรับ และเมื่อถึงขั้นชำระเงิน (ต้องชำระภายใน 48 ชั่วโมง) บนไอโฟนจะรับแจ้งเตือนได้เมื่อติดตั้งแล้วเท่านั้น</p><button type="button" class="btn ghost" data-insp="open">วิธีติดตั้งแอป</button></div>':'')+(ORQ.err?'<p class="aerr" role="alert">'+esc(ORQ.err)+'</p>':'')+
  '<div class="orqn" role="note"><b>เงื่อนไข</b><ul><li>รับเฉพาะหน่วยงานในกรุงเทพมหานคร</li><li>ค่าบริการ '+orqBaht(+(ORQ.info&&ORQ.info.rate)||0)+' ต่อหมอนวด 1 คน ต่อชั่วโมง (ไม่รวมช่วงพักเที่ยง)</li><li>ชำระเงินหลังสมาคมอนุมัติและหมอนวดตอบรับแล้ว</li></ul></div>'+
  '<button type="button" class="btn wide" data-orq="new">ส่งคำขอใหม่</button>'+(insKind()?'<button type="button" class="btn wide ghost" data-insp="open" style="margin-top:10px">ติดตั้งแอปเพื่อรับแจ้งเตือนทันที</button>':'')+'<h2 class="stl">คำขอของฉัน</h2>';
@@ -1008,7 +1023,7 @@ function orqAct(a,id){
  if(a==="pay"){ORQ.mode="pay";ORQ.pay=id;ORQ.slip=null;ORQ.slipMsg="";orqLoadPP();render();window.scrollTo(0,0);return}
  if(a==="slipsend"){orqSlip();return}}
 function orqBind(){document.querySelectorAll("[data-orq]").forEach(function(e){e.onclick=function(){orqAct(e.dataset.orq,e.dataset.id||"")}});
- var f=document.getElementById("orqf");if(f){f.oninput=orqCollect;f.onchange=orqCollect}
+ var f=document.getElementById("orqf");if(f){f.oninput=orqCollect;f.onchange=orqCollect;orqFreeKick()}
  var sl=document.getElementById("orq_slip");if(sl)sl.onchange=function(){var fl=sl.files&&sl.files[0];if(!fl)return;orqImg(fl,function(d,err){ORQ.slip=d;ORQ.slipMsg=d?"":err;var pv=document.getElementById("orq_sprev"),m=document.getElementById("orq_smsg"),b=document.querySelector("[data-orq=slipsend]");if(m)m.textContent=ORQ.slipMsg;if(pv)pv.innerHTML=d?'<img class="slipth" alt="ตัวอย่างสลิป" src="'+d+'" style="max-width:100%;max-height:220px;border-radius:8px">':"";if(b)b.disabled=!d})};
  if(ORQ.mode==="pay")orqDraw()}
 function needLogin(msg,reg){GUEST=false;AU.step=reg&&!rd("hadAcct",false)?"reg":"login";AU.ok=msg||"";authRender()}

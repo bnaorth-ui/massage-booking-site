@@ -14,6 +14,7 @@ const services=[
  {id:'ga',place_id:null,name:'นวดไทยแผนโบราณ',minutes:60,price:400,applies_all:true,active:true},
  {id:'sa',place_id:'sh1',name:'นวดไทย',minutes:60,price:400,applies_all:false,active:true},
  {id:'sb',place_id:'sh1',name:'นวดเท้า',minutes:60,price:350,applies_all:false,active:true}];
+const FREECALLS=[];
 const staff=[{id:'st1',name:'คุณวิภา',place_id:'sh1',photo_path:null},{id:'st2',name:'คุณสมศรี',place_id:'sh1',photo_path:null},{id:'st3',name:'คุณนุ่น',place_id:null,photo_path:null},{id:'st4',name:'คุณมะลิ',place_id:null,photo_path:null}];
 const ss=[['st1','sa'],['st1','sb'],['st2','sa'],['st3','ga'],['st4','ga']].map(x=>({staff_id:x[0],service_id:x[1]}));
 const ps=[{place_id:'og1',staff_id:'st3',weekdays:[]},{place_id:'cp1',staff_id:'st4',weekdays:[1,2,3,4,5]}];
@@ -26,6 +27,7 @@ await ctx.route('**/*supabase.co/**',async r=>{const q=r.request(),u=new URL(q.u
  calls.push({m,path,body,auth:q.headers()['authorization']||''});
  const J=(s,o)=>r.fulfill({status:s,contentType:'application/json',body:JSON.stringify(o)});const r2=()=>r.fulfill({status:204,body:''});
  const sess=()=>({access_token:'at',refresh_token:'rt',expires_in:3600,user:{id:UID,user_metadata:{first_name:'สมชาย',last_name:'ใจดี',phone:'0811111111'}}});
+ if(path==='/rest/v1/rpc/org_free_staff'){FREECALLS.push(body.p_date);return J(200,body.p_date===bkk(9)?['st4']:body.p_date===bkk(12)?[]:['st3','st4'])}
  if(path==='/rest/v1/rpc/org_request_info')return J(200,{rate:400,districts:['ปทุมวัน','พญาไท','บางรัก','ดุสิต'],lead_days:2,max_days:120,services:[{id:'sv15',name:'นวดคอบ่าไหล่',minutes:15,rest_minutes:5},{id:'sv30',name:'นวดไทย',minutes:30,rest_minutes:0}]});
  if(path==='/rest/v1/app_settings'&&m==='GET'&&u.search.includes('promptpay'))return J(200,[{promptpay_on:true,promptpay_type:'mobile',promptpay_id:'0812345678',promptpay_name:'สมาคมทดสอบ'}]);
  if(path==='/rest/v1/rpc/my_org_requests')return J(200,ORL);
@@ -106,6 +108,18 @@ await p.check('[data-orqs=st3]');
 ok('estimate shows rounds (5h*60/20=15)',await p.$eval('#orq_est',e=>e.textContent.includes('ประมาณ 15 รอบ')));
 ok('estimate: 5 hrs (9-15 minus lunch) x400 = 2,000',await p.$eval('#orq_est',e=>e.textContent.includes('5 ชั่วโมง')&&e.textContent.includes('2,000')));
 await p.check('[data-orqs=st4]');ok('estimate: 2 therapists = 4,000',await p.$eval('#orq_est',e=>e.textContent.includes('4,000')));
+// กรองหมอนวดตามวันที่: วันที่ st3 ไม่ว่าง -> ซ่อนและเอาออกจากที่เลือก + ประกาศ
+ok('date picked -> free list requested',FREECALLS.includes(bkk(5)));
+await p.fill('#orq_date',bkk(9));await p.waitForFunction(()=>document.querySelectorAll('[data-orqs]').length===1,null,{timeout:4000});
+ok('busy therapist hidden for that date',JSON.stringify(await p.$$eval('[data-orqs]',o=>o.map(x=>x.dataset.orqs)))===JSON.stringify(['st4']));
+ok('still-free therapist keeps selection',await p.isChecked('[data-orqs=st4]'));
+await p.waitForFunction(()=>/ไม่ว่างในวันนี้/.test((document.getElementById('sr')||{}).textContent||''),null,{timeout:3000}).catch(()=>{});
+ok('removal announced in live region',(await p.textContent('#sr')).includes('ไม่ว่างในวันนี้')&&(await p.textContent('#sr')).includes('คุณนุ่น'));
+ok('hint shows count',(await p.textContent('#orq_stf')).includes('ที่ว่างในวันที่เลือก 1 คน'));
+await p.fill('#orq_date',bkk(12));await p.waitForFunction(()=>document.querySelectorAll('[data-orqs]').length===0,null,{timeout:4000});
+ok('nobody free message',(await p.textContent('#orq_stf')).includes('ไม่มีหมอนวดที่ว่างในวันที่เลือก'));
+await p.fill('#orq_date',bkk(5));await p.waitForFunction(()=>document.querySelectorAll('[data-orqs]').length===2,null,{timeout:4000});
+await p.check('[data-orqs=st3]');await p.check('[data-orqs=st4]');
 await p.selectOption('#orq_ls','');await p.selectOption('#orq_le','');
 ok('estimate: no lunch -> 6 hrs',await p.$eval('#orq_est',e=>e.textContent.includes('6 ชั่วโมง')&&e.textContent.includes('2,400')));
 await p.selectOption('#orq_ls','12:00');await p.selectOption('#orq_le','13:00');
