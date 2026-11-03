@@ -44,7 +44,7 @@ h1{font-size:1.3rem;margin:0}
 .head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}.card{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:4px 14px;margin-bottom:14px}
 
 .row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
-.row:last-child{border:0}.row small{color:var(--mute);display:block}.hlc small{display:block;color:var(--mute);margin-top:2px}#main h1:focus{outline:none}.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}.toast{position:fixed;left:50%;transform:translateX(-50%);top:12px;max-width:calc(100% - 32px);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:99px;font-weight:700;z-index:60;box-shadow:0 4px 16px rgba(0,0,0,.25);text-align:center}.toast.bad{background:var(--bad);color:#fff}.toast[hidden]{display:none}.row>div:first-child{flex:1;min-width:180px}
+.row:last-child{border:0}.row small{color:var(--mute);display:block}.hlc small{display:block;color:var(--mute);margin-top:2px}#main h1:focus{outline:none}.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}@media print{#navb,.subtabs{display:none!important}}.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}.toast{position:fixed;left:50%;transform:translateX(-50%);top:12px;max-width:calc(100% - 32px);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:99px;font-weight:700;z-index:60;box-shadow:0 4px 16px rgba(0,0,0,.25);text-align:center}.toast.bad{background:var(--bad);color:#fff}.toast[hidden]{display:none}.row>div:first-child{flex:1;min-width:180px}
 .acts{display:flex;gap:6px;flex-wrap:wrap}
 .btn{font:inherit;font-size:.9rem;border-radius:10px;padding:8px 12px;border:2px solid var(--main);background:var(--main);color:var(--main-ink);cursor:pointer;font-weight:700}
 .btn.g{background:transparent;color:var(--main)}.btn.d{background:transparent;color:var(--bad);border-color:var(--bad)}
@@ -249,9 +249,9 @@ function enter(){AG.step="load";S.busy=false;gateDraw();whoAmI();
 
 /* ===================== หน้าจอ ===================== */
 var NAV=[["q","หน้าหลัก","🏠","คิวงานใหม่"],["pl","สถานที่และคน","🏪","ร้านและคำขอที่รอดำเนินการ"],["fin","การเงิน","💰","คำขอเติมเงินรอยืนยัน"],["nt","การแจ้งเตือน","🔔","ยังไม่ได้อ่าน"],["sys","จัดการระบบ","⚙️",""]],
-SUBM={pl:[["shop","ร้านนวด"],["org","หน่วยงาน"],["oreq","คำขอหน่วยงาน"],["comp","บริษัท"],["staff","พนักงาน"]],fin:[["pprq","คำขอเติมเงิน"],["ppac","บัญชีรับเงิน"],["rp","รายงาน"]],sys:[["svc","บริการกลาง"],["cat","หมวดหมู่"],["rvw","รีวิว"],["usr","ผู้ใช้งาน"],["ann","ประกาศ"],["set","การตั้งค่า"],["hl","สถานะระบบ"],["au","ประวัติการทำงาน"]]},
+SUBM={pl:[["shop","ร้านนวด"],["org","หน่วยงาน"],["oreq","คำขอหน่วยงาน"],["comp","บริษัท"],["staff","พนักงาน"]],fin:[["pprq","คำขอเติมเงิน"],["ppac","บัญชีรับเงิน"],["rp","รายงาน"],["fm","สรุปการเงิน"]],sys:[["svc","บริการกลาง"],["cat","หมวดหมู่"],["rvw","รีวิว"],["usr","ผู้ใช้งาน"],["ann","ประกาศ"],["set","การตั้งค่า"],["hl","สถานะระบบ"],["au","ประวัติการทำงาน"]]},
 NAVN={pl:"สถานที่และคน",fin:"การเงิน",sys:"จัดการระบบ"};
-function groupOf(t){return t==="q"||t==="nt"?t:/^(shop|org|oreq|comp|staff)$/.test(t)?"pl":/^(pp|rp|pprq|ppac)$/.test(t)?"fin":"sys"}
+function groupOf(t){return t==="q"||t==="nt"?t:/^(shop|org|oreq|comp|staff)$/.test(t)?"pl":/^(pp|rp|pprq|ppac|fm)$/.test(t)?"fin":"sys"}
 function curSub(){return S.tab==="pp"?"pp"+(S.pps==="ac"?"ac":"rq"):S.tab}
 var AUDS=["ผู้ใช้งาน","ร้านค้า","พนักงาน"],PPT=[["mobile","เบอร์มือถือ"],["national","เลขบัตรประชาชน"],["tax","เลขประจำตัวผู้เสียภาษี (นิติบุคคล)"],["ewallet","e-Wallet ID"]];
 function addBtn(t){return S.form&&S.form.t===t?"":'<button class="btn" data-a="new" data-t="'+t+'">+ เพิ่มใหม่</button>'}
@@ -571,11 +571,49 @@ function auBody(){var h="";
  h+='<div class="srch" style="display:flex;gap:8px;flex-wrap:wrap"><select class="in" id="aut" aria-label="ประเภท" style="flex:0 0 auto;width:auto">'+AUG.map(function(g){return'<option value="'+g[0]+'"'+(g[0]===AU.t?" selected":"")+'>'+g[1]+'</option>'}).join("")+'</select><input class="in" id="auq" type="search" aria-label="ค้นหาในประวัติ" placeholder="🔍 ค้นหาชื่อแอดมิน เลขอ้างอิง หรือชื่อรายการ" value="'+esc(AU.q)+'" autocomplete="off" style="flex:1 1 200px"></div><p class="hint2" id="aucnt" aria-live="polite">'+esc(auCount(L))+'</p><div id="aulst">'+auItems(L)+'</div>';
  return h}
 function auView(){return'<div class="head"><h1>ประวัติการทำงาน</h1><button type="button" class="btn g" id="aubtn" data-a="aure"'+(AU.busy?' aria-busy="true"':'')+'>'+(AU.busy?"กำลังโหลด…":"โหลดใหม่")+'</button></div><p class="hint2">บันทึกอัตโนมัติว่าแอดมินอนุมัติ ปฏิเสธ หรือแก้อะไรเมื่อไหร่ แก้ไขหรือลบจากหน้านี้ไม่ได้ และถูกล้างเองหลัง 12 เดือน</p><div id="aubody">'+auBody()+'</div>'}
+/* ---- สรุปการเงินสมาคมรายเดือน (เฉพาะแอดมิน) ---- */
+var FM={m:"",d:null,err:"",busy:false,bank:""},FMN=["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+function fmNow(){return new Date(Date.now()+7*36e5).toISOString().slice(0,7)}
+function fmMoney(n){return(+n||0).toLocaleString("th-TH",{minimumFractionDigits:2,maximumFractionDigits:2})}
+function fmLab(m){var a=String(m||fmNow()).split("-");return FMN[(+a[1]||1)-1]+" "+((+a[0]||0)+543)}
+function fmTot(d){var t={opening:0,topup:0,credit:0,gp:0,other:0,closing:0,gp_n:0,topup_req:0};((d&&d.shops)||[]).forEach(function(r){for(var k in t)t[k]+=+r[k]||0});for(var k in t)t[k]=Math.round(t[k]*100)/100;return t}
+function fmIssues(d){var o=[];if(!d)return o;(d.shops||[]).forEach(function(r){
+ var calc=Math.round(((+r.opening||0)+(+r.topup||0)+(+r.credit||0)+(+r.gp||0)+(+r.other||0))*100)/100;
+ if(Math.abs(calc-(+r.closing||0))>0.005)o.push(r.name+": ยอดยกมารวมรายการในเดือนไม่เท่ากับยอดคงเหลือ (ต่างกัน "+fmMoney((+r.closing||0)-calc)+" บาท)");
+ if(Math.abs((+r.topup_req||0)-(+r.topup||0))>0.005)o.push(r.name+": คำขอเติมเงินที่ยืนยันในเดือนนี้รวม "+fmMoney(r.topup_req)+" บาท แต่เข้ากระเป๋า "+fmMoney(r.topup)+" บาท");
+ if(Math.abs(+r.other||0)>0.005)o.push(r.name+": มีรายการประเภทอื่นในกระเป๋าเงิน "+fmMoney(r.other)+" บาท");});
+ var c=d.checks||{};(c.topup_lost||[]).forEach(function(x){o.push("เติมเงินยืนยันแล้วแต่ไม่เข้ากระเป๋า: "+x.ref+" ("+x.place+", "+fmMoney(x.amount)+" บาท)")});
+ (c.gp_missing||[]).forEach(function(x){o.push("งานเสร็จแล้วแต่ไม่มีรายการหัก GP: "+x.ref+" ("+x.place+")")});return o}
+function fmYears(){var y=+fmNow().slice(0,4),L=[];for(var i=y;i>=y-3;i--)L.push(i);return L}
+function fmSync(){if(S.tab!=="fm")return;var b=document.getElementById("fmbody"),btn=document.getElementById("fmbtn");if(!b||!btn){draw();return}b.innerHTML=fmBody();btn.textContent=FM.busy?"กำลังโหลด…":"โหลดใหม่";if(FM.busy)btn.setAttribute("aria-busy","true");else btn.removeAttribute("aria-busy")}
+function fmLoad(ann){if(!FM.m)FM.m=fmNow();if(FM.busy)return;var mm=FM.m;FM.busy=true;FM.err="";fmSync();return rpc("admin_finance_month",{p_month:mm+"-01"}).then(function(d){FM.busy=false;if(FM.m!==mm){fmLoad();return}FM.d=d&&typeof d==="object"?d:null;fmSync();if(ann){var n=fmIssues(FM.d).length;say("โหลดสรุปการเงิน"+fmLab(mm)+"เสร็จแล้ว "+(n?"พบเรื่องที่ควรตรวจ "+n+" รายการ":"ตัวเลขตรงกันทุกข้อ"))}},function(e){FM.busy=false;FM.err=errTh(e,"โหลดสรุปการเงินไม่สำเร็จ ตรวจสอบว่ารันไฟล์ SQL สรุปการเงินแล้ว");fmSync();if(ann)say(FM.err,true)})}
+function fmBank(ann){var el=document.getElementById("fmbr");if(!el)return;var d=FM.d,v=String(FM.bank||"").replace(/[,\s]/g,"");if(!d||v===""){el.textContent="";return}var n=parseFloat(v);if(isNaN(n)||n<0){el.textContent="กรอกเป็นตัวเลข เช่น 1500 หรือ 1500.50";if(ann)say(el.textContent,true);return}
+ var sys=fmTot(d).topup,df=Math.round((n-sys)*100)/100,m=Math.abs(df)<0.005?"ตรงกัน: ยอดธนาคารเท่ากับยอดเติมเงินที่ระบบยืนยัน "+fmMoney(sys)+" บาท":"ไม่ตรงกัน: ยอดธนาคาร "+fmMoney(n)+" บาท ระบบยืนยันเติมเงิน "+fmMoney(sys)+" บาท ธนาคาร"+(df>0?"มากกว่า":"น้อยกว่า")+"ระบบ "+fmMoney(Math.abs(df))+" บาท";el.textContent=m;if(ann)say(m)}
+function fmBody(){var h="";if(FM.err)h+='<div class="err">'+esc(FM.err)+'</div>';
+ var d=FM.d;if(!d)return h+(FM.err?"":'<div class="empty">'+(FM.busy?"กำลังโหลด…":"ยังไม่มีข้อมูล")+'</div>');
+ var L=d.shops||[],t=fmTot(d),is=fmIssues(d);
+ h+='<div class="rpw"><table class="rpt"><caption class="sr-only">สรุปกระเป๋าเงินร้านค้า'+esc(fmLab(FM.m))+' หน่วยเป็นบาท</caption><thead><tr><th scope="col">ร้าน</th><th scope="col">ยอดยกมา</th><th scope="col">เติมเงิน</th><th scope="col">เครดิตจากสมาคม</th><th scope="col">หัก GP</th><th scope="col">ยอดคงเหลือ</th></tr></thead><tbody>'+
+ (L.length?L.map(function(r){return'<tr><th scope="row">'+esc(r.name)+'</th><td>'+fmMoney(r.opening)+'</td><td>'+fmMoney(r.topup)+'</td><td>'+fmMoney(r.credit)+'</td><td>'+fmMoney(r.gp)+(r.gp_n?' ('+r.gp_n+' งาน)':'')+'</td><td>'+fmMoney(r.closing)+'</td></tr>'}).join(""):'<tr><td colspan="6">ไม่มีรายการของเดือนนี้</td></tr>')+
+ '</tbody><tfoot><tr><th scope="row">รวมทุกร้าน</th><td>'+fmMoney(t.opening)+'</td><td>'+fmMoney(t.topup)+'</td><td>'+fmMoney(t.credit)+'</td><td>'+fmMoney(t.gp)+(t.gp_n?' ('+t.gp_n+' งาน)':'')+'</td><td>'+fmMoney(t.closing)+'</td></tr></tfoot></table></div>';
+ h+='<h2 class="mgt">ตรวจกระทบยอด</h2>'+(is.length?'<div class="closed"><b>พบ '+is.length+' เรื่องที่ควรตรวจ</b><ul>'+is.map(function(x){return'<li>'+esc(x)+'</li>'}).join("")+'</ul></div>':'<div class="saved">ตัวเลขตรงกันทุกข้อ: ยอดยกมารวมรายการในเดือนเท่ากับยอดคงเหลือทุกร้าน, คำขอเติมเงินที่ยืนยันเข้ากระเป๋าครบ, งานที่เสร็จมีรายการหัก GP ครบ</div>');
+ h+='<h2 class="mgt">เทียบกับยอดในบัญชีธนาคาร (ไม่บังคับ)</h2><p class="hint2">พิมพ์ยอดรวมที่เข้าบัญชีสมาคมจากการเติมเงินของร้านในเดือนนี้ ระบบจะเทียบกับยอดเติมเงินที่ยืนยันแล้ว ตัวเลขนี้ไม่ถูกบันทึกไว้</p><label for="fmb" class="sub">ยอดจากธนาคาร (บาท)</label><input class="in" id="fmb" inputmode="decimal" autocomplete="off" value="'+esc(FM.bank)+'" style="max-width:220px"><p id="fmbr" role="status" aria-live="polite"></p>';
+ return h}
+function fmView(){if(!FM.m)FM.m=fmNow();var a=FM.m.split("-"),yr=fmYears();if(yr.indexOf(+a[0])<0)yr.push(+a[0]);
+ return'<div class="head noprint"><h1>สรุปการเงินสมาคมรายเดือน</h1><button type="button" class="btn g" id="fmbtn" data-a="fmre"'+(FM.busy?' aria-busy="true"':'')+'>'+(FM.busy?"กำลังโหลด…":"โหลดใหม่")+'</button></div>'+
+ '<div class="srch noprint" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><label for="fmmo" class="sub">เดือน</label><select class="in" id="fmmo" style="flex:0 0 auto;width:auto">'+FMN.map(function(n,i){var v=(i<9?"0":"")+(i+1);return'<option value="'+v+'"'+(v===a[1]?" selected":"")+'>'+n+'</option>'}).join("")+'</select><label for="fmy" class="sub">ปี พ.ศ.</label><select class="in" id="fmy" style="flex:0 0 auto;width:auto">'+yr.map(function(y){return'<option value="'+y+'"'+(y===+a[0]?" selected":"")+'>'+(y+543)+'</option>'}).join("")+'</select></div>'+
+ '<p class="hint2 noprint">รายการกระเป๋าเงินของร้านค้าทุกร้าน นับตามเวลาไทย เฉพาะรายการที่สำเร็จแล้ว ไม่รวมที่ยังรอตรวจ</p>'+
+ '<div class="acts noprint" style="margin:10px 0"><button type="button" class="btn" data-a="fmprint">พิมพ์ / บันทึกเป็น PDF</button><button type="button" class="btn g" data-a="fmcsv">ดาวน์โหลด CSV</button></div>'+
+ '<div id="fmbody">'+fmBody()+'</div>'}
+function fmCsv(){var d=FM.d;if(!d)return;var q=function(x){x=String(x==null?"":x);return /[",\n]/.test(x)?'"'+x.replace(/"/g,'""')+'"':x},t=fmTot(d),
+ rows=[["สรุปการเงินสมาคม",fmLab(FM.m)],["ร้าน","ยอดยกมา","เติมเงิน","เครดิตจากสมาคม","หัก GP","จำนวนงานที่หัก GP","ยอดคงเหลือ"]];
+ (d.shops||[]).forEach(function(r){rows.push([r.name,r.opening,r.topup,r.credit,r.gp,r.gp_n,r.closing])});rows.push(["รวมทุกร้าน",t.opening,t.topup,t.credit,t.gp,t.gp_n,t.closing]);
+ var is=fmIssues(d);rows.push([]);rows.push(["ผลตรวจกระทบยอด",is.length?"พบ "+is.length+" เรื่อง":"ตรงกันทุกข้อ"]);is.forEach(function(x){rows.push(["",x])});
+ var csv="﻿"+rows.map(function(r){return r.map(q).join(",")}).join("\r\n"),a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));a.download="finance-"+FM.m+".csv";document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500)}
 function view(){return subBar(groupOf(S.tab))+viewIn()}
 function viewIn(){var t=S.tab;
  if(t==="q")return qView();if(t==="rp")return rpView();if(t==="shop")return shopView();if(t==="org"||t==="comp")return orgView(t);if(t==="oreq")return oreqView();
  if(t==="staff")return (S.info?'<div class="saved" role="status">'+esc(S.info)+'</div>':'')+(S.stmsg?'<div class="'+(S.stok?"saved":"closed")+'" role="status">'+esc(S.stmsg)+'</div>':'')+stNewCard()+sdrCard()+'<div class="head"><h1>เพิ่มพนักงาน</h1>'+addBtn("staff")+'</div>'+(S.form&&S.form.t==="staff"?staffForm():searchBox("staff","ค้นหาชื่อหรือเบอร์พนักงาน")+'<div id="lst">'+staffList()+'</div>');
- if(t==="svc")return svcView();if(t==="cat")return catView();if(t==="ann")return annView();if(t==="rvw")return rvwView();if(t==="usr")return usrView();if(t==="hl")return hlView();if(t==="au")return auView();if(t==="nt")return ntView();if(t==="pp")return ppView();return setView()}
+ if(t==="svc")return svcView();if(t==="cat")return catView();if(t==="ann")return annView();if(t==="rvw")return rvwView();if(t==="usr")return usrView();if(t==="hl")return hlView();if(t==="au")return auView();if(t==="fm")return fmView();if(t==="nt")return ntView();if(t==="pp")return ppView();return setView()}
 var OQ_ST={pending:["รออนุมัติ","closed"],invited:["รอหมอนวดตอบรับ","saved"],awaiting_payment:["รอชำระเงิน","saved"],paid_review:["รอตรวจสลิป","closed"],confirmed:["ยืนยันแล้ว","saved"],rejected:["ไม่อนุมัติ",""],cancelled:["ยกเลิก",""],expired:["หมดเวลา",""],no_staff:["ไม่มีหมอนวดรับงาน",""]},OQ_IS={pending:"รอตอบ",accepted:"รับงาน",declined:"ปฏิเสธ",expired:"หมดเวลา",cancelled:"ยกเลิก"};
 function oqDate(d){var x=new Date(d+"T00:00:00");return x.toLocaleDateString("th-TH",{day:"numeric",month:"short",year:"numeric"})}
 function oqT(t){return t?String(t).slice(0,5):""}
@@ -611,7 +649,7 @@ function post(){var lg=document.getElementById("alogo");if(lg){if(!lg.dataset.o)
  if(S.tab==="oreq")(D.oreq||[]).forEach(function(r){var el=document.getElementById("oqslip_"+r.id);if(el&&r.slip_path)loadBlobInto("/storage/v1/object/authenticated/licenses/"+r.slip_path,el,"สลิปโอนเงินของ "+esc(r.org_name),"slipth")});
  if(S.tab==="shop"&&S.lic){var r=byId(D.regs,S.lic),el2=document.getElementById("lic_"+S.lic);if(r&&el2)loadBlobInto("/storage/v1/object/authenticated/licenses/"+r.license_path,el2,"ใบอนุญาตจัดตั้งร้านนวดของ "+esc(r.name),"licimg")}}
 function draw(){navDraw();document.getElementById("main").innerHTML=view();post()}
-function softDraw(){navDraw();var a=document.activeElement;if(S.form||S.busy||(a&&/INPUT|SELECT|TEXTAREA/.test(a.tagName)&&a.id!=="")||S.tab==="set"||S.tab==="usr"||S.tab==="hl"||S.tab==="au")return;document.getElementById("main").innerHTML=view();post()}
+function softDraw(){navDraw();var a=document.activeElement;if(S.form||S.busy||(a&&/INPUT|SELECT|TEXTAREA/.test(a.tagName)&&a.id!=="")||S.tab==="set"||S.tab==="usr"||S.tab==="hl"||S.tab==="au"||S.tab==="fm")return;document.getElementById("main").innerHTML=view();post()}
 function refresh(){if(!D||S.busy)return Promise.resolve();if(S.tab==="rvw"||RW.loaded)rvwLoad();return Promise.all([loadLive(),loadBk()]).then(softDraw,function(e){if(e&&e.status===401)doLogout()})}
 
 /* ===================== เหตุการณ์ ===================== */
@@ -676,6 +714,8 @@ document.addEventListener("input",function(e){var t=e.target;if(!t||!D)return;
  if(t.id==="olat"||t.id==="olng")document.getElementById("pinst").innerHTML=pinStatus(document.getElementById("olat").value.trim(),document.getElementById("olng").value.trim())});
 document.addEventListener("change",function(e){var t=e.target;if(!t||!D)return;
  if(t.id==="aut"){AU.t=t.value;auList();return}
+ if(t.id==="fmy"||t.id==="fmmo"){var yy=(document.getElementById("fmy")||{}).value,mo=(document.getElementById("fmmo")||{}).value;if(yy&&mo){FM.m=yy+"-"+mo;FM.bank="";fmLoad(true)}return}
+ if(t.id==="fmb"){FM.bank=t.value;fmBank(true);return}
  if(t.classList&&t.classList.contains("spk")&&S.form){var id=t.value,i=S.form.sel.indexOf(id);if(t.checked&&i<0)S.form.sel.push(id);if(!t.checked&&i>-1)S.form.sel.splice(i,1);
   if(S.form.t==="comp"){var sp=document.getElementById("staffpick");if(sp)sp.innerHTML=staffRowsHtml()}else{var c=document.getElementById("selcnt");if(c)c.textContent=S.form.sel.length}return}
  if((t.id==="fimg"||t.id==="simg"||t.id==="aimg")&&t.files&&t.files[0]){var er=document.getElementById("imgerr"),f=t.files[0];er.textContent="";if(!/^image\//.test(f.type)){er.textContent="เลือกไฟล์รูปภาพเท่านั้น";return}if(f.size>8*1024*1024){er.textContent="ไฟล์ใหญ่เกิน 8 MB";return}cropSquare(f,function(url){S.imgTmp=url;document.getElementById("imgprev").innerHTML=stImg(url,"",56)},function(){er.textContent="อ่านรูปนี้ไม่ได้ ลองไฟล์อื่น"})}});
@@ -700,7 +740,7 @@ document.addEventListener("click",function(e){
  if(a==="rpprint"){rpPrint();return}
  if(a==="rpcsv"){rpCsv();return}
  if(a==="ss"){S.ss=id;S.form=null;S.lic=null;S.rej=null;draw();return}
- if(a==="tab"){if(S.last[id])id=S.last[id];var gg=groupOf(id);if(S.last[gg])S.last[gg]=id;if(id==="pprq"||id==="ppac"){S.pps=id.slice(2);id="pp"}S.tab=id;S.sdc=null;S.sdn=null;S.ppsaved=false;S.form=null;S.del=null;S.saved=false;S.info="";S.stnew=null;S.stmsg="";S.hmsg="";S.rej=null;S.lic=null;S.tpc=null;S.tpr=null;S.slipv=null;S.oqr=null;draw();if(id==="nt"||id==="pp"||id==="shop"||id==="q")refresh();if(id==="rvw")rvwLoad();if(id==="usr")usrLogLoad();if(id==="hl")hlLoad();if(id==="au")auLoad();if(id==="set"&&S.sub==="a")loadAdmins().then(draw);return}
+ if(a==="tab"){if(S.last[id])id=S.last[id];var gg=groupOf(id);if(S.last[gg])S.last[gg]=id;if(id==="pprq"||id==="ppac"){S.pps=id.slice(2);id="pp"}S.tab=id;S.sdc=null;S.sdn=null;S.ppsaved=false;S.form=null;S.del=null;S.saved=false;S.info="";S.stnew=null;S.stmsg="";S.hmsg="";S.rej=null;S.lic=null;S.tpc=null;S.tpr=null;S.slipv=null;S.oqr=null;draw();if(id==="nt"||id==="pp"||id==="shop"||id==="q")refresh();if(id==="rvw")rvwLoad();if(id==="usr")usrLogLoad();if(id==="hl")hlLoad();if(id==="au")auLoad();if(id==="fm")fmLoad();if(id==="set"&&S.sub==="a")loadAdmins().then(draw);return}
  if(a==="sub"){S.saved=false;S.del=null;var sv=document.querySelector(".saved");if(sv)sv.remove();subTo(id);if(id==="c"){SLP.msg="";SLP.cfm=false;slipCount()}if(id==="a")loadAdmins().then(function(){var h=document.querySelector("[data-sg=a]");if(h&&S.sub==="a")h.innerHTML=adminHtml()},function(x){showErr(errTh(x))});return}
  if(a==="ntf"){S.ntf=id;draw();return}
   if(a==="ntc"){S.ntc=id;draw();return}
@@ -810,6 +850,9 @@ document.addEventListener("click",function(e){
  if(a==="usgo"){var tg=US.sel,pw2=US.pw;OKM="ตั้งรหัสผ่านชั่วคราวแล้ว";act(function(){return rpc("admin_reset_password",{p_user:tg.id,p_password:pw2}).then(function(){US.done={name:tg.name,phone:tg.phone,pw:pw2};US.sel=null;US.pw="";US.cfm=false;return usrLogLoad(true)})},function(){});return}
  if(a==="usdone"){US.done=null;draw();return}
  if(a==="hlre"){hlLoad(true);return}
+ if(a==="fmre"){fmLoad(true);return}
+ if(a==="fmcsv"){fmCsv();return}
+ if(a==="fmprint"){window.print();return}
  if(a==="aure"){auLoad(true);return}
  if(a==="uscopy"){var tx=US.done&&US.done.pw;if(tx&&navigator.clipboard)navigator.clipboard.writeText(tx).then(function(){US.copied=true;draw()},function(){});return}
  if(a==="slipask"){SLP.cfm=true;slipRedraw();return}

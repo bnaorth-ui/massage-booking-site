@@ -100,7 +100,7 @@ ok('home active; queue shown',(await onNav())==='หน้าหลัก'&&!!(a
 await p.click('#tabs [data-id=nt]');ok('nt active',(await onNav())==='การแจ้งเตือน');
 await p.click('#tabs [data-id=pl]');await p.waitForTimeout(300);ok('pl: subs '+(await sub()).join('|'),(await sub()).join()==='ร้านนวด,หน่วยงาน,คำขอหน่วยงาน,บริษัท,พนักงาน'&&(await onSub())==='ร้านนวด'&&(await onNav())==='สถานที่และคน');
 for(const [id,nm] of [['org','หน่วยงาน'],['comp','บริษัท'],['staff','พนักงาน']]){await p.click('#main .subtabs[aria-label] [data-id='+id+']');await p.waitForTimeout(200);ok('pl sub '+id,(await onSub())===nm&&(await onNav())==='สถานที่และคน')}
-await p.click('#tabs [data-id=fin]');await p.waitForTimeout(300);ok('fin: subs '+(await sub()).join('|'),(await sub()).join()==='คำขอเติมเงิน,บัญชีรับเงิน,รายงาน'&&(await onSub())==='คำขอเติมเงิน'&&(await onNav())==='การเงิน');
+await p.click('#tabs [data-id=fin]');await p.waitForTimeout(300);ok('fin: subs '+(await sub()).join('|'),(await sub()).join()==='คำขอเติมเงิน,บัญชีรับเงิน,รายงาน,สรุปการเงิน'&&(await onSub())==='คำขอเติมเงิน'&&(await onNav())==='การเงิน');
 const shown=async()=>await p.$$eval('[data-pg]',x=>x.filter(e=>!e.hidden).map(e=>e.dataset.pg).join());
 ok('fin default shows requests',(await shown())==='rq'&&await p.isVisible('[data-a=tpok]'));
 const sb0=await p.$$eval('#main .subtabs[aria-label] button',b=>b[0].textContent);ok('pending count on คำขอเติมเงิน ('+sb0+')',/\(\d+\)/.test(sb0));
