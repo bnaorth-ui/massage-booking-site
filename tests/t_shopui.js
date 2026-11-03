@@ -177,7 +177,7 @@ ok('slip stored in slips bucket under place',stor.some(s=>new RegExp('^slips/sh1
 ok('slip preview loaded via authenticated read',await until(()=>document.querySelector('#slipcur img')));
 await p.click('[role=tab][data-a=wt][data-id=his]');ok('topup in history waiting',(await txt('#main')).includes('รอยืนยัน')&&(await txt('#main')).includes('แนบสลิปแล้ว'));
 await p.click('[role=tab][data-a=wt][data-id=bal]');
-await p.click('[data-a=tpcancel]');await has('ยกเลิก');ok('topup cancelled',T.topup_requests[0].status==='cancelled');
+await p.click('[data-a=tpcancel]');for(let i=0;i<80&&T.topup_requests[0].status!=='cancelled';i++)await sleep(100);await has('ยกเลิก');ok('topup cancelled',T.topup_requests[0].status==='cancelled');
 // admin confirms another topup -> server side adds wallet row; client sees after refresh
 T.wallet_tx.push({id:'w9',place_id:'sh1',type:'topup',amount:500,note:'เติมเงินผ่านพร้อมเพย์ (อ้างอิง TPX)',ref:'TPX',status:'success',created_at:now()});
 await sub('svc');await p.click('[data-a=tab][data-id=wal]');ok('refresh picks up admin-confirmed topup',await has('1,460 บาท'));

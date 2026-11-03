@@ -45,7 +45,7 @@ await ctx.route('**/*supabase.co/**',async r=>{const q=r.request(),u=new URL(q.u
  if(path==='/rest/v1/rpc/delete_my_account'){dels.push(body);if(delMode==='blocked')return J(400,{code:'P0001',message:'มีการจองที่ยังไม่เสร็จสิ้น กรุณายกเลิกหรือรอให้เสร็จก่อนลบบัญชี'});return J(204,null)}
  if(path==='/storage/v1/object/list/avatars')return J(200,[{name:'a1.jpg'},{name:'a2.jpg'}]);
  if(path==='/storage/v1/object/avatars'&&m==='DELETE'){avdel.push(body);return J(200,[])}
- if(path==='/rest/v1/rpc/my_points')return J(200,PTS);
+ if(path==='/rest/v1/rpc/my_points'){if(globalThis.__hold)await globalThis.__hold;return J(200,PTS)}
  if(path==='/rest/v1/rpc/my_bookings')return J(200,BKS.slice().sort((a,b)=>b.s-a.s).map(fmt));
  if(path==='/rest/v1/rpc/cancel_booking'){const b=BKS.find(x=>x.ref===body.p_ref);if(Date.now()>b.s-24*3600000)return J(400,{code:'P0001',message:'ยกเลิกไม่ได้ เกินเวลาที่ยกเลิกได้'});b.status='cancelled';b.items.forEach(i=>i.active=false);return r.fulfill({status:204,body:''})}
  if(path==='/rest/v1/rpc/create_booking'){const pl=places.find(p=>p.id===body.p_place);const start=Date.parse(body.p_start);let old=null;
@@ -115,9 +115,13 @@ ok('NEW SEO hidden in installed (standalone) app',await pg.evaluate(()=>document
 pg=await open(UA.and);await pg.click('[data-ins=skip]');await pg.waitForTimeout(200);await pg.waitForSelector('[data-pl]');ok('NEW SEO visible on guest home with content',await pg.evaluate(()=>{const s=document.getElementById('seo');return !s.hidden&&s.getBoundingClientRect().height>100&&s.innerText.includes('ทำไมต้องจองกับเรา')&&s.innerText.includes('กรมสนับสนุนบริการสุขภาพ')&&!/ทุกคน/.test(s.innerText)}));await pg.close();
 // logged in account
 pg=await open(UA.and);await pg.click('[data-ins=skip]');await pg.waitForSelector('[data-gb=login]');await pg.click('[data-gb=login]');await pg.fill('#lph','0811111111');await pg.fill('#lpw','abc123');await pg.click('button[type=submit]');await pg.waitForSelector('[data-pl]',{timeout:4000});
+let __rel;globalThis.__hold=new Promise(r=>{__rel=r});
 await pg.click('[data-tab="ac"]');await pg.waitForTimeout(300);
 ok('account: how-to button',!!(await pg.$('[data-insp=open]')));
-await pg.click('[data-insp=open]');await pg.waitForTimeout(300);
+await pg.click('[data-insp=open]');await pg.waitForFunction(()=>document.activeElement&&document.activeElement.id==='inst',null,{timeout:8000}).catch(()=>{});await pg.waitForTimeout(100);
+const focusOk=await pg.evaluate(()=>document.activeElement&&document.activeElement.id==='inst');
+__rel();globalThis.__hold=null;await pg.waitForTimeout(1200);
+ok('background data arriving later keeps focus on the heading (no focus loss for screen readers)',await pg.evaluate(()=>document.activeElement&&document.activeElement.id==='inst')&&focusOk);
 ok('account: page + focus + tabs',(await T(pg)).includes('ติดตั้งแอปจองคิวนวด')&&await pg.evaluate(()=>document.activeElement.id==='inst'&&getComputedStyle(document.getElementById('tabs')).display!=='none'));
 await pg.click('[data-insp=no]');await pg.waitForTimeout(200);ok('back to account',(await T(pg)).includes('ออกจากระบบ'));
 // reload logged in: no intro

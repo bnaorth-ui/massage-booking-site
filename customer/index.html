@@ -391,6 +391,8 @@ function viewRender(){var h="",b="";
   (notes.length?notes.map(function(n){var d=new Date(n.at);return '<div class="msg"><div class="mh"><b>'+esc(n.title||n.to||"แจ้งเตือน")+'</b>'+(n.at>prev?'<span class="tag">ใหม่</span>':'')+'</div><small class="mt">'+d.toLocaleDateString("th-TH",{day:"numeric",month:"short"})+' '+d.toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"})+' น.</small><pre>'+esc(n.text)+'</pre>'+(n.ref?'<button class="lb" data-view="bk">ดูรายการจอง</button>':'')+(n.auto?'<button class="lb" data-view="">เปิดหน้าจอง</button>':'')+(n.orq?'<button class="lb" data-orq="open">ดูคำขอของฉัน</button>':'')+'</div>'}).join(""):'<div class="empty">ยังไม่มีการแจ้งเตือน</div>'))}
  return[h,b]}
 function ann(m,u){var r=document.getElementById(u?"sra":"sr"),t=document.getElementById("atoast");if(r){r.textContent="";setTimeout(function(){r.textContent=m},60)}if(t){t.textContent=m;t.className="atoast"+(u?" bad":"");t.hidden=false;clearTimeout(ann.t);ann.t=setTimeout(function(){t.hidden=true},6000)}}
+/* วาดหน้าใหม่ระหว่างโหลดข้อมูลเบื้องหลัง (keep) แล้วโฟกัสหลุดไปที่ body: คืนโฟกัสให้องค์ประกอบเดิมที่มี id เดียวกัน */
+function holdFocus(keep){var a=document.activeElement,id=keep&&a&&a!==document.body&&app.contains(a)?a.id:"";return function(){if(!id)return;var e=document.getElementById(id);if(e&&document.activeElement!==e){try{e.focus({preventScroll:true})}catch(x){}}}}
 function render(keep){
  try{tabsRender()}catch(e){}
  if(!ME&&!GUEST){if(!document.getElementById("authf"))authRender();return}
@@ -401,7 +403,7 @@ function render(keep){
  if(V.del&&S.view==="ac"&&document.getElementById("delf"))return;
  if(V.pwc&&S.view==="ac"&&document.getElementById("pwf"))return;
  if(V.rv&&(RF||RL)){if(!document.getElementById("rvp"))rvRender();return}
- if(S.view){var vv=viewRender();app.innerHTML=vv[0];bar.innerHTML=vv[1]?"<div>"+vv[1]+"</div>":"";bar.style.display=vv[1]?"":"none";if(!keep)window.scrollTo(0,0);bind();return}
+ if(S.view){var vv=viewRender(),hf=holdFocus(keep);app.innerHTML=vv[0];bar.innerHTML=vv[1]?"<div>"+vv[1]+"</div>":"";bar.style.display=vv[1]?"":"none";if(!keep)window.scrollTo(0,0);bind();hf();return}
  var h="",b="";
  if(S.step===5){
   h=(S.movedFrom?'<div class="flash">ยกเลิกนัดเดิมเลขที่ '+S.movedFrom+' ให้แล้ว และคืนคิวเดิมเรียบร้อย</div>':'')+'<div class="done"><div class="ico">✅</div><h1>'+(S.movedFrom?'เลื่อนคิวสำเร็จ':'จองสำเร็จแล้ว')+'</h1><p class="sub">เลขที่การจอง <span class="ref">'+S.ref+'</span></p></div>'+summary();
@@ -450,8 +452,8 @@ function render(keep){
    if(S.place.type==="shop"){h+='<div class="inbtns">'+bt+'</div>';b=""}else b=bt;
   }
  }
- app.innerHTML=h;bar.innerHTML=b?'<div>'+b+'</div>':"";bar.style.display=b?"":"none";
- if(!keep)window.scrollTo(0,0);bind();
+ var hf2=holdFocus(keep);app.innerHTML=h;bar.innerHTML=b?'<div>'+b+'</div>':"";bar.style.display=b?"":"none";
+ if(!keep)window.scrollTo(0,0);bind();hf2();
 }
 function unitNets(){var cl=calc(),el=0;if(cl.promo)S.svcs.forEach(function(v){if(promoCovers(cl.promo,v))el+=v.price});return S.svcs.map(function(v){var d=(cl.promo&&el&&promoCovers(cl.promo,v))?cl.disc*v.price/el:0;return Math.round((v.price-d)*100)/100})}
 function ptsRate(){return PT&&PT.per_baht>0?PT.per_baht:10}
