@@ -39,8 +39,6 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
   if(!isS)return J(400,{code:'P0001',message:'บัญชีนี้ไม่ใช่พนักงาน'});
   if(f==='my_jobs')return J(200,items);
   if(f==='staff_save_self'){if(!body.p_work_days.length)return J(400,{code:'P0001',message:'ต้องเลือกวันทำงานอย่างน้อย 1 วัน'});ST.accepting=body.p_accepting;ST.work_days=body.p_work_days;if(!body.p_keep_photo)ST.photo_path=body.p_photo;return J(204,null)}
-  if(f==='staff_set_blocks'){for(const mm of body.p_minutes){const hit=items.find(i=>i.active&&bkDate(Date.parse(i.starts_at))===body.p_day&&(()=>{const s=Math.floor(((Date.parse(i.starts_at)+H7)%86400000)/60000);return mm<s+i.minutes&&mm+30>s})());if(hit)return J(400,{code:'P0001',message:'ช่วงเวลานี้มีคิวอยู่แล้ว ปิดไม่ได้'})}
-   if(mode.failBlock)return J(400,{code:'P0001',message:'จำลองล้มเหลว'});blocks=blocks.filter(x=>x.day!==body.p_day).concat(body.p_minutes.map(mm=>({day:body.p_day,minute:mm})));return J(204,null)}
   if(f==='staff_mark_no_show'){const it=items.find(i=>i.id===body.p_item);calls.push({ns:body.p_item});it.bstatus='no_show';it.active=false;return J(204,null)}
  if(f==='reply_review'){reps.push(body);const r=RVS.find(x=>x.id===body.p_id);if(r.reply)return J(400,{code:'P0001',message:'ตอบรีวิวนี้ไปแล้ว'});r.reply=body.p_text;return J(204,null)}
  if(f==='report_review'){reps.push(body);RVS.find(x=>x.id===body.p_id).reported=true;return J(204,null)}

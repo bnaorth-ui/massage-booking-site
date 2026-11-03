@@ -41,8 +41,6 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
   if(f==='my_jobs')return J(200,items);
   if(f==='staff_income'){incCalls.push(body);if(mode.incOff)return J(404,{message:'Could not find the function public.staff_income in the schema cache'});if(mode.incErr)return J(500,{message:'boom'});const fr=Date.parse(body.p_from),to=Date.parse(body.p_to);return J(200,INCROWS.filter(x=>{const t=Date.parse(x.starts_at);return t>=fr&&t<to}))}
   if(f==='staff_save_self'){if(!body.p_work_days.length)return J(400,{code:'P0001',message:'ต้องเลือกวันทำงานอย่างน้อย 1 วัน'});ST.accepting=body.p_accepting;ST.work_days=body.p_work_days;if(!body.p_keep_photo)ST.photo_path=body.p_photo;return J(204,null)}
-  if(f==='staff_set_blocks'){for(const mm of body.p_minutes){const hit=items.find(i=>i.active&&bkDate(Date.parse(i.starts_at))===body.p_day&&(()=>{const s=Math.floor(((Date.parse(i.starts_at)+H7)%86400000)/60000);return mm<s+i.minutes&&mm+30>s})());if(hit)return J(400,{code:'P0001',message:'ช่วงเวลานี้มีคิวอยู่แล้ว ปิดไม่ได้'})}
-   if(mode.failBlock)return J(400,{code:'P0001',message:'จำลองล้มเหลว'});blocks=blocks.filter(x=>x.day!==body.p_day).concat(body.p_minutes.map(mm=>({day:body.p_day,minute:mm})));return J(204,null)}
   if(f==='set_job_status'){const it=items.find(i=>i.id===body.p_item);const R={pending:0,accepted:1,in_progress:2,done:3};if(!it||R[body.p_status]<=R[it.job])return J(400,{code:'P0001',message:'สถานะงานย้อนกลับไม่ได้'});it.job=body.p_status;if(body.p_status==='done')it.bstatus='completed';return J(204,null)}
   return J(404,{message:'no rpc '+f})}
  const tb=path.replace('/rest/v1/','');
