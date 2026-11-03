@@ -79,6 +79,7 @@ textarea.in{resize:vertical}
 .btn.ghost{background:transparent;color:var(--main)}.flash{background:var(--soft);border:2px solid var(--main);border-radius:12px;padding:8px 12px;margin:0 0 12px}.err{background:var(--bad-bg);color:var(--bad);border:2px solid var(--bad);border-radius:10px;padding:8px 12px;margin:8px 0}.chh{margin:0 0 6px}.chh .btn{width:auto;padding:8px 14px}.chl{display:flex;flex-direction:column;gap:8px;margin:10px 0 90px}.msg{max-width:85%;border-radius:14px;padding:8px 12px;border:2px solid var(--line);background:var(--card)}.msg.mine{align-self:flex-end;background:var(--soft)}.msg small{display:block;opacity:.8}.msg p{margin:2px 0 0;overflow-wrap:anywhere}.chf{position:sticky;bottom:var(--nbh,0px);display:flex;gap:8px;align-items:flex-end;background:var(--bg);padding:10px 0;border-top:1px solid var(--line)}.chf textarea{flex:1;margin:0;resize:none;font:inherit;padding:10px;border:2px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}.chf .btn{width:auto;margin:0;padding:10px 18px}.cn{display:inline-block;min-width:22px;border-radius:99px;background:#d64545;color:#fff;font-size:.8rem;padding:0 6px;margin-left:6px}.chb{margin-top:8px}.chb .btn{width:auto;padding:8px 14px}.vh{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
 .mpov{position:fixed;inset:0;z-index:60;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}.mpov header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--line)}.mpov header b{font-size:1.05rem}.mpx{font:inherit;min-width:44px;min-height:44px;border:2px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);cursor:pointer}.mpm{flex:1;min-height:200px;position:relative;background:var(--off)}.mpm .mpe{padding:16px;color:var(--mute)}.mpc{padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);display:grid;gap:8px;background:var(--bg)}.mpn{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.mpn button,.mpc .mpb{font:inherit;min-height:44px;min-width:44px;padding:6px 12px;border:2px solid var(--main);border-radius:10px;background:transparent;color:var(--main);cursor:pointer}.mpc .mpb.pri{background:var(--main);color:var(--main-ink)}.mpc input{font:inherit;min-height:44px;width:100%;border:2px solid var(--line);border-radius:10px;padding:6px 10px;background:var(--card);color:var(--ink)}.mpg{display:grid;grid-template-columns:1fr 1fr;gap:8px}.mpa{display:flex;gap:8px}.mpa .mpb{flex:1}.mpin{font-size:28px;line-height:30px;text-align:center;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}
 .gpbox{background:var(--soft);border:2px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 10px;font-size:.92rem}.gpbox ol{margin:6px 0 0;padding-left:20px}.gpbox li{margin:4px 0}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}.toast{position:fixed;left:50%;transform:translateX(-50%);top:12px;max-width:calc(100% - 32px);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:99px;font-weight:700;z-index:60;box-shadow:0 4px 16px rgba(0,0,0,.25);text-align:center}.toast.bad{background:var(--bad);color:#fff}.toast[hidden]{display:none}#main h1:focus{outline:none}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
@@ -87,6 +88,7 @@ textarea.in{resize:vertical}
  <div class="hd" id="hdr"></div>
  </div></header>
 <main id="main"></main>
+<div id="sr" class="sr" role="status" aria-live="polite" aria-atomic="true"></div><div id="sra" class="sr" role="alert" aria-live="assertive" aria-atomic="true"></div><div id="toast" class="toast" aria-hidden="true" hidden></div>
 <div class="navb" id="navb"><div id="tabs"></div></div>
 <script>
 (function(){
@@ -460,7 +462,7 @@ function shareSave(){var er=document.getElementById("sherr"),calls=[],bad=null;e
  for(var i=0;i<D.svc.length;i++){var v=D.svc[i],x=rd1("sh_"+v.id);if(bad){er.textContent="ส่วนแบ่งต้องเป็นตัวเลข 0-100 ("+v.name+")";return}
   if(x!==undefined&&x!==(D.rates.svc[v.id]==null?null:D.rates.svc[v.id]))calls.push([v.id,x])}
  if(!calls.length){er.textContent="ยังไม่ได้เปลี่ยนค่าใด";return}
- act(function(){var p=Promise.resolve();calls.forEach(function(c){p=p.then(function(){return rpc("shop_set_share",{p_place:WID,p_service:c[0],p_pct:c[1]})})});return p.then(loadRates)},function(){S.shareok=true})}
+ OKM="บันทึกส่วนแบ่งแล้ว";act(function(){var p=Promise.resolve();calls.forEach(function(c){p=p.then(function(){return rpc("shop_set_share",{p_place:WID,p_service:c[0],p_pct:c[1]})})});return p.then(loadRates)},function(){S.shareok=true})}
 function loadRates(){return g1("share_rates?select=service_id,pct&place_id=eq."+WID).then(function(a){var r={shop:null,svc:{}};(a||[]).forEach(function(x){if(x.service_id)r.svc[x.service_id]=+x.pct;else r.shop=+x.pct});D.rates=r},function(){D.rates=null})}
 function rateFor(sid){if(!D.rates)return null;if(sid&&D.rates.svc[sid]!=null)return D.rates.svc[sid];return D.rates.shop}
 /* --- หน้ารายงาน --- */
@@ -798,8 +800,11 @@ document.addEventListener("change",function(e){var t=e.target;if(!t||!D)return;
    imgPathFor("shop",url,null).then(function(path){return sbApi("/rest/v1/places?id=eq."+WID,{method:"PATCH",json:1,headers:{Prefer:"return=minimal"},body:JSON.stringify({image_path:path})}).then(function(){D.shop.imgPath=path;D.shop.img=pubUrl(path);er.textContent="";drawHeader();document.getElementById("imgprev").innerHTML=avatar(56)})})
    .catch(function(x){er.textContent=errTh(x,"บันทึกรูปไม่สำเร็จ")})},function(){er.textContent="อ่านรูปนี้ไม่ได้ ลองไฟล์อื่น"})}});
 function showErr(m){var x=document.getElementById("err");if(x&&(S.form||S.tab==="set"||S.wmode)){x.textContent=m}else{S.hmsg=m;draw()}}
-function act(fn,onOk){if(S.busy)return;S.busy=true;S.hmsg="";
- fn().then(function(){S.busy=false;if(onOk)onOk();draw()},function(e){S.busy=false;if(e&&e.status===401){doLogout();return}showErr(errTh(e,"ทำรายการไม่สำเร็จ"))})}
+var OKM="";
+function announce(m,u){var r=document.getElementById(u?"sra":"sr"),t=document.getElementById("toast");if(r){r.textContent="";setTimeout(function(){r.textContent=m},60)}if(t){t.textContent=m;t.className="toast"+(u?" bad":"");t.hidden=false;clearTimeout(announce.t);announce.t=setTimeout(function(){t.hidden=true},6000)}}
+function actDone(m){var b=document.querySelectorAll("#main .saved[role=status],#main .closed[role=status]");for(var i=0;i<b.length;i++)b[i].removeAttribute("role");var h=document.querySelector("#main h1");if(h){h.setAttribute("tabindex","-1");try{h.focus({preventScroll:true})}catch(x){}}announce(m)}
+function act(fn,onOk){var mk=OKM;OKM="";if(S.busy)return;S.busy=true;S.hmsg="";
+ fn().then(function(){S.busy=false;if(onOk)onOk();draw();actDone(mk||"ทำรายการสำเร็จแล้ว")},function(e){S.busy=false;if(e&&e.status===401){doLogout();return}showErr(errTh(e,"ทำรายการไม่สำเร็จ"))})}
 function patch(tbl,id,body){return sbApi("/rest/v1/"+tbl+"?id=eq."+id,{method:"PATCH",json:1,headers:{Prefer:"return=minimal"},body:JSON.stringify(body)})}
 document.addEventListener("click",function(e){
  var el=e.target.closest("[data-a]");if(!el||!D)return;
@@ -807,7 +812,7 @@ document.addEventListener("click",function(e){
  if(S.busy)return;
  if(a!=="clsask"&&S.clc){S.clc=0;var cb=document.getElementById("clsask");if(cb)cb.textContent="ขอปิดบัญชีร้าน"}
  if(a==="toggle"){if(!D.shop.on&&D.shop.autoClosed){S.hmsg="เปิดร้านไม่ได้ เพราะยอดกระเป๋าเงินไม่พอหักค่า GP"+(owed()>0?" (ค้างชำระ "+baht(owed())+")":"")+" เติมเงินแล้วระบบเปิดให้อัตโนมัติ";drawHeader();return}
-  var nv=D.shop.on?0:1;act(function(){return patch("places",WID,{active:!!nv})},function(){D.shop.on=nv});return}
+  var nv=D.shop.on?0:1;OKM=nv?"เปิดรับจองแล้ว":"ปิดรับจองชั่วคราวแล้ว";act(function(){return patch("places",WID,{active:!!nv})},function(){D.shop.on=nv});return}
  if(a==="pkmap"){openPicker();return}
   if(a==="pkname"){pinName(parseFloat(String(g("olat").value).replace(",",".")),parseFloat(String(g("olng").value).replace(",",".")));return}
   if(a==="geo"){var ps=g("pinst");
@@ -826,9 +831,9 @@ document.addEventListener("click",function(e){
  if(a==="new"){S.form={t:t,id:null};draw();return}
  if(a==="edit"){S.form={t:t,id:id};draw();return}
  if(a==="cancel"){S.form=null;draw();return}
- if(a==="tog"){var o=byId(L,id),nx=o.on?0:1,tbl=({svc:"services",staff:"staff",promo:"promotions"})[t];act(function(){return patch(tbl,id,{active:!!nx})},function(){o.on=nx});return}
+ if(a==="tog"){var o=byId(L,id),nx=o.on?0:1,tbl=({svc:"services",staff:"staff",promo:"promotions"})[t];OKM=nx?"เปิดใช้งานแล้ว":"ปิดการใช้งานแล้ว";act(function(){return patch(tbl,id,{active:!!nx})},function(){o.on=nx});return}
  if(a==="del"){if(S.del===t+id){var tb2=({svc:"services",staff:"staff",promo:"promotions"})[t];
-   act(function(){return sbApi("/rest/v1/"+tb2+"?id=eq."+id,{method:"DELETE",headers:{Prefer:"return=minimal"}})},function(){
+   OKM="ลบแล้ว";act(function(){return sbApi("/rest/v1/"+tb2+"?id=eq."+id,{method:"DELETE",headers:{Prefer:"return=minimal"}})},function(){
     if(t==="svc"){D.staff.forEach(function(p){p.svcs=(p.svcs||[]).filter(function(x){return x!==id})});D.promo.forEach(function(m){m.svcs=(m.svcs||[]).filter(function(x){return x!==id})})}
     D[t]=L.filter(function(x){return x.id!==id});S.del=null});S.del=null;return}
   S.del=t+id;draw();return}
@@ -836,14 +841,14 @@ document.addEventListener("click",function(e){
   if(ft==="svc"){var sn=g("sn").value.trim(),sp=+g("sp").value,sm=+g("sm").value,sd=g("sd").value.trim();
    if(!sn){er.textContent="กรุณากรอกชื่อบริการ";return}
    if(!(g("sp").value!==""&&sp>0)){er.textContent="ราคาต้องมากกว่า 0 บาท";return}
-   act(function(){return imgPathFor(kind,tmp,cur&&cur.imgPath).then(function(ip){var body={name:sn,minutes:sm,price:Math.round(sp),description:sd,image_path:ip};
+   OKM="บันทึกบริการแล้ว";act(function(){return imgPathFor(kind,tmp,cur&&cur.imgPath).then(function(ip){var body={name:sn,minutes:sm,price:Math.round(sp),description:sd,image_path:ip};
      return cur?patch("services",cur.id,body):sbApi("/rest/v1/services",{method:"POST",json:1,headers:{Prefer:"return=minimal"},body:JSON.stringify(Object.assign({place_id:WID},body))})}).then(loadCatalog)},function(){S.form=null});return}
   if(ft==="staff"){var n=g("fn").value.trim(),ss=[].slice.call(document.querySelectorAll(".ss:checked")).map(function(x){return x.value}),ph=g("fph").value.replace(/[\s-]/g,"");
    if(!n){er.textContent="กรุณากรอกชื่อพนักงาน";return}
    if(D.svc.length&&!ss.length){er.textContent="เลือกบริการที่พนักงานให้บริการได้อย่างน้อย 1 รายการ";return}
    if(!/^0\d{9}$/.test(ph)){er.textContent="เบอร์มือถือต้องเป็นตัวเลข 10 หลักขึ้นต้นด้วย 0";return}
    if(D.staff.some(function(x){return x.phone===ph&&(!cur||x.id!==cur.id)})){er.textContent="เบอร์มือถือนี้ถูกใช้กับพนักงานคนอื่นแล้ว";return}
-   act(function(){return imgPathFor(kind,tmp,cur&&cur.imgPath).then(function(ip){return rpc("shop_save_staff",{p_place:WID,p_id:cur?cur.id:null,p_name:n,p_phone:ph,p_photo:ip,p_services:ss})}).then(loadCatalog)},function(){S.form=null;S.stmsg="";S.stnew=cur?null:ph});return}
+   OKM=cur?"บันทึกการแก้ไขพนักงานแล้ว":"เพิ่ม "+n+" แล้ว ส่งลิงก์ให้พนักงานสร้างบัญชีได้เลย";act(function(){return imgPathFor(kind,tmp,cur&&cur.imgPath).then(function(ip){return rpc("shop_save_staff",{p_place:WID,p_id:cur?cur.id:null,p_name:n,p_phone:ph,p_photo:ip,p_services:ss})}).then(loadCatalog)},function(){S.form=null;S.stmsg="";S.stnew=cur?null:ph});return}
   if(ft==="promo"){var mt=g("mt").value.trim(),mv=+g("mv").value,ty=g("mty").value,all=g("mall").checked,ms=[].slice.call(document.querySelectorAll(".ms:checked")).map(function(x){return x.value}),s1=g("ms1").value,e1=g("me1").value;
    if(!mt){er.textContent="กรุณากรอกชื่อโปรโมชั่น";return}
    if(!(g("mv").value!==""&&mv>0)){er.textContent="มูลค่าส่วนลดต้องมากกว่า 0";return}
@@ -852,7 +857,7 @@ document.addEventListener("click",function(e){
    if(!s1||!e1){er.textContent="กรุณาเลือกวันเริ่มและวันสิ้นสุด";return}
    if(e1<s1){er.textContent="วันสิ้นสุดต้องไม่ก่อนวันเริ่ม";return}
    var md=g("md").value.trim();
-   act(function(){return imgPathFor(kind,tmp,cur&&cur.imgPath).then(function(ip){return rpc("shop_save_promotion",{p_place:WID,p_id:cur?cur.id:null,p_title:mt,p_desc:md,p_type:ty==="baht"?"amount":"percent",p_value:mv,p_all:all,p_services:all?[]:ms,p_start:s1,p_end:e1,p_image:ip})}).then(function(pid){
+   OKM="บันทึกโปรโมชั่นแล้ว";act(function(){return imgPathFor(kind,tmp,cur&&cur.imgPath).then(function(ip){return rpc("shop_save_promotion",{p_place:WID,p_id:cur?cur.id:null,p_title:mt,p_desc:md,p_type:ty==="baht"?"amount":"percent",p_value:mv,p_all:all,p_services:all?[]:ms,p_start:s1,p_end:e1,p_image:ip})}).then(function(pid){
      return loadCatalog()})},function(){S.form=null});return}
   return}
  if(a==="wnew"){S.wmode="topup";S.werr="";draw();return}
@@ -862,7 +867,7 @@ document.addEventListener("click",function(e){
   if(!(g("wa").value!==""&&amt>=100&&amt===Math.floor(amt))){S.werr="ใส่จำนวนเงินเป็นจำนวนเต็ม ขั้นต่ำ 100 บาท";draw();return}
   if(amt>50000){S.werr="เติมเงินครั้งละไม่เกิน 50,000 บาท";draw();return}
   var newId=null;
-  act(function(){return sbApi("/rest/v1/topup_requests",{method:"POST",json:1,headers:{Prefer:"return=representation"},body:JSON.stringify({place_id:WID,amount:amt})}).then(function(r){newId=r&&r[0]&&r[0].id;return loadLive()})},function(){S.wt="bal";S.tpshow=newId;S.slipDraft=null;S.slipMsg="";S.wmode=null;S.werr=""});return}
+  OKM="สร้างคำขอเติมเงินแล้ว";act(function(){return sbApi("/rest/v1/topup_requests",{method:"POST",json:1,headers:{Prefer:"return=representation"},body:JSON.stringify({place_id:WID,amount:amt})}).then(function(r){newId=r&&r[0]&&r[0].id;return loadLive()})},function(){S.wt="bal";S.tpshow=newId;S.slipDraft=null;S.slipMsg="";S.wmode=null;S.werr=""});return}
  if(a==="tpview"){S.wt="bal";S.tpshow=id;S.slipDraft=null;S.slipAsk=false;S.slipMsg="";draw();return}
  if(a==="slipsend"){var sx=byId(D.tx,id);
   if(!sx||sx.st!=="รอยืนยัน"){S.slipMsg="รายการนี้ปิดแล้ว ส่งสลิปไม่ได้";draw();return}
@@ -870,23 +875,23 @@ document.addEventListener("click",function(e){
   if(!S.slipAsk){S.slipAsk=true;draw();return}
   S.slipAsk=false;
   var sd2=S.slipDraft,sp2=WID+"/"+sx.ref+"-"+stamp()+".jpg";var m0=g("slipmsg");if(m0)m0.textContent="กำลังส่งสลิป...";
-  act(function(){return upObj("slips",sp2,sd2).then(function(){return rpc("attach_topup_slip",{p_id:sx.rid||sx.id,p_path:sp2})}).then(loadLive)},function(){S.slipDraft=null;S.slipMsg="ส่งสลิปให้แอดมินแล้ว แอดมินได้รับแจ้งเตือนและจะตรวจสอบเพื่ออนุมัติ ยอดจะเข้ากระเป๋าเงินอัตโนมัติ"});return}
+  OKM="ส่งสลิปให้แอดมินแล้ว";act(function(){return upObj("slips",sp2,sd2).then(function(){return rpc("attach_topup_slip",{p_id:sx.rid||sx.id,p_path:sp2})}).then(loadLive)},function(){S.slipDraft=null;S.slipMsg="ส่งสลิปให้แอดมินแล้ว แอดมินได้รับแจ้งเตือนและจะตรวจสอบเพื่ออนุมัติ ยอดจะเข้ากระเป๋าเงินอัตโนมัติ"});return}
  if(a==="slipno"){S.slipAsk=false;draw();return}
  if(a==="qrsave"){var qx=byId(D.tx,id),qp=ppInfo();if(qx)saveQr(qx,qp);return}
  if(a==="tpclose"){S.tpshow=null;S.slipDraft=null;S.slipAsk=false;S.slipMsg="";draw();return}
- if(a==="tpcancel"){var cx=byId(D.tx,id);if(cx&&cx.st==="รอยืนยัน"){act(function(){return rpc("cancel_topup",{p_id:cx.rid||cx.id}).then(loadLive)},function(){S.tpshow=null})}else{S.tpshow=null;draw()}return}
+ if(a==="tpcancel"){var cx=byId(D.tx,id);if(cx&&cx.st==="รอยืนยัน"){OKM="ยกเลิกคำขอเติมเงินแล้ว";act(function(){return rpc("cancel_topup",{p_id:cx.rid||cx.id}).then(loadLive)},function(){S.tpshow=null})}else{S.tpshow=null;draw()}return}
  if(a==="logout"){doLogout();return}
  if(a==="pwsave"){pwChange();return}
  if(a==="sharesave"){shareSave();return}
  if(a==="clsask"){if(S.clc!==1){S.clc=1;el.textContent="กดอีกครั้งเพื่อยืนยันขอปิดบัญชี";return}
   S.clc=0;var rs=val("clr").trim();S.clmsg="";
-  act(function(){return rpc("shop_request_close",{p_place:WID,p_reason:rs||null}).then(loadCls)},function(){S.clmsg="ส่งคำขอปิดบัญชีแล้ว รอสมาคมตรวจสอบ";S.clok=true});return}
- if(a==="clscancel"){act(function(){return rpc("shop_cancel_close",{p_place:WID}).then(loadCls)},function(){S.clmsg="ยกเลิกคำขอปิดบัญชีแล้ว";S.clok=true});return}
+  OKM="ส่งคำขอปิดบัญชีแล้ว";act(function(){return rpc("shop_request_close",{p_place:WID,p_reason:rs||null}).then(loadCls)},function(){S.clmsg="ส่งคำขอปิดบัญชีแล้ว รอสมาคมตรวจสอบ";S.clok=true});return}
+ if(a==="clscancel"){OKM="ยกเลิกคำขอปิดบัญชีแล้ว";act(function(){return rpc("shop_cancel_close",{p_place:WID}).then(loadCls)},function(){S.clmsg="ยกเลิกคำขอปิดบัญชีแล้ว";S.clok=true});return}
  if(a==="sdrx"){S.sdc=null;S.sdn=null;draw();return}
  if(a==="sdrok"){if(S.sdc!==id){S.sdc=id;S.sdn=null;draw();return}
-  act(function(){return rpc("shop_staff_delete_resolve",{p_place:WID,p_req:id,p_approve:true,p_note:null}).then(loadCatalog)},function(){S.sdc=null;S.sdn=null;S.stmsg="ลบบัญชีพนักงานแล้ว";S.stok=true});return}
+  OKM="ลบบัญชีพนักงานแล้ว";act(function(){return rpc("shop_staff_delete_resolve",{p_place:WID,p_req:id,p_approve:true,p_note:null}).then(loadCatalog)},function(){S.sdc=null;S.sdn=null;S.stmsg="ลบบัญชีพนักงานแล้ว";S.stok=true});return}
  if(a==="sdrno"){if(S.sdn!==id){S.sdn=id;S.sdc=null;draw();return}var sr=val("sdn_"+id).trim();
-  act(function(){return rpc("shop_staff_delete_resolve",{p_place:WID,p_req:id,p_approve:false,p_note:sr||null}).then(loadSdr)},function(){S.sdc=null;S.sdn=null;S.stmsg="บันทึกการไม่อนุมัติแล้ว";S.stok=true});return}
+  OKM="บันทึกการไม่อนุมัติแล้ว";act(function(){return rpc("shop_staff_delete_resolve",{p_place:WID,p_req:id,p_approve:false,p_note:sr||null}).then(loadSdr)},function(){S.sdc=null;S.sdn=null;S.stmsg="บันทึกการไม่อนุมัติแล้ว";S.stok=true});return}
  if(a==="stshare"){stShare(id);return}
  if(a==="stnewno"){S.stnew=null;S.stmsg="";draw();return}
  if(a==="gprpt"){RP.kind="gp";RP.data=null;RP.err="";S.tab="rp";S.form=null;S.del=null;S.saved=false;draw();window.scrollTo(0,0);return}
@@ -906,7 +911,7 @@ document.addEventListener("click",function(e){
   if(adv!==null&&!(adv>=1&&adv<=90&&adv===Math.floor(adv))){er2.textContent="จองล่วงหน้าต้องเป็นจำนวนเต็มระหว่าง 1-90 วัน";return}
   if(ch!==null&&!(ch>=0&&ch<=168&&ch===Math.floor(ch))){er2.textContent="เวลายกเลิกต้องเป็นจำนวนเต็มระหว่าง 0-168 ชั่วโมง";return}
   var body={name:nm,description:g("s2").value.trim(),area:g("s5").value.trim(),open_days:days,open_time:hm(o1),close_time:hm(c1),lat:pla,lng:plo,advance_days:adv===null?DEF.adv:adv,cancel_hours:ch===null?DEF.cancelH:ch};
-  act(function(){return patch("places",WID,body)},function(){
+  OKM="บันทึกการตั้งค่าแล้ว";act(function(){return patch("places",WID,body)},function(){
    Object.assign(D.shop,{name:nm,desc:body.description,area:body.area,days:days,open:o1,close:c1,lat:pla,lng:plo,adv:body.advance_days,cancelH:body.cancel_hours,ov:{adv:body.advance_days,cancelH:body.cancel_hours}});S.saved=true;window.scrollTo(0,0)});return}
 });
 
