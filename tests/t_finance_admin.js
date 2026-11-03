@@ -163,10 +163,8 @@ fmMode.err=true;await p.click('[data-a=fmre]');await p.waitForTimeout(600);
 ok('error alert announced',(await p.textContent('#sra')).includes('admin_finance_month'));
 fmMode.err=false;fmMode.d={from:'x',to:'y',shops:[{place_id:'sh1',name:'ร้านสบายดี สปา',opening:0,topup:500,credit:0,gp:-50,other:0,closing:450,gp_n:1,topup_req:500}],checks:{topup_lost:[],gp_missing:[]}};
 await p.click('[data-a=fmre]');await p.waitForTimeout(600);
-{const dl2=p.waitForEvent('download');await p.click('[data-a=fmprint]');const d2=await dl2;ok('print file filename',d2.suggestedFilename()===(await p.evaluate(()=>'finance-'+document.getElementById('fmy').value+'-'+document.getElementById('fmmo').value+'.html')));
- const hh=require('fs').readFileSync(await d2.path(),'utf8');
- ok('print file has title, table, no bank box',hh.includes('สรุปการเงินสมาคม')&&hh.includes('ร้านสบายดี สปา')&&hh.includes('ตัวเลขตรงกันทุกข้อ')&&!hh.includes('ยอดจากธนาคาร')&&hh.includes('window.print()'));
- await p.waitForTimeout(300);ok('print file has letterhead like org report',hh.includes('class="rpti"')&&hh.includes('สมาคมวิทยากรฝึกอาชีพคนตาบอด')&&hh.includes('วันที่ออกรายงาน')&&hh.includes('ช่วงเวลาที่รายงาน')&&hh.includes('เอกสารนี้ออกโดยระบบจองนวด'));
- ok('print download announced',(await p.textContent('#sr')).includes('ดาวน์โหลดไฟล์สรุปการเงิน'))}
+{const pp=ctx.waitForEvent('page');await p.click('[data-a=fmprint]');const w=await pp;await w.waitForLoadState();const hh=await w.evaluate(()=>document.documentElement.outerHTML),wt=await w.evaluate(()=>document.body.innerText);
+ ok('print window has title, table, no bank box',wt.includes('สรุปการเงินสมาคม')&&wt.includes('ร้านสบายดี สปา')&&wt.includes('ตัวเลขตรงกันทุกข้อ')&&!wt.includes('ยอดจากธนาคาร'));
+ ok('print window has letterhead like org report',hh.includes('class="rpti"')&&wt.includes('สมาคมวิทยากรฝึกอาชีพคนตาบอด')&&wt.includes('วันที่ออกรายงาน')&&wt.includes('ช่วงเวลาที่รายงาน')&&wt.includes('เอกสารนี้ออกโดยระบบจองนวด'));await w.close()}
 ok('print + csv buttons exist',await p.evaluate(()=>!!document.querySelector('[data-a=fmprint]')&&!!document.querySelector('[data-a=fmcsv]')));
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)})();

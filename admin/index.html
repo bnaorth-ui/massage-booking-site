@@ -602,7 +602,7 @@ function fmView(){if(!FM.m)FM.m=fmNow();var a=FM.m.split("-"),yr=fmYears();if(yr
  return'<div class="head noprint"><h1>สรุปการเงินสมาคมรายเดือน</h1><button type="button" class="btn g" id="fmbtn" data-a="fmre"'+(FM.busy?' aria-busy="true"':'')+'>'+(FM.busy?"กำลังโหลด…":"โหลดใหม่")+'</button></div>'+
  '<div class="srch noprint" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><label for="fmmo" class="sub">เดือน</label><select class="in" id="fmmo" style="flex:0 0 auto;width:auto">'+FMN.map(function(n,i){var v=(i<9?"0":"")+(i+1);return'<option value="'+v+'"'+(v===a[1]?" selected":"")+'>'+n+'</option>'}).join("")+'</select><label for="fmy" class="sub">ปี พ.ศ.</label><select class="in" id="fmy" style="flex:0 0 auto;width:auto">'+yr.map(function(y){return'<option value="'+y+'"'+(y===+a[0]?" selected":"")+'>'+(y+543)+'</option>'}).join("")+'</select></div>'+
  '<p class="hint2 noprint">รายการกระเป๋าเงินของร้านค้าทุกร้าน นับตามเวลาไทย เฉพาะรายการที่สำเร็จแล้ว ไม่รวมที่ยังรอตรวจ</p>'+
- '<div class="acts noprint" style="margin:10px 0"><button type="button" class="btn" data-a="fmprint">ดาวน์โหลดไฟล์สำหรับพิมพ์ (HTML)</button><button type="button" class="btn g" data-a="fmcsv">ดาวน์โหลด CSV</button></div>'+
+ '<div class="acts noprint" style="margin:10px 0"><button type="button" class="btn" data-a="fmprint">พิมพ์ / บันทึกเป็น PDF</button><button type="button" class="btn g" data-a="fmcsv">ดาวน์โหลด CSV</button></div>'+
  '<div id="fmbody">'+fmBody()+'</div>'}
 function fmHead(){var lg=D.set.logo?pubUrl(D.set.logo):((document.getElementById("alogo")||{}).src||""),
  issue=new Date().toLocaleDateString("th-TH",{day:"numeric",month:"long",year:"numeric",timeZone:"Asia/Bangkok"});
@@ -610,7 +610,10 @@ function fmHead(){var lg=D.set.logo?pubUrl(D.set.logo):((document.getElementById
 function fmPrint(){var b=document.getElementById("fmbody");if(!b||!FM.d)return;var c=b.cloneNode(true);c.querySelectorAll(".noprint").forEach(function(x){x.remove()});
  var css=Array.prototype.map.call(document.querySelectorAll("style"),function(x){return x.textContent}).join("\n"),t="สรุปการเงินสมาคม "+fmLab(FM.m);
  var h='<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+esc(t)+'</title><style>'+css+'</style></head><body><div class="noprint" style="padding:10px 16px"><button class="btn" onclick="window.print()">พิมพ์ / บันทึกเป็น PDF</button></div><main><div class="rp">'+fmHead()+c.innerHTML+'<p class="rpft">เอกสารนี้ออกโดยระบบจองนวดของ '+esc(D.set.assoc||"สมาคมวิทยากรฝึกอาชีพคนตาบอด")+'</p></div></main><script>window.addEventListener("load",function(){setTimeout(function(){try{window.print()}catch(e){}},500)})<\/script></body></html>';
- var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([h],{type:"text/html;charset=utf-8"}));a.download="finance-"+FM.m+".html";document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500);say("ดาวน์โหลดไฟล์สรุปการเงิน"+fmLab(FM.m)+" แล้ว เปิดไฟล์นั้นเพื่อพิมพ์หรือบันทึกเป็น PDF")}
+ var url=URL.createObjectURL(new Blob([h],{type:"text/html;charset=utf-8"})),w=null;
+ try{w=window.open(url,"_blank")}catch(e){}
+ if(!w){var a=document.createElement("a");a.href=url;a.download="finance-"+FM.m+".html";document.body.appendChild(a);a.click();a.remove();FM.err="เปิดหน้าพิมพ์ไม่ได้ ระบบดาวน์โหลดไฟล์ให้แทน ให้เปิดไฟล์นั้นแล้วกดพิมพ์ หรือเปิดเว็บแอดมินจาก Safari/Chrome (ไม่ใช่แอปที่ติดตั้งบนหน้าจอ) แล้วลองใหม่";fmSync();say(FM.err,true)}
+ setTimeout(function(){URL.revokeObjectURL(url)},120000)}
 function fmCsv(){var d=FM.d;if(!d)return;var q=function(x){x=String(x==null?"":x);return /[",\n]/.test(x)?'"'+x.replace(/"/g,'""')+'"':x},t=fmTot(d),
  rows=[["สรุปการเงินสมาคม",fmLab(FM.m)],["ร้าน","ยอดยกมา","เติมเงิน","เครดิตจากสมาคม","หัก GP","จำนวนงานที่หัก GP","ยอดคงเหลือ"]];
  (d.shops||[]).forEach(function(r){rows.push([r.name,r.opening,r.topup,r.credit,r.gp,r.gp_n,r.closing])});rows.push(["รวมทุกร้าน",t.opening,t.topup,t.credit,t.gp,t.gp_n,t.closing]);
