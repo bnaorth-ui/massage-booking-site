@@ -158,7 +158,7 @@ ok('lunch defaults 12:00-13:00 in new form',(await p.$eval('#olh',e=>e.value))==
 await p.selectOption('#olh','840');await p.selectOption('#olc','780');await p.click('[data-a=save]');ok('lunch end before start rejected',await has('เวลาพักเที่ยงต้องอยู่ภายในเวลาให้บริการ'));
 await p.selectOption('#olh','1200');await p.selectOption('#olc','1260');await p.click('[data-a=save]');ok('lunch outside opening hours rejected',await has('เวลาพักเที่ยงต้องอยู่ภายในเวลาให้บริการ'));
 await p.selectOption('#olh','720');await p.selectOption('#olc','780');
-await p.click('[data-a=save]');await has('หน่วยงานใหม่');
+await p.click('[data-a=save]');for(let i=0;i<50&&!T.places.some(x=>x.name==='หน่วยงานใหม่');i++)await wait(100);await has('พักเที่ยง 12:00-13:00');
 const o2=T.places.find(x=>x.name==='หน่วยงานใหม่');ok('lunch saved 12:00-13:00',o2&&o2.lunch_start==='12:00:00'&&o2.lunch_end==='13:00:00');ok('lunch shown in list',await has('พักเที่ยง 12:00-13:00'));ok('org rpc',o2&&o2.type==='org'&&o2.open_time==='09:30:00'&&o2.advance_days===20&&o2.lat===13.8&&T.place_staff.some(x=>x.place_id===o2.id&&x.staff_id==='p2')&&T.service_places.some(x=>x.place_id===o2.id));
 await p.click(`[data-a=edit][data-t=org][data-id=og1]`);await p.selectOption('#odate','2026-12-01').catch(()=>{});await p.fill('#spq','');
 await p.click('.spk[value=p2]');await p.click('[data-a=save]');ok('server conflict message shown in form',await has('ถูกจัดให้ สำนักงานเขต ในวันเดียวกันแล้ว'));await p.click('[data-a=cancel]');
@@ -180,10 +180,10 @@ await p.click('[data-a=tab][data-id=ppac]');await p.fill('#ppi','12345');await p
 await p.fill('#ppi','0812345678');await p.fill('#ppn','สมาคมฯ');await p.click('[data-a=ppsave]');await p.screenshot({path:require('./config').tmp('a1.png'),fullPage:true});ok('promptpay saved + QR',await until(()=>document.querySelector('#ppqr canvas,#ppqr img,#ppqr small'))&&T.app_settings[0].promptpay_id==='0812345678');
 ok('settings patched by id=eq.true',calls.some(c=>c.m==='PATCH'&&c.path==='/rest/v1/app_settings'&&c.q.includes('id=eq.true')));
 await p.click('[data-a=tab][data-id=pprq]');await p.click('[data-a=tpok][data-id=t1]');ok('confirm asks twice',await has('กดอีกครั้งเพื่อยืนยันรับเงิน'));
-await p.click('[data-a=tpok][data-id=t1]');for(let i=0;i<30&&T.topup_requests[0].status!=='confirmed';i++)await wait(100);await wait(250);
+await p.click('[data-a=tpok][data-id=t1]');for(let i=0;i<30&&T.topup_requests[0].status!=='confirmed';i++)await wait(100);await until(()=>!document.querySelector('[data-a=tpok][data-id=t1]'));
 ok('confirm rpc + status shown',(c=>c&&c.body.p_id==='t1'&&c.body.p_ok===true)(calls.filter(c=>c.path.endsWith('confirm_topup')).pop())&&(await txt('#main')).includes('ยืนยันแล้ว'));
-await p.click('[data-a=tprej][data-id=t2]');await p.click('[data-a=tprej][data-id=t2]');await wait(250);ok('reject rpc',T.topup_requests[1].status==='rejected');
-ok('badge down to 1',(await p.textContent('#tabs')).match(/การเงิน\s*1/));
+await p.click('[data-a=tprej][data-id=t2]');await p.click('[data-a=tprej][data-id=t2]');await until(()=>!document.querySelector('[data-a=tprej][data-id=t2]'));ok('reject rpc',T.topup_requests[1].status==='rejected');
+await until(()=>/การเงิน\s*1/.test(document.getElementById('tabs').textContent));ok('badge down to 1',(await p.textContent('#tabs')).match(/การเงิน\s*1/));
 // ---- แจ้งเตือน
 await p.click('[data-a=tab][data-id=nt]');ok('3 unread total in header',(await txt('#main')).includes('3 ใหม่'));
 ok('default cat = first with unread (shop) shows n2 only',(await txt('#main')).includes('ร้านปิดรับจองชั่วคราว')&&!(await txt('#main')).includes('ร้านขอเติมเงิน 500 บาท'));
