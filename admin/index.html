@@ -555,7 +555,7 @@ function auLine(r){var tl=AUT[r.tbl]||r.tbl,who=r.admin_name||"แอดมิ�
 function auChg(r){if(r.op!=="update"||!r.detail)return"";if(r.tbl==="app_settings")return"ช่องที่แก้: "+Object.keys(r.detail).join(", ");
  return Object.keys(r.detail).map(function(k){var v=r.detail[k];return(AUC[k]||k)+": "+auV(k,v[0])+" → "+auV(k,v[1])}).join(" · ")}
 function auFiltered(){var q=(AU.q||"").toLowerCase().trim().split(/\s+/).filter(Boolean);return(AU.rows||[]).filter(function(r){if(AU.t&&AUM[r.tbl]!==AU.t)return false;if(!q.length)return true;var h=(auLine(r)+" "+auChg(r)).toLowerCase();return q.every(function(x){return h.indexOf(x)>-1})})}
-function auList(){var L=auFiltered(),el=document.getElementById("aulst"),c=document.getElementById("aucnt");if(el)el.innerHTML=L.length?L.map(function(r){var ch=auChg(r);return'<div class="card hlc"><b>'+esc(auLine(r))+'</b><small>'+esc(hlT(r.at))+'</small>'+(ch?'<small>'+esc(ch)+'</small>':'')+'</div>'}).join(""):'<div class="empty">ไม่พบรายการ</div>';if(c)c.textContent="แสดง "+L.length+" จาก "+(AU.rows||[]).length+" รายการล่าสุด"}
+function auList(){var L=auFiltered(),el=document.getElementById("aulst"),c=document.getElementById("aucnt");if(el)el.innerHTML=L.length?L.map(function(r){var ch=auChg(r);return'<div class="card hlc"><b>'+esc(auLine(r))+'</b><small>'+esc(hlT(r.at))+'</small>'+(ch?'<small>'+esc(ch)+'</small>':'')+'</div>'}).join(""):'<div class="empty">ไม่พบรายการ</div>';var tx="แสดง "+L.length+" จาก "+(AU.rows||[]).length+" รายการล่าสุด";if(c&&c.textContent!==tx)c.textContent=tx}
 function auView(){var h='<div class="head"><h1>ประวัติการทำงาน</h1><button type="button" class="btn g" data-a="aure"'+(AU.busy?' disabled':'')+'>'+(AU.busy?"กำลังโหลด…":"โหลดใหม่")+'</button></div><p class="hint2">บันทึกอัตโนมัติว่าแอดมินอนุมัติ ปฏิเสธ หรือแก้อะไรเมื่อไหร่ แก้ไขหรือลบจากหน้านี้ไม่ได้ และถูกล้างเองหลัง 12 เดือน</p>';
  if(AU.err)h+='<div class="err" role="alert">'+esc(AU.err)+'</div>';
  if(!AU.rows)return h+(AU.err?"":'<div class="empty" role="status">'+(AU.busy?"กำลังโหลด…":"ยังไม่มีข้อมูล")+'</div>');
@@ -601,7 +601,7 @@ function post(){if(S.tab==="au"&&AU.rows)auList();var lg=document.getElementById
  if(S.tab==="oreq")(D.oreq||[]).forEach(function(r){var el=document.getElementById("oqslip_"+r.id);if(el&&r.slip_path)loadBlobInto("/storage/v1/object/authenticated/licenses/"+r.slip_path,el,"สลิปโอนเงินของ "+esc(r.org_name),"slipth")});
  if(S.tab==="shop"&&S.lic){var r=byId(D.regs,S.lic),el2=document.getElementById("lic_"+S.lic);if(r&&el2)loadBlobInto("/storage/v1/object/authenticated/licenses/"+r.license_path,el2,"ใบอนุญาตจัดตั้งร้านนวดของ "+esc(r.name),"licimg")}}
 function draw(){navDraw();document.getElementById("main").innerHTML=view();post()}
-function softDraw(){navDraw();var a=document.activeElement;if(S.form||S.busy||(a&&/INPUT|SELECT|TEXTAREA/.test(a.tagName)&&a.id!=="")||S.tab==="set"||S.tab==="usr")return;document.getElementById("main").innerHTML=view();post()}
+function softDraw(){navDraw();var a=document.activeElement;if(S.form||S.busy||(a&&/INPUT|SELECT|TEXTAREA/.test(a.tagName)&&a.id!=="")||S.tab==="set"||S.tab==="usr"||S.tab==="hl"||S.tab==="au")return;document.getElementById("main").innerHTML=view();post()}
 function refresh(){if(!D||S.busy)return Promise.resolve();if(S.tab==="rvw"||RW.loaded)rvwLoad();return Promise.all([loadLive(),loadBk()]).then(softDraw,function(e){if(e&&e.status===401)doLogout()})}
 
 /* ===================== เหตุการณ์ ===================== */

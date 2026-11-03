@@ -146,6 +146,13 @@ await p.fill('#auq','');await p.waitForTimeout(150);
 // reload button
 await p.click('[data-a=aure]');await p.waitForTimeout(500);
 ok('reload calls rpc again',auCalls.length===2);
+// VoiceOver: auto-refresh must not rebuild this tab
+const noRedraw=async(label)=>{const before=calls.length;await p.evaluate(()=>{window.__mut=0;const m=document.getElementById('main');window.__mk=m.firstElementChild;window.__ob=new MutationObserver(r=>{window.__mut+=r.length});window.__ob.observe(m,{subtree:true,childList:true,characterData:true,attributes:true})});
+ await p.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));await p.waitForTimeout(900);
+ ok(label+': refresh ran (data reloaded)',calls.length>before);
+ ok(label+': DOM untouched by refresh (no mutations)',await p.evaluate(()=>window.__mut===0&&document.getElementById('main').firstElementChild===window.__mk));
+ await p.evaluate(()=>window.__ob.disconnect())};
+await noRedraw('ประวัติการทำงาน');
 // error path
 auMode.err=true;await p.click('[data-a=aure]');await p.waitForTimeout(500);
 t=await p.evaluate(()=>document.body.innerText);

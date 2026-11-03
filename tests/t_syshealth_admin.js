@@ -125,6 +125,13 @@ hlMode.d={now:new Date().toISOString(),last_check:MIN(10),last_alert:MIN(5),issu
 await p.click('[data-a=hlre]');await p.waitForTimeout(600);
 t=await p.evaluate(()=>document.body.innerText);
 ok('refresh calls rpc again',hlCalls.length===2);
+// VoiceOver: auto-refresh must not rebuild this tab
+const noRedraw=async(label)=>{const before=calls.length;await p.evaluate(()=>{window.__mut=0;const m=document.getElementById('main');window.__mk=m.firstElementChild;window.__ob=new MutationObserver(r=>{window.__mut+=r.length});window.__ob.observe(m,{subtree:true,childList:true,characterData:true,attributes:true})});
+ await p.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));await p.waitForTimeout(900);
+ ok(label+': refresh ran (data reloaded)',calls.length>before);
+ ok(label+': DOM untouched by refresh (no mutations)',await p.evaluate(()=>window.__mut===0&&document.getElementById('main').firstElementChild===window.__mk));
+ await p.evaluate(()=>window.__ob.disconnect())};
+await noRedraw('สถานะระบบ');
 ok('issue listed without bullet',t.includes('สลิปคำขอหน่วยงานรอตรวจนานเกิน 24 ชั่วโมง 2 รายการ: ORG000005, ORG000006')&&!t.includes('• สลิป'));
 ok('warning banner count = 3 (issue+late+failed)',t.includes('พบเรื่องที่ควรดู 3 รายการ'));
 ok('failed job chip + message',t.includes('ล้มเหลว 2 ครั้งใน 7 วัน')&&t.includes('connection refused'));
