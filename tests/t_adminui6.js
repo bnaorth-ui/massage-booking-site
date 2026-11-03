@@ -129,6 +129,10 @@ await p.fill('#q_shop','0898');ok('search by owner phone',(await txt('#lst')).in
 await p.click('#tabs [data-id=sys]');await p.click('[data-a=tab][data-id=svc]');await p.click('[data-a=new][data-t=svc]');await p.fill('#sn','นวดประคบ');await p.fill('#sp','800');await p.selectOption('#sm','120');
 await p.fill('#sp','');await p.click('[data-a=save]');ok('empty price rejected',await has('กรุณากรอกราคา'));await p.fill('#sp','0');await p.fill('#sp','800');await p.setInputFiles('#simg',{name:'a.png',mimeType:'image/png',buffer:PNG});await until(()=>document.querySelector('#imgprev img'));await p.click('[data-a=save]');await has('นวดประคบ');
 const sv=T.services.find(x=>x.name==='นวดประคบ');ok('central service saved (place null, nil-uuid folder)',sv&&sv.place_id===null&&sv.minutes===120&&sv.price===800&&/^place-images\/00000000-0000-0000-0000-000000000000\/svc-/.test(sv.image_path));
+await p.click('[data-a=new][data-t=svc]');const dopts=await p.$$eval('#sm option',os=>os.map(x=>+x.value));ok('duration options include 15, 20, 25',[15,20,25,30,60].every(x=>dopts.includes(x)));
+ok('rest select defaults to none, has 5',(await p.$eval('#sr',e=>e.value))==='0'&&(await p.$$eval('#sr option',os=>os.map(x=>x.value))).includes('5'));
+await p.fill('#sn','นวด 15 นาที พัก 5');await p.fill('#sp','150');await p.selectOption('#sm','15');await p.selectOption('#sr','5');await p.click('[data-a=save]');await has('พักต่อ 5 นาที');
+const rv=T.services.find(x=>x.name==='นวด 15 นาที พัก 5');ok('rest_minutes saved with service',rv&&rv.minutes===15&&rv.rest_minutes===5&&rv.place_id===null);ok('list shows rest',(await p.textContent('#main')).includes('15 นาที (พักต่อ 5 นาที)'));
 await p.click('[data-a=new][data-t=svc]');await p.fill('#sn','บริการฟรี');await p.fill('#sp','0');await p.click('[data-a=save]');await has('บริการฟรี');ok('admin service price 0 saved',(T.services.find(x=>x.name==='บริการฟรี')||{}).price===0);
 await p.click(`[data-a=tog][data-t=svc][data-id=${sv.id}]`);await wait(150);ok('toggle svc',T.services.find(x=>x.id===sv.id).active===false);
 // ---- พนักงาน
