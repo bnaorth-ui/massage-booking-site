@@ -118,6 +118,7 @@ ok('healthy banner',t.includes('ปกติ')&&t.includes('ไม่พบเ�
 ok('job Thai names + schedules',t.includes('ส่งเตือนก่อนถึงคิว')&&t.includes('รันทุกนาที')&&t.includes('รันทุก 10 นาที')&&t.includes('ทุกวัน 04:00 น.')&&t.includes('วันที่ 1 ของเดือน 09:00 น.'));
 ok('no warning chips when healthy',!/ล้มเหลว \d+ ครั้ง|ไม่รันตามกำหนด/.test(t));
 ok('status region present',!!(await p.$('#main [role=status]')));
+ok('no middle-dot separator read aloud by screen readers',!(await p.evaluate(()=>document.getElementById('main').innerText)).includes('·'));
 ok('never-run new job is waiting, not a warning',t.includes('ล้างประวัติการทำงานแอดมิน (12 เดือน)')&&t.includes('รอรอบแรก'));
 ok('job card detail on its own line',await p.$$eval('#main .hlc small',e=>e.length>0&&e.every(x=>getComputedStyle(x).display==='block')));
 // refresh button reloads, with new data: issue + failed job + late job

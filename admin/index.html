@@ -533,10 +533,10 @@ function hlView(){var d=HL.d,h='<div class="head"><h1>สถานะระบ�
  var is=d.issues||[],jobs=d.jobs||[],late=jobs.filter(function(j){return hlLate(j,d.now)}),bad=jobs.filter(function(j){return +j.failed_7d>0});
  if(!is.length&&!late.length&&!bad.length)h+='<div class="saved" role="status"><b>ปกติ</b> ไม่พบเรื่องค้างหรืองานตั้งเวลาที่ผิดปกติ</div>';
  else h+='<div class="closed" role="status"><b>พบเรื่องที่ควรดู '+(is.length+late.length+bad.length)+' รายการ</b></div>';
- h+='<div class="card hlc"><b>เรื่องค้างที่ตรวจพบ</b>'+(is.length?'<ul>'+is.map(function(x){return'<li>'+esc(String(x.line||"").replace(/^•\s*/,""))+'</li>'}).join("")+'</ul>':'<small>ไม่มี</small>')+'<small>ตรวจรายวันล่าสุด '+esc(hlT(d.last_check))+' · แจ้งเตือนล่าสุด '+esc(hlT(d.last_alert))+'</small></div>';
+ h+='<div class="card hlc"><b>เรื่องค้างที่ตรวจพบ</b>'+(is.length?'<ul>'+is.map(function(x){return'<li>'+esc(String(x.line||"").replace(/^•\s*/,""))+'</li>'}).join("")+'</ul>':'<small>ไม่มี</small>')+'<small>ตรวจรายวันล่าสุด '+esc(hlT(d.last_check))+'</small><small>แจ้งเตือนล่าสุด '+esc(hlT(d.last_alert))+'</small></div>';
  h+='<h2 style="font-size:1.1rem;margin:16px 0 8px">งานตั้งเวลา ('+jobs.length+' งาน)</h2>';
  h+=jobs.map(function(j){var nm=HLJ[j.name]||j.name,lt=hlLate(j,d.now),f=+j.failed_7d||0,st=!j.active?"ปิดอยู่":!j.last_run?"รอรอบแรก":f>0?"ล้มเหลว "+f+" ครั้งใน 7 วัน":lt?"ไม่รันตามกำหนด":"ปกติ";
-  return'<div class="card hlc"><b>'+esc(nm)+'</b> <span class="'+(f>0||lt?"closed":"saved")+'" style="padding:2px 8px;border-radius:99px;font-size:.85rem">'+esc(st)+'</span><small>รัน'+esc(hlSch(j.schedule))+' · ครั้งล่าสุด '+esc(hlT(j.last_run))+'</small>'+(f>0&&j.last_fail_msg?'<small>ข้อความล่าสุด: '+esc(j.last_fail_msg)+'</small>':'')+'</div>'}).join("");
+  return'<div class="card hlc"><b>'+esc(nm)+'</b> <span class="'+(f>0||lt?"closed":"saved")+'" style="padding:2px 8px;border-radius:99px;font-size:.85rem">'+esc(st)+'</span><small>รัน'+esc(hlSch(j.schedule))+'</small><small>ครั้งล่าสุด '+esc(hlT(j.last_run))+'</small>'+(f>0&&j.last_fail_msg?'<small>ข้อความล่าสุด: '+esc(j.last_fail_msg)+'</small>':'')+'</div>'}).join("");
  return h}
 var AU={rows:null,err:"",busy:false,q:"",t:""},
  AUT={admins:"แอดมิน",app_settings:"การตั้งค่าระบบ",categories:"หมวดหมู่",services:"บริการ",announcements:"ประกาศ",places:"สถานที่",shop_registrations:"คำขอสมัครร้าน",topup_requests:"คำขอเติมเงิน",shop_close_requests:"คำขอปิดร้าน",staff_delete_requests:"คำขอลบพนักงาน",org_requests:"คำขอหน่วยงาน",reviews:"รีวิว",wallet_tx:"รายการกระเป๋าเงิน",staff:"พนักงาน",shop_members:"สมาชิกร้าน",bookings:"การจอง"},
@@ -553,7 +553,7 @@ function auLine(r){var tl=AUT[r.tbl]||r.tbl,who=r.admin_name||"แอดมิ�
  else w="แก้ไข"+tl+ref;
  return who+" "+w}
 function auChg(r){if(r.op!=="update"||!r.detail)return"";if(r.tbl==="app_settings")return"ช่องที่แก้: "+Object.keys(r.detail).join(", ");
- return Object.keys(r.detail).map(function(k){var v=r.detail[k];return(AUC[k]||k)+": "+auV(k,v[0])+" → "+auV(k,v[1])}).join(" · ")}
+ return Object.keys(r.detail).map(function(k){var v=r.detail[k];return(AUC[k]||k)+": "+auV(k,v[0])+" → "+auV(k,v[1])}).join(", ")}
 function auFiltered(){var q=(AU.q||"").toLowerCase().trim().split(/\s+/).filter(Boolean);return(AU.rows||[]).filter(function(r){if(AU.t&&AUM[r.tbl]!==AU.t)return false;if(!q.length)return true;var h=(auLine(r)+" "+auChg(r)).toLowerCase();return q.every(function(x){return h.indexOf(x)>-1})})}
 function auList(){var L=auFiltered(),el=document.getElementById("aulst"),c=document.getElementById("aucnt");if(el)el.innerHTML=L.length?L.map(function(r){var ch=auChg(r);return'<div class="card hlc"><b>'+esc(auLine(r))+'</b><small>'+esc(hlT(r.at))+'</small>'+(ch?'<small>'+esc(ch)+'</small>':'')+'</div>'}).join(""):'<div class="empty">ไม่พบรายการ</div>';var tx="แสดง "+L.length+" จาก "+(AU.rows||[]).length+" รายการล่าสุด";if(c&&c.textContent!==tx)c.textContent=tx}
 function auView(){var h='<div class="head"><h1>ประวัติการทำงาน</h1><button type="button" class="btn g" data-a="aure"'+(AU.busy?' disabled':'')+'>'+(AU.busy?"กำลังโหลด…":"โหลดใหม่")+'</button></div><p class="hint2">บันทึกอัตโนมัติว่าแอดมินอนุมัติ ปฏิเสธ หรือแก้อะไรเมื่อไหร่ แก้ไขหรือลบจากหน้านี้ไม่ได้ และถูกล้างเองหลัง 12 เดือน</p>';

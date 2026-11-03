@@ -124,6 +124,7 @@ ok('settings shows only field names',t.includes('ช่องที่แก้:
 ok('admin add / category delete',t.includes('เพิ่มแอดมิน')&&t.includes('ลบหมวดหมู่ หมวดเก่า'));
 ok('bool shown Thai',t.includes('ซ่อน: ไม่ใช่ → ใช่'));
 ok('numeric change',t.includes('GP %: 5 → 10'));
+ok('no middle-dot separator read aloud by screen readers',!(await p.evaluate(()=>document.getElementById('main').innerText)).includes('·'));
 ok('date/changes on own lines (small is block)',await p.$eval('#aulst .card small',e=>getComputedStyle(e).display==='block'));
 // filter by type
 await p.selectOption('#aut','fin');await p.waitForTimeout(200);
