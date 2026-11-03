@@ -122,6 +122,11 @@ ok('csv BOM + header + masked ('+dl.suggestedFilename()+')',csv.startsWith('\ufe
 
 // ---- ปุ่มพิมพ์: เปิดหน้าใหม่ที่พร้อมพิมพ์
 await p.click('[data-a=rpgo]');await until(()=>document.body.innerText.includes('สรุปภาพรวม'));
+{const [dlp]=await Promise.all([p.waitForEvent('download'),p.click('[data-a=rppdf]')]);const pth=await dlp.path(),buf=require('fs').readFileSync(pth);
+ ok('report pdf filename ('+dlp.suggestedFilename()+')',/^report-\d{4}-\d{2}\.pdf$/.test(dlp.suggestedFilename()));
+ ok('report pdf header/trailer',buf.slice(0,5).toString()==='%PDF-'&&buf.slice(-6).toString().includes('%%EOF'));
+ require('fs').copyFileSync(pth,process.env.PDFOUT||'/tmp/rp_out.pdf');
+ await p.waitForTimeout(300);ok('report pdf announced',(await p.textContent('#sr')).includes('ดาวน์โหลดไฟล์ PDF รายงาน'))}
 const [pop]=await Promise.all([ctx.waitForEvent('page'),p.click('[data-a=rpprint]')]);
 await pop.waitForLoadState();
 const pt=await pop.textContent('body');
