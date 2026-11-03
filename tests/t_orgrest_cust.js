@@ -70,12 +70,12 @@ async function pick(svc){await p.clock.setFixedTime(new Date(D0+'T08:00:00+07:00
  await p.click('[data-pl="og1"]');await p.waitForSelector('[data-svc="'+svc+'"]');const lab=await p.textContent('[data-svc="'+svc+'"]');await p.click('[data-svc="'+svc+'"]');await p.click('#next');await p.waitForSelector('#selT');await p.waitForTimeout(600);
  const o=await p.$$eval('#selT option',os=>os.filter(x=>x.value).map(x=>({v:+x.value,dis:x.disabled,t:x.textContent})));return{lab,o,label:await p.textContent('label[for=selT]')}}
 const vals=r=>r.o.map(x=>x.v),stepOf=a=>a.length>1?a[1]-a[0]:0;
-let r=await pick('r15');ok('r15 label shows rest',r.lab.includes('15 นาที')&&r.lab.includes('พักต่อ 5 นาที'));
+let r=await pick('r15');ok('r15 label shows rest',r.lab.includes('15 นาที พัก 5 นาที'));
 ok('r15 step 20 from 09:00',vals(r)[0]===540&&stepOf(vals(r))===20&&vals(r)[1]===560&&vals(r).length===24&&vals(r).slice(-1)[0]===1000);
 ok('r15 time label says rest',r.label.includes('ช่วงละ 20 นาที')&&r.label.includes('ใช้เวลา 15 นาที')&&r.label.includes('พักต่อ 5 นาที'));
 r=await pick('r20');ok('r20 step 25',vals(r)[0]===540&&stepOf(vals(r))===25&&vals(r).length===19&&vals(r).slice(-1)[0]===990);
 r=await pick('r25');ok('r25 step 30, last 16:30',stepOf(vals(r))===30&&vals(r).length===16&&vals(r).slice(-1)[0]===990);
-r=await pick('n30');ok('no-rest service keeps 30 step',stepOf(vals(r))===30&&vals(r).length===16&&!r.lab.includes('พักต่อ')&&!r.label.includes('พักต่อ'));
+r=await pick('n30');ok('no-rest service keeps 30 step',stepOf(vals(r))===30&&vals(r).length===16&&!r.lab.includes('พัก ')&&!r.label.includes('พักต่อ'));
 // คิวเดิมของ st3 ตอน 10:00-10:15 นวด + พัก 5 นาที (ฐานข้อมูลส่งช่วงกันคิวจนถึง 10:20)
 const fdStart=Date.parse(FD+'T10:00:00+07:00');BKS.push({ref:'MSX',place_id:'og1',place_name:'สำนักงานพัฒนาสังคม',place_type:'org',phone:'0800000000',s:fdStart,e:fdStart+20*60000,total:150,discount:0,promo:null,status:'confirmed',moved_from:null,moved_to:null,items:[{id:'itx',service_id:'r15',service_name:'นวด 15 นาที',staff_id:'st3',minutes:15,price:150,s:fdStart,e:fdStart+20*60000,active:true}]});
 r=await pick('r15');let m=Object.fromEntries(r.o.map(x=>[x.v,x]));ok('r15: 10:00 full, 10:20 free (rest ended)',m[600].dis&&!m[620].dis&&m[600].t.includes('เต็ม'));

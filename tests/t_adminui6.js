@@ -132,12 +132,12 @@ const sv=T.services.find(x=>x.name==='นวดประคบ');ok('central ser
 await p.click('[data-a=new][data-t=svc]');const dopts=await p.$$eval('#sm option',os=>os.map(x=>+x.value));ok('duration options include 15, 20, 25',[15,20,25,30,60].every(x=>dopts.includes(x)));
 ok('rest select defaults to none, has 5',(await p.$eval('#sr',e=>e.value))==='0'&&(await p.$$eval('#sr option',os=>os.map(x=>x.value))).includes('5'));
 await p.fill('#sn','นวด 15 นาที พัก 5');await p.fill('#sp','150');await p.selectOption('#sm','15');await p.selectOption('#sr','5');await p.click('[data-a=save]');await has('พักต่อ 5 นาที');
-const rv=T.services.find(x=>x.name==='นวด 15 นาที พัก 5');ok('rest_minutes saved with service',rv&&rv.minutes===15&&rv.rest_minutes===5&&rv.place_id===null);ok('list shows rest',(await p.textContent('#main')).includes('15 นาที (พักต่อ 5 นาที)'));
+const rv=T.services.find(x=>x.name==='นวด 15 นาที พัก 5');ok('rest_minutes saved with service',rv&&rv.minutes===15&&rv.rest_minutes===5&&rv.place_id===null);ok('list shows rest',(await p.textContent('#main')).includes('15 นาที พัก 5 นาที'));
 await p.click('[data-a=new][data-t=svc]');await p.fill('#sn','บริการฟรี');await p.fill('#sp','0');await p.click('[data-a=save]');await has('บริการฟรี');ok('admin service price 0 saved',(T.services.find(x=>x.name==='บริการฟรี')||{}).price===0);
 await p.click(`[data-a=tog][data-t=svc][data-id=${sv.id}]`);await wait(150);ok('toggle svc',T.services.find(x=>x.id===sv.id).active===false);
 // ---- พนักงาน
 await p.click('#tabs [data-id=pl]');await p.click('[data-a=tab][data-id=staff]');ok('staff list shows link status',(await txt('#main')).includes('เชื่อมบัญชีแล้ว')&&(await txt('#main')).includes('รอพนักงานสมัครสมาชิก'));
-await p.click('[data-a=new][data-t=staff]');await p.fill('#fn','คุณใหม่');await p.fill('#fph','0866666666');await p.click('.sv >> nth=0');await p.click('[data-a=save]');ok('duplicate phone blocked client-side',await has('ถูกใช้กับพนักงานคนอื่นแล้ว'));
+await p.click('[data-a=new][data-t=staff]');ok('service picker shows rest time',(await p.$$eval('.dchk label',ls=>ls.map(l=>l.textContent))).some(x=>x.includes(', 15 นาที พัก 5 นาที, ')));await p.fill('#fn','คุณใหม่');await p.fill('#fph','0866666666');await p.click('.sv >> nth=0');await p.click('[data-a=save]');ok('duplicate phone blocked client-side',await has('ถูกใช้กับพนักงานคนอื่นแล้ว'));
 await p.fill('#fph','0855555555');await p.click('[data-a=save]');await has('คุณใหม่');
 const ns=T.staff.find(x=>x.name==='คุณใหม่');ok('central staff rpc',ns&&ns.phone==='0855555555'&&T.staff_services.some(q=>q.staff_id===ns.id));
 ok('new staff share card shown',await has('เพิ่มคุณใหม่แล้ว')&&!!(await p.$('.card [data-a=stshare]')));
