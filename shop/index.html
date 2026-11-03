@@ -336,7 +336,7 @@ function pinName(la,lo){var e=document.getElementById("pinname");if(!e)return;if
 /* ---- ชื่อสถานที่จากพิกัด (OpenStreetMap Nominatim) เรียกเมื่อผู้ใช้กดเองเท่านั้น จำผลไว้ และเว้นช่วง >= 1.1 วินาที ---- */
 var RGC={},RGT=0,RGQ=null,RGTM=null;
 function nmFmt(j){var a=(j&&j.address)||{},nm=j&&j.name&&j.name!==a.road?String(j.name):"",P=[nm,a.road||a.pedestrian||"",a.suburb||a.quarter||a.neighbourhood||a.village||a.hamlet||"",a.city_district||a.district||a.county||a.town||a.city||"",a.state||a.province||""].filter(Boolean),O=[];P.forEach(function(x){if(O.indexOf(x)<0)O.push(x)});
- return O.length?(nm?"":"ใกล้ ")+O.join(" · "):(j&&j.display_name?String(j.display_name).slice(0,120):"")}
+ return O.length?(nm?"":"ใกล้ ")+O.join(", "):(j&&j.display_name?String(j.display_name).slice(0,120):"")}
 function revGeo(lat,lng,cb){var k=lat.toFixed(5)+","+lng.toFixed(5);if(RGC[k]!==undefined){cb(RGC[k]);return}
  RGQ={k:k,lat:lat,lng:lng,cb:cb};if(RGTM)return;
  RGTM=setTimeout(function(){RGTM=null;var q=RGQ;RGQ=null;if(!q)return;RGT=Date.now();
@@ -388,7 +388,7 @@ function listNt(){var L=feed(),n=S.ntNew||[],CATS=[["admin","จากระบ�
  cnt=function(k){return L.filter(function(x){return x.from===k}).length},nw=function(k){return L.filter(function(x){return x.from===k&&n.indexOf(x.id)>-1}).length};
  if(!S.ntf||S.ntf==="all"){var first=CATS.filter(function(c){return nw(c[0])>0})[0];S.ntf=first?first[0]:"admin"}
  var f=S.ntf,F=L.filter(function(x){return x.from===f}),lab=function(k){return k==="admin"?"ระบบ":k==="staff"?"พนักงาน":k==="gp"?"ค่า GP":"ผู้ใช้งาน"};
- return '<div class="head"><h1>การแจ้งเตือน</h1></div><p class="hint2">เลือกหมวดที่ต้องการดู: ข้อความจากระบบ (ประกาศจากสมาคม เครดิตวงเงิน ยอดกระเป๋าเงินต่ำ ร้านถูกปิด/เปิดอัตโนมัติ) จากผู้ใช้งานเมื่อมีการจอง ยกเลิก หรือเลื่อนคิว จากพนักงานเมื่อกดรับงาน เริ่มงาน หรือเสร็จสิ้นงาน และค่า GP ที่ระบบหักในแต่ละงาน</p><div class="nf" role="group" aria-label="เลือกหมวดการแจ้งเตือน">'+CATS.map(function(x){var w=nw(x[0]);return '<button data-a="ntf" data-id="'+x[0]+'" class="'+(f===x[0]?"on":"")+'" aria-pressed="'+(f===x[0])+'">'+x[1]+' ('+cnt(x[0])+')'+(w?' · ใหม่ '+w:'')+'</button>'}).join("")+'</div>'+
+ return '<div class="head"><h1>การแจ้งเตือน</h1></div><p class="hint2">เลือกหมวดที่ต้องการดู: ข้อความจากระบบ (ประกาศจากสมาคม เครดิตวงเงิน ยอดกระเป๋าเงินต่ำ ร้านถูกปิด/เปิดอัตโนมัติ) จากผู้ใช้งานเมื่อมีการจอง ยกเลิก หรือเลื่อนคิว จากพนักงานเมื่อกดรับงาน เริ่มงาน หรือเสร็จสิ้นงาน และค่า GP ที่ระบบหักในแต่ละงาน</p><div class="nf" role="group" aria-label="เลือกหมวดการแจ้งเตือน">'+CATS.map(function(x){var w=nw(x[0]);return '<button data-a="ntf" data-id="'+x[0]+'" class="'+(f===x[0]?"on":"")+'" aria-pressed="'+(f===x[0])+'">'+x[1]+' ('+cnt(x[0])+')'+(w?', ใหม่ '+w:'')+'</button>'}).join("")+'</div>'+
  (F.length?F.map(function(x){return '<div class="nti"><div class="qh"><b>'+esc(x.title)+'</b><span class="tag'+(x.from==="admin"?"":x.from==="staff"?" s":" w")+'">'+lab(x.from)+'</span>'+(n.indexOf(x.id)>-1?'<span class="tag w">ใหม่</span>':'')+'</div><small>'+ntAt(x.at)+'</small><pre>'+esc(x.text)+'</pre></div>'}).join(""):'<div class="empty">ยังไม่มีการแจ้งเตือนในหมวดนี้</div>')+
  (f==="gp"?'<div class="acts" style="margin-top:10px"><button type="button" class="btn g" data-a="gprpt">ดูรายงานค่า GP</button></div><p class="hint2">การแจ้งเตือนถูกล้างทุกวัน ถ้าต้องการดูประวัติค่า GP ย้อนหลังให้ดูที่เมนูรายงาน</p>':'')}
 function crc16(s){var c=0xFFFF;for(var i=0;i<s.length;i++){c^=s.charCodeAt(i)<<8;for(var j=0;j<8;j++)c=(c&0x8000)?((c<<1)^0x1021):(c<<1);c&=0xFFFF}return c.toString(16).toUpperCase().padStart(4,"0")}
@@ -479,7 +479,7 @@ function rpView(){var R=RP,mons=rpMonths();if(!R.mon)R.mon=mons[0].v;
  var d=R.data,c=rpCalc(d),st=d.staff?(byId(D.staff,d.staff)||{}).name:"พนักงานทุกคน",sv=d.svc?(byId(D.svc,d.svc)||{}).name:"ทุกบริการ",
  issue=new Date().toLocaleDateString("th-TH",{day:"numeric",month:"long",year:"numeric",timeZone:"Asia/Bangkok"}),
  title=({use:"รายงานการใช้บริการ",inc:"รายงานรายได้และส่วนแบ่งพนักงาน",gp:"รายงานค่า GP"})[d.kind];
- h+='<div class="rp"><div class="card rph"><b>'+esc(D.shop.name)+'</b><h2 class="rpti">'+title+'</h2><div>ช่วงเวลา: '+esc(d.label)+'</div><div>พนักงาน: '+esc(st)+' · บริการ: '+esc(sv)+'</div><div class="hint2">ออกรายงานวันที่ '+issue+'</div></div>'+
+ h+='<div class="rp"><div class="card rph"><b>'+esc(D.shop.name)+'</b><h2 class="rpti">'+title+'</h2><div>ช่วงเวลา: '+esc(d.label)+'</div><div>พนักงาน: '+esc(st)+', บริการ: '+esc(sv)+'</div><div class="hint2">ออกรายงานวันที่ '+issue+'</div></div>'+
  '<div class="acts noprint" style="margin:10px 0"><button class="btn" data-a="rpprint">พิมพ์ / บันทึกเป็น PDF</button><button class="btn g" data-a="rpcsv">ดาวน์โหลด Excel (CSV)</button></div>'+
  (d.kind==="inc"&&!d.noShare&&D.rates&&D.rates.shop==null&&!Object.keys(D.rates.svc).length?'<p class="hint2" role="status">ยังไม่ได้ตั้งส่วนแบ่งพนักงาน ตัวเลขส่วนแบ่งและร้านสุทธิจึงไม่แสดง <button type="button" class="btn g noprint" data-a="tab" data-id="share">ไปตั้งส่วนแบ่ง</button></p>':'')+
  (d.noShare&&d.kind==="inc"?'<p class="hint2" role="status">ฐานข้อมูลยังไม่รองรับส่วนแบ่ง (รอผู้ดูแลระบบอัปเดต) ตัวเลขส่วนแบ่งจึงไม่แสดง</p>':'')+
@@ -521,7 +521,7 @@ function rpBody(d,c){var k=d.kind,o='';
   o+='<div class="card"><b>รายการงานที่เสร็จสิ้น ('+c.rows.length+')</b><p class="hint2" style="margin:2px 0 8px">ชื่อลูกค้าแสดงแบบย่อ ไม่แสดงเบอร์โทร</p>'+(c.rows.length?rpTbl(["วันที่","เลขที่จอง","ลูกค้า","บริการ","พนักงาน","เวลา"],c.rows.map(function(r){return [rpTime(r.at),esc(r.ref),esc(r.cust),esc(r.svc),esc(r.staff),r.min+" นาที"]})):'<p class="hint2">ไม่มีข้อมูล</p>')+'</div>'}
  else if(k==="inc"){
   o+='<div class="card"><b>สรุปรายได้ ('+c.done+' งานที่เสร็จ)</b>'+sums([[rpMoney(c.full),"ราคาเต็ม (บาท)"],[rpMoney(c.disc),"ส่วนลดโปรโมชั่น"],[rpMoney(c.paid),"ลูกค้าจ่ายจริง"],[c.shareN?rpMoney(c.share):"-","ส่วนแบ่งพนักงาน"],[rpMoney(c.gp),"ค่า GP"],[c.shareN?rpMoney(c.net):"-","ร้านสุทธิ"]])+
-   '<p class="hint2" style="margin:8px 0 0">ร้านสุทธิ = ลูกค้าจ่ายจริง − ส่วนแบ่งพนักงาน − ค่า GP (ส่วนลดโปรโมชั่นเป็นภาระของร้าน)'+(c.shareN<c.done?' · มี '+(c.done-c.shareN)+' งานที่ไม่มีข้อมูลส่วนแบ่ง ไม่ถูกนับในยอดส่วนแบ่งและร้านสุทธิ':'')+'</p></div>';
+   '<p class="hint2" style="margin:8px 0 0">ร้านสุทธิ = ลูกค้าจ่ายจริง − ส่วนแบ่งพนักงาน − ค่า GP (ส่วนลดโปรโมชั่นเป็นภาระของร้าน)'+(c.shareN<c.done?', มี '+(c.done-c.shareN)+' งานที่ไม่มีข้อมูลส่วนแบ่ง ไม่ถูกนับในยอดส่วนแบ่งและร้านสุทธิ':'')+'</p></div>';
   var cols=["","งานที่เสร็จ","ราคาเต็ม","ส่วนแบ่ง","GP","ร้านสุทธิ"];
   var fn=function(n,x,mx){return [esc(n)+rpBar(x.d,mx),x.d,rpMoney(x.full),c.shareN?rpMoney(x.share):"-",rpMoney(x.gp),c.shareN?rpMoney(x.paid-x.share-x.gp):"-"]};
   o+=grp(c.stf,"แยกตามพนักงาน",["พนักงาน"].concat(cols.slice(1)),fn);o+=grp(c.svc,"แยกตามบริการ",["บริการ"].concat(cols.slice(1)),fn);
@@ -639,7 +639,7 @@ function stShare(id){var p=byId(D.staff,id);if(!p)return;
  if(navigator.share){navigator.share({title:"ลิงก์แอปรับงานพนักงาน",text:t}).then(function(){done("เปิดเมนูแชร์ให้แล้ว")},function(e){if(e&&e.name==="AbortError")return;copy()})}else copy()}
 function sdrCard(){if(D.sdrOff||!(D.sdr||[]).length)return"";
  return '<div class="card" style="border:2px solid var(--bad)"><b>คำขอลบบัญชีพนักงาน ('+D.sdr.length+')</b><p class="hint2" style="margin:2px 0 8px">เมื่ออนุมัติ ระบบจะลบชื่อ เบอร์ รูป แชต และบัญชีเข้าสู่ระบบของพนักงาน คิวงานและรีวิวเก่ายังอยู่ในรายงานของร้านแต่ไม่ระบุตัวพนักงาน กู้คืนไม่ได้</p>'+D.sdr.map(function(r){
-  return '<div class="item" style="padding:8px 0;border-top:1px solid var(--line)"><b>'+esc(r.name)+'</b><small style="display:block;color:var(--mute)">เบอร์ '+esc(r.phone||"-")+' · ขอเมื่อ '+new Date(r.requested_at).toLocaleDateString("th-TH",{day:"numeric",month:"short",year:"numeric",timeZone:"Asia/Bangkok"})+'</small>'+
+  return '<div class="item" style="padding:8px 0;border-top:1px solid var(--line)"><b>'+esc(r.name)+'</b><small style="display:block;color:var(--mute)">เบอร์ '+esc(r.phone||"-")+', ขอเมื่อ '+new Date(r.requested_at).toLocaleDateString("th-TH",{day:"numeric",month:"short",year:"numeric",timeZone:"Asia/Bangkok"})+'</small>'+
   (r.open_jobs>0?'<p style="color:var(--bad);margin:6px 0">ยังมีคิวที่ยังไม่เสร็จ '+r.open_jobs+' คิว อนุมัติไม่ได้จนกว่าจะเสร็จหรือยกเลิก</p>':'')+
   (S.sdn===r.id?'<div style="margin-top:8px"><label for="sdn_'+r.id+'">เหตุผลที่ไม่อนุมัติ (พนักงานจะเห็นข้อความนี้)</label><input class="in" id="sdn_'+r.id+'" maxlength="200"></div>':'')+
   '<div class="acts"><button type="button" class="btn d" data-a="sdrok" data-id="'+r.id+'"'+(r.open_jobs>0?" disabled":"")+'>'+(S.sdc===r.id?"กดอีกครั้งเพื่อยืนยันลบ":"อนุมัติ (ลบบัญชี)")+'</button><button type="button" class="btn g" data-a="sdrno" data-id="'+r.id+'">'+(S.sdn===r.id?"บันทึกการไม่อนุมัติ":"ไม่อนุมัติ")+'</button>'+(S.sdc===r.id||S.sdn===r.id?'<button type="button" class="btn g" data-a="sdrx">ยกเลิก</button>':'')+'</div></div>'}).join("")+'</div>'}

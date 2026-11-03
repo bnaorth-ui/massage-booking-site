@@ -396,7 +396,7 @@ function staffForm(){var p=S.form.id?byId(D.staff,S.form.id):{name:"",phone:"",i
 function scrCard(){if(D.scrOff||!(D.scr||[]).length)return"";
  return '<div class="card" style="border-color:var(--bad)"><b>คำขอปิดบัญชีร้าน ('+D.scr.length+')</b><p class="hint2" style="margin:2px 0 8px">เมื่ออนุมัติ ร้านจะถูกปิดรับจองถาวรและไม่แสดงให้ลูกค้าเห็น ร้านเปิดเองไม่ได้ ข้อมูลการจอง รีวิว และรายการเงินยังเก็บไว้ทำรายงาน ถ้าต้องการเปิดร้านกลับ ให้กดเปิดร้านที่รายการร้านทั้งหมด</p>'+D.scr.map(function(r){
   var blk=r.open_bookings>0||+r.balance<0||r.pending_topups>0;
-  return '<div class="bk"><div class="qh"><b>'+esc(r.name)+'</b></div><small>เจ้าของ '+esc(r.owner||"-")+' · ขอเมื่อ '+new Date(r.requested_at).toLocaleDateString("th-TH",{day:"numeric",month:"short",year:"numeric",timeZone:"Asia/Bangkok"})+'</small>'+
+  return '<div class="bk"><div class="qh"><b>'+esc(r.name)+'</b></div><small>เจ้าของ '+esc(r.owner||"-")+', ขอเมื่อ '+new Date(r.requested_at).toLocaleDateString("th-TH",{day:"numeric",month:"short",year:"numeric",timeZone:"Asia/Bangkok"})+'</small>'+
   (r.reason?'<small>เหตุผล: '+esc(r.reason)+'</small>':'')+'<small>ยอดกระเป๋าเงิน <b style="color:'+(+r.balance<0?"var(--bad)":"inherit")+'">'+baht(+r.balance)+'</b>'+(+r.balance>0?' (มียอดคงเหลือ ตกลงเรื่องการคืนเงินกับร้านก่อนอนุมัติ)':'')+'</small>'+
   (r.open_bookings>0?'<p style="color:var(--bad);margin:6px 0">ยังมีการจองที่ยังไม่เสร็จสิ้น '+r.open_bookings+' คิว อนุมัติไม่ได้</p>':'')+
   (+r.balance<0?'<p style="color:var(--bad);margin:6px 0">ร้านยังมียอดค้างชำระ อนุมัติไม่ได้</p>':'')+
@@ -405,7 +405,7 @@ function scrCard(){if(D.scrOff||!(D.scr||[]).length)return"";
   '<div class="acts"><button class="btn d" data-a="scrok" data-id="'+r.id+'"'+(blk?" disabled":"")+'>'+(S.scc===r.id?"กดอีกครั้งเพื่อยืนยันปิดบัญชี":"อนุมัติ (ปิดบัญชีร้าน)")+'</button><button class="btn g" data-a="scrno" data-id="'+r.id+'">'+(S.scn===r.id?"บันทึกการไม่อนุมัติ":"ไม่อนุมัติ")+'</button>'+(S.scc===r.id||S.scn===r.id?'<button class="btn g" data-a="scrx">ยกเลิก</button>':'')+'</div></div>'}).join("")+'</div>'}
 function sdrCard(){if(D.sdrOff||!(D.sdr||[]).length)return"";
  return '<div class="card" style="border-color:var(--bad)"><b>คำขอลบบัญชีพนักงานส่วนกลาง ('+D.sdr.length+')</b><p class="hint2" style="margin:2px 0 8px">พนักงานสังกัดร้านให้ร้านเป็นผู้อนุมัติ เมื่ออนุมัติ ระบบจะลบชื่อ เบอร์ รูป แชต และบัญชีเข้าสู่ระบบของพนักงาน คิวงานและรีวิวเก่ายังอยู่แต่ไม่ระบุตัวพนักงาน กู้คืนไม่ได้</p>'+D.sdr.map(function(r){
-  return '<div class="bk"><div class="qh"><b>'+esc(r.name)+'</b></div><small>เบอร์ '+esc(r.phone||"-")+' · ขอเมื่อ '+new Date(r.requested_at).toLocaleDateString("th-TH",{day:"numeric",month:"short",year:"numeric",timeZone:"Asia/Bangkok"})+'</small>'+
+  return '<div class="bk"><div class="qh"><b>'+esc(r.name)+'</b></div><small>เบอร์ '+esc(r.phone||"-")+', ขอเมื่อ '+new Date(r.requested_at).toLocaleDateString("th-TH",{day:"numeric",month:"short",year:"numeric",timeZone:"Asia/Bangkok"})+'</small>'+
   (r.open_jobs>0?'<p style="color:var(--bad);margin:6px 0">ยังมีคิวที่ยังไม่เสร็จ '+r.open_jobs+' คิว อนุมัติไม่ได้จนกว่าจะเสร็จหรือยกเลิก</p>':'')+
   (S.sdn===r.id?'<div style="margin-top:8px"><label for="sdn_'+r.id+'" style="font-size:.9rem;color:var(--mute)">เหตุผลที่ไม่อนุมัติ (พนักงานจะเห็นข้อความนี้)</label><input class="in" id="sdn_'+r.id+'" maxlength="200"></div>':'')+
   '<div class="acts"><button class="btn d" data-a="sdrok" data-id="'+r.id+'"'+(r.open_jobs>0?" disabled":"")+'>'+(S.sdc===r.id?"กดอีกครั้งเพื่อยืนยันลบ":"อนุมัติ (ลบบัญชี)")+'</button><button class="btn g" data-a="sdrno" data-id="'+r.id+'">'+(S.sdn===r.id?"บันทึกการไม่อนุมัติ":"ไม่อนุมัติ")+'</button>'+(S.sdc===r.id||S.sdn===r.id?'<button class="btn g" data-a="sdrx">ยกเลิก</button>':'')+'</div></div>'}).join("")+'</div>'}
@@ -461,7 +461,7 @@ function usrFind(){var q=((document.getElementById("usq")||{}).value||"").trim()
 function usrLogLoad(redraw){return sbApi("/rest/v1/password_reset_log?select=*&order=created_at.desc&limit=50").then(function(a){US.log=a||[];US.logErr="";if(S.tab==="usr"&&!S.busy||redraw)draw()},function(e){US.logErr=errTh(e,"โหลดประวัติไม่สำเร็จ ตรวจสอบว่ารันไฟล์ SQL ส่วนที่ 27 แล้ว");if(S.tab==="usr")draw()})}
 function usrView(){var h='<div class="head"><h1>ผู้ใช้งาน</h1></div><p class="hint2">ใช้เมื่อผู้ใช้ลืมรหัสผ่านและติดต่อสมาคม ค้นหาจากเบอร์ ตั้งรหัสผ่านชั่วคราวให้ แล้วแจ้งผู้ใช้ให้เข้าสู่ระบบและเปลี่ยนรหัสเองที่หน้าบัญชีทันที</p>';
  if(US.done){var d=US.done;h+='<div class="card" role="status"><b>ตั้งรหัสผ่านใหม่ให้ '+esc(d.name||"-")+' แล้ว</b><small>เบอร์ '+esc(d.phone||"-")+'</small><div style="font-size:1.6rem;font-weight:700;letter-spacing:.12em;margin:10px 0;overflow-wrap:anywhere" id="uspwshow">'+esc(d.pw)+'</div><div class="acts"><button type="button" class="btn g" data-a="uscopy">'+(US.copied?"คัดลอกแล้ว":"คัดลอกรหัส")+'</button></div><p class="hint2" style="margin:10px 0 0">แจ้งรหัสนี้ให้เจ้าของบัญชีทางโทรศัพท์ แล้วบอกให้เข้าสู่ระบบและเปลี่ยนรหัสผ่านเองที่หน้าบัญชีทันที รหัสนี้จะไม่แสดงอีกหลังกด "เสร็จสิ้น" เครื่องที่ล็อกอินค้างไว้ถูกบังคับออกจากระบบแล้ว</p><button type="button" class="btn" data-a="usdone" style="margin-top:8px">เสร็จสิ้น</button></div>'}
- else if(US.sel){var u=US.sel;h+='<div class="card form"><b>ตั้งรหัสผ่านใหม่ให้ '+esc(u.name||"-")+'</b><small>เบอร์ '+esc(u.phone||"-")+' · '+esc(UKIND[u.kind]||"")+'</small><div><label for="uspw">รหัสผ่านชั่วคราว (อย่างน้อย 8 ตัวอักษร)</label><input class="in" id="uspw" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="'+esc(US.pw)+'"'+(US.cfm?" readonly":"")+'></div>'+
+ else if(US.sel){var u=US.sel;h+='<div class="card form"><b>ตั้งรหัสผ่านใหม่ให้ '+esc(u.name||"-")+'</b><small>เบอร์ '+esc(u.phone||"-")+', '+esc(UKIND[u.kind]||"")+'</small><div><label for="uspw">รหัสผ่านชั่วคราว (อย่างน้อย 8 ตัวอักษร)</label><input class="in" id="uspw" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="'+esc(US.pw)+'"'+(US.cfm?" readonly":"")+'></div>'+
   (US.cfm?'<div role="alert" style="margin-top:8px;font-weight:600">ยืนยันว่าได้สอบถามและยืนยันตัวตนของ '+esc(u.name||"-")+' (เบอร์ '+esc(u.phone||"-")+') ทางโทรศัพท์แล้ว? เครื่องที่ล็อกอินค้างไว้จะถูกบังคับออกจากระบบ</div><div class="acts" style="margin-top:8px"><button type="button" class="btn d" data-a="usgo">ยืนยันตั้งรหัสผ่านใหม่</button><button type="button" class="btn g" data-a="usno">ยังไม่ตั้ง</button></div>'
    :'<div class="acts" style="margin-top:8px"><button type="button" class="btn" data-a="usask">ตั้งรหัสผ่านใหม่</button><button type="button" class="btn g" data-a="usgen">สุ่มรหัสให้</button><button type="button" class="btn g" data-a="uscancel">ยกเลิก</button></div>')+
   (US.err?'<div role="alert" style="color:var(--bad);margin-top:8px">'+esc(US.err)+'</div>':'')+'</div>'}
@@ -471,7 +471,7 @@ function usrView(){var h='<div class="head"><h1>ผู้ใช้งาน</h1>
  h+='<h2 style="margin:22px 0 8px;font-size:1.05rem">ประวัติการตั้งรหัสผ่านใหม่</h2><p class="hint2">แสดง 50 รายการล่าสุด ไม่เก็บรหัสผ่าน</p>';
  if(US.logErr)h+='<div role="alert" style="color:var(--bad)">'+esc(US.logErr)+'</div>';
  else if(!US.log)h+='<p class="hint2" role="status">กำลังโหลด</p>';
- else h+=US.log.length?US.log.map(function(x){return '<div class="row"><div><b>'+esc(x.user_name||"-")+'</b> <small>เบอร์ '+esc(x.user_phone||"-")+'</small><small>ตั้งโดย '+esc(x.admin_name||"-")+' · '+new Date(x.created_at).toLocaleString("th-TH",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",timeZone:"Asia/Bangkok"})+'</small></div></div>'}).join(""):'<div class="empty">ยังไม่มีการตั้งรหัสผ่านใหม่</div>';
+ else h+=US.log.length?US.log.map(function(x){return '<div class="row"><div><b>'+esc(x.user_name||"-")+'</b> <small>เบอร์ '+esc(x.user_phone||"-")+'</small><small>ตั้งโดย '+esc(x.admin_name||"-")+', '+new Date(x.created_at).toLocaleString("th-TH",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",timeZone:"Asia/Bangkok"})+'</small></div></div>'}).join(""):'<div class="empty">ยังไม่มีการตั้งรหัสผ่านใหม่</div>';
  return h}
 function rvwPending(){return RW.sh.filter(function(x){return x.reported&&!x.hidden}).length+RW.st.filter(function(x){return x.reported&&!x.hidden}).length}
 function rvwView(){var f=S.rvwf||"rep",h='<div class="head"><h1>ตรวจสอบรีวิว</h1></div>';
@@ -581,12 +581,12 @@ function oqDate(d){var x=new Date(d+"T00:00:00");return x.toLocaleDateString("th
 function oqT(t){return t?String(t).slice(0,5):""}
 function oreqCard(r){var st=OQ_ST[r.status]||[r.status,""],inv=r.org_invites||[],nm=function(i){var s=byId(D.staff,i.staff_id);return s?s.name:"-"};
  var h='<div class="card" id="oq_'+r.id+'"><div class="head"><h2>'+esc(r.org_name)+'</h2><span class="'+(st[1]||"")+'">'+st[0]+'</span></div>'+
- '<p class="sub">'+esc(r.ref)+' · เขต'+esc(r.district)+'</p><p>'+esc(r.address)+'</p>'+
- '<p>📅 '+oqDate(r.service_date)+' เวลา '+oqT(r.start_time)+'-'+oqT(r.end_time)+(r.lunch_start?' (พัก '+oqT(r.lunch_start)+'-'+oqT(r.lunch_end)+')':'')+' รวม '+(+r.hours)+' ชม. · อัตรา '+(+r.rate)+' บาท/คน/ชม.</p>'+
- '<p>👤 '+esc(r.contact_name)+' · <a href="tel:'+esc(r.contact_phone)+'">'+esc(r.contact_phone)+'</a> · <a target="_blank" rel="noopener" href="https://www.google.com/maps?q='+r.lat+','+r.lng+'">ดูแผนที่</a></p>';
+ '<p class="sub">'+esc(r.ref)+', เขต'+esc(r.district)+'</p><p>'+esc(r.address)+'</p>'+
+ '<p>📅 '+oqDate(r.service_date)+' เวลา '+oqT(r.start_time)+'-'+oqT(r.end_time)+(r.lunch_start?' (พัก '+oqT(r.lunch_start)+'-'+oqT(r.lunch_end)+')':'')+' รวม '+(+r.hours)+' ชม., อัตรา '+(+r.rate)+' บาท/คน/ชม.</p>'+
+ '<p>👤 '+esc(r.contact_name)+', <a href="tel:'+esc(r.contact_phone)+'">'+esc(r.contact_phone)+'</a>, <a target="_blank" rel="noopener" href="https://www.google.com/maps?q='+r.lat+','+r.lng+'">ดูแผนที่</a></p>';
  if(inv.length)h+='<p>หมอนวด: '+inv.map(function(i){return esc(nm(i))+' ('+(OQ_IS[i.status]||i.status)+(i.by_admin?' โดยแอดมิน':'')+')'}).join(", ")+'</p>';
  else h+='<p>หมอนวดที่เลือก: '+(r.staff_ids||[]).map(function(i){var s=byId(D.staff,i);return esc(s?s.name:"-")}).join(", ")+'</p>';
- if(r.amount!=null)h+='<p>ยอดชำระ '+(+r.amount).toLocaleString("th-TH")+' บาท'+(r.pay_due_at&&r.status==="awaiting_payment"?' · ภายใน '+ntAt(r.pay_due_at):'')+'</p>';
+ if(r.amount!=null)h+='<p>ยอดชำระ '+(+r.amount).toLocaleString("th-TH")+' บาท'+(r.pay_due_at&&r.status==="awaiting_payment"?', ภายใน '+ntAt(r.pay_due_at):'')+'</p>';
  if(r.note)h+='<p class="sub">หมายเหตุ: '+esc(r.note)+'</p>';
  if(r.slip_path)h+='<div id="oqslip_'+r.id+'" class="slipbox"></div>';
  h+='<div class="acts">';
@@ -622,7 +622,7 @@ function pinName(la,lo){var e=document.getElementById("pinname");if(!e)return;if
 /* ---- ชื่อสถานที่จากพิกัด (OpenStreetMap Nominatim) เรียกเมื่อผู้ใช้กดเองเท่านั้น จำผลไว้ และเว้นช่วง >= 1.1 วินาที ---- */
 var RGC={},RGT=0,RGQ=null,RGTM=null;
 function nmFmt(j){var a=(j&&j.address)||{},nm=j&&j.name&&j.name!==a.road?String(j.name):"",P=[nm,a.road||a.pedestrian||"",a.suburb||a.quarter||a.neighbourhood||a.village||a.hamlet||"",a.city_district||a.district||a.county||a.town||a.city||"",a.state||a.province||""].filter(Boolean),O=[];P.forEach(function(x){if(O.indexOf(x)<0)O.push(x)});
- return O.length?(nm?"":"ใกล้ ")+O.join(" · "):(j&&j.display_name?String(j.display_name).slice(0,120):"")}
+ return O.length?(nm?"":"ใกล้ ")+O.join(", "):(j&&j.display_name?String(j.display_name).slice(0,120):"")}
 function revGeo(lat,lng,cb){var k=lat.toFixed(5)+","+lng.toFixed(5);if(RGC[k]!==undefined){cb(RGC[k]);return}
  RGQ={k:k,lat:lat,lng:lng,cb:cb};if(RGTM)return;
  RGTM=setTimeout(function(){RGTM=null;var q=RGQ;RGQ=null;if(!q)return;RGT=Date.now();
