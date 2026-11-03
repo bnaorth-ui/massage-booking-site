@@ -163,8 +163,11 @@ fmMode.err=true;await p.click('[data-a=fmre]');await p.waitForTimeout(600);
 ok('error alert announced',(await p.textContent('#sra')).includes('admin_finance_month'));
 fmMode.err=false;fmMode.d={from:'x',to:'y',shops:[{place_id:'sh1',name:'ร้านสบายดี สปา',opening:0,topup:500,credit:0,gp:-50,other:0,closing:450,gp_n:1,topup_req:500}],checks:{topup_lost:[],gp_missing:[]}};
 await p.click('[data-a=fmre]');await p.waitForTimeout(600);
-{const pp=ctx.waitForEvent('page');await p.click('[data-a=fmprint]');const w=await pp;await w.waitForLoadState();const hh=await w.evaluate(()=>document.documentElement.outerHTML),wt=await w.evaluate(()=>document.body.innerText);
- ok('print window has title, table, no bank box',wt.includes('สรุปการเงินสมาคม')&&wt.includes('ร้านสบายดี สปา')&&wt.includes('ตัวเลขตรงกันทุกข้อ')&&!wt.includes('ยอดจากธนาคาร'));
- ok('print window has letterhead like org report',hh.includes('class="rpti"')&&wt.includes('สมาคมวิทยากรฝึกอาชีพคนตาบอด')&&wt.includes('วันที่ออกรายงาน')&&wt.includes('ช่วงเวลาที่รายงาน')&&wt.includes('เอกสารนี้ออกโดยระบบจองนวด'));await w.close()}
-ok('print + csv buttons exist',await p.evaluate(()=>!!document.querySelector('[data-a=fmprint]')&&!!document.querySelector('[data-a=fmcsv]')));
+{const dl3=p.waitForEvent('download');await p.click('[data-a=fmpdf]');const d3=await dl3;const mm=await p.evaluate(()=>document.getElementById('fmy').value+'-'+document.getElementById('fmmo').value);
+ ok('pdf filename',d3.suggestedFilename()==='finance-'+mm+'.pdf');const pth=await d3.path(),buf=require('fs').readFileSync(pth);
+ ok('pdf header/trailer',buf.slice(0,5).toString()==='%PDF-'&&buf.slice(-6).toString().includes('%%EOF'));
+ require('fs').copyFileSync(pth,process.env.PDFOUT||'/tmp/fm_out.pdf');
+ await p.waitForTimeout(300);ok('pdf download announced',(await p.textContent('#sr')).includes('ดาวน์โหลดไฟล์ PDF'));
+ ok('pdf button not stuck',await p.evaluate(()=>!!document.querySelector('[data-a=fmpdf]')))}
+ok('print + csv buttons exist',await p.evaluate(()=>!!document.querySelector('[data-a=fmpdf]')&&!!document.querySelector('[data-a=fmcsv]')));
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)})();

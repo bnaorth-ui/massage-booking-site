@@ -602,18 +602,46 @@ function fmView(){if(!FM.m)FM.m=fmNow();var a=FM.m.split("-"),yr=fmYears();if(yr
  return'<div class="head noprint"><h1>สรุปการเงินสมาคมรายเดือน</h1><button type="button" class="btn g" id="fmbtn" data-a="fmre"'+(FM.busy?' aria-busy="true"':'')+'>'+(FM.busy?"กำลังโหลด…":"โหลดใหม่")+'</button></div>'+
  '<div class="srch noprint" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><label for="fmmo" class="sub">เดือน</label><select class="in" id="fmmo" style="flex:0 0 auto;width:auto">'+FMN.map(function(n,i){var v=(i<9?"0":"")+(i+1);return'<option value="'+v+'"'+(v===a[1]?" selected":"")+'>'+n+'</option>'}).join("")+'</select><label for="fmy" class="sub">ปี พ.ศ.</label><select class="in" id="fmy" style="flex:0 0 auto;width:auto">'+yr.map(function(y){return'<option value="'+y+'"'+(y===+a[0]?" selected":"")+'>'+(y+543)+'</option>'}).join("")+'</select></div>'+
  '<p class="hint2 noprint">รายการกระเป๋าเงินของร้านค้าทุกร้าน นับตามเวลาไทย เฉพาะรายการที่สำเร็จแล้ว ไม่รวมที่ยังรอตรวจ</p>'+
- '<div class="acts noprint" style="margin:10px 0"><button type="button" class="btn" data-a="fmprint">พิมพ์ / บันทึกเป็น PDF</button><button type="button" class="btn g" data-a="fmcsv">ดาวน์โหลด CSV</button></div>'+
+ '<div class="acts noprint" style="margin:10px 0"><button type="button" class="btn" data-a="fmpdf">ดาวน์โหลด PDF</button><button type="button" class="btn g" data-a="fmcsv">ดาวน์โหลด CSV</button></div>'+
  '<div id="fmbody">'+fmBody()+'</div>'}
-function fmHead(){var lg=D.set.logo?pubUrl(D.set.logo):((document.getElementById("alogo")||{}).src||""),
- issue=new Date().toLocaleDateString("th-TH",{day:"numeric",month:"long",year:"numeric",timeZone:"Asia/Bangkok"});
- return'<div class="card rph"><div class="rphd">'+(lg?'<img class="rplogo" alt="โลโก้สมาคม" src="'+esc(lg)+'">':"")+'<div class="rpas"><b>'+esc(D.set.assoc||"สมาคมวิทยากรฝึกอาชีพคนตาบอด")+'</b>'+(D.set.address?'<div class="rpad">'+esc(D.set.address).replace(/\n/g,"<br>")+'</div>':"")+(D.set.phone||D.set.email?'<div class="rpad">'+(D.set.phone?"โทร "+esc(D.set.phone):"")+(D.set.phone&&D.set.email?", ":"")+(D.set.email?esc(D.set.email):"")+'</div>':"")+'</div></div><h1 class="rpti">สรุปการเงินสมาคม</h1><div class="rpin"><div><span>ช่วงเวลาที่รายงาน</span><b>'+esc(fmLab(FM.m))+'</b></div><div><span>วันที่ออกรายงาน</span><b>'+issue+'</b></div></div></div>'}
-function fmPrint(){var b=document.getElementById("fmbody");if(!b||!FM.d)return;var c=b.cloneNode(true);c.querySelectorAll(".noprint").forEach(function(x){x.remove()});
- var css=Array.prototype.map.call(document.querySelectorAll("style"),function(x){return x.textContent}).join("\n"),t="สรุปการเงินสมาคม "+fmLab(FM.m);
- var h='<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+esc(t)+'</title><style>'+css+'</style></head><body><div class="noprint" style="padding:10px 16px"><button class="btn" onclick="window.print()">พิมพ์ / บันทึกเป็น PDF</button></div><main><div class="rp">'+fmHead()+c.innerHTML+'<p class="rpft">เอกสารนี้ออกโดยระบบจองนวดของ '+esc(D.set.assoc||"สมาคมวิทยากรฝึกอาชีพคนตาบอด")+'</p></div></main><script>window.addEventListener("load",function(){setTimeout(function(){try{window.print()}catch(e){}},500)})<\/script></body></html>';
- var url=URL.createObjectURL(new Blob([h],{type:"text/html;charset=utf-8"})),w=null;
- try{w=window.open(url,"_blank")}catch(e){}
- if(!w){var a=document.createElement("a");a.href=url;a.download="finance-"+FM.m+".html";document.body.appendChild(a);a.click();a.remove();FM.err="เปิดหน้าพิมพ์ไม่ได้ ระบบดาวน์โหลดไฟล์ให้แทน ให้เปิดไฟล์นั้นแล้วกดพิมพ์ หรือเปิดเว็บแอดมินจาก Safari/Chrome (ไม่ใช่แอปที่ติดตั้งบนหน้าจอ) แล้วลองใหม่";fmSync();say(FM.err,true)}
- setTimeout(function(){URL.revokeObjectURL(url)},120000)}
+function fmWrap(c,txt,w){var segs,out=[],line="",fin=[];try{segs=Array.from(new Intl.Segmenter("th",{granularity:"word"}).segment(String(txt)),function(x){return x.segment})}catch(e){segs=Array.from(String(txt))}
+ segs.forEach(function(g){var t=line+g;if(!line||c.measureText(t).width<=w)line=t;else{out.push(line.replace(/\s+$/,""));line=g.replace(/^\s+/,"")}});if(line)out.push(line);
+ out.forEach(function(l){if(c.measureText(l).width<=w){fin.push(l);return}var cur="";Array.from(l).forEach(function(ch){if(cur&&c.measureText(cur+ch).width>w&&!/[ัิ-ฺ็-๎]/.test(ch)){fin.push(cur);cur=ch}else cur+=ch});if(cur)fin.push(cur)});return fin.length?fin:[""]}
+function fmPdfDraw(logo){var W=1240,H=1754,M=90,CW=W-2*M,F=getComputedStyle(document.body).fontFamily||"sans-serif",pages=[],c,y,d=FM.d,L=d.shops||[],t=fmTot(d),is=fmIssues(d),set=D.set||{};
+ function np(){var cv=document.createElement("canvas");cv.width=W;cv.height=H;c=cv.getContext("2d");c.fillStyle="#fff";c.fillRect(0,0,W,H);pages.push(cv);y=M}
+ function fnt(sz,b){c.font=(b?"700 ":"400 ")+sz+"px "+F}
+ function need(h){if(y+h>H-M)np()}
+ function txt(s,sz,o){o=o||{};var lh=Math.round(sz*1.55),w=o.w||CW,x0=o.x==null?M:o.x;fnt(sz,o.b);var ls=fmWrap(c,s,w);ls.forEach(function(l){need(lh);fnt(sz,o.b);c.fillStyle=o.col||"#1b2b27";c.textAlign=o.al||"left";c.fillText(l,o.al==="center"?x0+w/2:o.al==="right"?x0+w:x0,y+Math.round(sz*1.1));y+=lh});return ls.length*lh}
+ np();var top=y;if(logo){try{c.drawImage(logo,M,y,110,110)}catch(e){}}
+ var hx=M+130,hw=CW-260;txt(set.assoc||"สมาคมวิทยากรฝึกอาชีพคนตาบอด",34,{b:1,al:"center",x:hx,w:hw});
+ if(set.address)String(set.address).split("\n").forEach(function(l){txt(l,26,{al:"center",x:hx,w:hw,col:"#5b6b66"})});
+ var ct=(set.phone?"โทร "+set.phone:"")+(set.phone&&set.email?", ":"")+(set.email||"");if(ct)txt(ct,26,{al:"center",x:hx,w:hw,col:"#5b6b66"});
+ y=Math.max(y,top+120)+20;txt("สรุปการเงินสมาคม",46,{b:1,al:"center"});y+=6;
+ txt("ช่วงเวลาที่รายงาน: "+fmLab(FM.m),28,{b:1});txt("วันที่ออกรายงาน: "+new Date().toLocaleDateString("th-TH",{day:"numeric",month:"long",year:"numeric",timeZone:"Asia/Bangkok"}),28,{b:1});
+ y+=14;c.strokeStyle="#cfdad6";c.lineWidth=2;c.beginPath();c.moveTo(M,y);c.lineTo(W-M,y);c.stroke();y+=18;
+ var fr=[.23,.13,.13,.15,.22,.14],cw=fr.map(function(f){return Math.floor(CW*f)}),pad=10;
+ function row(cells,o){o=o||{};var sz=o.sz||25,lh=Math.round(sz*1.5),ls=cells.map(function(s,i){fnt(sz,o.b);return fmWrap(c,s,cw[i]-2*pad)}),n=Math.max.apply(null,ls.map(function(a){return a.length})),h=n*lh+16;need(h);
+  if(o.bg){c.fillStyle=o.bg;c.fillRect(M,y,CW,h)}var x=M;ls.forEach(function(a,i){fnt(sz,o.b);c.fillStyle="#1b2b27";c.textAlign=i?"right":"left";a.forEach(function(l,k){c.fillText(l,i?x+cw[i]-pad:x+pad,y+8+Math.round(sz*1.1)+k*lh)});x+=cw[i]});
+  c.strokeStyle=o.top?"#1b2b27":"#cfdad6";c.lineWidth=o.top?3:1.5;c.beginPath();c.moveTo(M,o.top?y:y+h);c.lineTo(W-M,o.top?y:y+h);c.stroke();y+=h}
+ row(["ร้าน","ยอดยกมา","เติมเงิน","เครดิตจากสมาคม","หัก GP","ยอดคงเหลือ"],{b:1,bg:"#eef3f1",sz:23});
+ if(L.length)L.forEach(function(r){row([r.name,fmMoney(r.opening),fmMoney(r.topup),fmMoney(r.credit),fmMoney(r.gp)+(r.gp_n?" ("+r.gp_n+" งาน)":""),fmMoney(r.closing)])});else row(["ไม่มีรายการของเดือนนี้","","","","",""]);
+ row(["รวมทุกร้าน",fmMoney(t.opening),fmMoney(t.topup),fmMoney(t.credit),fmMoney(t.gp)+(t.gp_n?" ("+t.gp_n+" งาน)":""),fmMoney(t.closing)],{b:1,top:1,bg:"#f6f9f8"});
+ y+=34;txt("ตรวจกระทบยอด",34,{b:1});y+=4;
+ if(is.length){txt("พบ "+is.length+" เรื่องที่ควรตรวจ",28,{b:1,col:"#9a5b00"});is.forEach(function(x){txt("- "+x,26,{x:M+16,w:CW-16})})}else txt("ตัวเลขตรงกันทุกข้อ: ยอดยกมารวมรายการในเดือนเท่ากับยอดคงเหลือทุกร้าน, คำขอเติมเงินที่ยืนยันเข้ากระเป๋าครบ, งานที่เสร็จมีรายการหัก GP ครบ",26,{col:"#0f6b57"});
+ y+=30;txt("เอกสารนี้ออกโดยระบบจองนวดของ "+(set.assoc||"สมาคมวิทยากรฝึกอาชีพคนตาบอด"),22,{al:"center",col:"#5b6b66"});return pages}
+function fmPdfBlob(pages){var enc=new TextEncoder(),ch=[],off=0,xr=[],i,n=pages.length,kids=[];function add(b){if(typeof b==="string")b=enc.encode(b);ch.push(b);off+=b.length}
+ function obj(k,head,st){xr[k]=off;add(k+" 0 obj\n"+head);if(st){add("\nstream\n");add(st);add("\nendstream")}add("\nendobj\n")}
+ for(i=0;i<n;i++)kids.push((3+i*3)+" 0 R");add("%PDF-1.4\n");obj(1,"<< /Type /Catalog /Pages 2 0 R >>");obj(2,"<< /Type /Pages /Kids ["+kids.join(" ")+"] /Count "+n+" >>");
+ pages.forEach(function(cv,i){var b=3+i*3,u=atob(cv.toDataURL("image/jpeg",.88).split(",")[1]),jp=new Uint8Array(u.length),cs="q 595.28 0 0 841.89 0 0 cm /Im0 Do Q",k;for(k=0;k<u.length;k++)jp[k]=u.charCodeAt(k);
+  obj(b,"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /XObject << /Im0 "+(b+2)+" 0 R >> >> /Contents "+(b+1)+" 0 R >>");obj(b+1,"<< /Length "+cs.length+" >>",cs);
+  obj(b+2,"<< /Type /XObject /Subtype /Image /Width "+cv.width+" /Height "+cv.height+" /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length "+jp.length+" >>",jp)});
+ var tot=3+n*3,xo=off;add("xref\n0 "+tot+"\n0000000000 65535 f \n");for(i=1;i<tot;i++)add(("0000000000"+xr[i]).slice(-10)+" 00000 n \n");add("trailer\n<< /Size "+tot+" /Root 1 0 R >>\nstartxref\n"+xo+"\n%%EOF\n");return new Blob(ch,{type:"application/pdf"})}
+function fmPdf(){if(!FM.d||FM.pdfBusy)return;FM.pdfBusy=true;var src=D.set.logo?pubUrl(D.set.logo):((document.getElementById("alogo")||{}).src||""),F=getComputedStyle(document.body).fontFamily||"sans-serif";
+ var lp=new Promise(function(ok){if(!src){ok(null);return}var im=new Image();im.crossOrigin="anonymous";im.onload=function(){ok(im)};im.onerror=function(){ok(null)};setTimeout(function(){ok(null)},4000);im.src=src});
+ var fp=document.fonts&&document.fonts.load?Promise.all([document.fonts.load("400 24px "+F,"ก"),document.fonts.load("700 24px "+F,"ก")]).catch(function(){}):Promise.resolve();
+ return Promise.all([lp,fp]).then(function(r){var pg=fmPdfDraw(r[0]);try{pg[0].toDataURL("image/jpeg")}catch(e){pg=fmPdfDraw(null)}
+  var a=document.createElement("a");a.href=URL.createObjectURL(fmPdfBlob(pg));a.download="finance-"+FM.m+".pdf";document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1000);
+  say("ดาวน์โหลดไฟล์ PDF สรุปการเงิน"+fmLab(FM.m)+" แล้ว")}).catch(function(){say("สร้างไฟล์ PDF ไม่สำเร็จ ลองใหม่อีกครั้ง หรือใช้ปุ่มดาวน์โหลด CSV",true)}).then(function(){FM.pdfBusy=false})}
 function fmCsv(){var d=FM.d;if(!d)return;var q=function(x){x=String(x==null?"":x);return /[",\n]/.test(x)?'"'+x.replace(/"/g,'""')+'"':x},t=fmTot(d),
  rows=[["สรุปการเงินสมาคม",fmLab(FM.m)],["ร้าน","ยอดยกมา","เติมเงิน","เครดิตจากสมาคม","หัก GP","จำนวนงานที่หัก GP","ยอดคงเหลือ"]];
  (d.shops||[]).forEach(function(r){rows.push([r.name,r.opening,r.topup,r.credit,r.gp,r.gp_n,r.closing])});rows.push(["รวมทุกร้าน",t.opening,t.topup,t.credit,t.gp,t.gp_n,t.closing]);
@@ -862,7 +890,7 @@ document.addEventListener("click",function(e){
  if(a==="hlre"){hlLoad(true);return}
  if(a==="fmre"){fmLoad(true);return}
  if(a==="fmcsv"){fmCsv();return}
- if(a==="fmprint"){fmPrint();return}
+ if(a==="fmpdf"){fmPdf();return}
  if(a==="aure"){auLoad(true);return}
  if(a==="uscopy"){var tx=US.done&&US.done.pw;if(tx&&navigator.clipboard)navigator.clipboard.writeText(tx).then(function(){US.copied=true;draw()},function(){});return}
  if(a==="slipask"){SLP.cfm=true;slipRedraw();return}
