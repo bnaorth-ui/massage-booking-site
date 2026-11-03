@@ -26,10 +26,10 @@ await ctx.route('**/*supabase.co/**',async r=>{const q=r.request(),u=new URL(q.u
  calls.push({m,path,body,auth:q.headers()['authorization']||''});
  const J=(s,o)=>r.fulfill({status:s,contentType:'application/json',body:JSON.stringify(o)});const r2=()=>r.fulfill({status:204,body:''});
  const sess=()=>({access_token:'at',refresh_token:'rt',expires_in:3600,user:{id:UID,user_metadata:{first_name:'สมชาย',last_name:'ใจดี',phone:'0811111111'}}});
- if(path==='/rest/v1/rpc/org_request_info')return J(200,{rate:400,districts:['ปทุมวัน','พญาไท','บางรัก','ดุสิต'],lead_days:2,max_days:120});
+ if(path==='/rest/v1/rpc/org_request_info')return J(200,{rate:400,districts:['ปทุมวัน','พญาไท','บางรัก','ดุสิต'],lead_days:2,max_days:120,services:[{id:'sv15',name:'นวดคอบ่าไหล่',minutes:15,rest_minutes:5},{id:'sv30',name:'นวดไทย',minutes:30,rest_minutes:0}]});
  if(path==='/rest/v1/app_settings'&&m==='GET'&&u.search.includes('promptpay'))return J(200,[{promptpay_on:true,promptpay_type:'mobile',promptpay_id:'0812345678',promptpay_name:'สมาคมทดสอบ'}]);
  if(path==='/rest/v1/rpc/my_org_requests')return J(200,ORL);
- if(path==='/rest/v1/rpc/submit_org_request'){SUBS.push(body.p);if(SUBFAIL)return J(400,{code:'P0001',message:SUBFAIL});const p=body.p;ORL.unshift({id:'rq'+(ORL.length+1),ref:'ORG-TEST-000'+(ORL.length+1),org_name:p.name,district:p.district,address:p.address,lat:p.lat,lng:p.lng,contact_name:p.contact_name,contact_phone:p.contact_phone,service_date:p.date,start_time:p.start+':00',end_time:p.end+':00',lunch_start:p.lunch_start?p.lunch_start+':00':null,lunch_end:p.lunch_end?p.lunch_end+':00':null,hours:5,rate:400,status:'pending',accepted_count:0,amount:null,pay_due_at:null,slip_path:null,slip_at:null,note:null,created_at:new Date().toISOString(),invites:[]});return J(200,'rq'+ORL.length)}
+ if(path==='/rest/v1/rpc/submit_org_request'){SUBS.push(body.p);if(SUBFAIL)return J(400,{code:'P0001',message:SUBFAIL});const p=body.p;ORL.unshift({id:'rq'+(ORL.length+1),ref:'ORG-TEST-000'+(ORL.length+1),org_name:p.name,district:p.district,address:p.address,lat:p.lat,lng:p.lng,contact_name:p.contact_name,contact_phone:p.contact_phone,service_date:p.date,start_time:p.start+':00',end_time:p.end+':00',service_label:p.service==='sv15'?'นวดคอบ่าไหล่ 15 นาที พัก 5 นาที':'นวดไทย 30 นาที',lunch_start:p.lunch_start?p.lunch_start+':00':null,lunch_end:p.lunch_end?p.lunch_end+':00':null,hours:5,rate:400,status:'pending',accepted_count:0,amount:null,pay_due_at:null,slip_path:null,slip_at:null,note:null,created_at:new Date().toISOString(),invites:[]});return J(200,'rq'+ORL.length)}
  if(path==='/rest/v1/rpc/org_request_cancel'){CANC.push(body.p_id);const r=ORL.find(x=>x.id===body.p_id);if(r)r.status='cancelled';return r2()}
  if(path==='/rest/v1/rpc/org_request_attach_slip'){ATT.push(body);const r=ORL.find(x=>x.id===body.p_id);r.status='paid_review';r.slip_path=body.p_path;return r2(r)}
  if(path.startsWith('/storage/v1/object/licenses/')){UPL.push({m,path,auth:q.headers()['authorization']||''});return J(200,{Key:'ok'})}
@@ -97,9 +97,13 @@ await p.fill('#orq_date',bkk(0));await p.click('[data-orq=send]');ok('date too s
 await p.fill('#orq_date',bkk(5));
 await p.selectOption('#orq_s','15:00');await p.selectOption('#orq_e','09:00');await p.click('[data-orq=send]');ok('end before start rejected',(await err()).includes('หลังเวลาเริ่ม'));
 await p.selectOption('#orq_s','09:00');await p.selectOption('#orq_e','15:00');
+await p.click('[data-orq=send]');ok('service required first',(await err()).includes('รูปแบบการนวด'));
+ok('service options shown',(await p.$$eval('[data-orqv]',o=>o.map(x=>x.parentElement.textContent.trim()))).join('|')==='นวดคอบ่าไหล่ 15 นาที พัก 5 นาที|นวดไทย 30 นาที');
+await p.check('[data-orqv=sv15]');
 await p.click('[data-orq=send]');ok('therapist required',(await err()).includes('หมอนวด'));
 // ประมาณราคา
 await p.check('[data-orqs=st3]');
+ok('estimate shows rounds (5h*60/20=15)',await p.$eval('#orq_est',e=>e.textContent.includes('ประมาณ 15 รอบ')));
 ok('estimate: 5 hrs (9-15 minus lunch) x400 = 2,000',await p.$eval('#orq_est',e=>e.textContent.includes('5 ชั่วโมง')&&e.textContent.includes('2,000')));
 await p.check('[data-orqs=st4]');ok('estimate: 2 therapists = 4,000',await p.$eval('#orq_est',e=>e.textContent.includes('4,000')));
 await p.selectOption('#orq_ls','');await p.selectOption('#orq_le','');
@@ -108,7 +112,7 @@ await p.selectOption('#orq_ls','12:00');await p.selectOption('#orq_le','13:00');
 await p.click('[data-orq=send]');ok('terms required',(await err()).includes('ยอมรับเงื่อนไข')&&SUBS.length===0);
 await p.evaluate(()=>Object.defineProperty(navigator,'userAgent',{get:()=>'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Safari/604.1',configurable:true}));
 await p.check('#orq_terms');await p.click('[data-orq=send]');await p.waitForSelector('.orqc',{timeout:4000});
-ok('submit payload correct',SUBS.length===1&&SUBS[0].name==='บริษัท ทดสอบ จำกัด'&&SUBS[0].district==='ปทุมวัน'&&SUBS[0].lat===13.7466&&SUBS[0].start==='09:00'&&SUBS[0].end==='15:00'&&SUBS[0].lunch_start==='12:00'&&SUBS[0].lunch_end==='13:00'&&SUBS[0].staff.length===2&&SUBS[0].terms===true&&SUBS[0].rate===400&&SUBS[0].contact_phone==='0899999999');
+ok('submit payload correct',SUBS.length===1&&SUBS[0].name==='บริษัท ทดสอบ จำกัด'&&SUBS[0].district==='ปทุมวัน'&&SUBS[0].lat===13.7466&&SUBS[0].start==='09:00'&&SUBS[0].end==='15:00'&&SUBS[0].lunch_start==='12:00'&&SUBS[0].lunch_end==='13:00'&&SUBS[0].staff.length===2&&SUBS[0].service==='sv15'&&SUBS[0].terms===true&&SUBS[0].rate===400&&SUBS[0].contact_phone==='0899999999');
 ok('list shows pending request',await p.$eval('.orqc',e=>e.textContent.includes('รอสมาคมตรวจสอบ')&&e.textContent.includes('ORG-TEST-0001')));
 ok('SR announces org request sent',await p.waitForFunction(t=>document.getElementById('sr').textContent.includes(t),'ส่งคำขอแล้ว',{timeout:4000}).then(()=>true,()=>false));
 ok('flash after submit',(await p.textContent('.flash')).includes('ส่งคำขอแล้ว'));
@@ -148,7 +152,7 @@ ok('cancel rpc sent',CANC.length===1&&CANC[0]==='rq1');
 await p.click('[data-orq=new]');await p.waitForSelector('#orqf');
 ok('draft cleared after submit -> new form blank',(await p.inputValue('#orq_name'))==='');
 await p.fill('#orq_name','ห้างทดสอบ');await p.selectOption('#orq_dist','พญาไท');await p.fill('#orq_addr','1 ถนนพหลโยธิน');await p.click('[data-orq=pin]');await p.waitForSelector('#mpov');await p.fill('#mp_lat','13.78');await p.fill('#mp_lng','100.54');await p.click('[data-mp=ok]');
-await p.fill('#orq_date',bkk(7));await p.check('[data-orqs=st3]');await p.check('#orq_terms');SUBFAIL='อัตราค่าบริการมีการเปลี่ยนแปลง กรุณาโหลดหน้าใหม่แล้วตรวจเงื่อนไขอีกครั้ง';
+await p.fill('#orq_date',bkk(7));await p.check('[data-orqv=sv30]');await p.check('[data-orqs=st3]');await p.check('#orq_terms');SUBFAIL='อัตราค่าบริการมีการเปลี่ยนแปลง กรุณาโหลดหน้าใหม่แล้วตรวจเงื่อนไขอีกครั้ง';
 await p.click('[data-orq=send]');await p.waitForFunction(()=>(document.getElementById('orq_err')||{}).textContent,null,{timeout:3000});
 ok('server error shown, form kept',(await err()).includes('อัตราค่าบริการมีการเปลี่ยนแปลง')&&(await p.inputValue('#orq_name'))==='ห้างทดสอบ');
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)

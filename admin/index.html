@@ -676,7 +676,7 @@ function oqT(t){return t?String(t).slice(0,5):""}
 function oreqCard(r){var st=OQ_ST[r.status]||[r.status,""],inv=r.org_invites||[],nm=function(i){var s=byId(D.staff,i.staff_id);return s?s.name:"-"};
  var h='<div class="card" id="oq_'+r.id+'"><div class="head"><h2>'+esc(r.org_name)+'</h2><span class="'+(st[1]||"")+'">'+st[0]+'</span></div>'+
  '<p class="sub">'+esc(r.ref)+', เขต'+esc(r.district)+'</p><p>'+esc(r.address)+'</p>'+
- '<p>📅 '+oqDate(r.service_date)+' เวลา '+oqT(r.start_time)+'-'+oqT(r.end_time)+(r.lunch_start?' (พัก '+oqT(r.lunch_start)+'-'+oqT(r.lunch_end)+')':'')+' รวม '+(+r.hours)+' ชม., อัตรา '+(+r.rate)+' บาท/คน/ชม.</p>'+
+ '<p>📅 '+oqDate(r.service_date)+' เวลา '+oqT(r.start_time)+'-'+oqT(r.end_time)+(r.lunch_start?' (พัก '+oqT(r.lunch_start)+'-'+oqT(r.lunch_end)+')':'')+' รวม '+(+r.hours)+' ชม., อัตรา '+(+r.rate)+' บาท/คน/ชม.</p>'+(r.service_label?'<p>💆 รูปแบบการนวด: '+esc(r.service_label)+'</p>':'')+
  '<p>👤 '+esc(r.contact_name)+', <a href="tel:'+esc(r.contact_phone)+'">'+esc(r.contact_phone)+'</a>, <a target="_blank" rel="noopener" href="https://www.google.com/maps?q='+r.lat+','+r.lng+'">ดูแผนที่</a></p>';
  if(inv.length)h+='<p>หมอนวด: '+inv.map(function(i){return esc(nm(i))+' ('+(OQ_IS[i.status]||i.status)+(i.by_admin?' โดยแอดมิน':'')+')'}).join(", ")+'</p>';
  else h+='<p>หมอนวดที่เลือก: '+(r.staff_ids||[]).map(function(i){var s=byId(D.staff,i);return esc(s?s.name:"-")}).join(", ")+'</p>';

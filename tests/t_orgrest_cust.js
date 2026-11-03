@@ -6,7 +6,7 @@ let mode={cat:true,rpcMissing:false};let seq=100000;const BKS=[];const NOTES=[];
 const UID='uuid-1';
 const places=[
  {id:'sh1',type:'shop',name:'ร้านสบายดี สปา',area:'สุขุมวิท',lat:13.76,lng:100.51,open_days:[0,1,2,3,4,5,6],open_time:'10:00:00',close_time:'21:00:00',fixed_date:null,advance_days:14,cancel_hours:24,image_path:null,status:'approved',active:true},
- {id:'og1',type:'org',name:'สำนักงานพัฒนาสังคม',area:'พญาไท',lat:13.758,lng:100.509,open_days:[0,1,2,3,4,5,6],open_time:'09:00:00',close_time:'17:00:00',fixed_date:bkk(3),advance_days:14,cancel_hours:24,image_path:null,status:'approved',active:true},
+ {id:'og1',type:'org',name:'สำนักงานพัฒนาสังคม',area:'พญาไท',lat:13.758,lng:100.509,open_days:[0,1,2,3,4,5,6],open_time:'09:00:00',close_time:'17:00:00',fixed_date:bkk(3),lunch_start:'12:00:00',lunch_end:'13:00:00',advance_days:14,cancel_hours:24,image_path:null,status:'approved',active:true},
  {id:'cp1',type:'company',name:'บริษัท ไทยออฟฟิศ',area:'ปทุมวัน',lat:13.7635,lng:100.5018,open_days:[1,2,3,4,5],open_time:'09:00:00',close_time:'18:00:00',fixed_date:null,advance_days:14,cancel_hours:24,image_path:null,status:'approved',active:true}];
 const services=[
  {id:'ga',place_id:null,name:'นวดไทยแผนโบราณ',minutes:60,price:400,applies_all:true,active:true},
@@ -71,10 +71,10 @@ async function pick(svc){await p.clock.setFixedTime(new Date(D0+'T08:00:00+07:00
  const o=await p.$$eval('#selT option',os=>os.filter(x=>x.value).map(x=>({v:+x.value,dis:x.disabled,t:x.textContent})));return{lab,o,label:await p.textContent('label[for=selT]')}}
 const vals=r=>r.o.map(x=>x.v),stepOf=a=>a.length>1?a[1]-a[0]:0;
 let r=await pick('r15');ok('r15 label shows rest',r.lab.includes('15 นาที พัก 5 นาที'));
-ok('r15 step 20 from 09:00',vals(r)[0]===540&&stepOf(vals(r))===20&&vals(r)[1]===560&&vals(r).length===24&&vals(r).slice(-1)[0]===1000);
+ok('r15 step 20 from 09:00',vals(r)[0]===540&&stepOf(vals(r))===20&&vals(r)[1]===560&&vals(r).length===21&&vals(r).slice(-1)[0]===1000&&vals(r).includes(780)&&vals(r).includes(800)&&!vals(r).includes(720));
 ok('r15 time label says rest',r.label.includes('ช่วงละ 20 นาที')&&r.label.includes('ใช้เวลา 15 นาที')&&r.label.includes('พักต่อ 5 นาที'));
-r=await pick('r20');ok('r20 step 25',vals(r)[0]===540&&stepOf(vals(r))===25&&vals(r).length===19&&vals(r).slice(-1)[0]===990);
-r=await pick('r25');ok('r25 step 30, last 16:30',stepOf(vals(r))===30&&vals(r).length===16&&vals(r).slice(-1)[0]===990);
+r=await pick('r20');ok('r20 step 25',vals(r)[0]===540&&stepOf(vals(r))===25&&vals(r).length===16&&vals(r).slice(-1)[0]===980&&vals(r).includes(780)&&vals(r).includes(805));
+r=await pick('r25');ok('r25 step 30, last 16:30',stepOf(vals(r))===30&&vals(r).length===14&&vals(r).slice(-1)[0]===990&&vals(r).includes(780));
 r=await pick('n30');ok('no-rest service keeps 30 step',stepOf(vals(r))===30&&vals(r).length===16&&!r.lab.includes('พัก ')&&!r.label.includes('พักต่อ'));
 // คิวเดิมของ st3 ตอน 10:00-10:15 นวด + พัก 5 นาที (ฐานข้อมูลส่งช่วงกันคิวจนถึง 10:20)
 const fdStart=Date.parse(FD+'T10:00:00+07:00');BKS.push({ref:'MSX',place_id:'og1',place_name:'สำนักงานพัฒนาสังคม',place_type:'org',phone:'0800000000',s:fdStart,e:fdStart+20*60000,total:150,discount:0,promo:null,status:'confirmed',moved_from:null,moved_to:null,items:[{id:'itx',service_id:'r15',service_name:'นวด 15 นาที',staff_id:'st3',minutes:15,price:150,s:fdStart,e:fdStart+20*60000,active:true}]});
