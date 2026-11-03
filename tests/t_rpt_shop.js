@@ -152,6 +152,10 @@ ok('estimate note+star',r.includes('ค่าประมาณ')&&r.includes('2
 ok('no phone in report',!/0801|0802|0803/.test(await p.evaluate(()=>[...document.querySelectorAll('.rpw td')].map(x=>x.textContent).join(' '))));
 }
 ok('by staff row',r.includes('คุณนุ่น'));
+const pdfChk=async(k)=>{const [dp]=await Promise.all([p.waitForEvent('download',{timeout:5000}).catch(()=>null),p.click('[data-a=rppdf]')]);ok('pdf download '+k,!!dp&&new RegExp('^report-'+k+'-.*\\.pdf$').test(dp.suggestedFilename()));
+ if(dp){const pth=await dp.path(),bf=require('fs').readFileSync(pth);ok('pdf valid '+k,bf.slice(0,5).toString()==='%PDF-'&&bf.slice(-6).toString().includes('%%EOF'));require('fs').copyFileSync(pth,(process.env.PDFDIR||'/tmp')+'/shop_'+k+'.pdf')}
+ await sleep(300);ok('pdf announced '+k,(await p.textContent('#sr')).includes('ดาวน์โหลดไฟล์ PDF'))};
+await pdfChk('inc');
 // filter by service that has none
 await p.selectOption('#rps','p1');await p.click('[data-a=rpgo]');await sleep(700);ok('staff filter keeps rows',(await p.textContent('#main')).includes('MS2'));
 await p.selectOption('#rpv','vUsed');await p.click('[data-a=rpgo]');await sleep(700);ok('service filter excludes',!(await p.textContent('#main')).includes('MS2'));
@@ -160,10 +164,12 @@ await p.selectOption('#rpv','');
 await p.click('[data-a=rpkind][data-id=use]');await sleep(200);await p.click('[data-a=rpgo]');await sleep(700);
 r=await p.textContent('#main');ok('use report',r.includes('รายงานการใช้บริการ')&&r.includes('แยกตามบริการ')&&r.includes('MS2')&&r.includes('ลูกค้าB'.replace('ลูกค้า','ลูกค้า')));
 ok('use cancel/move counts',(await p.$$eval('.rps div',ds=>ds.map(d=>d.textContent))).some(x=>x.includes('ยกเลิก')&&x.startsWith('1')));
+await pdfChk('use');
 // gp
 await p.click('[data-a=rpkind][data-id=gp]');await sleep(200);await p.click('[data-a=rpgo]');await sleep(700);
 r=await p.textContent('#main');ok('gp report',r.includes('รายงานค่า GP')&&r.includes('ค่า GP ที่หัก'));
 const gs=await p.$$eval('.rps div',ds=>ds.map(d=>d.textContent));ok('gp total 80',gs.some(x=>x.startsWith('80')&&x.includes('ค่า GP ที่หัก')));
+await pdfChk('gp');
 // csv
 const [dl]=await Promise.all([p.waitForEvent('download',{timeout:4000}).catch(()=>null),p.click('[data-a=rpcsv]')]);
 console.log('fn',dl&&dl.suggestedFilename());ok('csv download',!!dl&&/^report-gp-.*\.csv$/.test(dl.suggestedFilename()));
