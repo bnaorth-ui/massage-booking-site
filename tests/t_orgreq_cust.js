@@ -4,7 +4,7 @@ const {chromium}=require('playwright');
 const bkk=(n=0)=>{const d=new Date(Date.now()+7*3600000+n*86400000);return d.toISOString().slice(0,10)};
 (async()=>{const b=await chromium.launch(require('./config').launch);
 const ctx=await b.newContext({timezoneId:'Asia/Bangkok',locale:'th-TH'});const errs=[],calls=[];
-let mode={cat:true,rpcMissing:false};const RVS=[],RCGET=[];let RVFAIL='';const ORL=[],SUBS=[],CANC=[],ATT=[],UPL=[];let SUBFAIL='';let seq=100000;const BKS=[];const NOTES=[];
+let mode={cat:true,rpcMissing:false};const RVS=[],RCGET=[],CMPR=[];let CMPON=false;const CMPMO=new Date(Date.now()+7*3600000).toISOString().slice(0,7);let RVFAIL='';const ORL=[],SUBS=[],CANC=[],ATT=[],UPL=[];let SUBFAIL='';let seq=100000;const BKS=[];const NOTES=[];
 const UID='uuid-1';
 const places=[
  {id:'sh1',type:'shop',name:'ร้านสบายดี สปา',area:'สุขุมวิท',lat:13.76,lng:100.51,open_days:[0,1,2,3,4,5,6],open_time:'10:00:00',close_time:'21:00:00',fixed_date:null,advance_days:14,cancel_hours:24,image_path:null,status:'approved',active:true},
@@ -35,6 +35,12 @@ await ctx.route('**/*supabase.co/**',async r=>{const q=r.request(),u=new URL(q.u
  if(path==='/rest/v1/rpc/org_request_info')return J(200,{rate:400,districts:['ปทุมวัน','พญาไท','บางรัก','ดุสิต'],lead_days:10,pay_before_days:3,max_days:120,services:[{id:'sv15',name:'นวดคอบ่าไหล่',minutes:15,rest_minutes:5},{id:'sv30',name:'นวดไทย',minutes:30,rest_minutes:0}]});
  if(path==='/rest/v1/app_settings'&&m==='GET'&&u.search.includes('promptpay'))return J(200,[{promptpay_on:true,promptpay_type:'mobile',promptpay_id:'0812345678',promptpay_name:'สมาคมทดสอบ'}]);
  if(path.startsWith('/storage/v1/object/authenticated/receipts/')){RCGET.push(path);return r.fulfill({status:200,contentType:'application/pdf',body:Buffer.from('%PDF-1.4 rc')})}
+ if(path==='/rest/v1/rpc/my_company_places')return J(200,CMPON?[{id:'cmp1',name:'บริษัท ไทยออฟฟิศ'}]:[]);
+ if(path==='/rest/v1/rpc/my_company_report'){CMPR.push(body);const mo=body.p_month.slice(0,7),tt=(d,h,m)=>mo+'-'+d+'T'+h+':'+m+':00+07:00';return J(200,{month:body.p_month,rows:mo===CMPMO?[
+  {ref:'BK1',status:'completed',starts_at:new Date(tt('03','10','00')).toISOString(),ends_at:new Date(tt('03','10','30')).toISOString(),started_at:new Date(tt('03','10','02')).toISOString(),done_at:new Date(tt('03','10','31')).toISOString(),service:'นวดไทย',minutes:30,job:'done',active:true,staff:'คุณนุ่น',customer:'สมชาย'},
+  {ref:'BK2',status:'completed',starts_at:new Date(tt('03','10','30')).toISOString(),ends_at:new Date(tt('03','11','30')).toISOString(),started_at:new Date(tt('03','10','32')).toISOString(),done_at:new Date(tt('03','11','31')).toISOString(),service:'นวดไทย',minutes:60,job:'done',active:true,staff:'คุณนุ่น',customer:'สมหญิง'},
+  {ref:'BK3',status:'confirmed',starts_at:new Date(tt('05','13','00')).toISOString(),ends_at:new Date(tt('05','13','30')).toISOString(),started_at:null,done_at:null,service:'นวดเท้า',minutes:30,job:'pending',active:true,staff:'คุณวิภา',customer:'สมศักดิ์'},
+  {ref:'BK4',status:'no_show',starts_at:new Date(tt('06','14','00')).toISOString(),ends_at:new Date(tt('06','14','30')).toISOString(),started_at:null,done_at:null,service:'นวดไทย',minutes:30,job:'pending',active:true,staff:'คุณวิภา',customer:'สมชาติ'}]:[]})}
  if(path==='/rest/v1/rpc/org_review_submit'){RVS.push(body);const q=ORL.find(x=>x.id===body.p_id);if(RVFAIL)return J(400,{code:'P0001',message:RVFAIL});q.review={rating:body.p_rating,comment:body.p_comment,problem:body.p_problem};return r2()}
  if(path==='/rest/v1/rpc/my_org_requests')return J(200,ORL);
  if(path==='/rest/v1/rpc/submit_org_request'){SUBS.push(body.p);if(SUBFAIL)return J(400,{code:'P0001',message:SUBFAIL});const p=body.p;ORL.unshift({id:'rq'+(ORL.length+1),ref:'ORG-TEST-000'+(ORL.length+1),org_name:p.name,district:p.district,address:p.address,lat:p.lat,lng:p.lng,contact_name:p.contact_name,contact_phone:p.contact_phone,service_date:p.date,start_time:p.start+':00',end_time:p.end+':00',service_label:p.service==='sv15'?'นวดคอบ่าไหล่ 15 นาที พัก 5 นาที':'นวดไทย 30 นาที',lunch_start:p.lunch_start?p.lunch_start+':00':null,lunch_end:p.lunch_end?p.lunch_end+':00':null,hours:5,rate:400,status:'pending',accepted_count:0,amount:null,pay_due_at:null,slip_path:null,slip_at:null,note:null,created_at:new Date().toISOString(),invites:[]});return J(200,'rq'+ORL.length)}
@@ -286,6 +292,24 @@ await p.evaluate(()=>orqLoad());await p.waitForSelector('[data-orq=rcp][data-id=
 ok('receipt button only on the request that has one',(await p.$$('[data-orq=rcp]')).length===1);
 {const [dl]=await Promise.all([p.waitForEvent('download',{timeout:5000}),p.click('[data-orq=rcp][data-id=rq11]')]);
 ok('receipt downloaded as pdf named by ref',dl.suggestedFilename()==='receipt-ORG-TEST-0011.pdf'&&RCGET.length===1&&RCGET[0].endsWith('/receipts/uuid-1/rq11-abc.pdf'));}
+// ---- รายงานบริษัทรายเดือน
+await p.goto(require('./config').page('customer-booking.html'));await p.click('[data-tab=ac]');await p.waitForTimeout(500);
+ok('no company report card for ordinary user',!(await p.$('[data-orq=cmpopen]')));
+CMPON=true;await p.goto(require('./config').page('customer-booking.html'));await p.click('[data-tab=ac]');await p.waitForSelector('[data-orq=cmpopen]',{timeout:5000});
+ok('company contact sees report card',(await p.textContent('.regbar:has([data-orq=cmpopen])')).includes('รายงานบริษัท'));
+await p.click('[data-orq=cmpopen]');await p.waitForSelector('.orqsum',{timeout:5000});
+{const t=await p.textContent('#app');
+ok('report requested for this month, day 1',CMPR.length===1&&CMPR[0].p_place==='cmp1'&&CMPR[0].p_month===CMPMO+'-01');
+ok('summary: 4 queues, 2 done, 1.5 hours, 1 no-show',/4\s*คิวทั้งหมด/.test(t)&&/2\s*ใช้บริการแล้ว/.test(t)&&/1\.5\s*ชั่วโมงที่ให้บริการ/.test(t)&&/1\s*ไม่มา/.test(t));
+ok('per-therapist hours, per-day table, actual times',t.includes('คุณนุ่น')&&t.includes('แยกตามวัน')&&t.includes('เวลาให้บริการจริง')&&t.includes('10:02')&&t.includes('บริษัท ไทยออฟฟิศ'));
+ok('no money anywhere in report',!/บาท|ราคา|ยอด|฿/.test(t.slice(t.indexOf('รายงานบริษัท'))));}
+ok('month select has 24 months, current selected',(await p.$$('#cmp_month option')).length===24&&(await p.inputValue('#cmp_month'))===CMPMO);
+await p.selectOption('#cmp_month',await p.$$eval('#cmp_month option',o=>o[1].value));await p.waitForTimeout(700);
+ok('changing month reloads with new month, empty message',CMPR.length===2&&CMPR[1].p_month!==CMPR[0].p_month&&(await p.textContent('#app')).includes('ยังไม่มีการจองคิวในเดือนนี้'));
+await p.selectOption('#cmp_month',CMPMO);await p.waitForSelector('.orqsum',{timeout:4000});
+{const [dl]=await Promise.all([p.waitForEvent('download',{timeout:8000}),p.click('[data-orq=cmppdf]')]);const buf=require('fs').readFileSync(await dl.path());
+ok('monthly PDF downloads (ASCII name, valid PDF)',dl.suggestedFilename()==='company-report-'+CMPMO+'.pdf'&&buf.slice(0,5).toString()==='%PDF-'&&buf.length>3000);}
+await p.click('[data-orq=cmpback]');await p.waitForTimeout(300);ok('back returns to account page',!!(await p.$('[data-orq=cmpopen]')));
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)
 })()
 

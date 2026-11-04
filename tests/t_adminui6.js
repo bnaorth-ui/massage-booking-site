@@ -2,7 +2,7 @@ const {chromium}=require('playwright');
 const PNG=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==','base64');
 (async()=>{const b=await chromium.launch(require('./config').launch);
 const ctx=await b.newContext({timezoneId:'Asia/Bangkok',locale:'th-TH'});const errs=[],calls=[],stor=[];
-let n=100;const now=()=>new Date().toISOString();
+let CC=[],CCC=[];let n=100;const now=()=>new Date().toISOString();
 const users={'0811111111':{id:'u1',pw:'adminpass1',name:'แอดมิน หนึ่ง'},'0833333333':{id:'u3',pw:'custpass1',name:'ลูกค้า'}};
 for(const [ph,u] of Object.entries(users))u.phone=ph;
 const byTok=t=>Object.values(users).find(u=>'at-'+u.id===t);
@@ -50,6 +50,9 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
   if(f==='confirm_topup'){const t=T.topup_requests.find(x=>x.id===body.p_id);t.status=body.p_ok?'confirmed':'rejected';if(body.p_ok)bal[t.place_id].balance+=t.amount;return J(204,null)}
   if(f==='give_credit'){bal[body.p_place].balance+=body.p_amount;return J(204,null)}
   if(f==='admin_save_staff'){if(T.staff.some(s=>s.phone===body.p_phone&&s.id!==body.p_id))return J(400,{code:'P0001',message:'เบอร์มือถือนี้ถูกใช้กับพนักงานคนอื่นแล้ว'});let s=body.p_id&&T.staff.find(x=>x.id===body.p_id);if(!s){s={id:'p'+(++n),place_id:null,active:true,user_id:null,created_at:'9'};T.staff.push(s)}Object.assign(s,{name:body.p_name,phone:body.p_phone,photo_path:body.p_photo});T.staff_services=T.staff_services.filter(x=>x.staff_id!==s.id).concat(body.p_services.map(v=>({staff_id:s.id,service_id:v})));return J(200,s.id)}
+  if(f==='admin_company_contacts')return J(200,CC.map(x=>({...x})));
+  if(f==='admin_company_contact_add'){CCC.push(['add',body]);if(body.p_phone==='0999999999')return J(400,{code:'P0001',message:'ไม่พบบัญชีที่ใช้เบอร์นี้ ให้เจ้าของเบอร์สมัครสมาชิกก่อน'});CC.push({place_id:body.p_place,user_id:'uc'+CC.length,name:'คุณผู้ประสาน',phone:body.p_phone});return J(204,null)}
+  if(f==='admin_company_contact_remove'){CCC.push(['rm',body]);CC=CC.filter(x=>!(x.place_id===body.p_place&&x.user_id===body.p_user));return J(204,null)}
   if(f==='admin_save_place'){if(body.p_staff.some(x=>x.staff_id==='p2')&&body.p_type==='org'&&body.p_fixed_date==='2026-12-01')return J(400,{code:'P0001',message:'พนักงาน คุณสอง ถูกจัดให้ สำนักงานเขต ในวันเดียวกันแล้ว'});
    let p=body.p_id&&T.places.find(x=>x.id===body.p_id);if(!p){p={id:'pl'+(++n),type:body.p_type,status:'approved',active:true,auto_closed:false,gp_percent:10,area:'',created_at:'9'};T.places.push(p)}
    Object.assign(p,{name:body.p_name,category_id:body.p_category,lat:body.p_lat,lng:body.p_lng,open_time:body.p_open+':00',close_time:body.p_close+':00',fixed_date:body.p_type==='org'?body.p_fixed_date:null,advance_days:body.p_adv,cancel_hours:body.p_cancel,lunch_start:body.p_lunch_start?body.p_lunch_start+':00':null,lunch_end:body.p_lunch_end?body.p_lunch_end+':00':null});
@@ -174,6 +177,18 @@ await p.click('[data-a=save]');await has('บริษัทใหม่');await
 ok('company rpc with weekdays',c2&&c2.type==='company'&&c2.fixed_date===null&&T.place_staff.some(x=>x.place_id===c2.id&&x.weekdays.join()==='1,3'));
 ok('company list shows weekdays',(await txt('#lst')).includes('จ พ'));
 await p.click(`[data-a=tog][data-t=comp][data-id=${c2.id}]`);await wait(150);ok('toggle company',T.places.find(x=>x.id===c2.id).active===false);
+// ---- ผู้ประสานงานบริษัท (ดูรายงานรายเดือน)
+await p.click('#tabs [data-id=pl]');await p.click('[data-a=tab][data-id=comp]');await p.click(`[data-a=edit][data-t=comp][data-id=${c2.id}]`);await p.waitForSelector('#ccph',{timeout:4000});
+ok('contacts box shown when editing saved company',(await txt('#ccbox')).includes('ยังไม่มีผู้ประสานงาน'));
+await p.fill('#ccph','0999999999');await p.click('[data-a=ccadd]');await wait(300);ok('unknown phone: error shown, nothing added',(await txt('#ccerr')).includes('ไม่พบบัญชี')&&!CC.length);
+await p.fill('#ccph','12345');await p.click('[data-a=ccadd]');await wait(200);ok('short phone rejected client-side (no rpc)',(await txt('#ccerr')).includes('10 หลัก')&&CCC.length===1);
+await p.fill('#on','บริษัทใหม่ (แก้ไขยังไม่บันทึก)');
+await p.fill('#ccph','081-234-5678');await p.click('[data-a=ccadd]');await wait(400);
+ok('contact added with digits only, listed with remove button',CCC[1][1].p_phone==='0812345678'&&CCC[1][1].p_place===c2.id&&(await txt('#ccbox')).includes('0812345678')&&!!(await p.$('[data-a=ccrm]')));
+ok('unsaved form edits kept after adding contact',(await p.inputValue('#on'))==='บริษัทใหม่ (แก้ไขยังไม่บันทึก)');
+await p.click('[data-a=ccrm]');await wait(400);ok('contact removed',CCC[2][0]==='rm'&&!CC.length&&(await txt('#ccbox')).includes('ยังไม่มีผู้ประสานงาน'));
+await p.click('[data-a=cancel]');
+await p.click('[data-a=new][data-t=comp]');ok('new company: asks to save first',(await txt('#ccbox')).includes('บันทึกบริษัทก่อน'));await p.click('[data-a=cancel]');
 // ---- พร้อมเพย์และเติมเงิน
 await p.click('#tabs [data-id=fin]');await p.click('[data-a=tab][data-id=pprq]');ok('warn: promptpay not set',await has('ยังไม่ได้ตั้งค่าพร้อมเพย์'));
 ok('pending badge 3',(await p.textContent('#tabs')).match(/การเงิน\s*3/));
