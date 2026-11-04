@@ -14,7 +14,7 @@ const services=[
  {id:'ga',place_id:null,name:'นวดไทยแผนโบราณ',minutes:60,price:400,applies_all:true,active:true},
  {id:'sa',place_id:'sh1',name:'นวดไทย',minutes:60,price:400,applies_all:false,active:true},
  {id:'sb',place_id:'sh1',name:'นวดเท้า',minutes:60,price:350,applies_all:false,active:true}];
-const FREECALLS=[];
+const FREECALLS=[];const REPCALLS=[];
 const staff=[{id:'st1',name:'คุณวิภา',place_id:'sh1',photo_path:null},{id:'st2',name:'คุณสมศรี',place_id:'sh1',photo_path:null},{id:'st3',name:'คุณนุ่น',place_id:null,photo_path:null},{id:'st4',name:'คุณมะลิ',place_id:null,photo_path:null}];
 const ss=[['st1','sa'],['st1','sb'],['st2','sa'],['st3','ga'],['st4','ga']].map(x=>({staff_id:x[0],service_id:x[1]}));
 const ps=[{place_id:'og1',staff_id:'st3',weekdays:[]},{place_id:'cp1',staff_id:'st4',weekdays:[1,2,3,4,5]}];
@@ -27,8 +27,9 @@ await ctx.route('**/*supabase.co/**',async r=>{const q=r.request(),u=new URL(q.u
  calls.push({m,path,body,auth:q.headers()['authorization']||''});
  const J=(s,o)=>r.fulfill({status:s,contentType:'application/json',body:JSON.stringify(o)});const r2=()=>r.fulfill({status:204,body:''});
  const sess=()=>({access_token:'at',refresh_token:'rt',expires_in:3600,user:{id:UID,user_metadata:{first_name:'สมชาย',last_name:'ใจดี',phone:'0811111111'}}});
- if(path==='/rest/v1/rpc/org_free_staff'){FREECALLS.push(body.p_date);return J(200,body.p_date===bkk(9)?['st4']:body.p_date===bkk(12)?[]:['st3','st4'])}
- if(path==='/rest/v1/rpc/org_request_info')return J(200,{rate:400,districts:['ปทุมวัน','พญาไท','บางรัก','ดุสิต'],lead_days:2,max_days:120,services:[{id:'sv15',name:'นวดคอบ่าไหล่',minutes:15,rest_minutes:5},{id:'sv30',name:'นวดไทย',minutes:30,rest_minutes:0}]});
+ if(path==='/rest/v1/rpc/my_org_report'){REPCALLS.push(body.p_request);const t=bkk(3)+'T';return J(200,{rows:[{ref:'BK1',status:'completed',starts_at:t+'03:00:00Z',ends_at:t+'04:00:00Z',started_at:null,done_at:null,service:'นวดไทย',minutes:60,job:'done',active:true,staff:'คุณนุ่น',customer:'สมชาย'},{ref:'BK2',status:'confirmed',starts_at:t+'04:00:00Z',ends_at:t+'05:00:00Z',started_at:null,done_at:null,service:'นวดไทย',minutes:60,job:null,active:true,staff:'คุณนุ่น',customer:'มาลี'},{ref:'BK3',status:'cancelled',starts_at:t+'05:00:00Z',ends_at:t+'06:00:00Z',started_at:null,done_at:null,service:'นวดไทย',minutes:60,job:null,active:false,staff:'คุณนุ่น',customer:'ประยุทธ'}]})}
+ if(path==='/rest/v1/rpc/org_free_staff'){FREECALLS.push(body.p_date);return J(200,body.p_date===bkk(19)?['st4']:body.p_date===bkk(22)?[]:['st3','st4'])}
+ if(path==='/rest/v1/rpc/org_request_info')return J(200,{rate:400,districts:['ปทุมวัน','พญาไท','บางรัก','ดุสิต'],lead_days:10,pay_before_days:3,max_days:120,services:[{id:'sv15',name:'นวดคอบ่าไหล่',minutes:15,rest_minutes:5},{id:'sv30',name:'นวดไทย',minutes:30,rest_minutes:0}]});
  if(path==='/rest/v1/app_settings'&&m==='GET'&&u.search.includes('promptpay'))return J(200,[{promptpay_on:true,promptpay_type:'mobile',promptpay_id:'0812345678',promptpay_name:'สมาคมทดสอบ'}]);
  if(path==='/rest/v1/rpc/my_org_requests')return J(200,ORL);
  if(path==='/rest/v1/rpc/submit_org_request'){SUBS.push(body.p);if(SUBFAIL)return J(400,{code:'P0001',message:SUBFAIL});const p=body.p;ORL.unshift({id:'rq'+(ORL.length+1),ref:'ORG-TEST-000'+(ORL.length+1),org_name:p.name,district:p.district,address:p.address,lat:p.lat,lng:p.lng,contact_name:p.contact_name,contact_phone:p.contact_phone,service_date:p.date,start_time:p.start+':00',end_time:p.end+':00',service_label:p.service==='sv15'?'นวดคอบ่าไหล่ 15 นาที พัก 5 นาที':'นวดไทย 30 นาที',lunch_start:p.lunch_start?p.lunch_start+':00':null,lunch_end:p.lunch_end?p.lunch_end+':00':null,hours:5,rate:400,status:'pending',accepted_count:0,amount:null,pay_due_at:null,slip_path:null,slip_at:null,note:null,created_at:new Date().toISOString(),invites:[]});return J(200,'rq'+ORL.length)}
@@ -95,8 +96,10 @@ await p.click('[data-orq=pin]');await p.waitForSelector('#mpov');await p.fill('#
 ok('pin in Bangkok accepted',(await p.textContent('#orq_pin')).includes('13.74660')&&(await err())==='');
 await p.fill('#orq_cn','สมหมาย');await p.fill('#orq_cp','12345');await p.click('[data-orq=send]');ok('bad phone rejected',(await err()).includes('เบอร์'));
 await p.fill('#orq_cp','0899999999');await p.click('[data-orq=send]');ok('date required',(await err()).includes('วันที่'));
-await p.fill('#orq_date',bkk(0));await p.click('[data-orq=send]');ok('date too soon rejected',(await err()).includes('2 วันถัดไป'));
-await p.fill('#orq_date',bkk(5));
+await p.fill('#orq_date',bkk(0));await p.click('[data-orq=send]');ok('date too soon rejected',(await err()).includes('10 วันถัดไป'));
+await p.fill('#orq_date',bkk(5));await p.click('[data-orq=send]');ok('date within 10 days rejected',(await err()).includes('10 วันถัดไป'));
+ok('lead/pay rule shown near date + min attr',(await p.textContent('#orqf')).includes('ล่วงหน้าอย่างน้อย 10 วัน')&&(await p.textContent('#orqf')).includes('ภายใน 3 วันก่อนวันให้บริการ')&&(await p.getAttribute('#orq_date','min'))===bkk(10));
+await p.fill('#orq_date',bkk(15));
 await p.selectOption('#orq_s','15:00');await p.selectOption('#orq_e','09:00');await p.click('[data-orq=send]');ok('end before start rejected',(await err()).includes('หลังเวลาเริ่ม'));
 await p.selectOption('#orq_s','09:00');await p.selectOption('#orq_e','15:00');
 await p.click('[data-orq=send]');ok('service required first',(await err()).includes('รูปแบบการนวด'));
@@ -109,16 +112,16 @@ ok('estimate shows rounds (5h*60/20=15)',await p.$eval('#orq_est',e=>e.textConte
 ok('estimate: 5 hrs (9-15 minus lunch) x400 = 2,000',await p.$eval('#orq_est',e=>e.textContent.includes('5 ชั่วโมง')&&e.textContent.includes('2,000')));
 await p.check('[data-orqs=st4]');ok('estimate: 2 therapists = 4,000',await p.$eval('#orq_est',e=>e.textContent.includes('4,000')));
 // กรองหมอนวดตามวันที่: วันที่ st3 ไม่ว่าง -> ซ่อนและเอาออกจากที่เลือก + ประกาศ
-ok('date picked -> free list requested',FREECALLS.includes(bkk(5)));
-await p.fill('#orq_date',bkk(9));await p.waitForFunction(()=>document.querySelectorAll('[data-orqs]').length===1,null,{timeout:4000});
+ok('date picked -> free list requested',FREECALLS.includes(bkk(15)));
+await p.fill('#orq_date',bkk(19));await p.waitForFunction(()=>document.querySelectorAll('[data-orqs]').length===1,null,{timeout:4000});
 ok('busy therapist hidden for that date',JSON.stringify(await p.$$eval('[data-orqs]',o=>o.map(x=>x.dataset.orqs)))===JSON.stringify(['st4']));
 ok('still-free therapist keeps selection',await p.isChecked('[data-orqs=st4]'));
 await p.waitForFunction(()=>/ไม่ว่างในวันนี้/.test((document.getElementById('sr')||{}).textContent||''),null,{timeout:3000}).catch(()=>{});
 ok('removal announced in live region',(await p.textContent('#sr')).includes('ไม่ว่างในวันนี้')&&(await p.textContent('#sr')).includes('คุณนุ่น'));
 ok('hint shows count',(await p.textContent('#orq_stf')).includes('ที่ว่างในวันที่เลือก 1 คน'));
-await p.fill('#orq_date',bkk(12));await p.waitForFunction(()=>document.querySelectorAll('[data-orqs]').length===0,null,{timeout:4000});
+await p.fill('#orq_date',bkk(22));await p.waitForFunction(()=>document.querySelectorAll('[data-orqs]').length===0,null,{timeout:4000});
 ok('nobody free message',(await p.textContent('#orq_stf')).includes('ไม่มีหมอนวดที่ว่างในวันที่เลือก'));
-await p.fill('#orq_date',bkk(5));await p.waitForFunction(()=>document.querySelectorAll('[data-orqs]').length===2,null,{timeout:4000});
+await p.fill('#orq_date',bkk(15));await p.waitForFunction(()=>document.querySelectorAll('[data-orqs]').length===2,null,{timeout:4000});
 await p.check('[data-orqs=st3]');await p.check('[data-orqs=st4]');
 await p.selectOption('#orq_ls','');await p.selectOption('#orq_le','');
 ok('estimate: no lunch -> 6 hrs',await p.$eval('#orq_est',e=>e.textContent.includes('6 ชั่วโมง')&&e.textContent.includes('2,400')));
@@ -130,7 +133,7 @@ ok('submit payload correct',SUBS.length===1&&SUBS[0].name==='บริษัท 
 ok('list shows pending request',await p.$eval('.orqc',e=>e.textContent.includes('รอสมาคมตรวจสอบ')&&e.textContent.includes('ORG-TEST-0001')));
 ok('SR announces org request sent',await p.waitForFunction(t=>document.getElementById('sr').textContent.includes(t),'ส่งคำขอแล้ว',{timeout:4000}).then(()=>true,()=>false));
 ok('flash after submit',(await p.textContent('.flash')).includes('ส่งคำขอแล้ว'));
-ok('install tip shown after submit (not installed)',await p.$eval('#orq_instip',e=>e.textContent.includes('48 ชั่วโมง')&&!!e.querySelector('[data-insp=open]')));
+ok('install tip shown after submit (not installed)',await p.$eval('#orq_instip',e=>e.textContent.includes('ก่อนวันให้บริการ 3 วัน')&&!!e.querySelector('[data-insp=open]')));
 await p.evaluate(()=>{delete navigator.userAgent});
 
 // ---- ยกเลิกคำขอ
@@ -162,13 +165,61 @@ ok('rejected slip shows note',(await p.textContent('.orqc')).includes('ไม่
 await p.click('[data-orq=cancel]');await p.click('[data-orq=cancelok]');await p.waitForFunction(()=>document.querySelector('.orqc')&&document.querySelector('.orqc').textContent.includes('ยกเลิกแล้ว'),null,{timeout:4000});
 ok('SR announces org request cancelled',await p.waitForFunction(t=>document.getElementById('sr').textContent.includes(t),'ยกเลิกคำขอแล้ว',{timeout:4000}).then(()=>true,()=>false));
 ok('cancel rpc sent',CANC.length===1&&CANC[0]==='rq1');
+// ---- งานที่ยืนยันแล้ว: ลิงก์จองสำหรับพนักงานองค์กร
+ORL[0].status='confirmed';ORL[0].place_id='og1';
+await p.click('[data-orq=back]');await p.click('[data-tab=ac]');await p.click('[data-orq=open]');await p.waitForSelector('[data-orq=lcopy]',{timeout:4000});
+ok('confirmed card shows link/QR buttons',await p.$eval('.orqc',e=>!!e.querySelector('[data-orq=lcopy]')&&!!e.querySelector('[data-orq=lqr]')&&e.textContent.includes('พนักงานของหน่วยงานจองคิวเอง')));
+await p.evaluate(()=>{window.__cp=[];Object.defineProperty(navigator,'clipboard',{value:{writeText:t=>{window.__cp.push(t);return Promise.resolve()}},configurable:true})});
+await p.click('[data-orq=lcopy]');await p.waitForFunction(()=>window.__cp.length===1,null,{timeout:3000});
+ok('copy puts the place link on clipboard',(await p.evaluate(()=>window.__cp[0])).endsWith('?org=og1'));
+ok('SR announces link copied',await p.waitForFunction(t=>document.getElementById('sr').textContent.includes(t),'คัดลอกลิงก์แล้ว',{timeout:4000}).then(()=>true,()=>false));
+await p.click('[data-orq=lqr]');await p.waitForSelector('#orqlqr[data-qr]',{timeout:4000});
+ok('QR encodes the same link + shown link text',(await p.getAttribute('#orqlqr','data-qr')).endsWith('?org=og1')&&(await p.textContent('.orqc .insurl')).endsWith('?org=og1')&&(await p.getAttribute('[data-orq=lqr]','aria-expanded'))==='true');
+await p.dispatchEvent('[data-orq=lqr]','click');ok('QR can be hidden',!(await p.$('#orqlqr'))&&(await p.getAttribute('[data-orq=lqr]','aria-expanded'))==='false');
 // ---- ข้อผิดพลาดจากเซิร์ฟเวอร์แสดงให้ผู้ใช้เห็น
 await p.click('[data-orq=new]');await p.waitForSelector('#orqf');
 ok('draft cleared after submit -> new form blank',(await p.inputValue('#orq_name'))==='');
 await p.fill('#orq_name','ห้างทดสอบ');await p.selectOption('#orq_dist','พญาไท');await p.fill('#orq_addr','1 ถนนพหลโยธิน');await p.click('[data-orq=pin]');await p.waitForSelector('#mpov');await p.fill('#mp_lat','13.78');await p.fill('#mp_lng','100.54');await p.click('[data-mp=ok]');
-await p.fill('#orq_date',bkk(7));await p.check('[data-orqv=sv30]');await p.check('[data-orqs=st3]');await p.check('#orq_terms');SUBFAIL='อัตราค่าบริการมีการเปลี่ยนแปลง กรุณาโหลดหน้าใหม่แล้วตรวจเงื่อนไขอีกครั้ง';
+await p.fill('#orq_date',bkk(17));await p.check('[data-orqv=sv30]');await p.check('[data-orqs=st3]');await p.check('#orq_terms');SUBFAIL='อัตราค่าบริการมีการเปลี่ยนแปลง กรุณาโหลดหน้าใหม่แล้วตรวจเงื่อนไขอีกครั้ง';
 await p.click('[data-orq=send]');await p.waitForFunction(()=>(document.getElementById('orq_err')||{}).textContent,null,{timeout:3000});
 ok('server error shown, form kept',(await err()).includes('อัตราค่าบริการมีการเปลี่ยนแปลง')&&(await p.inputValue('#orq_name'))==='ห้างทดสอบ');
+// ---- แท็บแบ่งคำขอ / ส่งซ้ำ / ติดต่อสมาคม / ใบสรุป PDF
+await p.click('[data-orq=back]');
+ORL.push({id:'rq9',ref:'ORG-TEST-0009',org_name:'บริษัท รอตรวจ',district:'ดุสิต',address:'9 ถนนทดสอบ',lat:13.77,lng:100.52,contact_name:'คุณทดสอบ',contact_phone:'0811112222',service_date:bkk(30),start_time:'09:00:00',end_time:'12:00:00',lunch_start:null,lunch_end:null,hours:3,rate:400,status:'pending',accepted_count:0,amount:null,pay_due_at:null,slip_path:null,slip_at:null,note:null,service_label:'นวดไทย 30 นาที',created_at:new Date().toISOString(),invites:[]});
+await p.click('[data-tab=ac]');await p.click('[data-orq=open]');await p.waitForSelector('.orqtabs',{timeout:4000});
+ok('tab counts shown',JSON.stringify(await p.$$eval('.orqtabs button',o=>o.map(x=>x.textContent)))===JSON.stringify(['กำลังดำเนินการ (1)','ยืนยันแล้ว (1)','ยกเลิกและหมดอายุ (0)','รายงาน']));
+ok('default tab = in progress, shows only pending card',(await p.getAttribute('#orqtab_act','aria-pressed'))==='true'&&await p.$$eval('.orqc',o=>o.length===1&&o[0].textContent.includes('บริษัท รอตรวจ')));
+await p.click('#orqtab_done');ok('done tab shows confirmed only',(await p.getAttribute('#orqtab_done','aria-pressed'))==='true'&&await p.$$eval('.orqc',o=>o.length===1&&o[0].textContent.includes('ORG-TEST-0001')));
+ok('SR announces tab change',await p.waitForFunction(t=>document.getElementById('sr').textContent.includes(t),'ยืนยันแล้ว 1 รายการ',{timeout:4000}).then(()=>true,()=>false));
+await p.click('#orqtab_closed');ok('empty tab message',(await p.textContent('#app')).includes('ไม่มีคำขอในหมวดนี้'));
+await p.click('#orqtab_done');
+ok('contact buttons (tel + LINE) on card',await p.$eval('.orqc',e=>!!e.querySelector('a[href^="tel:"]')&&!!e.querySelector('a[href^="https://line.me"]')));
+{const dl=p.waitForEvent('download',{timeout:15000});await p.click('[data-orq=sumpdf]');const d=await dl;const fp=await d.path();const buf=require('fs').readFileSync(fp);
+ if(process.env.PDFOUT)require('fs').copyFileSync(fp,process.env.PDFOUT);
+ ok('summary PDF downloads (ASCII name, valid PDF)',d.suggestedFilename()==='summary-ORG-TEST-0001.pdf'&&buf.slice(0,5).toString()==='%PDF-'&&buf.length>5000);}
+{await p.click('[data-orq=reppage]');await p.waitForSelector('.orqsum',{timeout:5000});
+ ok('report tab opened from card, rpc called with request id',REPCALLS[0]==='rq1'&&(await p.getAttribute('#orqtab_rep','aria-pressed'))==='true');
+ const sm=await p.$$eval('.orqsum li',o=>o.map(x=>x.textContent));
+ ok('report summary counts',sm[0].startsWith('2')&&sm[1].startsWith('2')&&sm[2].startsWith('1')&&sm[3].startsWith('60')&&sm[5].startsWith('1'));
+ const tx=await p.textContent('#app');
+ ok('report shows first names + per-therapist, no PDF-less state',tx.includes('มาลี')&&tx.includes('แยกตามหมอนวด')&&tx.includes('เสร็จสิ้น')&&tx.includes('ยกเลิก'));
+ ok('report SR announcement',await p.waitForFunction(t=>document.getElementById('sr').textContent.includes(t),'โหลดรายงานแล้ว',{timeout:4000}).then(()=>true,()=>false));
+ const dl=p.waitForEvent('download',{timeout:15000});await p.click('[data-orq=reppdf]');const d=await dl;const buf=require('fs').readFileSync(await d.path());
+ ok('report PDF downloads',d.suggestedFilename()==='report-ORG-TEST-0001.pdf'&&buf.slice(0,5).toString()==='%PDF-'&&buf.length>5000);
+ await p.click('#orqtab_done');}
+{ORL.find(x=>x.id==='rq9').status='invited';await p.evaluate(()=>orqLoad(1));
+ ok('status change alerts requester (SR + flash)',await p.waitForFunction(t=>document.getElementById('sr').textContent.includes(t),'สมาคมอนุมัติคำขอแล้ว',{timeout:4000}).then(()=>true,()=>false)&&(await p.textContent('#app')).includes('สมาคมอนุมัติคำขอแล้ว'));
+ ok('status change plays sound + toast',await p.evaluate(()=>!!document.querySelector('[role=status]')&&document.body.textContent.includes('ความคืบหน้าคำขอหน่วยงาน')));
+ ORL.find(x=>x.id==='rq9').status='pending';}
+await p.click('[data-orq=again]');await p.waitForSelector('#orqf',{timeout:4000});
+ok('again: form prefilled, date + service left empty',(await p.inputValue('#orq_name'))==='บริษัท ทดสอบ จำกัด'&&(await p.inputValue('#orq_dist'))==='ปทุมวัน'&&(await p.inputValue('#orq_date'))===''&&(await p.$('[data-orqv]:checked'))===null);
+ok('again: SR announces',await p.waitForFunction(t=>document.getElementById('sr').textContent.includes(t),'เปิดแบบฟอร์มด้วยข้อมูลเดิม',{timeout:4000}).then(()=>true,()=>false));
+// ---- เปิดลิงก์จองของงาน (?org=) ต้องไปหน้าจองของงานนั้นเลย
+await p.goto(require('./config').page('customer-booking.html')+'?org=og1');await p.waitForTimeout(1500);
+ok('deep link opens the org place booking',await p.$eval('#app',e=>e.textContent.includes('สำนักงานพัฒนาสังคม')&&!e.querySelector('[data-pl]')));
+ok('link consumed (stored id cleared)',!(await p.evaluate(()=>sessionStorage.getItem('orgLink'))));
+await p.goto(require('./config').page('customer-booking.html')+'?org=00000000-0000-0000-0000-000000000000');await p.waitForTimeout(1500);
+ok('bad link announces unavailable + shows home',(await p.textContent('#sr')).includes('ลิงก์จองนี้ไม่พร้อมใช้งาน')&&!!(await p.$('[data-pl]')));
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)
 })()
 

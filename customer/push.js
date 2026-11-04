@@ -58,7 +58,7 @@ function onPill(){unlock();if(busy)return;
  if(state==="off")enable()}
 window.Push={
  attach:function(cfg){C=cfg;mkPill();refreshState();var tick=0,had=false;setInterval(function(){tick++;var has=!!(C.uid&&C.uid());if(has!==had||(has&&tick%6===0)){had=has;refreshState()}},1000);document.addEventListener("visibilitychange",function(){if(!document.hidden)refreshState()})},
- beep:beep,
+ beep:beep,toast:toast,
  /* เสียงสำรองในหน้า: เรียก fn ทุก 2 วินาที (คืนจำนวนแจ้งเตือนที่ยังไม่อ่าน หรือ null ถ้าข้อมูลยังไม่พร้อม) ถ้าจำนวนเพิ่มขึ้น = มีของใหม่ → ส่งเสียง */
  watch:function(fn){var last=null,since=0;setInterval(function(){var n=null;try{n=fn()}catch(e){n=null}
   if(typeof n!=="number"){last=null;since=0;return}
