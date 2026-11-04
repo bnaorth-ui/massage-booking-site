@@ -116,4 +116,9 @@ await p.click('[data-a=wd][data-d="1"]');await sleep(400);
 ok('cannot take a company day off: message, no save, still on',saves===0&&(await p.textContent('#wdsum')).includes('เป็นวันประจำบริษัท')&&(await p.getAttribute('[data-a=wd][data-d="1"]','aria-pressed'))==='true'&&ST.work_days.includes(1));
 await p.click('[data-a=wd][data-d="2"]');await sleep(500);
 ok('other day can still be turned off',saves===1&&!ST.work_days.includes(2)&&ST.work_days.includes(1)&&ST.work_days.includes(3));
+// ---- กดหยุดวันที่มีงานนอกสถานที่ที่รับไว้แล้ว: เตือน (วันที่ไม่ใช่วันประจำบริษัท)
+{const d6=new Date(addD(todayS,6)+'T00:00:00Z').getUTCDay();
+ if(d6===1||d6===3){ok('iv2 weekday is a company day in this run (skip warn test)',true)}
+ else{if(!ST.work_days.includes(d6)){await p.click('[data-a=wd][data-d="'+d6+'"]');await sleep(500)}await p.click('[data-a=wd][data-d="'+d6+'"]');await sleep(500);
+  ok('turning off a day with an accepted org job warns',(await p.textContent('#wdsum')).includes('งานนอกสถานที่ที่รับไว้แล้ว'))}}
 console.log('errors:',errs.join('|')||'none');await p.context().browser().close();process.exit(0)})();
