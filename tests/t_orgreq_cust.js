@@ -300,7 +300,7 @@ ok('receipt downloaded as pdf named by ref',dl.suggestedFilename()==='receipt-OR
 await p.goto(require('./config').page('customer-booking.html'));await p.click('[data-tab=ac]');await p.waitForTimeout(500);
 ok('no company report card for ordinary user',!(await p.$('[data-orq=cmpopen]')));
 CMPON=true;await p.goto(require('./config').page('customer-booking.html'));await p.click('[data-tab=ac]');await p.waitForSelector('[data-orq=cmpopen]',{timeout:5000});
-ok('company contact sees report card',(await p.textContent('.regbar:has([data-orq=cmpopen])')).includes('รายงานบริษัท'));
+ok('company contact sees report card',(await p.textContent('.regbar:has([data-orq=cmpopen])')).includes('งานนวดประจำบริษัท')&&(await p.textContent('[data-orq=cmpopen]')).trim()==='เปิดหน้าบริษัท');
 await p.click('[data-orq=cmpopen]');await p.waitForSelector('#cmptab_ov',{timeout:5000});await p.waitForSelector('.orqsum',{timeout:5000});
 {const t=await p.textContent('#app');
 ok('5 tabs shown, overview default',(await p.$$('[data-orq=cmptab]')).length===5&&(await p.getAttribute('#cmptab_ov','aria-pressed'))==='true'&&t.includes('ภาพรวม')&&t.includes('ตารางงาน')&&t.includes('การลา')&&t.includes('รายงานรายเดือน')&&t.includes('แจ้งปัญหาและคะแนน'));
@@ -333,7 +333,7 @@ const cmp0=CMPR.length;await p.click('#cmptab_rp');await p.waitForSelector('.orq
 ok('report requested for this month, day 1',CMPR.length>=1&&CMPR[0].p_place==='cmp1'&&CMPR[0].p_month===CMPMO+'-01');
 ok('summary: 4 queues, 2 done, 1.5 hours, 1 no-show',/4\s*คิวทั้งหมด/.test(t)&&/2\s*ใช้บริการแล้ว/.test(t)&&/1\.5\s*ชั่วโมงที่ให้บริการ/.test(t)&&/1\s*ไม่มา/.test(t));
 ok('per-therapist hours, per-day table, actual times',t.includes('คุณนุ่น')&&t.includes('แยกตามวัน')&&t.includes('เวลาให้บริการจริง')&&t.includes('10:02')&&t.includes('บริษัท ไทยออฟฟิศ'));
-ok('no money anywhere in report',!/บาท|ราคา|ยอด|฿/.test(t.slice(t.indexOf('รายงานบริษัท'))));}
+ok('no money anywhere in report',!/บาท|ราคา|ยอด|฿/.test(t.slice(t.indexOf('แยกตามหมอนวด'))));}
 ok('month select has 24 months, current selected',(await p.$$('#cmp_month option')).length===24&&(await p.inputValue('#cmp_month'))===CMPMO);
 await p.selectOption('#cmp_month',await p.$$eval('#cmp_month option',o=>o[1].value));await p.waitForTimeout(700);
 ok('changing month reloads with new month, empty message',CMPR.length>cmp0&&CMPR[CMPR.length-1].p_month!==CMPMO+'-01'&&(await p.textContent('#app')).includes('ยังไม่มีการจองคิวในเดือนนี้'));
