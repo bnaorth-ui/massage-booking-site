@@ -75,7 +75,7 @@ window.Push={
   last=n},2000)},
  /* เรียกก่อนออกจากระบบ: เลิกผูกการแจ้งเตือนของเครื่องนี้กับบัญชีเดิม (ใช้ token ที่จับไว้ก่อนล้าง session) */
  beforeLogout:function(){try{if(!C||!CAN)return;var tk=C.token&&C.token();if(!tk||!("serviceWorker" in navigator))return;
-  navigator.serviceWorker.getRegistration("sw.js").then(function(r){return r&&r.pushManager.getSubscription()}).then(function(sub){if(!sub)return;
-   fetch(C.url+"/rest/v1/rpc/unregister_push",{method:"POST",keepalive:true,headers:{apikey:C.key,Authorization:"Bearer "+tk,"Content-Type":"application/json"},body:JSON.stringify({p_endpoint:sub.endpoint})}).catch(function(){})}).catch(function(){})}catch(e){}}
+  return navigator.serviceWorker.getRegistration("sw.js").then(function(r){return r&&r.pushManager.getSubscription()}).then(function(sub){if(!sub)return;
+   return fetch(C.url+"/rest/v1/rpc/unregister_push",{method:"POST",keepalive:true,headers:{apikey:C.key,Authorization:"Bearer "+tk,"Content-Type":"application/json"},body:JSON.stringify({p_endpoint:sub.endpoint})}).catch(function(){})}).catch(function(){})}catch(e){}}
 };
 })();

@@ -239,7 +239,7 @@ function afterLogin(){showGate(true);G.mode="load";G.err="";gRender();whoAmI();
    if(r&&r[0]&&r[0].status==="approved"){G.err="ร้านอนุมัติแล้วแต่ยังไม่พบสิทธิ์จัดการร้าน กรุณาติดต่อสมาคม";gMode("loaderr");return}
    return loadCats().then(function(){gMode("reg2")})})
  }).catch(function(e){if(e&&e.status===401){doLogout();return}G.err=errTh(e,"โหลดข้อมูลไม่สำเร็จ");gMode("loaderr")})}
-function doLogout(){if(window.Push)Push.beforeLogout();var tk=SBS&&SBS.access_token;if(tk)sbReq("/auth/v1/logout",{method:"POST"}).catch(function(){});sbSave(null);location.reload()}
+function doLogout(){var pw=window.Push?Push.beforeLogout():null;var tk=SBS&&SBS.access_token;if(tk)sbReq("/auth/v1/logout",{method:"POST"}).catch(function(){});sbSave(null);var go=function(){location.reload()};if(pw&&pw.then){var dn=false,fin=function(){if(!dn){dn=true;go()}};pw.then(fin,fin);setTimeout(fin,1500)}else go()}
 document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest("[data-g]");if(!el)return;var a=el.dataset.g;G.ok="";
  if(a==="forgot"){gMode("forgot");ctLoad();return}
  if(a==="reg"){loadCats().then(function(){gMode("reg")});return}

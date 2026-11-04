@@ -240,7 +240,7 @@ function gateSubmit(st){if(S.busy)return;
     if(e.code==="user_already_exists"||/already (registered|exists)/i.test(e.message||""))return sbReq("/auth/v1/token?grant_type=password",{method:"POST",json:1,auth:false,body:JSON.stringify({email:sbEmail(p),password:w})}).then(sbSet,function(){var x=new Error("เบอร์นี้มีบัญชีอยู่แล้ว ใส่รหัสผ่านเดิมของบัญชีนั้น");x.code="P0001";throw x});throw e})
    .then(function(){return rpc("claim_first_admin")}).then(function(){S.busy=false;return enter()})
    .catch(function(e){S.busy=false;gerr(errTh(e,"สร้างบัญชีไม่สำเร็จ"))})}}
-function doLogout(){if(window.Push)Push.beforeLogout();if(SBS&&SBS.access_token)sbReq("/auth/v1/logout",{method:"POST"}).catch(function(){});sbSave(null);location.reload()}
+function doLogout(){var pw=window.Push?Push.beforeLogout():null;if(SBS&&SBS.access_token)sbReq("/auth/v1/logout",{method:"POST"}).catch(function(){});sbSave(null);var go=function(){location.reload()};if(pw&&pw.then){var dn=false,fin=function(){if(!dn){dn=true;go()}};pw.then(fin,fin);setTimeout(fin,1500)}else go()}
 function whoAmI(){var u=SBS.user,m=u.user_metadata||{};WHO={id:u.id,phone:m.phone||"",name:(m.first_name||"").trim()||m.phone||"แอดมิน"}}
 /* เข้าระบบ: ตรวจว่าเป็นแอดมิน แล้วโหลดข้อมูลทั้งหมด */
 function enter(){AG.step="load";S.busy=false;gateDraw();whoAmI();
