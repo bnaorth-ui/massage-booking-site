@@ -89,7 +89,7 @@ const PNG=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42
 await p.waitForSelector('[data-pl]',{timeout:5000});
 // ---- ผู้เยี่ยมชมเห็นปุ่มขอบริการสำหรับหน่วยงาน -> ต้องล็อกอินก่อน
 ok('guest home shows org invitation bar with button',await p.$eval('.regbar:has([data-orq=guest])',e=>e.textContent.includes('ให้หมอนวดไปดูแลคนในองค์กรของคุณถึงที่')&&e.textContent.includes('ขอบริการสำหรับหน่วยงาน')));
-ok('org bar sits after register-shop bar',await p.evaluate(()=>{const a=[...document.querySelectorAll('.regbar')];return a.length<2||a[a.length-1].querySelector('[data-orq=guest]')!==null}));
+ok('org bar sits after register-shop bar',await p.evaluate(()=>{const a=[...document.querySelectorAll('.regbar')];return a.length<2||(a[a.length-2].querySelector('[data-orq=guest]')!==null&&a[a.length-1].querySelector('[data-orq=capguest]')!==null)}));
 await p.click('[data-orq=guest]');await p.waitForSelector('#rph,#lph',{timeout:3000});
 ok('login/register required first',!!(await p.$('#rph,#lph'))&&(await p.textContent('#app')).includes('ส่งคำขอสำหรับหน่วยงาน'));
 if(await p.$('[data-ag=login]'))await p.click('[data-ag=login]');
