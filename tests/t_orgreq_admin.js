@@ -72,6 +72,7 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
   if(f==='admin_find_users'){finds.push(body);const q=body.p_q.replace(/\D/g,'');if(q.length<3)return J(400,{code:'P0001',message:'พิมพ์เบอร์อย่างน้อย 3 หลัก'});return J(200,PEOPLE.filter(x=>x.phone.includes(q)))}
   if(f==='admin_reset_password'){resets.push(body);if(resetErr)return J(400,{code:'P0001',message:resetErr});const u=PEOPLE.find(x=>x.id===body.p_user);T.password_reset_log.unshift({id:resets.length,admin_name:'แอดมิน หนึ่ง',user_name:u.name,user_phone:u.phone,created_at:now()});return J(204,null)}
   if(f==='admin_handovers')return J(200,HOL);
+  if(f==='admin_company_reviews')return J(200,[{id:'c1',place_id:'cp1',place_name:'บริษัท ไทยออฟฟิศ',month:'2026-10-01',rating:2,comment:'หมอนวดมาสาย',problem:true,created_at:'2026-11-01T03:00:00Z'},{id:'c2',place_id:'cp1',place_name:'บริษัท ไทยออฟฟิศ',month:'2026-09-01',rating:5,comment:null,problem:false,created_at:'2026-10-01T03:00:00Z'}]);
   if(f==='admin_org_reviews')return J(200,[{id:'v1',request_id:'q1',ref:'ORG000001',org_name:'บริษัทตัวอย่าง จำกัด',service_date:'2026-10-20',rating:2,comment:'มาสายมาก',problem:true,created_at:'2026-10-21T03:00:00Z',staff:'คุณกลาง'},{id:'v2',request_id:'q2',ref:'ORG000002',org_name:'โรงเรียนทดสอบ',service_date:'2026-10-22',rating:5,comment:null,problem:false,created_at:'2026-10-23T03:00:00Z',staff:'คุณสอง'}]);
   if(f==='admin_handover_candidates')return J(200,[{id:'p1',name:'คุณกลาง',comp:[{name:'บริษัท ไทยออฟฟิศ',days:[1,3]}]},{id:'p3',name:'คุณว่าง',comp:[]}]);
   if(f==='admin_org_replace_staff'){hoCalls.push(['replace',body]);return J(200,'hx')}
@@ -124,6 +125,7 @@ ok('cards listed with details',t.includes('บริษัทตัวอย่�
 ok('slip image loaded',await until(()=>document.querySelector('#oqslip_q2 img')));
 ok('invite status shown',t.includes('คุณกลาง (รอตอบ)'));
 ok('deadline panel lists invite near due',t.includes('ใกล้หมดเวลา')&&t.includes('หน่วยงานรอตอบ')&&t.includes('ยังไม่ตอบ: คุณกลาง')&&t.includes('ด่วน')&&/เหลือ 4 ชั่วโมง|เหลือ 5 ชั่วโมง/.test(t));
+ok('company ratings panel: average + flagged + comment',await p.evaluate(()=>{const e=document.getElementById('crvq');if(!e)return false;const t=e.innerText;return t.includes('คะแนนเฉลี่ย 3.5 จาก 5')&&t.includes('ต้องดู 1')&&t.includes('หมอนวดมาสาย')&&t.includes('บริษัท ไทยออฟฟิศ')&&t.includes('2026-10')}));
 ok('reviews panel: average + flagged + comment',await p.evaluate(()=>{const e=document.getElementById('orvq');if(!e)return false;const t=e.innerText;return t.includes('คะแนนเฉลี่ย 3.5 จาก 5')&&t.includes('ต้องดู 1')&&t.includes('มาสายมาก')&&t.includes('แจ้งว่ามีปัญหา')&&t.includes('หมอนวด: คุณกลาง')}));
 ok('deadline panel has tel links',!!(await p.$('#dlq a[href="tel:0800000000"]')));
 await p.screenshot({path:'oreq_admin.png',fullPage:true});

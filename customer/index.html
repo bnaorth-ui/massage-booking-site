@@ -390,7 +390,7 @@ function viewRender(){var h="",b="";
   var nsub=V.nt==="a"?"a":"n",NTB=[["n","แจ้งเตือน",notes.length],["a","จากระบบ",an.length]];
   h='<h1>แจ้งเตือน</h1><div class="tg" role="tablist" aria-label="หมวดแจ้งเตือน">'+NTB.map(function(x){return '<button type="button" role="tab" data-nt="'+x[0]+'" class="'+(x[0]===nsub?"on":"")+'" aria-selected="'+(x[0]===nsub)+'">'+x[1]+' ('+x[2]+')</button>'}).join("")+'</div>'+
   (nsub==="a"?(an.length?an.map(function(x){return '<div class="ann"><b>📢 '+esc(x.title)+'</b><br>'+esc(x.body)+'</div>'}).join(""):'<div class="empty">ยังไม่มีข้อความจากระบบ</div>'):
-  (notes.length?notes.map(function(n){var d=new Date(n.at);return '<div class="msg"><div class="mh"><b>'+esc(n.title||n.to||"แจ้งเตือน")+'</b>'+(n.at>prev?'<span class="tag">ใหม่</span>':'')+'</div><small class="mt">'+d.toLocaleDateString("th-TH",{day:"numeric",month:"short"})+' '+d.toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"})+' น.</small><pre>'+esc(n.text)+'</pre>'+(n.ref?'<button class="lb" data-view="bk">ดูรายการจอง</button>':'')+(n.auto?'<button class="lb" data-view="">เปิดหน้าจอง</button>':'')+(n.orq?'<button class="lb" data-orq="open">ดูคำขอของฉัน</button>':'')+'</div>'}).join(""):'<div class="empty">ยังไม่มีการแจ้งเตือน</div>'))}
+  (notes.length?notes.map(function(n){var d=new Date(n.at);return '<div class="msg"><div class="mh"><b>'+esc(n.title||n.to||"แจ้งเตือน")+'</b>'+(n.at>prev?'<span class="tag">ใหม่</span>':'')+'</div><small class="mt">'+d.toLocaleDateString("th-TH",{day:"numeric",month:"short"})+' '+d.toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"})+' น.</small><pre>'+esc(n.text)+'</pre>'+(n.ref?'<button class="lb" data-view="bk">ดูรายการจอง</button>':'')+(n.auto?'<button class="lb" data-view="">เปิดหน้าจอง</button>':'')+(n.orq?'<button class="lb" data-orq="open">ดูคำขอของฉัน</button>':'')+(n.cmp&&CMP.places&&CMP.places.length?'<button class="lb" data-orq="cmpopen">เปิดหน้าบริษัท</button>':'')+'</div>'}).join(""):'<div class="empty">ยังไม่มีการแจ้งเตือน</div>'))}
  return[h,b]}
 function ann(m,u){var r=document.getElementById(u?"sra":"sr"),t=document.getElementById("atoast");if(r){r.textContent="";setTimeout(function(){r.textContent=m},60)}if(t){t.textContent=m;t.className="atoast"+(u?" bad":"");t.hidden=false;clearTimeout(ann.t);ann.t=setTimeout(function(){t.hidden=true},6000)}}
 /* วาดหน้าใหม่ระหว่างโหลดข้อมูลเบื้องหลัง (keep) แล้วโฟกัสหลุดไปที่ body: คืนโฟกัสให้องค์ประกอบเดิมที่มี id เดียวกัน */
@@ -596,7 +596,7 @@ function mapBk(r){var all=r.items||[],its=all.filter(function(i){return i.active
   staffName:asg.length>1?asg.map(function(a){return a.svcName+": "+a.staffName}).join(", "):names.join(", "),date:s.date,time:s.min,min:Math.max(1,Math.round((Date.parse(r.ends_at)-t0)/60000)),pu:+r.points_used||0,pd:+r.points_discount||0,price:+r.total||0,customer:r.customer_name,status:STTH[r.status]||"ยืนยันแล้ว",id:r.id,st0:r.status,noShow:r.status==="no_show",movedFrom:r.moved_from,movedTo:r.moved_to,at:r.created_at,jobs:jobs,cancelH:r.cancel_hours}}
 function loadPoints(){return sbApi("/rest/v1/rpc/my_points",{method:"POST",json:1,body:"{}"}).then(function(a){PT=a||null}).catch(function(){})}
 function loadBookings(){return sbApi("/rest/v1/rpc/my_bookings",{method:"POST",json:1,body:"{}"}).then(function(a){BK=(a||[]).map(mapBk);if(S&&S.place&&S.step>0&&S.step<4&&!S.movedFrom&&orgHas(S.place.id)){S=fresh();render(true);orgHasMsg()}}).then(function(){return loadChatUnread()})}
-function loadNotes(){return sbApi("/rest/v1/notifications?select=id,kind,title,body,created_at,booking_id&audience=eq.user&order=created_at.desc&limit=60").then(function(a){NOTES=(a||[]).filter(function(n){return n.kind!=="announce"}).map(function(n){return{kind:"user",id:n.id,at:new Date(n.created_at).toISOString(),title:n.title,text:n.body||"",ref:n.booking_id?"1":"",auto:(n.kind==="preopen"||n.kind==="promo"||n.kind==="newshop"),orq:n.kind==="orgreq"}})})}
+function loadNotes(){return sbApi("/rest/v1/notifications?select=id,kind,title,body,created_at,booking_id&audience=eq.user&order=created_at.desc&limit=60").then(function(a){NOTES=(a||[]).filter(function(n){return n.kind!=="announce"}).map(function(n){return{kind:"user",id:n.id,at:new Date(n.created_at).toISOString(),title:n.title,text:n.body||"",ref:n.booking_id?"1":"",auto:(n.kind==="preopen"||n.kind==="promo"||n.kind==="newshop"),orq:n.kind==="orgreq",cmp:n.kind==="company"}})})}
 function refreshUser(){var v=S.view;return Promise.all([loadBookings().catch(function(){}),loadNotes().catch(function(){}),loadPoints(),loadReviews(),loadFavs(),ORQ.list!==null?orqLoad(1):null]).then(function(){if(S.view===v)render(true)})}
 /* เวลาว่างของพนักงาน: ถามฐานข้อมูลเฉพาะช่วงที่ไม่ว่าง (ไม่เห็นข้อมูลลูกค้าคนอื่น) */
 function placeStaffIds(p){return p.type==="shop"?p.staff.map(function(c){return c.id}):(p.staff||[]).slice()}
@@ -1140,19 +1140,77 @@ function orqDraw(){var el=document.getElementById("orqqr"),r=orqCur();if(!el||!r
 function orqCur(){return(ORQ.list||[]).filter(function(r){return r.id===ORQ.pay})[0]||null}
 function orqRcp(id){var r=(ORQ.list||[]).filter(function(x){return x.id===id})[0];if(!r||!r.receipt_path||ORQ.rcpBusy)return;ORQ.rcpBusy=true;ann("กำลังเตรียมไฟล์ใบเสร็จ");
  sbApi("/storage/v1/object/authenticated/receipts/"+r.receipt_path,{blob:true}).then(function(b){var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([b],{type:"application/pdf"}));a.download="receipt-"+r.ref+".pdf";document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1000);ORQ.rcpBusy=false;ann("ดาวน์โหลดใบเสร็จแล้ว")},function(){ORQ.rcpBusy=false;ORQ.err="ดาวน์โหลดใบเสร็จไม่สำเร็จ ลองใหม่อีกครั้ง";render(true);ann(ORQ.err)})}
-var CMP={uid:null,places:null,id:null,month:"",data:null,busy:false,err:"",pdfBusy:false},CMPM=["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+var CMP={uid:null,places:null,id:null,month:"",data:null,busy:false,err:"",pdfBusy:false,tab:"ov",c:{},cb:{},ce:{},fb:null,flash:""},CMPM=["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
 function cmpMonthLbl(m){var a=String(m||"").split("-");return a.length<2?"-":CMPM[(+a[1])-1]+" "+((+a[0])+543)}
 function cmpMonths(){var cur=orqDay(0).slice(0,7).split("-"),y=+cur[0],mo=+cur[1],o=[];for(var i=0;i<24;i++){o.push(y+"-"+(mo<10?"0":"")+mo);mo--;if(mo<1){mo=12;y--}}return o}
-function cmpLoad(){if(!ME)return;if(CMP.uid!==ME.id){CMP={uid:ME.id,places:null,id:null,month:"",data:null,busy:false,err:"",pdfBusy:false}}if(CMP.places!==null||CMP.loading)return;CMP.loading=true;var u=ME.id;
+function cmpLoad(){if(!ME)return;if(CMP.uid!==ME.id){CMP={uid:ME.id,places:null,id:null,month:"",data:null,busy:false,err:"",pdfBusy:false,tab:"ov",c:{},cb:{},ce:{},fb:null,flash:""}}if(CMP.places!==null||CMP.loading)return;CMP.loading=true;var u=ME.id;
  sbApi("/rest/v1/rpc/my_company_places",{method:"POST",json:1,body:"{}"}).then(function(r){return Array.isArray(r)?r:[]},function(){return[]}).then(function(r){CMP.loading=false;if(CMP.uid!==u)return;CMP.places=r;if(r.length&&S.view==="ac"&&!V.orq)render(true)})}
 function cmpBar(){if(!CMP.places||!CMP.places.length)return"";return'<div class="regbar"><b>รายงานบริษัท</b><span>ดูสรุปการให้บริการรายเดือนของ'+esc(CMP.places.length===1?CMP.places[0].name:"บริษัทของท่าน")+' แยกตามหมอนวด จำนวนคิวและชั่วโมง ดาวน์โหลดเป็น PDF ได้</span><button type="button" class="btn ghost" data-orq="cmpopen">เปิดรายงานบริษัท</button></div>'}
 function cmpDays(rows){var d={};rows.filter(function(x){return x.active&&x.status!=="cancelled"&&x.status!=="rescheduled"}).forEach(function(x){var k=new Date(new Date(x.starts_at).getTime()+252e5).toISOString().slice(0,10);d[k]=d[k]||{st:{},q:0,m:0};d[k].q++;d[k].st[x.staff||"-"]=1;if(orqRepStat(x)==="เสร็จสิ้น")d[k].m+=+x.minutes||0});return Object.keys(d).sort().map(function(k){return{k:k,staff:Object.keys(d[k].st).sort().join(", "),q:d[k].q,m:d[k].m}})}
 function cmpHr(m){return(Math.round((+m||0)/6)/10).toFixed(1)}
 function cmpActual(x){return x.started_at&&x.done_at?orqHM(x.started_at)+"-"+orqHM(x.done_at):"-"}
+var CMPT=[["ov","ภาพรวม"],["sc","ตารางงาน"],["lv","การลา"],["rp","รายงานรายเดือน"],["fb","แจ้งปัญหาและคะแนน"]],CMPWD=["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัสบดี","ศุกร์","เสาร์"];
+function cmpWd(k){return CMPWD[new Date(k+"T00:00:00Z").getUTCDay()]}
+function cmpDt(k){return"วัน"+cmpWd(k)+"ที่ "+orqD(k)}
+function cmpFetch(key,fn,body){if(CMP.c[key]!==undefined||CMP.cb[key]||CMP.ce[key])return;CMP.cb[key]=1;var pid=CMP.id;
+ sbApi("/rest/v1/rpc/"+fn,{method:"POST",json:1,body:JSON.stringify(body)}).then(function(d){delete CMP.cb[key];CMP.c[key]=d==null?(fn==="my_company_schedule"?{days:[],staff:[]}:[]):d;if(V.orq&&ORQ.mode==="comp"&&CMP.id===pid)render(true)},function(e){delete CMP.cb[key];CMP.ce[key]=errTh(e,"โหลดข้อมูลไม่สำเร็จ ลองใหม่อีกครั้ง");if(V.orq&&ORQ.mode==="comp"&&CMP.id===pid)render(true);ann(CMP.ce[key])})}
+function cmpKeys(){var p=CMP.id,cm=orqDay(0).slice(0,7);return{sc:"sc"+p,rpn:"rp"+p+cm,lv:"lv"+p+CMP.month,rv:"rv"+p}}
+function cmpNeed(){var P=CMP.places||[];if(!P.length||!CMP.id)return;var k=cmpKeys(),t=CMP.tab,cm=orqDay(0).slice(0,7);
+ if(t==="ov"||t==="sc")cmpFetch(k.sc,"my_company_schedule",{p_place:CMP.id,p_from:orqDay(0),p_to:orqDay(34)});
+ if(t==="ov")cmpFetch(k.rpn,"my_company_report",{p_place:CMP.id,p_month:cm+"-01"});
+ if(t==="lv")cmpFetch(k.lv,"my_company_leaves",{p_place:CMP.id,p_month:CMP.month+"-01"});
+ if(t==="fb")cmpFetch(k.rv,"my_company_reviews",{p_place:CMP.id});
+ if(t==="rp")cmpKick()}
+function cmpTab(t){if(!CMPT.some(function(x){return x[0]===t}))return;CMP.tab=t;var k=cmpKeys();[k.sc,k.rpn,k.lv,k.rv].forEach(function(x){delete CMP.c[x];delete CMP.ce[x]});if(t==="fb"&&!CMP.fb)CMP.fb={month:"",rating:0,comment:"",problem:false,busy:false,err:""};render(true);ann("เปิดแถบ "+CMPT.filter(function(x){return x[0]===t})[0][1]);var b=document.getElementById("cmptab_"+t);if(b)b.focus();cmpNeed()}
+function cmpState(key){return CMP.ce[key]?'<p class="aerr" role="alert">'+esc(CMP.ce[key])+'</p><button type="button" class="btn ghost" data-orq="cmpretry">ลองใหม่</button>':CMP.c[key]===undefined?'<div class="empty" role="status">กำลังโหลด…</div>':""}
+function cmpDayBox(sc,k,lbl){var d=(sc.days||[]).filter(function(x){return x.day===k})[0],h='<div class="bk orqc"><div class="qh"><b>'+lbl+'</b></div><small>'+cmpDt(k)+'</small>';
+ if(!d)return h+'<p>ไม่มีหมอนวดประจำในวันนี้</p></div>';
+ h+=d.present.length?'<p>หมอนวดที่มาให้บริการ: <b>'+d.present.map(esc).join(", ")+'</b></p>':'<p class="aerr">ไม่มีหมอนวดมาให้บริการในวันนี้ (หมอนวดประจำลา) สมาคมจะแจ้งหากมีผู้มาแทน</p>';
+ if(d.leave.length)h+='<p>ลา: '+d.leave.map(function(l){return esc(l.name)+' ('+esc(l.reason)+')'}).join(", ")+'</p>';
+ return h+'</div>'}
+function cmpOv(h){var k=cmpKeys(),st=cmpState(k.sc);if(st)return h+st;var sc=CMP.c[k.sc];
+ h+='<h2 class="stl">วันนี้และพรุ่งนี้</h2>'+cmpDayBox(sc,orqDay(0),"วันนี้")+cmpDayBox(sc,orqDay(1),"พรุ่งนี้");
+ var lv=(sc.days||[]).filter(function(d){return d.day<=orqDay(13)&&d.leave.length});
+ h+='<h2 class="stl">การลาใน 14 วันข้างหน้า</h2>'+(lv.length?'<ul class="orqsum">'+lv.map(function(d){return d.leave.map(function(l){return'<li>'+cmpDt(d.day)+': <b>'+esc(l.name)+'</b> ลา ('+esc(l.reason)+')</li>'}).join("")}).join("")+'</ul>':'<p>ยังไม่มีการลา</p>');
+ var rp=CMP.c[k.rpn];h+='<h2 class="stl">สรุปเดือน '+cmpMonthLbl(orqDay(0).slice(0,7))+'</h2>';
+ if(CMP.ce[k.rpn])return h+'<p class="aerr" role="alert">'+esc(CMP.ce[k.rpn])+'</p>';
+ if(!rp)return h+'<div class="empty" role="status">กำลังโหลดสรุปเดือน…</div>';
+ var m=orqRepCalc(rp.rows||[]);return h+'<ul class="orqsum"><li><b>'+m.queues+'</b> คิวทั้งหมด</li><li><b>'+m.done+'</b> ใช้บริการแล้ว</li><li><b>'+cmpHr(m.mins)+'</b> ชั่วโมงที่ให้บริการ</li><li><b>'+m.noshow+'</b> ไม่มา</li><li><b>'+m.cancelled+'</b> ยกเลิกหรือเลื่อน</li></ul>'}
+function cmpSc(h){var k=cmpKeys(),st=cmpState(k.sc);if(st)return h+st;var sc=CMP.c[k.sc],hm=function(t){return String(t||"").slice(0,5)};
+ h+='<h2 class="stl">หมอนวดประจำและวันที่มา</h2>';
+ h+=(sc.staff||[]).length?'<div class="rpw"><table class="orqt"><thead><tr><th>หมอนวด</th><th>วันที่มาประจำสัปดาห์</th><th>เวลา</th></tr></thead><tbody>'+sc.staff.map(function(x){return'<tr><td>'+esc(x.name)+'</td><td>'+(x.days||[]).map(function(d){return CMPWD[d]}).join(", ")+'</td><td>'+hm(sc.open)+'-'+hm(sc.close)+' น.</td></tr>'}).join("")+'</tbody></table></div>':'<p>ยังไม่ได้กำหนดหมอนวดประจำ</p>';
+ var ds=(sc.days||[]).filter(function(d){return d.day<=orqDay(27)});
+ h+='<h2 class="stl">ปฏิทิน 4 สัปดาห์ข้างหน้า</h2>';
+ return h+(ds.length?'<div class="rpw"><table class="orqt"><thead><tr><th>วันที่</th><th>หมอนวดที่มา</th><th>ลา</th></tr></thead><tbody>'+ds.map(function(d){return'<tr><td>'+cmpDt(d.day)+'</td><td>'+(d.present.length?d.present.map(esc).join(", "):'<b>ไม่มีหมอนวด</b>')+'</td><td>'+(d.leave.length?d.leave.map(function(l){return esc(l.name)}).join(", "):'-')+'</td></tr>'}).join("")+'</tbody></table></div>':'<p>ไม่มีวันทำงานใน 4 สัปดาห์นี้</p>')}
+function cmpLv(h){h+='<label class="fld" for="cmp_month"><span>เลือกเดือน</span><select class="sel" id="cmp_month">'+cmpMonths().map(function(m){return'<option value="'+m+'"'+(m===CMP.month?" selected":"")+'>'+cmpMonthLbl(m)+'</option>'}).join("")+'</select></label>';
+ var k=cmpKeys(),st=cmpState(k.lv);if(st)return h+st;var L=CMP.c[k.lv];
+ return h+(L.length?'<div class="rpw"><table class="orqt"><thead><tr><th>วันที่</th><th>หมอนวด</th><th>เหตุผล</th></tr></thead><tbody>'+L.map(function(x){return'<tr><td>'+cmpDt(x.day)+'</td><td>'+esc(x.name)+'</td><td>'+esc(x.reason)+'</td></tr>'}).join("")+'</tbody></table></div>':'<div class="empty">ไม่มีการลาในเดือนนี้</div>')}
+function cmpFbCollect(){var F=CMP.fb;if(!F)return;var m=document.getElementById("cmp_fbm"),c=document.querySelector("input[name=cmp_rt]:checked"),t=document.getElementById("cmp_fbc"),p=document.getElementById("cmp_fbp");if(m)F.month=m.value;if(c)F.rating=+c.value;if(t)F.comment=t.value;if(p)F.problem=p.checked}
+function cmpFb(h){var k=cmpKeys(),F=CMP.fb||(CMP.fb={month:"",rating:0,comment:"",problem:false,busy:false,err:""}),st=cmpState(k.rv);
+ h+=(CMP.flash?'<div class="flash" role="status">'+esc(CMP.flash)+'</div>':'');if(st)return h+st;
+ var R=CMP.c[k.rv],done=R.map(function(x){return String(x.month).slice(0,7)}),opts=cmpMonths().slice(0,4).filter(function(m){return done.indexOf(m)<0});
+ if(!F.month||opts.indexOf(F.month)<0)F.month=opts[0]||"";
+ h+='<h2 class="stl">ให้คะแนนบริการประจำเดือน</h2>';
+ if(!opts.length)h+='<p>ให้คะแนนครบทุกเดือนที่เปิดให้แล้ว ขอบคุณครับ</p>';
+ else{var rs="";for(var i=1;i<=5;i++)rs+='<label class="chk"><input type="radio" name="cmp_rt" value="'+i+'"'+(F.rating===i?" checked":"")+'> '+i+' คะแนน'+(i===5?" (ดีมาก)":i===1?" (ควรปรับปรุง)":"")+'</label>';
+  h+='<label class="fld" for="cmp_fbm"><span>เดือนที่ให้คะแนน (ให้ได้เดือนละ 1 ครั้ง)</span><select class="sel" id="cmp_fbm">'+opts.map(function(m){return'<option value="'+m+'"'+(m===F.month?" selected":"")+'>'+cmpMonthLbl(m)+'</option>'}).join("")+'</select></label>'+
+  '<fieldset class="fld"><legend><b>ความพึงพอใจโดยรวม</b></legend>'+rs+'</fieldset>'+
+  '<label class="fld" for="cmp_fbc"><span>ข้อความถึงสมาคม หรือรายละเอียดปัญหา (ไม่บังคับ ไม่เกิน 500 ตัวอักษร)</span><textarea class="sel" id="cmp_fbc" rows="4" maxlength="500">'+esc(F.comment)+'</textarea></label>'+
+  '<label class="chk"><input type="checkbox" id="cmp_fbp"'+(F.problem?" checked":"")+'> มีปัญหาที่ต้องการแจ้งสมาคม</label><p class="aerr" id="cmp_fberr" role="alert">'+esc(F.err)+'</p>'+
+  '<button type="button" class="btn wide" data-orq="cmpfbsend"'+(F.busy?" disabled":"")+'>'+(F.busy?"กำลังส่ง…":"ส่งถึงสมาคม")+'</button>'}
+ if(R.length)h+='<h2 class="stl">ที่เคยให้คะแนน</h2><div class="rpw"><table class="orqt"><thead><tr><th>เดือน</th><th>คะแนน</th><th>แจ้งปัญหา</th><th>ข้อความ</th></tr></thead><tbody>'+R.map(function(x){return'<tr><td>'+cmpMonthLbl(String(x.month).slice(0,7))+'</td><td>'+x.rating+'/5</td><td>'+(x.problem?"มี":"-")+'</td><td>'+esc(x.comment||"-")+'</td></tr>'}).join("")+'</tbody></table></div>';
+ return h+'<h2 class="stl">ติดต่อสมาคม</h2><div class="mbtns">'+(orqCtBtns()||'<p>ยังไม่มีข้อมูลติดต่อ</p>')+'</div>'}
+function cmpFbSend(){var F=CMP.fb;if(!F||F.busy)return;cmpFbCollect();var bad=function(m){F.err=m;render(true);ann(m)};
+ if(!F.month)return bad("เลือกเดือนที่จะให้คะแนน");if(!(F.rating>=1&&F.rating<=5))return bad("กรุณาเลือกคะแนน 1-5");
+ F.busy=true;F.err="";render(true);var pid=CMP.id;
+ sbApi("/rest/v1/rpc/company_review_submit",{method:"POST",json:1,body:JSON.stringify({p_place:pid,p_month:F.month+"-01",p_rating:F.rating,p_comment:F.comment||null,p_problem:!!F.problem})}).then(function(){CMP.fb={month:"",rating:0,comment:"",problem:false,busy:false,err:""};CMP.flash="ขอบคุณครับ สมาคมได้รับแล้ว";delete CMP.c["rv"+pid];delete CMP.ce["rv"+pid];render(true);ann(CMP.flash);cmpNeed()},function(e){F.busy=false;F.err=errTh(e,"ส่งไม่สำเร็จ ลองใหม่อีกครั้ง");render(true);ann(F.err)})}
 function cmpPage(){var P=CMP.places||[],back='<button type="button" class="lb" data-orq="cmpback">← กลับไปหน้าบัญชี</button>';
  if(!P.length)return back+'<div class="empty">บัญชีนี้ยังไม่ได้เป็นผู้ประสานงานของบริษัทใด</div>';
- var cur=P.filter(function(x){return x.id===CMP.id})[0]||P[0],h=back+'<h1 id="orqt" tabindex="-1">รายงานบริษัท</h1>';
+ var cur=P.filter(function(x){return x.id===CMP.id})[0]||P[0],h=back+'<h1 id="orqt" tabindex="-1">'+esc(cur.name)+'</h1>';
  if(P.length>1)h+='<label class="fld" for="cmp_place"><span>เลือกบริษัท</span><select class="sel" id="cmp_place">'+P.map(function(x){return'<option value="'+esc(x.id)+'"'+(x.id===cur.id?" selected":"")+'>'+esc(x.name)+'</option>'}).join("")+'</select></label>';
+ h+='<div class="orqtabs" role="group" aria-label="เมนูหน้าบริษัท">'+CMPT.map(function(x){return'<button type="button" id="cmptab_'+x[0]+'" data-orq="cmptab" data-id="'+x[0]+'" aria-pressed="'+(x[0]===CMP.tab)+'">'+x[1]+'</button>'}).join("")+'</div>';
+ if(CMP.tab==="sc")return cmpSc(h);if(CMP.tab==="lv")return cmpLv(h);if(CMP.tab==="fb")return cmpFb(h);if(CMP.tab==="rp")return cmpRepBody(h,cur);return cmpOv(h)}
+function cmpRepBody(h,cur){
  h+='<label class="fld" for="cmp_month"><span>เลือกเดือน</span><select class="sel" id="cmp_month">'+cmpMonths().map(function(m){return'<option value="'+m+'"'+(m===CMP.month?" selected":"")+'>'+cmpMonthLbl(m)+'</option>'}).join("")+'</select></label>';
  if(CMP.err)return h+'<p class="aerr" role="alert">'+esc(CMP.err)+'</p>';
  if(!CMP.data)return h+'<div class="empty" role="status">กำลังโหลดรายงาน…</div>';
@@ -1167,7 +1225,7 @@ function cmpPage(){var P=CMP.places||[],back='<button type="button" class="lb" d
  return h+'<div class="mbtns"><button type="button" class="btn" data-orq="cmppdf">ดาวน์โหลด PDF รายงาน</button></div>'}
 function cmpKick(){var P=CMP.places||[];if(!P.length)return;var cur=P.filter(function(x){return x.id===CMP.id})[0]||P[0];CMP.id=cur.id;if(CMP.busy||CMP.data||CMP.err)return;CMP.busy=true;var pid=cur.id,mo=CMP.month;
  sbApi("/rest/v1/rpc/my_company_report",{method:"POST",json:1,body:JSON.stringify({p_place:pid,p_month:mo+"-01"})}).then(function(d){if(CMP.id!==pid||CMP.month!==mo)return;CMP.busy=false;CMP.data=d||{rows:[]};if(V.orq&&ORQ.mode==="comp")render(true);var n=orqRepCalc(CMP.data.rows||[]);ann("โหลดรายงานแล้ว ใช้บริการแล้ว "+n.done+" คิว จากทั้งหมด "+n.queues+" คิว")},function(e){if(CMP.id!==pid||CMP.month!==mo)return;CMP.busy=false;CMP.err=errTh(e,"โหลดรายงานไม่สำเร็จ ลองใหม่อีกครั้ง");if(V.orq&&ORQ.mode==="comp")render(true);ann(CMP.err)})}
-function cmpSel(pid,mo){if(pid)CMP.id=pid;if(mo)CMP.month=mo;CMP.data=null;CMP.err="";CMP.busy=false;render(true);ann("กำลังโหลดรายงาน "+cmpMonthLbl(CMP.month));cmpKick()}
+function cmpSel(pid,mo){if(pid){CMP.id=pid;CMP.fb=null;CMP.flash=""}if(mo)CMP.month=mo;CMP.data=null;CMP.err="";CMP.busy=false;render(true);ann("กำลังโหลด "+cmpMonthLbl(CMP.month));cmpNeed()}
 function cmpPdf(){var P=CMP.places||[],cur=P.filter(function(x){return x.id===CMP.id})[0]||P[0],d=CMP.data;if(!cur||!d)return;
  pdfRun(function(){var K=pdfKit(),ct=SET.ct||{},rows=d.rows||[],m=orqRepCalc(rows),dd=cmpDays(rows);
   K.txt(ct.name||"สมาคมวิทยากรฝึกอาชีพคนตาบอด",26,{b:1,al:"center"});K.gap(6);K.txt("รายงานการให้บริการประจำเดือน",36,{b:1,al:"center"});K.gap(6);K.rule();K.gap(12);
@@ -1229,9 +1287,12 @@ function orqAct(a,id){
  if(a==="rev"){ORQ.mode="rev";ORQ.rv={id:id,rating:0,comment:"",problem:false,busy:false,err:""};render();window.scrollTo(0,0);var th=document.getElementById("orqt");if(th)th.focus();return}
  if(a==="revsend"){orqRevSend();return}
  if(a==="rcp"){orqRcp(id);return}
- if(a==="cmpopen"){var P=CMP.places||[];if(!P.length)return;S.view="ac";V.orq=true;V.fvp=false;V.insp=false;V.pwc=false;V.del=false;ORQ.mode="comp";if(!CMP.id||!P.filter(function(x){return x.id===CMP.id})[0])CMP.id=P[0].id;if(!CMP.month)CMP.month=orqDay(0).slice(0,7);CMP.data=null;CMP.err="";CMP.busy=false;render();window.scrollTo(0,0);var th2=document.getElementById("orqt");if(th2)th2.focus();cmpKick();return}
+ if(a==="cmpopen"){var P=CMP.places||[];if(!P.length)return;S.view="ac";V.orq=true;V.fvp=false;V.insp=false;V.pwc=false;V.del=false;ORQ.mode="comp";if(!CMP.id||!P.filter(function(x){return x.id===CMP.id})[0])CMP.id=P[0].id;if(!CMP.month)CMP.month=orqDay(0).slice(0,7);CMP.data=null;CMP.err="";CMP.busy=false;CMP.tab="ov";CMP.c={};CMP.cb={};CMP.ce={};CMP.flash="";render();window.scrollTo(0,0);var th2=document.getElementById("orqt");if(th2)th2.focus();cmpNeed();return}
  if(a==="cmpback"){V.orq=false;ORQ.mode="list";render();window.scrollTo(0,0);return}
- if(a==="cmppdf"){cmpPdf();return}}
+ if(a==="cmppdf"){cmpPdf();return}
+ if(a==="cmptab"){cmpTab(id);return}
+ if(a==="cmpretry"){var kk=cmpKeys();[kk.sc,kk.rpn,kk.lv,kk.rv].forEach(function(x){delete CMP.ce[x]});render(true);cmpNeed();return}
+ if(a==="cmpfbsend"){cmpFbSend();return}}
 function orqBind(){var cpl=document.getElementById("cmp_place");if(cpl)cpl.onchange=function(){cmpSel(cpl.value,null)};var cmo=document.getElementById("cmp_month");if(cmo)cmo.onchange=function(){cmpSel(null,cmo.value)};var rvb=document.getElementById("orq_rvc");if(rvb){rvb.oninput=orqRevCollect}document.querySelectorAll("input[name=orq_rv],#orq_rvp").forEach(function(e){e.onchange=orqRevCollect});document.querySelectorAll("[data-orq]").forEach(function(e){e.onclick=function(){orqAct(e.dataset.orq,e.dataset.id||"")}});
  var f=document.getElementById("orqf");if(f){f.oninput=orqCollect;f.onchange=orqCollect;orqFreeKick()}
  var sl=document.getElementById("orq_slip");if(sl)sl.onchange=function(){var fl=sl.files&&sl.files[0];if(!fl)return;orqImg(fl,function(d,err){ORQ.slip=d;ORQ.slipMsg=d?"":err;var pv=document.getElementById("orq_sprev"),m=document.getElementById("orq_smsg"),b=document.querySelector("[data-orq=slipsend]");if(m)m.textContent=ORQ.slipMsg;if(pv)pv.innerHTML=d?'<img class="slipth" alt="ตัวอย่างสลิป" src="'+d+'" style="max-width:100%;max-height:220px;border-radius:8px">':"";if(b)b.disabled=!d})};
