@@ -28,6 +28,7 @@ await ctx.route('**/*supabase.co/**',async r=>{const q=r.request(),u=new URL(q.u
  const J=(s,o)=>r.fulfill({status:s,contentType:'application/json',body:JSON.stringify(o)});const r2=()=>r.fulfill({status:204,body:''});
  const sess=()=>({access_token:'at',refresh_token:'rt',expires_in:3600,user:{id:UID,user_metadata:{first_name:'สมชาย',last_name:'ใจดี',phone:'0811111111'}}});
  if(path==='/rest/v1/rpc/my_org_report'){REPCALLS.push(body.p_request);const t=bkk(3)+'T';return J(200,{rows:[{ref:'BK1',status:'completed',starts_at:t+'03:00:00Z',ends_at:t+'04:00:00Z',started_at:null,done_at:null,service:'นวดไทย',minutes:60,job:'done',active:true,staff:'คุณนุ่น',customer:'สมชาย'},{ref:'BK2',status:'confirmed',starts_at:t+'04:00:00Z',ends_at:t+'05:00:00Z',started_at:null,done_at:null,service:'นวดไทย',minutes:60,job:null,active:true,staff:'คุณนุ่น',customer:'มาลี'},{ref:'BK3',status:'cancelled',starts_at:t+'05:00:00Z',ends_at:t+'06:00:00Z',started_at:null,done_at:null,service:'นวดไทย',minutes:60,job:null,active:false,staff:'คุณนุ่น',customer:'ประยุทธ'}]})}
+ if(path==='/rest/v1/rpc/org_link_info'){const q=ORL.find(x=>x.id===body.p_id);return J(200,q?{status:q.status,place_id:q.status==='confirmed'?'og1':null,org_name:q.org_name,service_date:q.service_date,start_time:q.start_time,end_time:q.end_time}:null)}
  if(path==='/rest/v1/rpc/org_free_staff'){FREECALLS.push(body.p_date);return J(200,body.p_date===bkk(19)?['st4']:body.p_date===bkk(22)?[]:['st3','st4'])}
  if(path==='/rest/v1/rpc/org_request_info')return J(200,{rate:400,districts:['ปทุมวัน','พญาไท','บางรัก','ดุสิต'],lead_days:10,pay_before_days:3,max_days:120,services:[{id:'sv15',name:'นวดคอบ่าไหล่',minutes:15,rest_minutes:5},{id:'sv30',name:'นวดไทย',minutes:30,rest_minutes:0}]});
  if(path==='/rest/v1/app_settings'&&m==='GET'&&u.search.includes('promptpay'))return J(200,[{promptpay_on:true,promptpay_type:'mobile',promptpay_id:'0812345678',promptpay_name:'สมาคมทดสอบ'}]);
@@ -189,6 +190,8 @@ ORL.push({id:'rq9',ref:'ORG-TEST-0009',org_name:'บริษัท รอตร
 await p.click('[data-tab=ac]');await p.click('[data-orq=open]');await p.waitForSelector('.orqtabs',{timeout:4000});
 ok('tab counts shown',JSON.stringify(await p.$$eval('.orqtabs button',o=>o.map(x=>x.textContent)))===JSON.stringify(['กำลังดำเนินการ (1)','ยืนยันแล้ว (1)','ยกเลิกและหมดอายุ (0)','รายงาน']));
 ok('default tab = in progress, shows only pending card',(await p.getAttribute('#orqtab_act','aria-pressed'))==='true'&&await p.$$eval('.orqc',o=>o.length===1&&o[0].textContent.includes('บริษัท รอตรวจ')));
+await p.click('.orqc [data-orq=lcopy]');
+ok('pending card: share link available before payment (?orq=)',await p.waitForFunction(()=>(window.__cp||[]).some(x=>x.endsWith('?orq=rq9')),null,{timeout:4000}).then(()=>true,()=>false));
 await p.click('#orqtab_done');ok('done tab shows confirmed only',(await p.getAttribute('#orqtab_done','aria-pressed'))==='true'&&await p.$$eval('.orqc',o=>o.length===1&&o[0].textContent.includes('ORG-TEST-0001')));
 ok('SR announces tab change',await p.waitForFunction(t=>document.getElementById('sr').textContent.includes(t),'ยืนยันแล้ว 1 รายการ',{timeout:4000}).then(()=>true,()=>false));
 await p.click('#orqtab_closed');ok('empty tab message',(await p.textContent('#app')).includes('ไม่มีคำขอในหมวดนี้'));
@@ -220,6 +223,12 @@ ok('deep link opens the org place booking',await p.$eval('#app',e=>e.textContent
 ok('link consumed (stored id cleared)',!(await p.evaluate(()=>sessionStorage.getItem('orgLink'))));
 await p.goto(require('./config').page('customer-booking.html')+'?org=00000000-0000-0000-0000-000000000000');await p.waitForTimeout(1500);
 ok('bad link announces unavailable + shows home',(await p.textContent('#sr')).includes('ลิงก์จองนี้ไม่พร้อมใช้งาน')&&!!(await p.$('[data-pl]')));
+await p.goto(require('./config').page('customer-booking.html')+'?orq=rq9');await p.waitForSelector('#orqlm',{timeout:6000});
+ok('pre-payment link shows waiting message, not booking',(await p.textContent('#orqlm')).includes('ยังไม่เปิดรับจอง')&&!!(await p.$('[data-pl]')));
+await p.goto(require('./config').page('customer-booking.html')+'?orq=rq1');await p.waitForTimeout(2000);
+ok('confirmed request link opens booking page',await p.$eval('#app',e=>e.textContent.includes('สำนักงานพัฒนาสังคม')&&!e.querySelector('[data-pl]')));
+await p.goto(require('./config').page('customer-booking.html')+'?orq=nope');await p.waitForSelector('#orqlm',{timeout:6000});
+ok('unknown request link says not found',(await p.textContent('#orqlm')).includes('ไม่พบงาน'));
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)
 })()
 
