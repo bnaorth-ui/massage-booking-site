@@ -131,8 +131,10 @@ ok('cards listed with details',t.includes('บริษัทตัวอย่�
 ok('slip image loaded',await until(()=>document.querySelector('#oqslip_q2 img')));
 ok('invite status shown',t.includes('คุณกลาง (รอตอบ)'));
 ok('deadline panel lists invite near due',t.includes('ใกล้หมดเวลา')&&t.includes('หน่วยงานรอตอบ')&&t.includes('ยังไม่ตอบ: คุณกลาง')&&t.includes('ด่วน')&&/เหลือ 4 ชั่วโมง|เหลือ 5 ชั่วโมง/.test(t));
+await p.click('[data-a=oqsub][data-id=rt]');await p.waitForTimeout(200);
 ok('company ratings panel: average + flagged + comment',await p.evaluate(()=>{const e=document.getElementById('crvq');if(!e)return false;const t=e.innerText;return t.includes('คะแนนเฉลี่ย 3.5 จาก 5')&&t.includes('ต้องดู 1')&&t.includes('หมอนวดมาสาย')&&t.includes('บริษัท ไทยออฟฟิศ')&&t.includes('2026-10')}));
 ok('reviews panel: average + flagged + comment',await p.evaluate(()=>{const e=document.getElementById('orvq');if(!e)return false;const t=e.innerText;return t.includes('คะแนนเฉลี่ย 3.5 จาก 5')&&t.includes('ต้องดู 1')&&t.includes('มาสายมาก')&&t.includes('แจ้งว่ามีปัญหา')&&t.includes('หมอนวด: คุณกลาง')}));
+await p.click('[data-a=oqsub][data-id=rq]');await p.waitForTimeout(200);
 ok('deadline panel has tel links',!!(await p.$('#dlq a[href="tel:0800000000"]')));
 await p.screenshot({path:'oreq_admin.png',fullPage:true});
 // proxy accept for q3
@@ -159,6 +161,7 @@ ok('approve handover rpc',hoCalls[0]&&hoCalls[0].p_id==='h1'&&hoCalls[0].p_ok===
 await p.click('[data-a=hono][data-id=h2]');await p.waitForTimeout(200);ok('reject handover asks reason',!!(await p.$('#hon_h2')));
 await p.fill('#hon_h2','ไม่ว่าง');await p.click('[data-a=hono][data-id=h2]');await p.waitForTimeout(500);
 ok('reject handover rpc with note',hoCalls[1]&&hoCalls[1].p_id==='h2'&&hoCalls[1].p_ok===false&&hoCalls[1].p_note==='ไม่ว่าง');
+await p.click('[data-a=oqsub][data-id=co]');await p.waitForTimeout(200);
 t=await p.evaluate(()=>document.body.innerText);
 ok('company substitute panel: pending + uncovered + leave form',t.includes('หมอนวดแทนบริษัท')&&t.includes('คุณนุ่น ลา ขอให้ คุณสอง แทน')&&t.includes('วันที่หมอนวดประจำลาและยังไม่มีคนแทน')&&t.includes('ธุระ')&&!!(await p.$('#lva_s')));
 await p.click('[data-a=chok][data-id=ch1]');await p.waitForTimeout(500);ok('approve company substitute rpc',chCalls[0][0]==='decide'&&chCalls[0][1].p_id==='ch1'&&chCalls[0][1].p_ok===true);
@@ -170,6 +173,7 @@ ok('assign rpc with from staff',chCalls.some(c=>c[0]==='assign'&&c[1].p_to==='p1
 await p.click('[data-a=chrm][data-id=ch9]');await p.waitForTimeout(500);ok('admin can cancel substitute',chCalls.some(c=>c[0]==='remove'&&c[1].p_id==='ch9'));
 await p.selectOption('#lva_s','p1');await p.fill('#lva_d','2099-02-01');await p.fill('#lva_r','โทรมาลา');await p.click('[data-a=lvaadd]');await p.waitForTimeout(500);
 ok('admin records leave on behalf',chCalls.some(c=>c[0]==='leave'&&c[1].p_staff==='p1'&&c[1].p_day==='2099-02-01'&&c[1].p_reason==='โทรมาลา'));
+await p.click('[data-a=oqsub][data-id=rq]');await p.waitForTimeout(200);
 await p.evaluate(()=>window.scrollTo(0,0));
 ok('remove button on accepted therapist',!!(await p.$('[data-a=oqrm][data-id=iv2]')));
 await p.click('[data-a=oqrp][data-id=iv2]');await p.waitForSelector('#rep_sel',{timeout:4000});
@@ -196,4 +200,11 @@ await p.setInputFiles('#rcp_q4',{name:'new.pdf',mimeType:'application/pdf',buffe
 ok('replace uploads new file and deletes the old one',rcUps.length===2&&rcUps[1].path!==firstPath&&rcDels.some(x=>x[0]===firstPath));
 await p.click('[data-a=oqrcrm][data-id=q4]');await p.waitForTimeout(900);
 ok('remove clears path and deletes file',rcCalls[rcCalls.length-1].p_path===null&&rcDels.some(x=>x[0]===rcUps[1].path)&&(await p.textContent('[aria-label="ใบเสร็จของ หน่วยงานยืนยันแล้ว"]')).includes('ยังไม่ได้แนบใบเสร็จ'));
+await p.click('[data-a=oqsub][data-id=rq]');await p.waitForTimeout(200);
+ok('sub-tab bar: 4 tabs with roles, one selected',await p.evaluate(()=>{const b=[...document.querySelectorAll('#main [data-a=oqsub]')];return b.length===4&&b.every(x=>x.getAttribute('role')==='tab')&&b.filter(x=>x.getAttribute('aria-selected')==='true').length===1&&b.map(x=>x.dataset.id).join()==='rq,co,rc,rt'}));
+await p.click('[data-a=oqsub][data-id=rt]');await p.waitForTimeout(200);
+ok('ratings tab shows only rating panels',await p.evaluate(()=>!!document.getElementById('crvq')&&!!document.getElementById('orvq')&&!document.getElementById('chvq')&&!document.getElementById('capq')&&!document.getElementById('spq')&&!document.querySelector('.item [data-a=oqrm]')));
+await p.click('[data-a=oqsub][data-id=co]');await p.waitForTimeout(200);
+ok('company tab shows company panels only',await p.evaluate(()=>!!document.getElementById('chvq')&&!document.getElementById('crvq')&&!document.getElementById('spq')));
+ok('selected tab keeps focus after switch',await p.evaluate(()=>document.activeElement&&document.activeElement.dataset.id==='co'));
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)})();

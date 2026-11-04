@@ -139,6 +139,7 @@ let t=await p.evaluate(()=>document.body.innerText);
 ok('subtab badge counts pending+paid_review (2)',/คำขอหน่วยงาน \(2\)/.test(t));
 await p.click('#main .subtabs [data-id=oreq]');await p.waitForTimeout(400);
 await p.evaluate(()=>{window.__open=[];window.open=(u)=>{window.__open.push(u);return null};window.__clip=[];Object.defineProperty(navigator,'clipboard',{value:{writeText:t=>{window.__clip.push(t);return Promise.resolve()}},configurable:true})});
+await p.click('[data-a=oqsub][data-id=rc]');await p.waitForTimeout(250);
 const Q=()=>p.evaluate(()=>document.getElementById('spq')?document.getElementById('spq').innerText:'');
 let c=await Q();
 ok('panel shows posting, counts, new badge',c.includes('รับสมัครหมอนวด')&&c.includes('รับสมัครหมอนวดประจำ')&&c.includes('เปิดรับสมัคร')&&c.includes('ผู้สมัคร 1 คน (ใหม่ 1)')&&c.includes('ใหม่ 1'));

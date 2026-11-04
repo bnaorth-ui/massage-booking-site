@@ -132,6 +132,7 @@ await p.click('#tabs [data-id=pl]');await p.waitForTimeout(300);
 let t=await p.evaluate(()=>document.body.innerText);
 ok('subtab badge counts pending+paid_review (2)',/คำขอหน่วยงาน \(2\)/.test(t));
 await p.click('#main .subtabs [data-id=oreq]');await p.waitForTimeout(400);
+await p.click('[data-a=oqsub][data-id=co]');await p.waitForTimeout(250);
 const T0=()=>p.evaluate(()=>document.getElementById('capq')?document.getElementById('capq').innerText:'');
 let c=await T0();
 ok('panel lists details',c.includes('บริษัท เอบีซี จำกัด')&&c.includes('ชาย 1 หญิง 2')&&c.includes('มาตรา 33')&&c.includes('15,000')&&c.includes('ต้องดู 2')&&c.includes('ไม่ระบุเงินเดือน')&&c.includes('มาตรา 35'));
