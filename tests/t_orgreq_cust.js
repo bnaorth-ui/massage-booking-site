@@ -14,7 +14,7 @@ const services=[
  {id:'ga',place_id:null,name:'นวดไทยแผนโบราณ',minutes:60,price:400,applies_all:true,active:true},
  {id:'sa',place_id:'sh1',name:'นวดไทย',minutes:60,price:400,applies_all:false,active:true},
  {id:'sb',place_id:'sh1',name:'นวดเท้า',minutes:60,price:350,applies_all:false,active:true}];
-const FREECALLS=[];const MORE=[];const REPCALLS=[];
+const FREECALLS=[];const UPD=[];const MORE=[];const REPCALLS=[];
 const staff=[{id:'st1',name:'คุณวิภา',place_id:'sh1',photo_path:null},{id:'st2',name:'คุณสมศรี',place_id:'sh1',photo_path:null},{id:'st3',name:'คุณนุ่น',place_id:null,photo_path:null},{id:'st4',name:'คุณมะลิ',place_id:null,photo_path:null}];
 const ss=[['st1','sa'],['st1','sb'],['st2','sa'],['st3','ga'],['st4','ga']].map(x=>({staff_id:x[0],service_id:x[1]}));
 const ps=[{place_id:'og1',staff_id:'st3',weekdays:[]},{place_id:'cp1',staff_id:'st4',weekdays:[1,2,3,4,5]}];
@@ -30,6 +30,7 @@ await ctx.route('**/*supabase.co/**',async r=>{const q=r.request(),u=new URL(q.u
  if(path==='/rest/v1/rpc/my_org_report'){REPCALLS.push(body.p_request);const t=bkk(3)+'T';return J(200,{rows:[{ref:'BK1',status:'completed',starts_at:t+'03:00:00Z',ends_at:t+'04:00:00Z',started_at:null,done_at:null,service:'นวดไทย',minutes:60,job:'done',active:true,staff:'คุณนุ่น',customer:'สมชาย'},{ref:'BK2',status:'confirmed',starts_at:t+'04:00:00Z',ends_at:t+'05:00:00Z',started_at:null,done_at:null,service:'นวดไทย',minutes:60,job:null,active:true,staff:'คุณนุ่น',customer:'มาลี'},{ref:'BK3',status:'cancelled',starts_at:t+'05:00:00Z',ends_at:t+'06:00:00Z',started_at:null,done_at:null,service:'นวดไทย',minutes:60,job:null,active:false,staff:'คุณนุ่น',customer:'ประยุทธ'}]})}
  if(path==='/rest/v1/rpc/org_link_info'){const q=ORL.find(x=>x.id===body.p_id);return J(200,q?{status:q.status,place_id:q.status==='confirmed'?'og1':null,org_name:q.org_name,service_date:q.service_date,start_time:q.start_time,end_time:q.end_time}:null)}
  if(path==='/rest/v1/rpc/org_request_invite_more'){MORE.push(body);const q=ORL.find(x=>x.id===body.p_id);q.status='invited';return J(200,body.p_staff.length)}
+ if(path==='/rest/v1/rpc/org_request_update'){UPD.push(body);const q=ORL.find(x=>x.id===body.p_id);Object.assign(q,{org_name:body.p.name,contact_name:body.p.contact_name,service_id:body.p.service,staff_ids:body.p.staff});return J(200,q.id)}
  if(path==='/rest/v1/rpc/org_free_staff'){FREECALLS.push(body.p_date);return J(200,body.p_date===bkk(19)?['st4']:body.p_date===bkk(22)?[]:['st3','st4'])}
  if(path==='/rest/v1/rpc/org_request_info')return J(200,{rate:400,districts:['ปทุมวัน','พญาไท','บางรัก','ดุสิต'],lead_days:10,pay_before_days:3,max_days:120,services:[{id:'sv15',name:'นวดคอบ่าไหล่',minutes:15,rest_minutes:5},{id:'sv30',name:'นวดไทย',minutes:30,rest_minutes:0}]});
  if(path==='/rest/v1/app_settings'&&m==='GET'&&u.search.includes('promptpay'))return J(200,[{promptpay_on:true,promptpay_type:'mobile',promptpay_id:'0812345678',promptpay_name:'สมาคมทดสอบ'}]);
@@ -232,6 +233,20 @@ ok('send button reflects selection',(await p.textContent('[data-orq=moresend]'))
 await p.click('[data-orq=moresend]');
 ok('invite-more RPC called with selection',await p.waitForFunction(()=>true).then(()=>MORE.length===1&&MORE[0].p_id==='rq10'&&MORE[0].p_staff[0]==='st4'));
 ok('after sending: status invited + flash + SR',await p.waitForFunction(t=>document.getElementById('sr').textContent.includes(t),'ส่งคำเชิญหมอนวดเพิ่ม 1 คน',{timeout:4000}).then(()=>true,()=>false)&&!(await p.$('[data-orq=more]')));
+// ---- แก้ไขคำขอที่ยังรออนุมัติ
+{const q=ORL.find(x=>x.id==='rq9');q.service_id='sv30';q.staff_ids=['st3'];}
+await p.evaluate(()=>orqLoad());await p.click('#orqtab_act');
+ok('edit button only on pending',!!(await p.$('[data-orq=edit][data-id=rq9]'))&&!(await p.$('[data-orq=edit][data-id=rq1]')));
+await p.click('[data-orq=edit][data-id=rq9]');await p.waitForSelector('#orqf',{timeout:4000});
+ok('edit form prefilled incl. date, service, staff',(await p.inputValue('#orq_name'))==='บริษัท รอตรวจ'&&(await p.inputValue('#orq_date'))===bkk(30)&&await p.isChecked('[data-orqv=sv30]')&&(await p.textContent('h1')).includes('แก้ไขคำขอ')&&(await p.textContent('[data-orq=send]')).includes('บันทึกการแก้ไข'));
+await p.fill('#orq_name','บริษัท รอตรวจ (แก้ไข)');await p.check('#orq_terms');
+await p.waitForFunction(()=>!!document.querySelector('[data-orqs=st3]'),null,{timeout:4000});
+await p.click('[data-orq=send]');await p.waitForSelector('.orqc',{timeout:4000});
+ok('update rpc called with id + new data',UPD.length===1&&UPD[0].p_id==='rq9'&&UPD[0].p.name==='บริษัท รอตรวจ (แก้ไข)'&&UPD[0].p.service==='sv30'&&UPD[0].p.staff[0]==='st3');
+ok('edited card shown + SR',(await p.textContent('#app')).includes('บริษัท รอตรวจ (แก้ไข)')&&await p.waitForFunction(t=>document.getElementById('sr').textContent.includes(t),'บันทึกการแก้ไขคำขอแล้ว',{timeout:4000}).then(()=>true,()=>false));
+await p.click('[data-orq=new]').catch(()=>{});await p.waitForSelector('#orqf',{timeout:4000});
+ok('new request after edit starts empty',(await p.inputValue('#orq_name'))===''&&(await p.textContent('h1')).includes('ขอบริการสำหรับหน่วยงาน'));
+await p.click('[data-orq=back]');
 // ---- เปิดลิงก์จองของงาน (?org=) ต้องไปหน้าจองของงานนั้นเลย
 await p.goto(require('./config').page('customer-booking.html')+'?org=og1');await p.waitForTimeout(1500);
 ok('deep link opens the org place booking',await p.$eval('#app',e=>e.textContent.includes('สำนักงานพัฒนาสังคม')&&!e.querySelector('[data-pl]')));
