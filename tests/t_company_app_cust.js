@@ -122,6 +122,7 @@ await p.click('[data-orq=capcancel]');ok('cancel needs confirm click',CANCS.leng
 await p.click('[data-orq=capcancel]');await p.waitForTimeout(300);ok('cancel sent',CANCS.length===1&&(await p.textContent('#app')).includes('ยกเลิกแล้ว'));
 await p.click('[data-orq=capback]');await p.waitForTimeout(200);
 ok('back returns to account with bar',!!(await p.$('[data-orq=capopen]')));
+ok('account menu: compact button "สำหรับบริษัท", no title/description',await p.evaluate(()=>{const b=document.querySelector('[data-orq=capopen]');const bar=b&&b.closest('.regbar');return !!bar&&b.textContent.trim()==='สำหรับบริษัท'&&bar.textContent.trim()==='สำหรับบริษัท'&&!document.body.innerText.includes('ลงทะเบียนบริษัทของคุณด้านล่างนี้')}));
 await p.click('[data-orq=capopen]');await p.waitForSelector('#capf');ok('reopen works',!!(await p.$('#capf')));
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)
 })()
