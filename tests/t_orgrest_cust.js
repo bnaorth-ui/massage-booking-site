@@ -7,6 +7,7 @@ const UID='uuid-1';
 const places=[
  {id:'sh1',type:'shop',name:'ร้านสบายดี สปา',area:'สุขุมวิท',lat:13.76,lng:100.51,open_days:[0,1,2,3,4,5,6],open_time:'10:00:00',close_time:'21:00:00',fixed_date:null,advance_days:14,cancel_hours:24,image_path:null,status:'approved',active:true},
  {id:'og1',type:'org',name:'สำนักงานพัฒนาสังคม',area:'พญาไท',lat:13.758,lng:100.509,open_days:[0,1,2,3,4,5,6],open_time:'09:00:00',close_time:'17:00:00',fixed_date:bkk(3),lunch_start:'12:00:00',lunch_end:'13:00:00',advance_days:14,cancel_hours:24,image_path:null,status:'approved',active:true},
+ {id:'og2',type:'org',name:'สำนักงานทดสอบสอง',area:'พญาไท',lat:13.758,lng:100.509,open_days:[0,1,2,3,4,5,6],open_time:'10:00:00',close_time:'16:00:00',fixed_date:bkk(3),lunch_start:'12:00:00',lunch_end:'13:00:00',advance_days:14,cancel_hours:24,image_path:null,status:'approved',active:true},
  {id:'cp1',type:'company',name:'บริษัท ไทยออฟฟิศ',area:'ปทุมวัน',lat:13.7635,lng:100.5018,open_days:[1,2,3,4,5],open_time:'09:00:00',close_time:'18:00:00',fixed_date:null,advance_days:14,cancel_hours:24,image_path:null,status:'approved',active:true}];
 const services=[
  {id:'ga',place_id:null,name:'นวดไทยแผนโบราณ',minutes:60,price:400,applies_all:true,active:true},
@@ -18,7 +19,7 @@ const services=[
  {id:'n30',place_id:null,name:'นวด 30 นาที ไม่พัก',minutes:30,rest_minutes:0,price:300,applies_all:true,active:true}];
 const staff=[{id:'st1',name:'คุณวิภา',place_id:'sh1',photo_path:null},{id:'st2',name:'คุณสมศรี',place_id:'sh1',photo_path:null},{id:'st3',name:'คุณนุ่น',place_id:null,photo_path:null},{id:'st4',name:'คุณมะลิ',place_id:null,photo_path:null}];
 const ss=[['st1','sa'],['st1','sb'],['st2','sa'],['st3','ga'],['st4','ga'],['st3','r15'],['st3','r20'],['st3','r25'],['st3','n30']].map(x=>({staff_id:x[0],service_id:x[1]}));
-const ps=[{place_id:'og1',staff_id:'st3',weekdays:[]},{place_id:'cp1',staff_id:'st4',weekdays:[1,2,3,4,5]}];
+const ps=[{place_id:'og1',staff_id:'st3',weekdays:[]},{place_id:'og2',staff_id:'st3',weekdays:[]},{place_id:'cp1',staff_id:'st4',weekdays:[1,2,3,4,5]}];
 const promos=[{id:'pm1',place_id:'sh1',title:'ลดราคานวดเท้า',description:'',type:'percent',value:10,applies_all:false,start_date:bkk(-1),end_date:bkk(30),image_path:null,active:true}];
 const pms=[{promotion_id:'pm1',service_id:'sb'}];
 const nm=id=>(staff.find(s=>s.id===id)||{}).name;
@@ -66,8 +67,8 @@ await p.fill('#lph','0811111111');await p.fill('#lpw','abc123');await p.click('b
 const hmNow=async()=>0;
 const day=(off)=>new Date(Date.now()+7*3600000+off*86400000).toISOString().slice(0,10);
 const D0=day(0),FD=bkk(3);
-async function pick(svc){await p.clock.setFixedTime(new Date(D0+'T08:00:00+07:00'));await p.click('[data-tab=""]');for(let i=0;i<5&&!(await p.$('[data-pl]'));i++){await p.click('#back');await p.waitForTimeout(150)}await p.waitForSelector('[data-pl]');await p.click('[data-kind=org]');await p.waitForSelector('[data-pl="og1"]');
- await p.click('[data-pl="og1"]');await p.waitForSelector('[data-svc="'+svc+'"]');const lab=await p.textContent('[data-svc="'+svc+'"]');await p.click('[data-svc="'+svc+'"]');await p.click('#next');await p.waitForSelector('#selT');await p.waitForTimeout(600);
+async function pick(svc,pl){await p.clock.setFixedTime(new Date(D0+'T08:00:00+07:00'));await p.click('[data-tab=""]');for(let i=0;i<5&&!(await p.$('[data-pl]'));i++){await p.click('#back');await p.waitForTimeout(150)}await p.waitForSelector('[data-pl]');await p.click('[data-kind=org]');await p.waitForSelector('[data-pl="og1"]');
+ await p.click('[data-pl="'+(pl||'og1')+'"]');await p.waitForSelector('[data-svc="'+svc+'"]');const lab=await p.textContent('[data-svc="'+svc+'"]');await p.click('[data-svc="'+svc+'"]');await p.click('#next');await p.waitForSelector('#selT');await p.waitForTimeout(600);
  const o=await p.$$eval('#selT option',os=>os.filter(x=>x.value).map(x=>({v:+x.value,dis:x.disabled,t:x.textContent})));return{lab,o,label:await p.textContent('label[for=selT]')}}
 const vals=r=>r.o.map(x=>x.v),stepOf=a=>a.length>1?a[1]-a[0]:0;
 let r=await pick('r15');ok('r15 label shows rest',r.lab.includes('15 นาที พัก 5 นาที'));
@@ -84,4 +85,9 @@ r=await pick('n30');m=Object.fromEntries(r.o.map(x=>[x.v,x]));ok('n30: 10:00 ful
 // เลือก 10:20 ของ r15 -> หน้าพนักงานแสดงเวลานวดจริง 10:20-10:35 ไม่รวมเวลาพัก
 r=await pick('r15');await p.selectOption('#selT','620');await p.waitForTimeout(400);
 ok('staff step shows massage time only',(await p.textContent('h1'))==='เลือกพนักงาน'&&(await p.textContent('.sub')).includes('10:20 น.-10:35 น.')&&!(await p.textContent('.sub')).includes('10:40'));
+for(const [sv,n,mx] of [['r15',6,700],['r20',5,700],['r25',4,690]]){const r=await pick(sv,'og2');const v=vals(r);
+ ok(sv+' og2 morning slots '+n+', none overlap lunch/close',v.filter(x=>x<720).length===n&&v.every(x=>x>=600&&x<=960));
+ if(sv==='r20')ok('r20 og2: 11:40 offered (rest may fall in lunch), afternoon last 15:30',v.includes(700)&&v.includes(780)&&v.slice(-1)[0]===930&&!v.includes(955));
+ if(sv==='r15')ok('r15 og2: afternoon last 15:40',v.slice(-1)[0]===940);
+ if(sv==='r25')ok('r25 og2: afternoon last 15:30',v.slice(-1)[0]===930&&v.filter(x=>x>=780).length===6);}
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)})();
