@@ -4,7 +4,7 @@ const {chromium}=require('playwright');
 const bkk=(n=0)=>{const d=new Date(Date.now()+7*3600000+n*86400000);return d.toISOString().slice(0,10)};
 (async()=>{const b=await chromium.launch(require('./config').launch);
 const ctx=await b.newContext({timezoneId:'Asia/Bangkok',locale:'th-TH'});const errs=[],calls=[];
-let mode={cat:true,rpcMissing:false};const RVS=[];let RVFAIL='';const ORL=[],SUBS=[],CANC=[],ATT=[],UPL=[];let SUBFAIL='';let seq=100000;const BKS=[];const NOTES=[];
+let mode={cat:true,rpcMissing:false};const RVS=[],RCGET=[];let RVFAIL='';const ORL=[],SUBS=[],CANC=[],ATT=[],UPL=[];let SUBFAIL='';let seq=100000;const BKS=[];const NOTES=[];
 const UID='uuid-1';
 const places=[
  {id:'sh1',type:'shop',name:'ร้านสบายดี สปา',area:'สุขุมวิท',lat:13.76,lng:100.51,open_days:[0,1,2,3,4,5,6],open_time:'10:00:00',close_time:'21:00:00',fixed_date:null,advance_days:14,cancel_hours:24,image_path:null,status:'approved',active:true},
@@ -34,6 +34,7 @@ await ctx.route('**/*supabase.co/**',async r=>{const q=r.request(),u=new URL(q.u
  if(path==='/rest/v1/rpc/org_free_staff'){FREECALLS.push(body.p_date);return J(200,body.p_date===bkk(19)?['st4']:body.p_date===bkk(22)?[]:['st3','st4'])}
  if(path==='/rest/v1/rpc/org_request_info')return J(200,{rate:400,districts:['ปทุมวัน','พญาไท','บางรัก','ดุสิต'],lead_days:10,pay_before_days:3,max_days:120,services:[{id:'sv15',name:'นวดคอบ่าไหล่',minutes:15,rest_minutes:5},{id:'sv30',name:'นวดไทย',minutes:30,rest_minutes:0}]});
  if(path==='/rest/v1/app_settings'&&m==='GET'&&u.search.includes('promptpay'))return J(200,[{promptpay_on:true,promptpay_type:'mobile',promptpay_id:'0812345678',promptpay_name:'สมาคมทดสอบ'}]);
+ if(path.startsWith('/storage/v1/object/authenticated/receipts/')){RCGET.push(path);return r.fulfill({status:200,contentType:'application/pdf',body:Buffer.from('%PDF-1.4 rc')})}
  if(path==='/rest/v1/rpc/org_review_submit'){RVS.push(body);const q=ORL.find(x=>x.id===body.p_id);if(RVFAIL)return J(400,{code:'P0001',message:RVFAIL});q.review={rating:body.p_rating,comment:body.p_comment,problem:body.p_problem};return r2()}
  if(path==='/rest/v1/rpc/my_org_requests')return J(200,ORL);
  if(path==='/rest/v1/rpc/submit_org_request'){SUBS.push(body.p);if(SUBFAIL)return J(400,{code:'P0001',message:SUBFAIL});const p=body.p;ORL.unshift({id:'rq'+(ORL.length+1),ref:'ORG-TEST-000'+(ORL.length+1),org_name:p.name,district:p.district,address:p.address,lat:p.lat,lng:p.lng,contact_name:p.contact_name,contact_phone:p.contact_phone,service_date:p.date,start_time:p.start+':00',end_time:p.end+':00',service_label:p.service==='sv15'?'นวดคอบ่าไหล่ 15 นาที พัก 5 นาที':'นวดไทย 30 นาที',lunch_start:p.lunch_start?p.lunch_start+':00':null,lunch_end:p.lunch_end?p.lunch_end+':00':null,hours:5,rate:400,status:'pending',accepted_count:0,amount:null,pay_due_at:null,slip_path:null,slip_at:null,note:null,created_at:new Date().toISOString(),invites:[]});return J(200,'rq'+ORL.length)}
@@ -278,6 +279,13 @@ ok('server error shown, form kept',(await p.textContent('#orq_rverr')).includes(
 RVFAIL='';await p.click('[data-orq=revsend]');await p.waitForTimeout(800);
 ok('review rpc payload',RVS.length===2&&RVS[1].p_id==='rq11'&&RVS[1].p_rating===2&&RVS[1].p_comment==='มาสาย'&&RVS[1].p_problem===true);
 {const t=await p.textContent('#app');ok('back to list with thanks + shown rating, button gone',t.includes('ขอบคุณที่ให้คะแนน')&&t.includes('ท่านให้คะแนนบริการแล้ว 2/5 (แจ้งปัญหา)')&&!(await p.$('[data-orq=rev][data-id=rq11]')));}
+// ---- ดาวน์โหลดใบเสร็จที่สมาคมแนบ
+ok('no receipt button before admin attaches',!(await p.$('[data-orq=rcp]')));
+ORL.find(x=>x.id==='rq11').receipt_path='uuid-1/rq11-abc.pdf';
+await p.evaluate(()=>orqLoad());await p.waitForSelector('[data-orq=rcp][data-id=rq11]',{timeout:4000});
+ok('receipt button only on the request that has one',(await p.$$('[data-orq=rcp]')).length===1);
+{const [dl]=await Promise.all([p.waitForEvent('download',{timeout:5000}),p.click('[data-orq=rcp][data-id=rq11]')]);
+ok('receipt downloaded as pdf named by ref',dl.suggestedFilename()==='receipt-ORG-TEST-0011.pdf'&&RCGET.length===1&&RCGET[0].endsWith('/receipts/uuid-1/rq11-abc.pdf'));}
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)
 })()
 

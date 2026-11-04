@@ -673,6 +673,10 @@ function viewIn(){var t=S.tab;
 var OQ_ST={pending:["รออนุมัติ","closed"],invited:["รอหมอนวดตอบรับ","saved"],awaiting_payment:["รอชำระเงิน","saved"],paid_review:["รอตรวจสลิป","closed"],confirmed:["ยืนยันแล้ว","saved"],rejected:["ไม่อนุมัติ",""],cancelled:["ยกเลิก",""],expired:["หมดเวลา",""],no_staff:["ไม่มีหมอนวดรับงาน",""]},OQ_IS={pending:"รอตอบ",accepted:"รับงาน",declined:"ปฏิเสธ",expired:"หมดเวลา",cancelled:"ยกเลิก",replaced:"เปลี่ยนตัวแล้ว"};
 function oqDate(d){var x=new Date(d+"T00:00:00");return x.toLocaleDateString("th-TH",{day:"numeric",month:"short",year:"numeric"})}
 function oqT(t){return t?String(t).slice(0,5):""}
+function rcpBox(r){return'<div class="rcpbox" role="group" aria-label="ใบเสร็จของ '+esc(r.org_name)+'"><span class="sub">'+(r.receipt_path?'แนบใบเสร็จแล้ว เมื่อ '+ntAt(r.receipt_at):'ยังไม่ได้แนบใบเสร็จ')+'</span>'+
+ '<label class="sub" for="rcp_'+r.id+'">'+(r.receipt_path?'เปลี่ยนไฟล์ใบเสร็จ':'แนบใบเสร็จ')+' (PDF ไม่เกิน 5 MB)</label><input class="in" id="rcp_'+r.id+'" type="file" accept="application/pdf"><button class="btn" data-a="oqrcp" data-id="'+r.id+'">'+(r.receipt_path?'อัปโหลดไฟล์ใหม่':'อัปโหลดใบเสร็จ')+'</button>'+
+ (r.receipt_path?'<button class="btn" data-a="oqrcv" data-id="'+r.id+'">เปิดดูใบเสร็จ</button><button class="btn d" data-a="oqrcrm" data-id="'+r.id+'">ลบใบเสร็จ</button>':'')+'</div>'}
+function rcpDel(path){return path?sbApi("/storage/v1/object/receipts",{method:"DELETE",json:1,body:JSON.stringify({prefixes:[path]})}).catch(function(){}):Promise.resolve()}
 function oreqCard(r){var st=OQ_ST[r.status]||[r.status,""],inv=r.org_invites||[],nm=function(i){var s=byId(D.staff,i.staff_id);return s?s.name:"-"};
  var h='<div class="card" id="oq_'+r.id+'"><div class="head"><h2>'+esc(r.org_name)+'</h2><span class="'+(st[1]||"")+'">'+st[0]+'</span></div>'+
  '<p class="sub">'+esc(r.ref)+', เขต'+esc(r.district)+'</p><p>'+esc(r.address)+'</p>'+
@@ -691,6 +695,7 @@ function oreqCard(r){var st=OQ_ST[r.status]||[r.status,""],inv=r.org_invites||[]
  if(/^(invited|awaiting_payment|paid_review|confirmed)$/.test(r.status)&&String(r.service_date).slice(0,10)>=new Date(Date.now()+7*3600000).toISOString().slice(0,10)){inv.filter(function(i){return i.status==="accepted"}).forEach(function(i){
    if(String(r.service_date).slice(0,10)>new Date(Date.now()+7*3600000).toISOString().slice(0,10)){if(S.rep&&S.rep.inv===i.id){h+=!S.rep.cands?'<span class="sub" role="status">กำลังตรวจหมอนวดที่ว่างในวันงาน…</span>':!S.rep.cands.length?'<span class="sub">ไม่มีหมอนวดที่ว่างในวันงานนี้</span><button class="btn" data-a="oqrpno">ปิด</button>':'<label class="sub" for="rep_sel">เลือกหมอนวดแทน '+esc(nm(i))+'</label><select class="in" id="rep_sel"><option value="">เลือกหมอนวดที่ว่าง</option>'+S.rep.cands.map(function(c){return'<option value="'+esc(c.id)+'"'+(S.rep.sel===c.id?' selected':'')+'>'+esc(c.name)+'</option>'}).join("")+'</select><button class="btn" data-a="oqrpsend" data-id="'+i.id+'">ส่งคำเชิญหมอนวดแทน</button><button class="btn" data-a="oqrpno">ปิด</button>'}else h+='<button class="btn" data-a="oqrp" data-id="'+i.id+'">เลือกหมอนวดแทน '+esc(nm(i))+'</button>'}
    h+=S.rmI===i.id?'<input class="in" id="rmn_'+i.id+'" placeholder="เหตุผลที่ถอด '+esc(nm(i))+' (ไม่บังคับ)" maxlength="200"><button class="btn d" data-a="oqrm" data-id="'+i.id+'">ยืนยันถอด '+esc(nm(i))+' ออกจากงาน</button>':'<button class="btn d" data-a="oqrm" data-id="'+i.id+'">ถอด '+esc(nm(i))+' ออกจากงาน</button>'})}
+ if(r.status==="confirmed")h+=rcpBox(r);
  if(r.status==="awaiting_payment"||r.status==="invited")h+=(S.oqr===r.id?'<input class="in" id="oqn_'+r.id+'" placeholder="เหตุผล (ไม่บังคับ)" maxlength="200"><button class="btn d" data-a="oqno" data-id="'+r.id+'">ยืนยันยกเลิกคำขอ</button>':'<button class="btn d" data-a="oqno" data-id="'+r.id+'">ยกเลิกคำขอ</button>');
  return h+'</div>'}
 function hoPanel(){var L=D.ho||[],P=L.filter(function(x){return x.status==="pending_admin"}),H=L.filter(function(x){return x.status!=="pending_admin"});if(!L.length)return"";
@@ -901,6 +906,14 @@ document.addEventListener("click",function(e){
  if(a==="oqno"){if(S.oqr!==id){S.oqr=id;draw();return}var on_=g("oqn_"+id),orr=on_?on_.value.trim():"";
   act(function(){return rpc("admin_org_request_reject",{p_id:id,p_reason:orr||null}).then(loadCore).then(loadLive)},function(){S.oqr=null;S.info="บันทึกแล้ว และแจ้งผู้ขอแล้ว"});return}
  if(a==="oqinv"){act(function(){return rpc("admin_org_invite_respond",{p_invite:id,p_accept:t==="1"}).then(loadCore).then(loadLive)},function(){S.info="บันทึกการตอบรับแทนหมอนวดแล้ว"});return}
+ if(a==="oqrcp"){var rq=byId(D.oreq,id),fi=document.getElementById("rcp_"+id),fl=fi&&fi.files&&fi.files[0];
+  if(!rq)return;if(!fl){showErr("กรุณาเลือกไฟล์ PDF ใบเสร็จก่อน");return}
+  if(!(fl.type==="application/pdf"||/\.pdf$/i.test(fl.name))){showErr("แนบได้เฉพาะไฟล์ PDF");return}
+  if(fl.size>5*1024*1024){showErr("ไฟล์ใหญ่เกิน 5 MB");return}
+  var np_=rq.user_id+"/"+id+"-"+Date.now().toString(36)+".pdf",old=rq.receipt_path;
+  act(function(){return sbApi("/storage/v1/object/receipts/"+np_,{method:"POST",body:fl,headers:{"Content-Type":"application/pdf"}}).then(function(){return rpc("admin_org_receipt_set",{p_id:id,p_path:np_})}).then(function(){return old&&old!==np_?rcpDel(old):0}).then(loadCore).then(loadLive)},function(){S.info="แนบใบเสร็จแล้ว หน่วยงานได้รับแจ้งเตือน"});return}
+ if(a==="oqrcrm"){var rq2=byId(D.oreq,id);if(!rq2||!rq2.receipt_path)return;var op=rq2.receipt_path;act(function(){return rpc("admin_org_receipt_set",{p_id:id,p_path:null}).then(function(){return rcpDel(op)}).then(loadCore).then(loadLive)},function(){S.info="ลบใบเสร็จแล้ว"});return}
+ if(a==="oqrcv"){var rq3=byId(D.oreq,id);if(!rq3||!rq3.receipt_path)return;sbApi("/storage/v1/object/authenticated/receipts/"+rq3.receipt_path,{blob:true}).then(function(b){var u=URL.createObjectURL(new Blob([b],{type:"application/pdf"})),w=window.open(u,"_blank");if(!w){var l=document.createElement("a");l.href=u;l.download="receipt-"+rq3.ref+".pdf";document.body.appendChild(l);l.click();l.remove()}setTimeout(function(){URL.revokeObjectURL(u)},60000)},function(){showErr("เปิดใบเสร็จไม่สำเร็จ")});return}
  if(a==="oqclose"){act(function(){return rpc("admin_org_close_invites",{p_id:id}).then(loadCore).then(loadLive)},function(){S.info="ปิดรับคำตอบแล้ว"});return}
  if(a==="oqpay"){if(t==="0"&&S.oqr!==id){S.oqr=id;draw();return}var pn=g("oqn_"+id),pnote=pn?pn.value.trim():"";
   act(function(){return rpc("admin_org_payment_confirm",{p_id:id,p_ok:t==="1",p_note:pnote||null}).then(loadCore).then(loadLive)},function(){S.oqr=null;S.info=t==="1"?"ยืนยันรับเงินแล้ว งานได้รับการยืนยัน":"แจ้งผู้ขอให้ส่งสลิปใหม่แล้ว"});return}

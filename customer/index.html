@@ -623,7 +623,7 @@ function rd(k,d){try{var v=JSON.parse(localStorage.getItem(k));return v==null?d:
 function wr(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}
 function sbEmail(p){return p+"@"+SB.alias}   /* ใช้เบอร์มือถือเป็นตัวตน: เบอร์ → อีเมลสำรองภายในระบบ (ผู้ใช้ไม่เห็น) */
 function sbReq(path,o){o=o||{};var h={apikey:SB.key};if(o.json)h["Content-Type"]="application/json";if(o.auth!==false&&SBS&&SBS.access_token)h.Authorization="Bearer "+SBS.access_token;if(o.headers)for(var k in o.headers)h[k]=o.headers[k];
- return fetch(SB.url+path,{method:o.method||"GET",headers:h,body:o.body}).then(function(r){return r.text().then(function(tx){var j=null;try{j=tx?JSON.parse(tx):null}catch(e){}
+ return fetch(SB.url+path,{method:o.method||"GET",headers:h,body:o.body}).then(function(r){if(o.blob&&r.ok)return r.blob();return r.text().then(function(tx){var j=null;try{j=tx?JSON.parse(tx):null}catch(e){}
   if(!r.ok){var er=new Error((j&&(j.msg||j.message||j.error_description||j.error))||("HTTP "+r.status));er.status=r.status;er.code=j&&(j.error_code||j.code)||"";throw er}return j})},function(){throw new Error("NET")})}
 function sbSave(s){SBS=s;if(s)wr(SSK,s);else try{localStorage.removeItem(SSK)}catch(e){}}
 function sbSet(j){var s={access_token:j.access_token,refresh_token:j.refresh_token,expires_at:j.expires_at||Math.floor(Date.now()/1000)+(j.expires_in||3600),user:j.user};sbSave(s);return s}
@@ -1118,6 +1118,7 @@ function orqListPage(){var L=ORQ.list,h='<button type="button" class="lb" data-o
   if(orqMoreCan(r))acts+='<button type="button" class="btn ghost" data-orq="more" data-id="'+r.id+'">เลือกหมอนวดเพิ่ม (ได้ '+(r.accepted_count||0)+' จาก '+orqWant(r)+' คน)</button>';
   if(orqLinkCan(r))acts+='<button type="button" class="btn" data-orq="lcopy" data-id="'+r.id+'">คัดลอกลิงก์จองสำหรับพนักงาน</button>'+(navigator.share?'<button type="button" class="btn ghost" data-orq="lshare" data-id="'+r.id+'">แชร์ลิงก์</button>':'')+'<button type="button" class="btn ghost" data-orq="lqr" data-id="'+r.id+'" aria-expanded="'+(ORQ.qr===r.id)+'">'+(ORQ.qr===r.id?'ซ่อนคิวอาร์โค้ด':'แสดงคิวอาร์โค้ดให้พนักงานสแกน')+'</button>'+(ORQ.qr===r.id?'<div class="orqlq" id="orqlqr" data-id="'+r.id+'"></div><p class="insurl">'+esc(orqLinkUrl(r))+'</p>':'');
   if(r.status==="confirmed")acts+='<button type="button" class="btn ghost" data-orq="reppage" data-id="'+r.id+'">ดูรายงานการใช้บริการ</button>';
+  if(r.receipt_path)acts+='<button type="button" class="btn" data-orq="rcp" data-id="'+r.id+'">ดาวน์โหลดใบเสร็จ (PDF)</button>';
   if(orqRevCan(r))acts+='<button type="button" class="btn" data-orq="rev" data-id="'+r.id+'">ให้คะแนนบริการ</button>';
   if(r.status==="confirmed")acts+='<button type="button" class="btn ghost" data-orq="sumpdf" data-id="'+r.id+'">ดาวน์โหลดใบสรุปงาน (PDF)</button>';
   if(r.status==="confirmed"||ORQG.closed.indexOf(r.status)>-1)acts+='<button type="button" class="btn ghost" data-orq="again" data-id="'+r.id+'">ส่งคำขอซ้ำด้วยข้อมูลเดิม</button>';
@@ -1136,6 +1137,8 @@ function loadQr(cb){if(window.QRCode){cb(true);return}if(QRQ){QRQ.push(cb);retur
 function orqDraw(){var el=document.getElementById("orqqr"),r=orqCur();if(!el||!r||!ORQ.pp||!ORQ.pp.on||el.dataset.done)return;
  loadQr(function(ok){var e2=document.getElementById("orqqr");if(!e2||e2.dataset.done)return;if(!ok||!window.QRCode){e2.innerHTML='<small>ไม่สามารถแสดง QR ได้ ใช้หมายเลขพร้อมเพย์ด้านล่างโอนเงินได้เลย</small>';return}e2.dataset.done="1";e2.innerHTML="";try{new QRCode(e2,{text:ppPayload(ORQ.pp.type,ORQ.pp.id,r.amount),width:200,height:200,correctLevel:QRCode.CorrectLevel.M})}catch(x){e2.innerHTML='<small>ไม่สามารถแสดง QR ได้ ใช้หมายเลขพร้อมเพย์ด้านล่างโอนเงินได้เลย</small>'}})}
 function orqCur(){return(ORQ.list||[]).filter(function(r){return r.id===ORQ.pay})[0]||null}
+function orqRcp(id){var r=(ORQ.list||[]).filter(function(x){return x.id===id})[0];if(!r||!r.receipt_path||ORQ.rcpBusy)return;ORQ.rcpBusy=true;ann("กำลังเตรียมไฟล์ใบเสร็จ");
+ sbApi("/storage/v1/object/authenticated/receipts/"+r.receipt_path,{blob:true}).then(function(b){var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([b],{type:"application/pdf"}));a.download="receipt-"+r.ref+".pdf";document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1000);ORQ.rcpBusy=false;ann("ดาวน์โหลดใบเสร็จแล้ว")},function(){ORQ.rcpBusy=false;ORQ.err="ดาวน์โหลดใบเสร็จไม่สำเร็จ ลองใหม่อีกครั้ง";render(true);ann(ORQ.err)})}
 function orqRevCan(r){return r.status==="confirmed"&&!r.review&&String(r.service_date).slice(0,10)<=orqDay(0)}
 function orqRevPage(){var R=ORQ.rv,r=R&&(ORQ.list||[]).filter(function(x){return x.id===R.id})[0],back='<button type="button" class="lb" data-orq="list">← กลับไปคำขอของฉัน</button>';
  if(!r||!orqRevCan(r))return back+'<div class="empty">งานนี้ให้คะแนนไม่ได้ หรือให้คะแนนไปแล้ว</div>';
@@ -1185,7 +1188,8 @@ function orqAct(a,id){
  if(a==="pay"){ORQ.mode="pay";ORQ.pay=id;ORQ.slip=null;ORQ.slipMsg="";orqLoadPP();render();window.scrollTo(0,0);return}
  if(a==="slipsend"){orqSlip();return}
  if(a==="rev"){ORQ.mode="rev";ORQ.rv={id:id,rating:0,comment:"",problem:false,busy:false,err:""};render();window.scrollTo(0,0);var th=document.getElementById("orqt");if(th)th.focus();return}
- if(a==="revsend"){orqRevSend();return}}
+ if(a==="revsend"){orqRevSend();return}
+ if(a==="rcp"){orqRcp(id);return}}
 function orqBind(){var rvb=document.getElementById("orq_rvc");if(rvb){rvb.oninput=orqRevCollect}document.querySelectorAll("input[name=orq_rv],#orq_rvp").forEach(function(e){e.onchange=orqRevCollect});document.querySelectorAll("[data-orq]").forEach(function(e){e.onclick=function(){orqAct(e.dataset.orq,e.dataset.id||"")}});
  var f=document.getElementById("orqf");if(f){f.oninput=orqCollect;f.onchange=orqCollect;orqFreeKick()}
  var sl=document.getElementById("orq_slip");if(sl)sl.onchange=function(){var fl=sl.files&&sl.files[0];if(!fl)return;orqImg(fl,function(d,err){ORQ.slip=d;ORQ.slipMsg=d?"":err;var pv=document.getElementById("orq_sprev"),m=document.getElementById("orq_smsg"),b=document.querySelector("[data-orq=slipsend]");if(m)m.textContent=ORQ.slipMsg;if(pv)pv.innerHTML=d?'<img class="slipth" alt="ตัวอย่างสลิป" src="'+d+'" style="max-width:100%;max-height:220px;border-radius:8px">':"";if(b)b.disabled=!d})};

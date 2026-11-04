@@ -38,10 +38,11 @@ const T={bookings:BKX.filter(b=>b.place_id!=='og1').concat(RPT),admins:[],
  org_requests:[
   {id:'q1',ref:'ORG000001',org_name:'บริษัทตัวอย่าง จำกัด',district:'บางรัก',address:'1 ถนนสีลม',lat:13.72,lng:100.52,contact_name:'คุณสมชาย',contact_phone:'0812223333',service_date:new Date(Date.now()+864e5*10).toISOString().slice(0,10),start_time:'09:00:00',end_time:'17:00:00',lunch_start:'12:00:00',lunch_end:'13:00:00',hours:7,rate:400,staff_ids:['p1','p2'],status:'pending',created_at:'2026-11-01T01:00:00Z',slip_path:null,amount:null},
   {id:'q2',ref:'ORG000002',org_name:'โรงเรียนทดสอบ',district:'ดุสิต',address:'2 ถนนราชวิถี',lat:13.76,lng:100.51,contact_name:'คุณมาลี',contact_phone:'0844445555',service_date:new Date(Date.now()+864e5*10).toISOString().slice(0,10),start_time:'09:00:00',end_time:'12:00:00',lunch_start:null,lunch_end:null,hours:3,rate:400,staff_ids:['p1'],status:'paid_review',created_at:'2026-10-31T01:00:00Z',slip_path:'u3/orgslip-1.jpg',amount:1200},
+  {id:'q4',ref:'ORG000004',org_name:'หน่วยงานยืนยันแล้ว',district:'ห้วยขวาง',address:'4',lat:13.77,lng:100.54,contact_name:'ข',contact_phone:'0899999999',service_date:new Date(Date.now()+864e5*20).toISOString().slice(0,10),start_time:'09:00:00',end_time:'11:00:00',lunch_start:null,lunch_end:null,hours:2,rate:400,staff_ids:['p1'],status:'confirmed',user_id:'u5',receipt_path:null,receipt_at:null,created_at:'2026-10-29T01:00:00Z',slip_path:null},
   {id:'q3',ref:'ORG000003',org_name:'หน่วยงานรอตอบ',district:'พญาไท',address:'3',lat:13.77,lng:100.53,contact_name:'ก',contact_phone:'0800000000',service_date:new Date(Date.now()+864e5*10).toISOString().slice(0,10),start_time:'09:00:00',end_time:'11:00:00',lunch_start:null,lunch_end:null,hours:2,rate:400,staff_ids:['p1'],status:'invited',created_at:'2026-10-30T01:00:00Z',slip_path:null,amount:null}],
  org_invites:[{id:'iv1',request_id:'q3',staff_id:'p1',status:'pending',by_admin:false},{id:'iv2',request_id:'q2',staff_id:'p2',status:'accepted',by_admin:false}]};
 T.org_requests.find(x=>x.id==='q3').invite_due_at=new Date(Date.now()+5*36e5).toISOString();
-const oqCalls=[],hoCalls=[],HOL=[{id:'h1',status:'pending_admin',org_name:'บริษัทโอนงาน',ref:'ORG-H-1',service_date:'2099-01-10',from_name:'คุณเอ',to_name:'คุณบี',reason:'ติดธุระ',admin_note:null},{id:'h2',status:'pending_admin',org_name:'บริษัทสอง',ref:'ORG-H-2',service_date:'2099-01-11',from_name:'คุณซี',to_name:'คุณดี',reason:'',admin_note:null}],SDR=[];
+const oqCalls=[];const rcCalls=[],rcUps=[],rcDels=[],hoCalls=[],HOL=[{id:'h1',status:'pending_admin',org_name:'บริษัทโอนงาน',ref:'ORG-H-1',service_date:'2099-01-10',from_name:'คุณเอ',to_name:'คุณบี',reason:'ติดธุระ',admin_note:null},{id:'h2',status:'pending_admin',org_name:'บริษัทสอง',ref:'ORG-H-2',service_date:'2099-01-11',from_name:'คุณซี',to_name:'คุณดี',reason:'',admin_note:null}],SDR=[];
 const bal={sh1:{balance:960,owner_phone:'0899111111',owner_name:'สมหมาย ใจดี'},sh2:{balance:-600,owner_phone:'0898',owner_name:''},og1:null};
 let mode={netDown:false};
 await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.protocol==='file:')return r.continue();if(!u.host.endsWith('supabase.co'))return r.abort();
@@ -54,6 +55,9 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
  if(path==='/auth/v1/token'){if(sp.get('grant_type')==='refresh_token'){const x=Object.values(users).find(z=>'rt-'+z.id===body.refresh_token);return x?J(200,sess(x)):J(400,{error_code:'bad',msg:'bad'})}
   const ph=body.email.split('@')[0],us=users[ph];if(!us||us.pw!==body.password)return J(400,{error_code:'invalid_credentials',msg:'Invalid login credentials'});return J(200,sess(us))}
  if(path==='/auth/v1/logout')return J(204,{});
+ if(path==='/storage/v1/object/receipts'&&m==='DELETE'){rcDels.push(body.prefixes);return J(200,[])}
+ if(path.startsWith('/storage/v1/object/receipts/')&&m==='POST'){rcUps.push({path:path.replace('/storage/v1/object/receipts/',''),ct:q.headers()['content-type'],len:(q.postDataBuffer()||Buffer.alloc(0)).length});return J(200,{Key:'k'})}
+ if(path.startsWith('/storage/v1/object/authenticated/receipts/'))return r.fulfill({status:200,contentType:'application/pdf',body:Buffer.from('%PDF-1.4 test')});
  if(path.startsWith('/storage/v1/object/authenticated/'))return r.fulfill({status:200,contentType:'image/png',body:PNG});
  if(path==='/storage/v1/object/slips'&&m==='DELETE'){dels.push(body.prefixes);if(delFail)return J(500,{message:'storage error'});return J(200,[])}
  if(path.startsWith('/storage/v1/object/')){stor.push({path:path.replace('/storage/v1/object/',''),len:(q.postDataBuffer()||Buffer.alloc(0)).length});return J(200,{Key:'k'})}
@@ -72,6 +76,7 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
   if(f==='admin_handover_candidates')return J(200,[{id:'p1',name:'คุณกลาง'}]);
   if(f==='admin_org_replace_staff'){hoCalls.push(['replace',body]);return J(200,'hx')}
   if(f==='admin_handover_decide'){hoCalls.push(body);const h=HOL.find(x=>x.id===body.p_id);h.status=body.p_ok?'pending_staff':'rejected';return J(204,null)}
+  if(f==='admin_org_receipt_set'){rcCalls.push(body);const x=T.org_requests.find(z=>z.id===body.p_id);x.receipt_path=body.p_path;x.receipt_at=body.p_path?new Date().toISOString():null;return J(204,null)}
   if(f.startsWith('admin_org_')){oqCalls.push([f,body]);const rq=T.org_requests.find(x=>x.id===(body.p_id));if(f==='admin_org_request_approve'){rq.status='invited';T.org_invites.push({id:'iv9',request_id:rq.id,staff_id:'p1',status:'pending',by_admin:false});return J(200,'pl9')}if(f==='admin_org_request_reject'){rq.status='rejected';return J(204,null)}if(f==='admin_org_payment_confirm'){rq.status=body.p_ok?'confirmed':'awaiting_payment';return J(204,null)}if(f==='admin_org_invite_respond'){const iv=T.org_invites.find(x=>x.id===body.p_invite);iv.status=body.p_accept?'accepted':'declined';iv.by_admin=true;return J(204,null)}if(f==='admin_org_close_invites'){rq.status='no_staff';return J(204,null)}}
   if(f==='admin_staff_delete_requests'){if(process.env.NOSQL)return J(404,{message:'Could not find the function public.admin_staff_delete_requests in the schema cache'});return J(200,SDR.filter(x=>x.st==='pending').map(x=>x.row))}
   if(f==='admin_staff_delete_resolve'){sdrCalls.push(body);const x=SDR.find(z=>z.row.id===body.p_req&&z.st==='pending');if(!x)return J(400,{code:'P0001',message:'ไม่พบคำขอที่รออยู่'});if(x.row.open_jobs>0&&body.p_approve)return J(400,{code:'P0001',message:'พนักงานยังมีคิวที่ยังไม่เสร็จ'});x.st=body.p_approve?'done':'rejected';if(body.p_approve){const sf=T.staff.find(q=>q.id===x.row.staff_id);Object.assign(sf,{name:'พนักงานที่ออกจากระบบ',phone:null,active:false,user_id:null})}return J(204,null)}
@@ -157,4 +162,19 @@ await p.click('[data-a=oqrm][data-id=iv2]');await p.waitForTimeout(200);
 ok('remove asks reason first (no rpc yet)',!!(await p.$('#rmn_iv2'))&&!oqCalls.some(c=>c[0]==='admin_org_remove_staff'));
 await p.fill('#rmn_iv2','ติดต่อไม่ได้');await p.click('[data-a=oqrm][data-id=iv2]');await p.waitForTimeout(500);
 ok('remove rpc with reason',oqCalls.some(c=>c[0]==='admin_org_remove_staff'&&c[1].p_invite==='iv2'&&c[1].p_reason==='ติดต่อไม่ได้'));
+// ---- แนบใบเสร็จ PDF
+await p.evaluate(()=>window.scrollTo(0,0));
+ok('receipt box only on confirmed request',!!(await p.$('#rcp_q4'))&&!(await p.$('#rcp_q1'))&&(await p.textContent('[aria-label="ใบเสร็จของ หน่วยงานยืนยันแล้ว"]')).includes('ยังไม่ได้แนบใบเสร็จ'));
+await p.click('[data-a=oqrcp][data-id=q4]');await p.waitForTimeout(300);ok('no file -> message, no upload',(await p.evaluate(()=>document.body.innerText)).includes('กรุณาเลือกไฟล์ PDF')&&rcUps.length===0);
+await p.setInputFiles('#rcp_q4',{name:'a.png',mimeType:'image/png',buffer:Buffer.from('x')});await p.click('[data-a=oqrcp][data-id=q4]');await p.waitForTimeout(300);ok('non-pdf rejected',(await p.evaluate(()=>document.body.innerText)).includes('แนบได้เฉพาะไฟล์ PDF')&&rcUps.length===0);
+await p.setInputFiles('#rcp_q4',{name:'big.pdf',mimeType:'application/pdf',buffer:Buffer.alloc(5*1024*1024+10)});await p.click('[data-a=oqrcp][data-id=q4]');await p.waitForTimeout(500);ok('over 5MB rejected',(await p.evaluate(()=>document.body.innerText)).includes('ไฟล์ใหญ่เกิน 5 MB')&&rcUps.length===0);
+await p.setInputFiles('#rcp_q4',{name:'ใบเสร็จ.pdf',mimeType:'application/pdf',buffer:Buffer.from('%PDF-1.4 hello')});await p.click('[data-a=oqrcp][data-id=q4]');await p.waitForTimeout(900);
+ok('upload path under requester folder, pdf content type',rcUps.length===1&&/^u5\/q4-[a-z0-9]+\.pdf$/.test(rcUps[0].path)&&rcUps[0].ct==='application/pdf'&&rcUps[0].len===14);
+ok('attach rpc with same path',rcCalls.length===1&&rcCalls[0].p_id==='q4'&&rcCalls[0].p_path===rcUps[0].path);
+ok('box now shows attached + view/remove buttons',(await p.textContent('[aria-label="ใบเสร็จของ หน่วยงานยืนยันแล้ว"]')).includes('แนบใบเสร็จแล้ว')&&!!(await p.$('[data-a=oqrcv][data-id=q4]'))&&!!(await p.$('[data-a=oqrcrm][data-id=q4]')));
+const firstPath=rcUps[0].path;
+await p.setInputFiles('#rcp_q4',{name:'new.pdf',mimeType:'application/pdf',buffer:Buffer.from('%PDF-1.4 two')});await p.click('[data-a=oqrcp][data-id=q4]');await p.waitForTimeout(900);
+ok('replace uploads new file and deletes the old one',rcUps.length===2&&rcUps[1].path!==firstPath&&rcDels.some(x=>x[0]===firstPath));
+await p.click('[data-a=oqrcrm][data-id=q4]');await p.waitForTimeout(900);
+ok('remove clears path and deletes file',rcCalls[rcCalls.length-1].p_path===null&&rcDels.some(x=>x[0]===rcUps[1].path)&&(await p.textContent('[aria-label="ใบเสร็จของ หน่วยงานยืนยันแล้ว"]')).includes('ยังไม่ได้แนบใบเสร็จ'));
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)})();
