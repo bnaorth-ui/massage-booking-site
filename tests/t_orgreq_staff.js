@@ -107,4 +107,13 @@ ok('company assignment card: main work with days + hours',t.includes('งาน�
 ok('company tab does not carry org invites; keeps the extra-work note',!t.includes('งานนอกสถานที่ (งานเสริม)')&&t.includes('งานเสริมและจะไม่ถูกจัดชนกับวันเหล่านี้'));
 await p.click('[data-a=hv][data-id=og]');await sleep(300);t=await T0(p);
 ok('org section labelled as extra work',t.includes('งานนอกสถานที่ (งานเสริม)'));
+// ---- วันประจำบริษัท (จันทร์/พุธ) เปลี่ยนเป็นวันหยุดเองไม่ได้
+await p.click('#nav button:nth-child(2)');await sleep(400);t=await T0(p);
+const lab=async d=>await p.getAttribute('[data-a=wd][data-d="'+d+'"]','aria-label');
+ok('company days labelled as fixed',(await lab(1)).includes('ประจำบริษัท บริษัท ไทยออฟฟิศ')&&(await lab(3)).includes('เปลี่ยนไม่ได้')&&!(await lab(2)).includes('ประจำ')&&t.includes('ติดป้าย'));
+const sv0=oiCalls.length;let saves=0;await p.route('**/rpc/staff_save_self',async r=>{saves++;await r.fallback()});
+await p.click('[data-a=wd][data-d="1"]');await sleep(400);
+ok('cannot take a company day off: message, no save, still on',saves===0&&(await p.textContent('#wdsum')).includes('เป็นวันประจำบริษัท')&&(await p.getAttribute('[data-a=wd][data-d="1"]','aria-pressed'))==='true'&&ST.work_days.includes(1));
+await p.click('[data-a=wd][data-d="2"]');await sleep(500);
+ok('other day can still be turned off',saves===1&&!ST.work_days.includes(2)&&ST.work_days.includes(1)&&ST.work_days.includes(3));
 console.log('errors:',errs.join('|')||'none');await p.context().browser().close();process.exit(0)})();
