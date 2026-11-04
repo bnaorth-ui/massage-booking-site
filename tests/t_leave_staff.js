@@ -112,6 +112,8 @@ ok('queue page shows no leave strip even with leave days',!t.includes('วัน
 // ฝั่งผู้รับ
 SH.push({id:'h2',role:'to',status:'pending_staff',place_id:'cp1',place_name:'บริษัท ไทยออฟฟิศ',day:addD(todayS,9),from_name:'คุณแพร',to_name:'คุณนุ่น',reason:'ธุระ',open:'09:00:00',close:'17:00:00'});
 await p.reload();await sleep(900);t=await T0(p);
+ok('org invite waits -> opens on org tab; company tab present with count',(await p.getAttribute('[data-a=hv][data-id=og]','aria-selected'))==='true'&&(await p.textContent('[data-a=hv][data-id=co]')).includes('(1)')&&!t.includes('งานแทนบริษัท'));
+await p.click('[data-a=hv][data-id=co]');await sleep(300);t=await T0(p);
 ok('incoming substitute request card',t.includes('งานแทนบริษัท')&&t.includes('ขอให้คุณไปแทน คุณแพร')&&t.includes('บริษัท ไทยออฟฟิศ'));
 await p.click('[data-a=subresp][data-ok="1"]');await sleep(800);t=await T0(p);
 ok('accept rpc then listed as upcoming substitute job',shCalls[3][0]==='resp'&&shCalls[3][1].p_accept===true&&t.includes('รับไปแทนแล้ว')&&t.includes('ไปแทน คุณแพร'));

@@ -162,6 +162,11 @@ function feed(){var L=[];
  return L.sort(function(a,b){return a.at<b.at?1:-1})}
 function isRead(x){return x.nid?READS.indexOf(x.nid)>-1:ANNREAD.indexOf(x.id)>-1}
 function newJobs(){return JOBS.filter(function(j){return j.active&&j.bstatus==="confirmed"&&j.job==="pending"}).length}
+function coPend(){return SUBH.filter(function(h){return h.role==="to"&&h.status==="pending_staff"}).length}
+function ogPend(){return OINV.filter(function(i){return i.status==="pending"&&i.req_status==="invited"}).length+HO.filter(function(x){return x.role==="to"&&x.status==="pending_staff"}).length}
+function homeBadge(){return newJobs()+coPend()+ogPend()}
+function hvTabs(co,og){var cur=S.hv==="co"&&co?"co":S.hv==="og"&&og?"og":"cu",nj=newJobs(),T=[["cu","คิวลูกค้า",nj,"มีคิวใหม่ที่ยังไม่ได้รับ "+nj+" คิว"]];if(co)T.push(["co","งานบริษัท",coPend(),"รอตอบ "+coPend()+" รายการ"]);if(og)T.push(["og","งานหน่วยงาน",ogPend(),"รอตอบ "+ogPend()+" รายการ"]);
+ return{cur:cur,html:T.length<2?"":'<div class="nf" role="tablist" aria-label="หมวดงาน">'+T.map(function(x){return'<button type="button" role="tab" data-a="hv" data-id="'+x[0]+'" class="'+(x[0]===cur?"on":"")+'" aria-selected="'+(x[0]===cur)+'"'+(x[2]?' aria-label="'+x[1]+' '+x[3]+'"':'')+'>'+x[1]+(x[2]?' ('+x[2]+')':'')+'</button>'}).join("")+'</div>'}}
 function okUrl(u){return /^https?:\/\//i.test(u||"")}
 function ctView(){var c=CT,tel=String(c.phone||"").replace(/[^0-9+]/g,""),h='<h2 class="stl">ติดต่อเรา</h2>';
  h+='<div class="ctc"><b>'+esc(c.name||"สมาคมวิทยากรฝึกอาชีพคนตาบอด")+'</b>'+(c.addr?'<p>'+esc(c.addr)+'</p>':"")+'</div>';
@@ -278,7 +283,7 @@ function apSend(){apCollect();var d=AP.d,er="";if(AP.busy)return;
 var timer=null;
 function enter(){AG.d=null;AG.step="load";S.busy=false;gateDraw();
  return loadAll().then(function(ok){if(!ok){return rpc("my_staff_applications").catch(function(){return[]}).then(function(l){if(APPLY||(l&&l.length)){AP.list=l||[];AP.fd=false;AG.step="apply";gateDraw();return apInit()}AG.step="denied";gateDraw()})}startMain()}).catch(function(e){if(e&&(e.status===401||e.message==="NOSESS")){doLogout();return}AG.err=errTh(e,"โหลดข้อมูลไม่สำเร็จ");AG.step="loaderr";gateDraw()})}
-function startMain(){document.getElementById("navb").style.display="";if(S.tab==="nt")openNt();draw();
+function startMain(){if(!S.hv)S.hv=ogPend()>0?"og":coPend()>0?"co":"cu";document.getElementById("navb").style.display="";if(S.tab==="nt")openNt();draw();
  if(!timer){timer=setInterval(refresh,20000);document.addEventListener("visibilitychange",function(){if(!document.hidden)refresh()})}}
 function refresh(){if(!ME||inflight||document.hidden||S.busy)return;var a=document.activeElement;if(a&&/INPUT|SELECT|TEXTAREA/.test(a.tagName))return;
  inflight=true;loadAll(true).then(function(ok){inflight=false;if(!ok)return;if(S.tab==="nt")openNt();if(S.tab==="ac")rvLoad();draw()},function(e){inflight=false;if(e&&e.status===401)doLogout()})}
@@ -481,7 +486,10 @@ function view(){var t=today(),h="";
    groups="",last=null,lateShown=false;
   EM.cx="ไม่มีงานที่ถูกยกเลิกใน 7 วันล่าสุด";
   list.forEach(function(j){if(cur[0]!=="done"&&cur[0]!=="cx"&&ended(j)&&!lateShown){lateShown=true;last=null;groups+='<h2 style="margin-top:20px">เลยเวลานัดแล้ว</h2>'}var d=bkDate(Date.parse(j.starts_at));if(d!==last){last=d;groups+='<h3 style="margin:14px 0 6px;font-size:1rem">'+(d===t?"วันนี้, ":"")+thD(d)+'</h3>'}groups+=jobCard(j,false)});
-  h=banner()+compCard()+subCard()+oinvCard()+'<h1>คิวงาน</h1><p class="sub">'+esc(ME.place)+'</p><div class="nf" role="tablist" aria-label="หมวดคิวงาน">'+TAB.map(function(x){return'<button type="button" role="tab" data-a="qt" data-id="'+x[0]+'" class="'+(x[0]===cur[0]?"on":"")+'" aria-selected="'+(x[0]===cur[0])+'">'+x[1]+' ('+x[2].length+')</button>'}).join("")+'</div>'+
+  var coH=compCard()+subCard(),ogH=oinvCard(),hv=hvTabs(!!coH,!!ogH);
+  if(hv.cur==='co')return banner()+'<h1>คิวงาน</h1><p class="sub">'+esc(ME.place)+'</p>'+hv.html+coH;
+  if(hv.cur==='og')return banner()+'<h1>คิวงาน</h1><p class="sub">'+esc(ME.place)+'</p>'+hv.html+ogH;
+  h=banner()+'<h1>คิวงาน</h1><p class="sub">'+esc(ME.place)+'</p>'+hv.html+'<div class="nf" role="tablist" aria-label="หมวดคิวงาน">'+TAB.map(function(x){return'<button type="button" role="tab" data-a="qt" data-id="'+x[0]+'" class="'+(x[0]===cur[0]?"on":"")+'" aria-selected="'+(x[0]===cur[0])+'">'+x[1]+' ('+x[2].length+')</button>'}).join("")+'</div>'+
    (list.length?groups:'<div class="empty">'+EM[cur[0]]+'</div>')+
    (cur[0]==="done"?'<p class="sub" style="text-align:center;margin-top:12px">แสดงเฉพาะงานของวันนี้ ดูงานวันอื่นและยอดส่วนแบ่งย้อนหลังได้ที่เมนูรายได้</p><button type="button" class="btn g" data-a="tab" data-id="inc">ไปที่เมนูรายได้</button>'
     :cur[0]==="cx"?'<p class="sub" style="text-align:center;margin-top:12px">แสดงเฉพาะงานที่ถูกยกเลิกหรือเลื่อนคิวใน 7 วันล่าสุด</p>':"")}
@@ -498,7 +506,7 @@ function draw(){if(!ME)return;
  if(S.pwOpen&&S.tab==="ac"&&document.getElementById("pwn"))return;
  document.getElementById("app").innerHTML=view();
  drawHeader();
- document.getElementById("nav").innerHTML=TABS.map(function(t){var u=t[0]==="nt"?ntUnread():t[0]==="q"?newJobs():0,lb=t[0]==="nt"?"ยังไม่ได้อ่าน "+u+" รายการ":"งานใหม่ที่ยังไม่ได้รับ "+u+" งาน";return'<button type="button" data-a="tab" data-id="'+t[0]+'" class="'+(t[0]===S.tab?"on":"")+'"><span aria-hidden="true">'+t[2]+'</span>'+t[1]+(S.tab!==t[0]&&u?'<i class="bdg" aria-label="'+lb+'">'+u+'</i>':'')+'</button>'}).join("");
+ document.getElementById("nav").innerHTML=TABS.map(function(t){var u=t[0]==="nt"?ntUnread():t[0]==="q"?homeBadge():0,lb=t[0]==="nt"?"ยังไม่ได้อ่าน "+u+" รายการ":"งานใหม่หรือรอตอบ "+u+" รายการ";return'<button type="button" data-a="tab" data-id="'+t[0]+'" class="'+(t[0]===S.tab?"on":"")+'"><span aria-hidden="true">'+t[2]+'</span>'+t[1]+(S.tab!==t[0]&&u?'<i class="bdg" aria-label="'+lb+'">'+u+'</i>':'')+'</button>'}).join("");
  bindAcct();var lg=document.getElementById("logout");if(lg)lg.onclick=doLogout;
 }
 
@@ -524,6 +532,7 @@ document.addEventListener("click",function(e){
  if(a==="pwno"){S.pwOpen=false;S.pwErr="";draw();return}
  if(a==="pwsave"){pwSave();return}
  if(a==="qt"){S.qt=id;draw();return}
+ if(a==="hv"){S.hv=id;S.err="";S.ok="";draw();var hb=document.querySelector('[data-a=hv][data-id="'+id+'"]');if(hb)hb.focus();return}
  if(S.busy)return;
  if(a==="hoopen"){S.ho={inv:id,cands:null,sel:"",reason:"",err:""};draw();ann("เปิดรายการเพื่อนที่ว่างในวันงาน");rpc("staff_handover_candidates",{p_invite:id}).then(function(c){if(S.ho&&S.ho.inv===id){S.ho.cands=c||[];draw();ann(S.ho.cands.length?"มีเพื่อนว่าง "+S.ho.cands.length+" คน":"ไม่มีเพื่อนที่ว่างในวันงานนี้")}},function(e){if(S.ho&&S.ho.inv===id){S.ho.err=errTh(e,"โหลดรายชื่อไม่สำเร็จ");draw()}});return}
  if(a==="hoclose"){S.ho=null;draw();ann("ปิดแล้ว");return}
