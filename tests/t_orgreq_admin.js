@@ -73,7 +73,7 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
   if(f==='admin_reset_password'){resets.push(body);if(resetErr)return J(400,{code:'P0001',message:resetErr});const u=PEOPLE.find(x=>x.id===body.p_user);T.password_reset_log.unshift({id:resets.length,admin_name:'แอดมิน หนึ่ง',user_name:u.name,user_phone:u.phone,created_at:now()});return J(204,null)}
   if(f==='admin_handovers')return J(200,HOL);
   if(f==='admin_org_reviews')return J(200,[{id:'v1',request_id:'q1',ref:'ORG000001',org_name:'บริษัทตัวอย่าง จำกัด',service_date:'2026-10-20',rating:2,comment:'มาสายมาก',problem:true,created_at:'2026-10-21T03:00:00Z',staff:'คุณกลาง'},{id:'v2',request_id:'q2',ref:'ORG000002',org_name:'โรงเรียนทดสอบ',service_date:'2026-10-22',rating:5,comment:null,problem:false,created_at:'2026-10-23T03:00:00Z',staff:'คุณสอง'}]);
-  if(f==='admin_handover_candidates')return J(200,[{id:'p1',name:'คุณกลาง'}]);
+  if(f==='admin_handover_candidates')return J(200,[{id:'p1',name:'คุณกลาง',comp:[{name:'บริษัท ไทยออฟฟิศ',days:[1,3]}]},{id:'p3',name:'คุณว่าง',comp:[]}]);
   if(f==='admin_org_replace_staff'){hoCalls.push(['replace',body]);return J(200,'hx')}
   if(f==='admin_handover_decide'){hoCalls.push(body);const h=HOL.find(x=>x.id===body.p_id);h.status=body.p_ok?'pending_staff':'rejected';return J(204,null)}
   if(f==='admin_org_receipt_set'){rcCalls.push(body);const x=T.org_requests.find(z=>z.id===body.p_id);x.receipt_path=body.p_path;x.receipt_at=body.p_path?new Date().toISOString():null;return J(204,null)}
@@ -154,7 +154,7 @@ ok('reject handover rpc with note',hoCalls[1]&&hoCalls[1].p_id==='h2'&&hoCalls[1
 await p.evaluate(()=>window.scrollTo(0,0));
 ok('remove button on accepted therapist',!!(await p.$('[data-a=oqrm][data-id=iv2]')));
 await p.click('[data-a=oqrp][data-id=iv2]');await p.waitForSelector('#rep_sel',{timeout:4000});
-ok('free staff listed for replacement',(await p.$$eval('#rep_sel option',o=>o.map(x=>x.textContent))).includes('คุณกลาง'));
+{const o=await p.$$eval('#rep_sel option',x=>x.map(y=>y.textContent));ok('free staff listed with company days info',o.includes('คุณกลาง (ว่างวันนั้น, ประจำบริษัท บริษัท ไทยออฟฟิศ: จ พ)')&&o.includes('คุณว่าง (ว่างวันนั้น)'));}
 await p.click('[data-a=oqrpsend]');await p.waitForTimeout(300);ok('must pick a replacement first',!hoCalls.some(c=>c[0]==='replace'));
 await p.selectOption('#rep_sel','p1');await p.click('[data-a=oqrpsend]');await p.waitForTimeout(600);
 ok('replace rpc with chosen staff',hoCalls.some(c=>c[0]==='replace'&&c[1].p_invite==='iv2'&&c[1].p_to==='p1'));

@@ -40,6 +40,7 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
   if(!isS)return J(400,{code:'P0001',message:'บัญชีนี้ไม่ใช่พนักงาน'});
   if(f==='my_org_invites')return J(200,OI);
   if(f==='my_handovers')return J(200,HO);
+  if(f==='my_assignments')return J(200,[{place_id:'cp1',name:'บริษัท ไทยออฟฟิศ',days:[1,3],open:'09:00:00',close:'17:00:00'}]);
   if(f==='staff_handover_candidates')return J(200,[{id:'sx',name:'คุณเพื่อน'}]);
   if(f==='staff_handover_request'){hoCalls.push(['req',body]);HO.push({id:'h1',role:'from',status:'pending_admin',org_name:'โรงเรียนทดสอบ',service_date:addD(todayS,6),start_time:'09:00:00',end_time:'12:00:00',from_name:'ฉัน',to_name:'คุณเพื่อน',reason:body.p_reason,admin_note:null,invite_id:body.p_invite});return J(200,'h1')}
   if(f==='staff_handover_cancel'){hoCalls.push(['cancel',body]);HO.splice(0,HO.length);return J(204,null)}
@@ -96,4 +97,7 @@ await p.reload();await sleep(900);t=await T0(p);
 ok('incoming handover card',t.includes('ขอให้คุณรับช่วงงาน')&&t.includes('บริษัทรับช่วง')&&t.includes('คุณเพื่อน'));
 await p.click('[data-a=horesp][data-ok="1"]');await sleep(800);t=await T0(p);
 ok('accept handover rpc',hoCalls[2][0]==='resp'&&hoCalls[2][1].p_id==='h2'&&hoCalls[2][1].p_accept===true&&t.includes('รับช่วงงานแล้ว'));
+t=await T0(p);
+ok('company assignment card: main work with days + hours',t.includes('งานประจำ (บริษัท)')&&t.includes('บริษัท ไทยออฟฟิศ')&&t.includes('ทุกจันทร์, พุธ')&&t.includes('09:00-17:00'));
+ok('org section labelled as extra work',t.includes('งานนอกสถานที่ (งานเสริม)')&&t.includes('งานเสริมและจะไม่ถูกจัดชนกับวันเหล่านี้'));
 console.log('errors:',errs.join('|')||'none');await p.context().browser().close();process.exit(0)})();
