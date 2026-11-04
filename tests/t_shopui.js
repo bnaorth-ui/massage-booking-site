@@ -70,7 +70,7 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
 const p=await ctx.newPage();p.on('pageerror',e=>errs.push(e.message));p.on('dialog',d=>{errs.push('DIALOG '+d.message());d.dismiss()});
 const ok=(nm,c)=>console.log((c?'PASS ':'FAIL ')+nm);
 const txt=async s=>await p.textContent(s||'body');
-const sub=async id=>{if(!(await p.$('[role=tab][data-id='+id+']')))await p.click('#tabs [data-id=mg]');await p.click('[role=tab][data-id='+id+']')};
+const sub=async id=>{const sel='[role=tab][data-id='+id+']';for(let k=0;k<4&&!(await p.$(sel));k++){await p.click('#tabs [data-id=mg]');try{await p.waitForSelector(sel,{timeout:3000})}catch(e){}}await p.click(sel)};
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const until=async(f,a)=>{try{await p.waitForFunction(f,a,{timeout:4000});return true}catch(e){return false}};
 const has=async t=>until(x=>document.body.innerText.includes(x),t);
@@ -177,7 +177,7 @@ ok('slip stored in slips bucket under place',stor.some(s=>new RegExp('^slips/sh1
 ok('slip preview loaded via authenticated read',await until(()=>document.querySelector('#slipcur img')));
 await p.click('[role=tab][data-a=wt][data-id=his]');ok('topup in history waiting',(await txt('#main')).includes('รอยืนยัน')&&(await txt('#main')).includes('แนบสลิปแล้ว'));
 await p.click('[role=tab][data-a=wt][data-id=bal]');
-await p.click('[data-a=tpcancel]');for(let i=0;i<80&&T.topup_requests[0].status!=='cancelled';i++)await sleep(100);await has('ยกเลิก');ok('topup cancelled',T.topup_requests[0].status==='cancelled');
+await p.click('[data-a=tpcancel]');for(let i=0;i<80&&T.topup_requests[0].status!=='cancelled';i++)await sleep(100);await has('ยกเลิก');await until(()=>!document.querySelector('[data-a=tpcancel]'));ok('topup cancelled',T.topup_requests[0].status==='cancelled');
 // admin confirms another topup -> server side adds wallet row; client sees after refresh
 T.wallet_tx.push({id:'w9',place_id:'sh1',type:'topup',amount:500,note:'เติมเงินผ่านพร้อมเพย์ (อ้างอิง TPX)',ref:'TPX',status:'success',created_at:now()});
 await sub('svc');await p.click('[data-a=tab][data-id=wal]');ok('refresh picks up admin-confirmed topup',await has('1,460 บาท'));

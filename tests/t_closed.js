@@ -1,7 +1,9 @@
 const {chromium}=require('playwright');
+/* ตรึงเวลาเป็น 10:00 น. (เวลาไทย) ของวันนี้ ให้ผลทดสอบไม่ขึ้นกับเวลาที่รัน (เดิมล้มช่วงใกล้เที่ยงคืนเพราะเวลาเปิด-ปิดของร้านทดสอบข้ามวัน) */
+const REALNOW=Date.now.bind(Date);const _d=new Date(REALNOW()+7*3600000);const T0=Date.UTC(_d.getUTCFullYear(),_d.getUTCMonth(),_d.getUTCDate(),3,0,0);const OFF=T0-REALNOW();
 const bkk=(n=0)=>{const d=new Date(Date.now()+7*3600000+n*86400000);return d.toISOString().slice(0,10)};
 (async()=>{const b=await chromium.launch(require('./config').launch);
-const ctx=await b.newContext({timezoneId:'Asia/Bangkok',locale:'th-TH'});const errs=[],calls=[];
+const ctx=await b.newContext({timezoneId:'Asia/Bangkok',locale:'th-TH'});await ctx.clock.install({time:T0});Date.now=()=>REALNOW()+OFF;const errs=[],calls=[];
 let mode={cat:true,rpcMissing:false};let PTS={on:true,baht_per:10,per_baht:10,min:100,expire_months:12,balance:450,next_expiry:new Date(Date.now()+30*86400000).toISOString(),next_expiry_points:100,history:[{kind:'earn',points:450,note:'ได้แต้มจากการใช้บริการ MS1',at:new Date().toISOString()}]};let lastCB=null;let MSGS=[{id:'m1',booking_id:'bid-MS1',room_key:'shop',sender_id:'shopuser',sender_role:'shop',sender_name:'ร้านสบายดี สปา',body:'ยินดีต้อนรับค่ะ',created_at:'2026-10-29T10:00:00.000000+00:00'}];let UNR=[{booking_id:'bid-MS1',room:'shop',n:1}];let marks=[];let sendErr=null;let seq=100000;const BKS=[];const NOTES=[];
 const UID='uuid-1';const REVD=[];const subs=[];let subErr=null;
 const bn=new Date(Date.now()+7*3600000),nowH=bn.getUTCHours()+bn.getUTCMinutes()/60,dw=bn.getUTCDay();const hh=h=>{h=((h%24)+24)%24;const m=Math.round(h*60);return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')+':00'};
