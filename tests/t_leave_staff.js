@@ -80,7 +80,9 @@ const T0=async pg=>await pg.evaluate(()=>document.body.innerText);
 let p=await mk(null,'');
 await p.fill('#lph','0844444444');await p.fill('#lpw','staffpass1');await p.click('#agf .btn');await sleep(800);
 let t=await T0(p);
-ok('leave card shown',t.includes('แจ้งลางาน')&&t.includes('ยังไม่มีการแจ้งลา')&&!!(await p.$('#lvd'))&&!!(await p.$('#lvr')));
+ok('queue page has no leave card',!t.includes('แจ้งลางาน')&&!(await p.$('#lvd')));
+await p.click('[data-a=tab][data-id=ac]');await sleep(500);t=await T0(p);
+ok('leave card shown in account tab',t.includes('แจ้งลางาน')&&t.includes('ยังไม่มีการแจ้งลา')&&!!(await p.$('#lvd'))&&!!(await p.$('#lvr')));
 ok('date input bounded to 60 days',(await p.getAttribute('#lvd','max'))===addD(todayS,60)&&(await p.getAttribute('#lvd','min'))===todayS);
 await p.click('[data-a=lvadd]');await sleep(300);t=await T0(p);
 ok('requires date',t.includes('กรุณาเลือกวันที่ลา')&&lvCalls.length===0);
@@ -105,6 +107,8 @@ await p.selectOption('#subto','sx');await p.fill('#subre','ป่วย');await 
 ok('request rpc + waiting for admin shown',shCalls[1][0]==='req'&&shCalls[1][1].p_to==='sx'&&shCalls[1][1].p_reason==='ป่วย'&&t.includes('รอแอดมินอนุมัติ (คุณเพื่อน)')&&!!(await p.$('[data-a=subcancel]')));
 await p.click('[data-a=subcancel]');await sleep(800);t=await T0(p);
 ok('cancel substitute request',shCalls[2][0]==='cancel'&&t.includes('ยกเลิกคำขอหาคนแทนแล้ว')&&!!(await p.$('[data-a=subopen]')));
+await p.click('[data-a=tab][data-id=q]');await sleep(400);t=await T0(p);
+ok('queue page shows no leave strip even with leave days',!t.includes('วันลาที่แจ้งไว้')&&!t.includes('คุณแจ้งลา')&&!(await p.$('[data-a=lvdel]')));
 // ฝั่งผู้รับ
 SH.push({id:'h2',role:'to',status:'pending_staff',place_id:'cp1',place_name:'บริษัท ไทยออฟฟิศ',day:addD(todayS,9),from_name:'คุณแพร',to_name:'คุณนุ่น',reason:'ธุระ',open:'09:00:00',close:'17:00:00'});
 await p.reload();await sleep(900);t=await T0(p);

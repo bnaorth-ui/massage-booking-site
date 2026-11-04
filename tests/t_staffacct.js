@@ -83,7 +83,7 @@ ok('no staff_blocks request',!calls.some(c=>String(c.path||c.u||'').includes('st
 await p.click('[data-a=tab][data-id=ac]');await sleep(300);
 const t=await txt('#app');const hr=await p.$$eval('#app a',a=>a.map(x=>x.getAttribute('href')));
 if(!process.env.EMPTY){
-ok('ct: title+assoc+address',(await p.textContent('h1'))==='บัญชี'&&(await p.textContent('h2')).includes('ติดต่อเรา')&&t.includes('สมาคมทดสอบ')&&t.includes('เลขที่ 1 ถนนทดสอบ'));
+ok('ct: title+assoc+address',(await p.textContent('h1'))==='บัญชี'&&(await p.$$eval('h2',e=>e.map(x=>x.textContent).join('|'))).includes('ติดต่อเรา')&&t.includes('สมาคมทดสอบ')&&t.includes('เลขที่ 1 ถนนทดสอบ'));
 ok('ct: tel + line links',hr.includes('tel:021234567')&&hr.includes('https://line.me/R/ti/p/@test'));
 ok('ct: hours shown, no register/map/faq',t.includes('08:30 – 16:30')&&!t.includes('ลงทะเบียน')&&!t.includes('แผนที่'));
 }else ok('ct empty message',t.includes('ยังไม่ได้ตั้งค่า')&&hr.length===0);
