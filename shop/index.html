@@ -634,7 +634,12 @@ function qCard(b){var c=qCat(b),its=(b.booking_items||[]).slice().sort(function(
  '<small style="display:block">เลขที่ '+esc(b.ref)+', '+baht(b.total_price||0)+(b.promo_title?', '+esc(b.promo_title):'')+'</small>'+qCancelUi(b,c)+chatBtn(b.id,"shop",b.ref,b.customer_name,b.ends_at,b.status!=="rescheduled")+'</div>'}
 var QCR=["พนักงานไม่สะดวก","ร้านปิดทำการ","เหตุฉุกเฉิน","อื่นๆ (ระบุเหตุผล)"];
 function qCanCancel(b,c){return c==="wait"&&b.status==="confirmed"&&Date.parse(b.starts_at)>Date.now()&&!(b.booking_items||[]).some(function(i){return i.active&&(i.job==="in_progress"||i.job==="done")})}
-function qCancelUi(b,c){if(!qCanCancel(b,c))return"";
+function qCanNoShow(b,c){return c==="wait"&&b.status==="confirmed"&&Date.parse(b.starts_at)<=Date.now()&&!(b.booking_items||[]).some(function(i){return i.active&&(i.job==="in_progress"||i.job==="done")})}
+function qNoShowUi(b){
+ if(S.qn!==b.id)return'<div class="acts" style="margin-top:8px"><button type="button" class="btn g" data-a="qns" data-id="'+b.id+'" aria-label="บันทึกว่าลูกค้าไม่มา คิวเลขที่ '+esc(b.ref)+' ของ '+esc(b.customer_name)+'">ลูกค้าไม่มา</button></div>';
+ return'<div class="pinbox" role="group" aria-labelledby="qnsh_'+b.id+'" style="margin-top:8px"><b id="qnsh_'+b.id+'" tabindex="-1">ยืนยันว่าลูกค้าไม่มา คิวเลขที่ '+esc(b.ref)+'</b><p class="hint2" style="margin:0">ใช้เมื่อลูกค้าไม่มารับบริการตามนัด ระบบจะปล่อยคิว แจ้งลูกค้า พนักงาน และแอดมิน พร้อมคืนแต้มที่ลูกค้าใช้ (ถ้ามี) ย้อนกลับไม่ได้</p>'+
+  '<div class="acts"><button type="button" class="btn d" data-a="qnsok" data-id="'+b.id+'">ยืนยันลูกค้าไม่มา</button><button type="button" class="btn g" data-a="qnsno" data-id="'+b.id+'">ไม่ใช่</button></div></div>'}
+function qCancelUi(b,c){if(qCanNoShow(b,c))return qNoShowUi(b);if(!qCanCancel(b,c))return"";
  if(S.qx!==b.id)return'<div class="acts" style="margin-top:8px"><button type="button" class="btn g" data-a="qcx" data-id="'+b.id+'" aria-label="ยกเลิกคิว เลขที่ '+esc(b.ref)+' ของ '+esc(b.customer_name)+'">ยกเลิกคิวนี้</button></div>';
  return'<div class="pinbox" role="group" aria-labelledby="qcxh_'+b.id+'" style="margin-top:8px"><b id="qcxh_'+b.id+'" tabindex="-1">ยืนยันยกเลิกคิว เลขที่ '+esc(b.ref)+'</b><p class="hint2" style="margin:0">ระบบจะแจ้งลูกค้าและพนักงาน พร้อมคืนแต้มที่ลูกค้าใช้ (ถ้ามี) ยกเลิกแล้วย้อนกลับไม่ได้</p>'+
   '<div><label for="qcr_'+b.id+'">เหตุผลที่ยกเลิก</label><select class="in" id="qcr_'+b.id+'">'+QCR.map(function(x,i){return'<option value="'+i+'">'+x+'</option>'}).join("")+'</select></div>'+
@@ -843,7 +848,7 @@ function draw(){drawHeader();
 /* รีเฟรชเบื้องหลัง: ไม่ล้างฟอร์มที่กำลังกรอกอยู่ */
 function softDraw(){drawHeader();
  navDraw();
- var busyForm=S.form||S.wmode||S.slipDraft||S.tab==="set"||S.tab==="cls"||S.tab==="share"||S.tab==="rp"||S.busy||S.chat||S.rvReply||S.qx;
+ var busyForm=S.form||S.wmode||S.slipDraft||S.tab==="set"||S.tab==="cls"||S.tab==="share"||S.tab==="rp"||S.busy||S.chat||S.rvReply||S.qx||S.qn;
  if(!busyForm){document.getElementById("main").innerHTML=view();
   if(S.tab==="wal"&&S.tpshow){var tq=byId(D.tx,S.tpshow),pq=ppInfo();if(tq&&tq.st==="รอยืนยัน"){if(pq.on)drawQr("qrbox",ppPayload(pq.type,pq.id,tq.amt));var sc=document.getElementById("slipcur");if(sc&&tq.slipPath)loadSlip(tq.slipPath,sc)}}}}
 function refresh(){if(!D||S.busy)return Promise.resolve();return loadLive().then(function(){if(S.tab==="nt"){openNt()}if(S.tab==="rv"&&!S.rvReply)rvLoad();softDraw()},function(e){if(e&&e.status===401)doLogout()})}
@@ -891,6 +896,9 @@ document.addEventListener("click",function(e){
  if(a==="rvmore"){RV.show+=20;draw();return}
  if(a==="ntf"){S.ntf=id;draw();return}
  if(a==="qt"){S.qt=id;draw();return}
+ if(a==="qns"){S.qn=id;draw();var h2=g("qnsh_"+id);if(h2)h2.focus();return}
+ if(a==="qnsno"){S.qn=null;draw();var b2=document.querySelector('[data-a="qns"][data-id="'+id+'"]');if(b2)b2.focus();return}
+ if(a==="qnsok"){var bn=byId(D.bk,id);if(!bn)return;OKM="บันทึกว่าลูกค้าไม่มา คิวเลขที่ "+bn.ref+" แล้ว ระบบแจ้งลูกค้าและพนักงานแล้ว";act(function(){return rpc("shop_mark_no_show",{p_ref:bn.ref}).then(loadBk)},function(){S.qn=null});return}
  if(a==="qcx"){S.qx=id;draw();var h=g("qcxh_"+id);if(h)h.focus();return}
  if(a==="qcxno"){S.qx=null;draw();var bb=document.querySelector('[data-a="qcx"][data-id="'+id+'"]');if(bb)bb.focus();return}
  if(a==="qcxok"){var bk=byId(D.bk,id);if(!bk)return;var ri=+val("qcr_"+id),ot=val("qco_"+id).trim(),qe=g("qce_"+id);

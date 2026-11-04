@@ -15,6 +15,8 @@ const BK=[
  {id:'b5',ref:'MS5',customer_name:'ลูกค้าE',phone:'0805',place_id:'sh1',status:'rescheduled',moved_to:'MS6',starts_at:D1(3),ends_at:D1(3.04),total_price:400,created_at:D1(-1),booking_items:[it('i5','นวดไทย',D1(3),'pending',false)]},
  {id:'b8',ref:'MS8',customer_name:'ลูกค้าH',phone:'0808',place_id:'sh1',status:'completed',starts_at:D1(-2),ends_at:D1(-1.96),total_price:400,created_at:D1(-3),booking_items:[it('i8','นวดไทย',D1(-2),'done')]},
  {id:'b9',ref:'MS9',customer_name:'ลูกค้าI',phone:'0809',place_id:'sh1',status:'cancelled',starts_at:D1(-10),ends_at:D1(-9.96),total_price:400,created_at:D1(-11),booking_items:[it('i9','นวดไทย',D1(-10),'pending',false)]},
+ {id:'b10',ref:'MS10',customer_name:'ลูกค้าJ',phone:'0810',place_id:'sh1',status:'confirmed',starts_at:D1(-0.1),ends_at:D1(-0.06),total_price:400,created_at:D1(-1),booking_items:[it('i10','นวดไทย',D1(-0.1),'accepted')]},
+ {id:'b11',ref:'MS11',customer_name:'ลูกค้าK',phone:'0811',place_id:'sh1',status:'confirmed',starts_at:D1(-0.1),ends_at:D1(-0.06),total_price:400,created_at:D1(-1),booking_items:[it('i11','นวดไทย',D1(-0.1),'in_progress')]},
  {id:'b7',ref:'MS7',customer_name:'ร้านอื่น',phone:'0807',place_id:'sh9',status:'confirmed',starts_at:D1(1),ends_at:D1(1.04),total_price:400,created_at:D1(0),booking_items:[]}
 ];
 const T={
@@ -60,6 +62,7 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
    T.promotion_services=T.promotion_services.filter(x=>x.promotion_id!==p.id).concat(body.p_services.map(v=>({promotion_id:p.id,service_id:v})));return J(200,p.id)}
   if(f==='attach_topup_slip'){const t=T.topup_requests.find(x=>x.id===body.p_id);if(!t||t.status!=='pending')return J(400,{code:'P0001',message:'รายการนี้ปิดแล้ว ส่งสลิปไม่ได้'});t.slip_path=body.p_path;t.slip_at=now();return J(204,null)}
   if(f==='cancel_booking'){const bk=T.bookings.find(x=>x.ref===body.p_ref);if(mode.cxErr)return J(400,{code:'P0001',message:'พนักงานเริ่มให้บริการแล้ว ยกเลิกไม่ได้'});bk.status='cancelled';bk.booking_items.forEach(i=>i.active=false);return J(204,null)}
+  if(f==='shop_mark_no_show'){const bk=T.bookings.find(x=>x.ref===body.p_ref);bk.status='no_show';bk.booking_items.forEach(i=>i.active=false);return J(204,null)}
   if(f==='cancel_topup'){const t=T.topup_requests.find(x=>x.id===body.p_id);t.status='cancelled';return J(204,null)}
   return J(404,{message:'no rpc '+f})}
  const tb=path.replace('/rest/v1/','');if(T[tb]===undefined)return J(404,{message:'nf '+path});
@@ -111,4 +114,16 @@ ok('rpc sent ref + reason',!!cc&&cc.body.p_ref==='MS1'&&cc.body.p_reason==='พ�
 await p.waitForTimeout(300);const mtx=await p.textContent('#main');if(mtx.includes('ลูกค้าA'))console.log('MAIN:',mtx.slice(0,400));ok('card left waiting tab',!mtx.includes('ลูกค้าA'));
 await p.click('[data-a=qt][data-id=cx]');ok('card now in cancelled tab',(await p.textContent('#main')).includes('ลูกค้าA'));
 ok('no cancel button on cancelled card',await p.$('[data-a=qcx]')===null);
+await p.click('[data-a=qt][data-id=wait]');
+ok('past pending booking: no-show button, no cancel button',await p.$('[data-a=qns][data-id=b10]')!==null&&await p.$('[data-a=qcx][data-id=b10]')===null);
+ok('in-progress booking has neither button',await p.$('[data-a=qns][data-id=b11]')===null&&await p.$('[data-a=qcx][data-id=b11]')===null);
+ok('no-show label has ref and name',(await p.getAttribute('[data-a=qns][data-id=b10]','aria-label')).includes('MS10')&&(await p.getAttribute('[data-a=qns][data-id=b10]','aria-label')).includes('ลูกค้าJ'));
+await p.click('[data-a=qns][data-id=b10]');
+ok('no-show confirm focus',await until(()=>document.activeElement&&document.activeElement.id==='qnsh_b10'));
+await p.click('[data-a=qnsno][data-id=b10]');
+ok('declining restores focus to button',await until(()=>document.activeElement&&document.activeElement.getAttribute('data-a')==='qns'));
+await p.click('[data-a=qns][data-id=b10]');await p.click('[data-a=qnsok][data-id=b10]');
+await until(()=>!document.querySelector('[data-a=qns][data-id=b10]'));
+ok('rpc shop_mark_no_show sent',calls.some(c=>c.path.endsWith('/rpc/shop_mark_no_show')&&c.body.p_ref==='MS10'));
+await p.click('[data-a=qt][data-id=cx]');ok('no-show card in cancelled tab',(await p.textContent('#main')).includes('ลูกค้าJ')&&(await p.textContent('#main')).includes('ลูกค้าไม่มา'));
 console.log('errors:',errs.join('|')||'none');await b.close()})();
