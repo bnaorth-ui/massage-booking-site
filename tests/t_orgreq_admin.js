@@ -40,7 +40,7 @@ const T={bookings:BKX.filter(b=>b.place_id!=='og1').concat(RPT),admins:[],
   {id:'q2',ref:'ORG000002',org_name:'โรงเรียนทดสอบ',district:'ดุสิต',address:'2 ถนนราชวิถี',lat:13.76,lng:100.51,contact_name:'คุณมาลี',contact_phone:'0844445555',service_date:new Date(Date.now()+864e5*10).toISOString().slice(0,10),start_time:'09:00:00',end_time:'12:00:00',lunch_start:null,lunch_end:null,hours:3,rate:400,staff_ids:['p1'],status:'paid_review',created_at:'2026-10-31T01:00:00Z',slip_path:'u3/orgslip-1.jpg',amount:1200},
   {id:'q3',ref:'ORG000003',org_name:'หน่วยงานรอตอบ',district:'พญาไท',address:'3',lat:13.77,lng:100.53,contact_name:'ก',contact_phone:'0800000000',service_date:new Date(Date.now()+864e5*10).toISOString().slice(0,10),start_time:'09:00:00',end_time:'11:00:00',lunch_start:null,lunch_end:null,hours:2,rate:400,staff_ids:['p1'],status:'invited',created_at:'2026-10-30T01:00:00Z',slip_path:null,amount:null}],
  org_invites:[{id:'iv1',request_id:'q3',staff_id:'p1',status:'pending',by_admin:false}]};
-const oqCalls=[],SDR=[];
+const oqCalls=[],hoCalls=[],HOL=[{id:'h1',status:'pending_admin',org_name:'บริษัทโอนงาน',ref:'ORG-H-1',service_date:'2099-01-10',from_name:'คุณเอ',to_name:'คุณบี',reason:'ติดธุระ',admin_note:null},{id:'h2',status:'pending_admin',org_name:'บริษัทสอง',ref:'ORG-H-2',service_date:'2099-01-11',from_name:'คุณซี',to_name:'คุณดี',reason:'',admin_note:null}],SDR=[];
 const bal={sh1:{balance:960,owner_phone:'0899111111',owner_name:'สมหมาย ใจดี'},sh2:{balance:-600,owner_phone:'0898',owner_name:''},og1:null};
 let mode={netDown:false};
 await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.protocol==='file:')return r.continue();if(!u.host.endsWith('supabase.co'))return r.abort();
@@ -66,6 +66,8 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
   if(f==='admin_shop_overview')return J(200,T.places.filter(p=>p.type==='shop').map(p=>({place_id:p.id,balance:bal[p.id].balance,owner_phone:bal[p.id].owner_phone,owner_name:bal[p.id].owner_name})));
   if(f==='admin_find_users'){finds.push(body);const q=body.p_q.replace(/\D/g,'');if(q.length<3)return J(400,{code:'P0001',message:'พิมพ์เบอร์อย่างน้อย 3 หลัก'});return J(200,PEOPLE.filter(x=>x.phone.includes(q)))}
   if(f==='admin_reset_password'){resets.push(body);if(resetErr)return J(400,{code:'P0001',message:resetErr});const u=PEOPLE.find(x=>x.id===body.p_user);T.password_reset_log.unshift({id:resets.length,admin_name:'แอดมิน หนึ่ง',user_name:u.name,user_phone:u.phone,created_at:now()});return J(204,null)}
+  if(f==='admin_handovers')return J(200,HOL);
+  if(f==='admin_handover_decide'){hoCalls.push(body);const h=HOL.find(x=>x.id===body.p_id);h.status=body.p_ok?'pending_staff':'rejected';return J(204,null)}
   if(f.startsWith('admin_org_')){oqCalls.push([f,body]);const rq=T.org_requests.find(x=>x.id===(body.p_id));if(f==='admin_org_request_approve'){rq.status='invited';T.org_invites.push({id:'iv9',request_id:rq.id,staff_id:'p1',status:'pending',by_admin:false});return J(200,'pl9')}if(f==='admin_org_request_reject'){rq.status='rejected';return J(204,null)}if(f==='admin_org_payment_confirm'){rq.status=body.p_ok?'confirmed':'awaiting_payment';return J(204,null)}if(f==='admin_org_invite_respond'){const iv=T.org_invites.find(x=>x.id===body.p_invite);iv.status=body.p_accept?'accepted':'declined';iv.by_admin=true;return J(204,null)}if(f==='admin_org_close_invites'){rq.status='no_staff';return J(204,null)}}
   if(f==='admin_staff_delete_requests'){if(process.env.NOSQL)return J(404,{message:'Could not find the function public.admin_staff_delete_requests in the schema cache'});return J(200,SDR.filter(x=>x.st==='pending').map(x=>x.row))}
   if(f==='admin_staff_delete_resolve'){sdrCalls.push(body);const x=SDR.find(z=>z.row.id===body.p_req&&z.st==='pending');if(!x)return J(400,{code:'P0001',message:'ไม่พบคำขอที่รออยู่'});if(x.row.open_jobs>0&&body.p_approve)return J(400,{code:'P0001',message:'พนักงานยังมีคิวที่ยังไม่เสร็จ'});x.st=body.p_approve?'done':'rejected';if(body.p_approve){const sf=T.staff.find(q=>q.id===x.row.staff_id);Object.assign(sf,{name:'พนักงานที่ออกจากระบบ',phone:null,active:false,user_id:null})}return J(204,null)}
@@ -131,4 +133,10 @@ await p.click('[data-a=oqno][data-id=q3]');await p.waitForTimeout(200);ok('rejec
 await p.click('[data-a=oqno][data-id=q3]');await p.waitForTimeout(500);
 ok('reject rpc',oqCalls.some(c=>c[0]==='admin_org_request_reject'&&c[1].p_id==='q3'));
 t=await p.evaluate(()=>document.body.innerText);ok('history section has rejected',t.includes('ประวัติ')&&t.includes('ไม่อนุมัติ'));
+t=await p.evaluate(()=>document.body.innerText);ok('handover queue shown with names + reason',t.includes('คำขอมอบหมายงานระหว่างหมอนวด')&&t.includes('บริษัทโอนงาน')&&t.includes('คุณเอ มอบหมายให้ คุณบี')&&t.includes('ติดธุระ'));
+await p.click('[data-a=hook][data-id=h1]');await p.waitForTimeout(500);
+ok('approve handover rpc',hoCalls[0]&&hoCalls[0].p_id==='h1'&&hoCalls[0].p_ok===true);
+await p.click('[data-a=hono][data-id=h2]');await p.waitForTimeout(200);ok('reject handover asks reason',!!(await p.$('#hon_h2')));
+await p.fill('#hon_h2','ไม่ว่าง');await p.click('[data-a=hono][data-id=h2]');await p.waitForTimeout(500);
+ok('reject handover rpc with note',hoCalls[1]&&hoCalls[1].p_id==='h2'&&hoCalls[1].p_ok===false&&hoCalls[1].p_note==='ไม่ว่าง');
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)})();

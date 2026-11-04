@@ -7,7 +7,7 @@ const todayS=bkDate(Date.now()),addD=(d,n)=>new Date(Date.parse(d+'T00:00:00Z')+
 const at=(d,m)=>new Date(Date.parse(d+'T00:00:00+07:00')+m*60000).toISOString();
 const users={'0844444444':{id:'u1',pw:'staffpass1',phone:'0844444444',name:'นุ่น'},'0899999999':{id:'u9',pw:'nopass111',phone:'0899999999',name:'คนนอก'}};
 const ST={id:'s1',user:'u1',name:'คุณนุ่น',phone:'0844444444',photo_path:null,accepting:true,work_days:[0,1,2,3,4,5,6]};
-let n=100;const oiCalls=[];const OI=[{id:'iv1',status:'pending',req_status:'invited',org_name:'บริษัทตัวอย่าง',district:'บางรัก',service_date:addD(todayS,5),start_time:'09:00:00',end_time:'17:00:00',lunch_start:'12:00:00',lunch_end:'13:00:00',hours:7},{id:'iv2',status:'accepted',req_status:'confirmed',org_name:'โรงเรียนทดสอบ',district:'ดุสิต',service_date:addD(todayS,6),start_time:'09:00:00',end_time:'12:00:00',lunch_start:null,lunch_end:null,hours:3},{id:'iv3',status:'pending',req_status:'rejected',org_name:'ไม่ควรเห็น',district:'x',service_date:addD(todayS,7),start_time:'09:00:00',end_time:'10:00:00',lunch_start:null,lunch_end:null,hours:1}];
+let n=100;const oiCalls=[];const HO=[];const hoCalls=[];const OI=[{id:'iv1',status:'pending',req_status:'invited',org_name:'บริษัทตัวอย่าง',district:'บางรัก',service_date:addD(todayS,5),start_time:'09:00:00',end_time:'17:00:00',lunch_start:'12:00:00',lunch_end:'13:00:00',hours:7},{id:'iv2',status:'accepted',req_status:'confirmed',org_name:'โรงเรียนทดสอบ',district:'ดุสิต',service_date:addD(todayS,6),start_time:'09:00:00',end_time:'12:00:00',lunch_start:null,lunch_end:null,hours:3},{id:'iv3',status:'pending',req_status:'rejected',org_name:'ไม่ควรเห็น',district:'x',service_date:addD(todayS,7),start_time:'09:00:00',end_time:'10:00:00',lunch_start:null,lunch_end:null,hours:1}];
 let items=[
  {id:'i1',ref:'MS100001',bstatus:'confirmed',active:true,job:'pending',service:'นวดไทย',minutes:60,starts_at:at(todayS,23*60),ends_at:at(todayS,24*60),price:400,customer:'สมศรี ใจดี',phone:'0811111111',place:'ร้านสบายดี สปา'},
  {id:'i2',ref:'MS100002',bstatus:'confirmed',active:true,job:'pending',service:'นวดเท้า',minutes:60,starts_at:at(addD(todayS,1),600),ends_at:at(addD(todayS,1),660),price:300,customer:'วิชัย',phone:'0822222222',place:'ร้านสบายดี สปา'},
@@ -39,6 +39,11 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
   if(f==='staff_me')return J(200,isS?{id:'s1',name:ST.name,phone:ST.phone,photo_path:ST.photo_path,active:true,accepting:ST.accepting,work_days:ST.work_days,place:'ร้านสบายดี สปา',open_min:600,close_min:1260}:null);
   if(!isS)return J(400,{code:'P0001',message:'บัญชีนี้ไม่ใช่พนักงาน'});
   if(f==='my_org_invites')return J(200,OI);
+  if(f==='my_handovers')return J(200,HO);
+  if(f==='staff_handover_candidates')return J(200,[{id:'sx',name:'คุณเพื่อน'}]);
+  if(f==='staff_handover_request'){hoCalls.push(['req',body]);HO.push({id:'h1',role:'from',status:'pending_admin',org_name:'โรงเรียนทดสอบ',service_date:addD(todayS,6),start_time:'09:00:00',end_time:'12:00:00',from_name:'ฉัน',to_name:'คุณเพื่อน',reason:body.p_reason,admin_note:null,invite_id:body.p_invite});return J(200,'h1')}
+  if(f==='staff_handover_cancel'){hoCalls.push(['cancel',body]);HO.splice(0,HO.length);return J(204,null)}
+  if(f==='staff_handover_respond'){hoCalls.push(['resp',body]);HO.splice(0,HO.length);return J(204,null)}
   if(f==='staff_org_invite_respond'){oiCalls.push(body);const i=OI.find(x=>x.id===body.p_invite);i.status=body.p_accept?'accepted':'declined';return J(204,null)}
   if(f==='my_jobs')return J(200,items);
   if(f==='staff_delete_status'){if(mode.dlOff)return J(404,{message:'Could not find the function public.staff_delete_status in the schema cache'});return J(200,{status:DL.st,note:DL.note,open_jobs:DL.open,by:DL.by||'shop'})}
@@ -75,4 +80,20 @@ OI.push({id:'iv4',status:'pending',req_status:'invited',org_name:'ที่ส�
 await p.click('#nav button:nth-child(2)');await p.click('#nav button:nth-child(1)');await sleep(300);await p.reload();await sleep(900);
 await p.click('[data-a=oinv][data-id=iv4][data-ok="0"]');await sleep(700);t=await T0(p);
 ok('decline rpc',oiCalls.length===2&&oiCalls[1].p_accept===false&&t.includes('ปฏิเสธคำเชิญแล้ว'));
+// ---- มอบหมายงานให้เพื่อน
+await p.reload();await sleep(900);
+ok('handover button on accepted job',!!(await p.$('[data-a=hoopen][data-id=iv2]')));
+await p.click('[data-a=hoopen][data-id=iv2]');await p.waitForSelector('#hoto',{timeout:4000});
+ok('free colleagues listed',(await p.$$eval('#hoto option',o=>o.map(x=>x.textContent))).includes('คุณเพื่อน'));
+await p.click('[data-a=hosend]');await sleep(300);t=await T0(p);
+ok('must choose a colleague first',t.includes('กรุณาเลือกเพื่อน')&&hoCalls.length===0);
+await p.selectOption('#hoto','sx');await p.fill('#hore','ไม่สะดวก');await p.click('[data-a=hosend]');await sleep(800);t=await T0(p);
+ok('handover request rpc + waiting state',hoCalls[0]&&hoCalls[0][0]==='req'&&hoCalls[0][1].p_invite==='iv2'&&hoCalls[0][1].p_to==='sx'&&hoCalls[0][1].p_reason==='ไม่สะดวก'&&t.includes('รอแอดมินอนุมัติ')&&!(await p.$('[data-a=hoopen][data-id=iv2]')));
+await p.click('[data-a=hocancel]');await sleep(800);t=await T0(p);
+ok('handover cancel rpc',hoCalls[1][0]==='cancel'&&hoCalls[1][1].p_id==='h1'&&!!(await p.$('[data-a=hoopen][data-id=iv2]')));
+HO.push({id:'h2',role:'to',status:'pending_staff',org_name:'บริษัทรับช่วง',service_date:addD(todayS,9),start_time:'09:00:00',end_time:'12:00:00',from_name:'คุณเพื่อน',to_name:'ฉัน',reason:'ติดธุระ',admin_note:null,invite_id:'zz'});
+await p.reload();await sleep(900);t=await T0(p);
+ok('incoming handover card',t.includes('ขอให้คุณรับช่วงงาน')&&t.includes('บริษัทรับช่วง')&&t.includes('คุณเพื่อน'));
+await p.click('[data-a=horesp][data-ok="1"]');await sleep(800);t=await T0(p);
+ok('accept handover rpc',hoCalls[2][0]==='resp'&&hoCalls[2][1].p_id==='h2'&&hoCalls[2][1].p_accept===true&&t.includes('รับช่วงงานแล้ว'));
 console.log('errors:',errs.join('|')||'none');await p.context().browser().close();process.exit(0)})();
