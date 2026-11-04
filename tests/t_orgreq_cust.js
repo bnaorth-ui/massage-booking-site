@@ -4,7 +4,7 @@ const {chromium}=require('playwright');
 const bkk=(n=0)=>{const d=new Date(Date.now()+7*3600000+n*86400000);return d.toISOString().slice(0,10)};
 (async()=>{const b=await chromium.launch(require('./config').launch);
 const ctx=await b.newContext({timezoneId:'Asia/Bangkok',locale:'th-TH'});const errs=[],calls=[];
-let mode={cat:true,rpcMissing:false};const ORL=[],SUBS=[],CANC=[],ATT=[],UPL=[];let SUBFAIL='';let seq=100000;const BKS=[];const NOTES=[];
+let mode={cat:true,rpcMissing:false};const RVS=[];let RVFAIL='';const ORL=[],SUBS=[],CANC=[],ATT=[],UPL=[];let SUBFAIL='';let seq=100000;const BKS=[];const NOTES=[];
 const UID='uuid-1';
 const places=[
  {id:'sh1',type:'shop',name:'ร้านสบายดี สปา',area:'สุขุมวิท',lat:13.76,lng:100.51,open_days:[0,1,2,3,4,5,6],open_time:'10:00:00',close_time:'21:00:00',fixed_date:null,advance_days:14,cancel_hours:24,image_path:null,status:'approved',active:true},
@@ -34,6 +34,7 @@ await ctx.route('**/*supabase.co/**',async r=>{const q=r.request(),u=new URL(q.u
  if(path==='/rest/v1/rpc/org_free_staff'){FREECALLS.push(body.p_date);return J(200,body.p_date===bkk(19)?['st4']:body.p_date===bkk(22)?[]:['st3','st4'])}
  if(path==='/rest/v1/rpc/org_request_info')return J(200,{rate:400,districts:['ปทุมวัน','พญาไท','บางรัก','ดุสิต'],lead_days:10,pay_before_days:3,max_days:120,services:[{id:'sv15',name:'นวดคอบ่าไหล่',minutes:15,rest_minutes:5},{id:'sv30',name:'นวดไทย',minutes:30,rest_minutes:0}]});
  if(path==='/rest/v1/app_settings'&&m==='GET'&&u.search.includes('promptpay'))return J(200,[{promptpay_on:true,promptpay_type:'mobile',promptpay_id:'0812345678',promptpay_name:'สมาคมทดสอบ'}]);
+ if(path==='/rest/v1/rpc/org_review_submit'){RVS.push(body);const q=ORL.find(x=>x.id===body.p_id);if(RVFAIL)return J(400,{code:'P0001',message:RVFAIL});q.review={rating:body.p_rating,comment:body.p_comment,problem:body.p_problem};return r2()}
  if(path==='/rest/v1/rpc/my_org_requests')return J(200,ORL);
  if(path==='/rest/v1/rpc/submit_org_request'){SUBS.push(body.p);if(SUBFAIL)return J(400,{code:'P0001',message:SUBFAIL});const p=body.p;ORL.unshift({id:'rq'+(ORL.length+1),ref:'ORG-TEST-000'+(ORL.length+1),org_name:p.name,district:p.district,address:p.address,lat:p.lat,lng:p.lng,contact_name:p.contact_name,contact_phone:p.contact_phone,service_date:p.date,start_time:p.start+':00',end_time:p.end+':00',service_label:p.service==='sv15'?'นวดคอบ่าไหล่ 15 นาที พัก 5 นาที':'นวดไทย 30 นาที',lunch_start:p.lunch_start?p.lunch_start+':00':null,lunch_end:p.lunch_end?p.lunch_end+':00':null,hours:5,rate:400,status:'pending',accepted_count:0,amount:null,pay_due_at:null,slip_path:null,slip_at:null,note:null,created_at:new Date().toISOString(),invites:[]});return J(200,'rq'+ORL.length)}
  if(path==='/rest/v1/rpc/org_request_cancel'){CANC.push(body.p_id);const r=ORL.find(x=>x.id===body.p_id);if(r)r.status='cancelled';return r2()}
@@ -262,6 +263,21 @@ ok('unknown request link says not found',(await p.textContent('#orqlm')).include
 BKS.push({ref:'BK-OG1-1',place_id:'og1',place_name:'สำนักงานพัฒนาสังคม',place_type:'org',phone:'0811111111',s:Date.now()+3*86400000,e:Date.now()+3*86400000+3600000,total:400,discount:0,promo:null,status:'confirmed',moved_from:null,moved_to:null,items:[]});
 await p.goto(require('./config').page('customer-booking.html')+'?org=og1');await p.waitForSelector('#orqlm',{timeout:6000});
 ok('one booking per person: second attempt blocked with message',(await p.textContent('#orqlm')).includes('จองได้คนละ 1 คิว')&&!!(await p.$('[data-pl]')));
+// ---- ให้คะแนนบริการหลังงานเสร็จ
+ORL.push({id:'rq11',ref:'ORG-TEST-0011',org_name:'บริษัท งานผ่านแล้ว',district:'ดุสิต',service_date:bkk(-1),address:'11 ถนนทดสอบ',lat:13.77,lng:100.52,contact_name:'คุณทดสอบ',contact_phone:'0811112222',start_time:'09:00:00',end_time:'12:00:00',lunch_start:null,lunch_end:null,hours:3,rate:400,status:'confirmed',accepted_count:1,amount:1200,pay_due_at:null,slip_path:null,note:null,service_label:null,place_id:'og1',staff_ids:['st3'],invites:[{id:'i11',staff_id:'st3',name:'คุณนุ่น',status:'accepted'}]});
+ORL.push({id:'rq12',ref:'ORG-TEST-0012',org_name:'บริษัท งานอนาคต',district:'ดุสิต',service_date:bkk(5),address:'11 ถนนทดสอบ',lat:13.77,lng:100.52,contact_name:'คุณทดสอบ',contact_phone:'0811112222',start_time:'09:00:00',end_time:'12:00:00',lunch_start:null,lunch_end:null,hours:3,rate:400,status:'confirmed',accepted_count:1,amount:1200,pay_due_at:null,slip_path:null,note:null,service_label:null,place_id:'og1',staff_ids:['st3'],invites:[{id:'i11',staff_id:'st3',name:'คุณนุ่น',status:'accepted'}]});
+await p.goto(require('./config').page('customer-booking.html'));await p.click('[data-tab=ac]');await p.click('[data-orq=open]');await p.waitForSelector('.orqtabs',{timeout:4000});await p.click('#orqtab_done');
+{const t=await p.evaluate(()=>{const g=(i)=>document.querySelector('[data-orq=rev][data-id='+i+']');return [!!g('rq11'),!!g('rq12')]});
+ok('rating button only on past confirmed job',t[0]===true&&t[1]===false);}
+await p.click('[data-orq=rev][data-id=rq11]');await p.waitForSelector('input[name=orq_rv]',{timeout:4000});
+ok('review page opens with 5 radio options',(await p.$$('input[name=orq_rv]')).length===5&&(await p.evaluate(()=>document.activeElement.id))==='orqt');
+await p.click('[data-orq=revsend]');await p.waitForTimeout(300);ok('must pick rating first (no rpc, error read)',RVS.length===0&&(await p.textContent('#orq_rverr')).includes('กรุณาเลือกคะแนน'));
+await p.check('input[name=orq_rv][value="2"]');await p.fill('#orq_rvc','มาสาย');await p.check('#orq_rvp');
+RVFAIL='ท่านให้คะแนนงานนี้แล้ว';await p.click('[data-orq=revsend]');await p.waitForTimeout(500);
+ok('server error shown, form kept',(await p.textContent('#orq_rverr')).includes('ให้คะแนนงานนี้แล้ว')&&(await p.inputValue('#orq_rvc'))==='มาสาย'&&(await p.isChecked('input[name=orq_rv][value="2"]')));
+RVFAIL='';await p.click('[data-orq=revsend]');await p.waitForTimeout(800);
+ok('review rpc payload',RVS.length===2&&RVS[1].p_id==='rq11'&&RVS[1].p_rating===2&&RVS[1].p_comment==='มาสาย'&&RVS[1].p_problem===true);
+{const t=await p.textContent('#app');ok('back to list with thanks + shown rating, button gone',t.includes('ขอบคุณที่ให้คะแนน')&&t.includes('ท่านให้คะแนนบริการแล้ว 2/5 (แจ้งปัญหา)')&&!(await p.$('[data-orq=rev][data-id=rq11]')));}
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)
 })()
 

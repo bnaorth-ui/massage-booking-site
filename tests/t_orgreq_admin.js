@@ -40,6 +40,7 @@ const T={bookings:BKX.filter(b=>b.place_id!=='og1').concat(RPT),admins:[],
   {id:'q2',ref:'ORG000002',org_name:'โรงเรียนทดสอบ',district:'ดุสิต',address:'2 ถนนราชวิถี',lat:13.76,lng:100.51,contact_name:'คุณมาลี',contact_phone:'0844445555',service_date:new Date(Date.now()+864e5*10).toISOString().slice(0,10),start_time:'09:00:00',end_time:'12:00:00',lunch_start:null,lunch_end:null,hours:3,rate:400,staff_ids:['p1'],status:'paid_review',created_at:'2026-10-31T01:00:00Z',slip_path:'u3/orgslip-1.jpg',amount:1200},
   {id:'q3',ref:'ORG000003',org_name:'หน่วยงานรอตอบ',district:'พญาไท',address:'3',lat:13.77,lng:100.53,contact_name:'ก',contact_phone:'0800000000',service_date:new Date(Date.now()+864e5*10).toISOString().slice(0,10),start_time:'09:00:00',end_time:'11:00:00',lunch_start:null,lunch_end:null,hours:2,rate:400,staff_ids:['p1'],status:'invited',created_at:'2026-10-30T01:00:00Z',slip_path:null,amount:null}],
  org_invites:[{id:'iv1',request_id:'q3',staff_id:'p1',status:'pending',by_admin:false},{id:'iv2',request_id:'q2',staff_id:'p2',status:'accepted',by_admin:false}]};
+T.org_requests.find(x=>x.id==='q3').invite_due_at=new Date(Date.now()+5*36e5).toISOString();
 const oqCalls=[],hoCalls=[],HOL=[{id:'h1',status:'pending_admin',org_name:'บริษัทโอนงาน',ref:'ORG-H-1',service_date:'2099-01-10',from_name:'คุณเอ',to_name:'คุณบี',reason:'ติดธุระ',admin_note:null},{id:'h2',status:'pending_admin',org_name:'บริษัทสอง',ref:'ORG-H-2',service_date:'2099-01-11',from_name:'คุณซี',to_name:'คุณดี',reason:'',admin_note:null}],SDR=[];
 const bal={sh1:{balance:960,owner_phone:'0899111111',owner_name:'สมหมาย ใจดี'},sh2:{balance:-600,owner_phone:'0898',owner_name:''},og1:null};
 let mode={netDown:false};
@@ -67,6 +68,7 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
   if(f==='admin_find_users'){finds.push(body);const q=body.p_q.replace(/\D/g,'');if(q.length<3)return J(400,{code:'P0001',message:'พิมพ์เบอร์อย่างน้อย 3 หลัก'});return J(200,PEOPLE.filter(x=>x.phone.includes(q)))}
   if(f==='admin_reset_password'){resets.push(body);if(resetErr)return J(400,{code:'P0001',message:resetErr});const u=PEOPLE.find(x=>x.id===body.p_user);T.password_reset_log.unshift({id:resets.length,admin_name:'แอดมิน หนึ่ง',user_name:u.name,user_phone:u.phone,created_at:now()});return J(204,null)}
   if(f==='admin_handovers')return J(200,HOL);
+  if(f==='admin_org_reviews')return J(200,[{id:'v1',request_id:'q1',ref:'ORG000001',org_name:'บริษัทตัวอย่าง จำกัด',service_date:'2026-10-20',rating:2,comment:'มาสายมาก',problem:true,created_at:'2026-10-21T03:00:00Z',staff:'คุณกลาง'},{id:'v2',request_id:'q2',ref:'ORG000002',org_name:'โรงเรียนทดสอบ',service_date:'2026-10-22',rating:5,comment:null,problem:false,created_at:'2026-10-23T03:00:00Z',staff:'คุณสอง'}]);
   if(f==='admin_handover_candidates')return J(200,[{id:'p1',name:'คุณกลาง'}]);
   if(f==='admin_org_replace_staff'){hoCalls.push(['replace',body]);return J(200,'hx')}
   if(f==='admin_handover_decide'){hoCalls.push(body);const h=HOL.find(x=>x.id===body.p_id);h.status=body.p_ok?'pending_staff':'rejected';return J(204,null)}
@@ -116,6 +118,9 @@ t=await p.evaluate(()=>document.body.innerText);
 ok('cards listed with details',t.includes('บริษัทตัวอย่าง จำกัด')&&t.includes('เขตบางรัก')&&t.includes('รวม 7 ชม.')&&t.includes('คุณสมชาย')&&t.includes('โรงเรียนทดสอบ')&&t.includes('หน่วยงานรอตอบ'));
 ok('slip image loaded',await until(()=>document.querySelector('#oqslip_q2 img')));
 ok('invite status shown',t.includes('คุณกลาง (รอตอบ)'));
+ok('deadline panel lists invite near due',t.includes('ใกล้หมดเวลา')&&t.includes('หน่วยงานรอตอบ')&&t.includes('ยังไม่ตอบ: คุณกลาง')&&t.includes('ด่วน')&&/เหลือ 4 ชั่วโมง|เหลือ 5 ชั่วโมง/.test(t));
+ok('reviews panel: average + flagged + comment',await p.evaluate(()=>{const e=document.getElementById('orvq');if(!e)return false;const t=e.innerText;return t.includes('คะแนนเฉลี่ย 3.5 จาก 5')&&t.includes('ต้องดู 1')&&t.includes('มาสายมาก')&&t.includes('แจ้งว่ามีปัญหา')&&t.includes('หมอนวด: คุณกลาง')}));
+ok('deadline panel has tel links',!!(await p.$('#dlq a[href="tel:0800000000"]')));
 await p.screenshot({path:'oreq_admin.png',fullPage:true});
 // proxy accept for q3
 await p.click('[data-a=oqinv][data-id=iv1][data-t="1"]');await p.waitForTimeout(500);
