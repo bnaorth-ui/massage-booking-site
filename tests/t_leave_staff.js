@@ -14,7 +14,7 @@ let items=[
  {id:'i3',ref:'MS100003',bstatus:'cancelled',active:false,job:'pending',service:'นวดไทย',minutes:60,starts_at:at(todayS,23*60-120),ends_at:at(todayS,23*60-60),price:400,customer:'ยกเลิกนะ',phone:null,place:'ร้านสบายดี สปา'}];
 let nts=[{id:'n1',audience:'staff',staff_id:'s1',kind:'booking',title:'คิวใหม่',body:'เลขที่ MS100002',created_at:new Date().toISOString()}];
 let anns=[{id:'a1',title:'ประชุมพนักงาน',body:'วันศุกร์ 10 โมง',audiences:['พนักงาน'],day:todayS,active:true,created_at:new Date(Date.now()-3600000).toISOString()},{id:'a2',title:'ไม่ใช่ของเรา',body:'x',audiences:['ผู้ใช้งาน'],day:todayS,active:true,created_at:new Date().toISOString()}];
-let LV=[],lvCalls=[],reads=[],blocks=[],mode={},incCalls=[],pwPut=[],dlCalls=[],DL={st:'none',note:'',open:0};
+let LV=[],lvCalls=[],SH=[],shCalls=[],reads=[],blocks=[],mode={},incCalls=[],pwPut=[],dlCalls=[],DL={st:'none',note:'',open:0};
 const thisM=todayS.slice(0,7),prevM=(()=>{let y=+thisM.slice(0,4),m=+thisM.slice(5,7)-1;m--;if(m<0){m=11;y--}return y+'-'+String(m+1).padStart(2,'0')})();
 const INCROWS=[
  {id:'x1',ref:'R1',service:'นวดไทย',starts_at:at(thisM+'-01',600),place:'ร้านสบายดี สปา',list_price:400,pct:50,share:200},
@@ -47,6 +47,11 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
   if(f==='staff_handover_respond'){hoCalls.push(['resp',body]);HO.splice(0,HO.length);return J(204,null)}
   if(f==='staff_org_invite_respond'){oiCalls.push(body);const i=OI.find(x=>x.id===body.p_invite);i.status=body.p_accept?'accepted':'declined';return J(204,null)}
   if(f==='my_leaves')return J(200,LV);
+  if(f==='my_sub_handovers')return J(200,SH);
+  if(f==='staff_sub_candidates'){shCalls.push(['cands',body]);return J(200,[{id:'sx',name:'คุณเพื่อน'}])}
+  if(f==='staff_sub_request'){shCalls.push(['req',body]);SH.push({id:'h1',role:'from',status:'pending_admin',place_id:body.p_place,place_name:'บริษัท ไทยออฟฟิศ',day:body.p_day,from_name:'คุณนุ่น',to_name:'คุณเพื่อน',reason:body.p_reason,open:'09:00:00',close:'17:00:00'});return J(200,'h1')}
+  if(f==='staff_sub_cancel'){shCalls.push(['cancel',body]);SH.splice(0,SH.length);return J(204,null)}
+  if(f==='staff_company_sub_respond'){shCalls.push(['resp',body]);const h=SH.find(x=>x.id===body.p_id);h.status=body.p_accept?'done':'declined';return J(204,null)}
   if(f==='staff_leave_add'){lvCalls.push(['add',body]);if(body.p_day===addD(todayS,2))return J(400,{code:'P0001',message:'วันนี้มีคิวจองแล้ว 1 คิว กรุณาติดต่อสมาคมเพื่อจัดการคิวก่อนลา'});LV.push({day:body.p_day,reason:body.p_reason});return J(204,null)}
   if(f==='staff_leave_cancel'){lvCalls.push(['del',body]);const i=LV.findIndex(x=>x.day===body.p_day);if(i<0)return J(400,{code:'P0001',message:'ไม่พบรายการลานี้'});LV.splice(i,1);return J(204,null)}
   if(f==='my_jobs')return J(200,items);
@@ -88,4 +93,22 @@ ok('server block (has bookings) shown, input kept',t.includes('มีคิว�
 await p.click('[data-a=lvdel]');await sleep(800);t=await T0(p);
 ok('cancel leave rpc',lvCalls[lvCalls.length-1][0]==='del'&&lvCalls[lvCalls.length-1][1].p_day===addD(todayS,5)&&t.includes('ยกเลิกการลาวันที่')&&!(await p.$('[data-a=lvdel]')));
 await p.screenshot({path:'leave_staff.png',fullPage:true});
+// ---- หาคนแทน (บริษัท ไทยออฟฟิศ ประจำจันทร์/พุธ)
+let mon=null;for(let k=3;k<30;k++){const dd=addD(todayS,k),w=new Date(dd+'T00:00:00Z').getUTCDay();if(w===1){mon=dd;break}}
+await p.fill('#lvd',mon);await p.fill('#lvr','ลาป่วย');await p.click('[data-a=lvadd]');await sleep(800);t=await T0(p);
+ok('regular company day leave offers find-substitute',t.includes('ยังไม่มีคนแทน')&&!!(await p.$('[data-a=subopen]')));
+await p.click('[data-a=subopen]');await p.waitForSelector('#subto',{timeout:4000});
+ok('candidates loaded for that place+day',shCalls[0][0]==='cands'&&shCalls[0][1].p_place==='cp1'&&shCalls[0][1].p_day===mon&&(await p.$$eval('#subto option',o=>o.map(x=>x.textContent))).includes('คุณเพื่อน'));
+await p.click('[data-a=subsend]');await sleep(300);t=await T0(p);
+ok('must choose a colleague',t.includes('กรุณาเลือกเพื่อนที่จะไปแทน')&&shCalls.length===1);
+await p.selectOption('#subto','sx');await p.fill('#subre','ป่วย');await p.click('[data-a=subsend]');await sleep(800);t=await T0(p);
+ok('request rpc + waiting for admin shown',shCalls[1][0]==='req'&&shCalls[1][1].p_to==='sx'&&shCalls[1][1].p_reason==='ป่วย'&&t.includes('รอแอดมินอนุมัติ (คุณเพื่อน)')&&!!(await p.$('[data-a=subcancel]')));
+await p.click('[data-a=subcancel]');await sleep(800);t=await T0(p);
+ok('cancel substitute request',shCalls[2][0]==='cancel'&&t.includes('ยกเลิกคำขอหาคนแทนแล้ว')&&!!(await p.$('[data-a=subopen]')));
+// ฝั่งผู้รับ
+SH.push({id:'h2',role:'to',status:'pending_staff',place_id:'cp1',place_name:'บริษัท ไทยออฟฟิศ',day:addD(todayS,9),from_name:'คุณแพร',to_name:'คุณนุ่น',reason:'ธุระ',open:'09:00:00',close:'17:00:00'});
+await p.reload();await sleep(900);t=await T0(p);
+ok('incoming substitute request card',t.includes('งานแทนบริษัท')&&t.includes('ขอให้คุณไปแทน คุณแพร')&&t.includes('บริษัท ไทยออฟฟิศ'));
+await p.click('[data-a=subresp][data-ok="1"]');await sleep(800);t=await T0(p);
+ok('accept rpc then listed as upcoming substitute job',shCalls[3][0]==='resp'&&shCalls[3][1].p_accept===true&&t.includes('รับไปแทนแล้ว')&&t.includes('ไปแทน คุณแพร'));
 console.log('errors:',errs.join('|')||'none');await p.context().browser().close();process.exit(0)})();

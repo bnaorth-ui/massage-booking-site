@@ -209,6 +209,7 @@ function candsFor(v,d){d=d||S.date;return candsRaw(v,d).filter(function(c){retur
 function candsRaw(v,d){d=d||S.date;var p=S.place,w=p.staffDays||{},l=p.type==="shop"?p.staff:p.staff.map(function(i){return find(CENTRAL,i)});
  l=l.filter(function(c){return c&&c.on&&(c.svcs||[]).indexOf(v.id)>-1});
  if(p.type==="org")l=l.filter(function(c){var ds=w[c.id]||[];return !d||!ds.length||ds.indexOf(dowOf(d))>-1});
+ if(p.type==="org"&&d&&p.subs&&p.subs[d])p.subs[d].forEach(function(id){var c=find(CENTRAL,id);if(c&&c.on&&(c.svcs||[]).indexOf(v.id)>-1&&!l.some(function(x){return x.id===c.id}))l.push(c)});
  return l}
 function freeFor(v,i,d,m){return candsFor(v,d).filter(function(c){return segFree(c,d,m+svcOff(i),v.min+(v.rest||0))})}
 function syncSts(){S.sts=[];S.svcs.forEach(function(v){var c=S.asg[v.uid];if(c&&!S.sts.some(function(x){return x.id===c.id}))S.sts.push(c)})}
@@ -573,12 +574,13 @@ function applyCatalog(R){
  SHOPSVC={};
  PLACES=(R.places||[]).map(function(r){
   var shop=r.type==="shop",comp=r.type==="company",days=(r.open_days||[]).slice(),
-  p={id:r.id,type:shop?"shop":"org",comp:comp,name:r.name,area:r.area||"",icon:shop?"🌿":comp?"🏢":"🏛️",lat:r.lat,lng:r.lng,days:days,open:hrs(r.open_time),close:hrs(r.close_time),lunchS:r.lunch_start?hrs(r.lunch_start):null,lunchE:r.lunch_end?hrs(r.lunch_end):null,svcs:[],staff:[],staffDays:{},on:1,ov:{adv:r.advance_days,cancelH:r.cancel_hours},img:pubUrl("place-images",r.image_path)};
+  p={id:r.id,type:shop?"shop":"org",comp:comp,name:r.name,area:r.area||"",icon:shop?"🌿":comp?"🏢":"🏛️",lat:r.lat,lng:r.lng,days:days,open:hrs(r.open_time),close:hrs(r.close_time),lunchS:r.lunch_start?hrs(r.lunch_start):null,lunchE:r.lunch_end?hrs(r.lunch_end):null,svcs:[],staff:[],staffDays:{},subs:{},on:1,ov:{adv:r.advance_days,cancelH:r.cancel_hours},img:pubUrl("place-images",r.image_path)};
   if(shop){SHOPSVC[r.id]=sv.filter(function(x){return x.place_id===r.id}).map(mapSvc);p.svcs=SHOPSVC[r.id].map(function(v){return v.id});
    p.staff=CENTRAL.filter(function(c){return stf.some(function(x){return x.id===c.id&&x.place_id===r.id})})}
   else{
    p.svcs=SVC.filter(function(v){return sv.some(function(x){return x.id===v.id&&(x.applies_all||sps.some(function(q){return q.service_id===x.id&&q.place_id===r.id}))})}).map(function(v){return v.id});
    pss.filter(function(q){return q.place_id===r.id&&find(CENTRAL,q.staff_id)}).forEach(function(q){p.staff.push(q.staff_id);p.staffDays[q.staff_id]=(q.weekdays&&q.weekdays.length)?q.weekdays.slice():days.slice()});
+   (R.place_subs||[]).filter(function(q){return q.place_id===r.id}).forEach(function(q){(p.subs[q.day]=p.subs[q.day]||[]).push(q.staff_id)});
    if(comp){var u=[];p.staff.forEach(function(i){p.staffDays[i].forEach(function(d){if(u.indexOf(d)<0)u.push(d)})});p.days=u.sort(function(a,b){return a-b})}
    else p.sdate=r.fixed_date||""}
   return p});
@@ -1166,12 +1168,12 @@ function cmpState(key){return CMP.ce[key]?'<p class="aerr" role="alert">'+esc(CM
 function cmpDayBox(sc,k,lbl){var d=(sc.days||[]).filter(function(x){return x.day===k})[0],h='<div class="bk orqc"><div class="qh"><b>'+lbl+'</b></div><small>'+cmpDt(k)+'</small>';
  if(!d)return h+'<p>ไม่มีหมอนวดประจำในวันนี้</p></div>';
  h+=d.present.length?'<p>หมอนวดที่มาให้บริการ: <b>'+d.present.map(esc).join(", ")+'</b></p>':'<p class="aerr">ไม่มีหมอนวดมาให้บริการในวันนี้ (หมอนวดประจำลา) สมาคมจะแจ้งหากมีผู้มาแทน</p>';
- if(d.leave.length)h+='<p>ลา: '+d.leave.map(function(l){return esc(l.name)+' ('+esc(l.reason)+')'}).join(", ")+'</p>';
+ if(d.leave.length)h+='<p>ลา: '+d.leave.map(function(l){return esc(l.name)+' ('+esc(l.reason)+')'+(l.sub?' แทนโดย '+esc(l.sub):'')}).join(", ")+'</p>';
  return h+'</div>'}
 function cmpOv(h){var k=cmpKeys(),st=cmpState(k.sc);if(st)return h+st;var sc=CMP.c[k.sc];
  h+='<h2 class="stl">วันนี้และพรุ่งนี้</h2>'+cmpDayBox(sc,orqDay(0),"วันนี้")+cmpDayBox(sc,orqDay(1),"พรุ่งนี้");
  var lv=(sc.days||[]).filter(function(d){return d.day<=orqDay(13)&&d.leave.length});
- h+='<h2 class="stl">การลาใน 14 วันข้างหน้า</h2>'+(lv.length?'<ul class="orqsum">'+lv.map(function(d){return d.leave.map(function(l){return'<li>'+cmpDt(d.day)+': <b>'+esc(l.name)+'</b> ลา ('+esc(l.reason)+')</li>'}).join("")}).join("")+'</ul>':'<p>ยังไม่มีการลา</p>');
+ h+='<h2 class="stl">การลาใน 14 วันข้างหน้า</h2>'+(lv.length?'<ul class="orqsum">'+lv.map(function(d){return d.leave.map(function(l){return'<li>'+cmpDt(d.day)+': <b>'+esc(l.name)+'</b> ลา ('+esc(l.reason)+')'+(l.sub?' มี '+esc(l.sub)+' มาแทน':' ยังไม่มีคนแทน')+'</li>'}).join("")}).join("")+'</ul>':'<p>ยังไม่มีการลา</p>');
  var rp=CMP.c[k.rpn];h+='<h2 class="stl">สรุปเดือน '+cmpMonthLbl(orqDay(0).slice(0,7))+'</h2>';
  if(CMP.ce[k.rpn])return h+'<p class="aerr" role="alert">'+esc(CMP.ce[k.rpn])+'</p>';
  if(!rp)return h+'<div class="empty" role="status">กำลังโหลดสรุปเดือน…</div>';
@@ -1184,7 +1186,7 @@ function cmpSc(h){var k=cmpKeys(),st=cmpState(k.sc);if(st)return h+st;var sc=CMP
  return h+(ds.length?'<div class="rpw"><table class="orqt"><thead><tr><th>วันที่</th><th>หมอนวดที่มา</th><th>ลา</th></tr></thead><tbody>'+ds.map(function(d){return'<tr><td>'+cmpDt(d.day)+'</td><td>'+(d.present.length?d.present.map(esc).join(", "):'<b>ไม่มีหมอนวด</b>')+'</td><td>'+(d.leave.length?d.leave.map(function(l){return esc(l.name)}).join(", "):'-')+'</td></tr>'}).join("")+'</tbody></table></div>':'<p>ไม่มีวันทำงานใน 4 สัปดาห์นี้</p>')}
 function cmpLv(h){h+='<label class="fld" for="cmp_month"><span>เลือกเดือน</span><select class="sel" id="cmp_month">'+cmpMonths().map(function(m){return'<option value="'+m+'"'+(m===CMP.month?" selected":"")+'>'+cmpMonthLbl(m)+'</option>'}).join("")+'</select></label>';
  var k=cmpKeys(),st=cmpState(k.lv);if(st)return h+st;var L=CMP.c[k.lv];
- return h+(L.length?'<div class="rpw"><table class="orqt"><thead><tr><th>วันที่</th><th>หมอนวด</th><th>เหตุผล</th></tr></thead><tbody>'+L.map(function(x){return'<tr><td>'+cmpDt(x.day)+'</td><td>'+esc(x.name)+'</td><td>'+esc(x.reason)+'</td></tr>'}).join("")+'</tbody></table></div>':'<div class="empty">ไม่มีการลาในเดือนนี้</div>')}
+ return h+(L.length?'<div class="rpw"><table class="orqt"><thead><tr><th>วันที่</th><th>หมอนวด</th><th>เหตุผล</th><th>ผู้มาแทน</th></tr></thead><tbody>'+L.map(function(x){return'<tr><td>'+cmpDt(x.day)+'</td><td>'+esc(x.name)+'</td><td>'+esc(x.reason)+'</td><td>'+(x.sub?esc(x.sub):'-')+'</td></tr>'}).join("")+'</tbody></table></div>':'<div class="empty">ไม่มีการลาในเดือนนี้</div>')}
 function cmpFbCollect(){var F=CMP.fb;if(!F)return;var m=document.getElementById("cmp_fbm"),c=document.querySelector("input[name=cmp_rt]:checked"),t=document.getElementById("cmp_fbc"),p=document.getElementById("cmp_fbp");if(m)F.month=m.value;if(c)F.rating=+c.value;if(t)F.comment=t.value;if(p)F.problem=p.checked}
 function cmpFb(h){var k=cmpKeys(),F=CMP.fb||(CMP.fb={month:"",rating:0,comment:"",problem:false,busy:false,err:""}),st=cmpState(k.rv);
  h+=(CMP.flash?'<div class="flash" role="status">'+esc(CMP.flash)+'</div>':'');if(st)return h+st;

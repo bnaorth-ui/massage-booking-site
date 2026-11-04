@@ -136,7 +136,7 @@ var JSTEPS=[["accept","รับงาน","accepted"],["start","เริ่ม
 var JRANK={pending:0,accepted:1,in_progress:2,done:3},JL=["รอรับงาน","รับงานแล้ว","กำลังนวด","เสร็จสิ้นแล้ว"];
 
 /* ===================== ข้อมูล ===================== */
-var LVS=[],OINV=[],ASGN=[],HO=[],ME=null,JOBS=[],OFFS=[],NT=[],ANN=[],READS=[],ANNREAD=rd("staffAnnRead",[]);
+var SUBH=[],LVS=[],OINV=[],ASGN=[],HO=[],ME=null,JOBS=[],OFFS=[],NT=[],ANN=[],READS=[],ANNREAD=rd("staffAnnRead",[]);
 var S={ho:null,tab:"q",qt:"new",ntf:"all",ntNew:[],err:"",busy:false,wdMsg:""};
 var AG={step:"load",fail:0,lock:0,ok:"",err:"",join:"",ph:""};
 var INS={ev:null,done:false,fd:false};
@@ -147,7 +147,7 @@ function loadAll(light){
    sbApi("/rest/v1/notifications?select=*&audience=eq.staff&order=created_at.desc&limit=100"),
    sbApi("/rest/v1/notification_reads?select=notification_id&limit=2000"),
    sbApi("/rest/v1/announcements?select=*&active=eq.true&order=created_at.desc&limit=50"),
-   light?null:sbApi("/rest/v1/app_settings?select=*&limit=1").catch(function(){return[]}),rpc("my_org_invites").catch(function(){return[]}),rpc("my_handovers").catch(function(){return[]}),rpc("my_assignments").catch(function(){return[]}),rpc("my_leaves").catch(function(){return[]})]);
+   light?null:sbApi("/rest/v1/app_settings?select=*&limit=1").catch(function(){return[]}),rpc("my_org_invites").catch(function(){return[]}),rpc("my_handovers").catch(function(){return[]}),rpc("my_assignments").catch(function(){return[]}),rpc("my_leaves").catch(function(){return[]}),rpc("my_sub_handovers").catch(function(){return[]})]);
  pre.catch(function(){});
  return rpc("staff_me").then(function(me){
   if(!me)return null;ME=me;
@@ -155,7 +155,7 @@ function loadAll(light){
     var r=x[0];JOBS=r[0]||[];if(!light)OFFS=(x[1]||[]).map(function(d){return d.day});
     NT=(r[1]||[]).filter(function(n){return n.kind!=="announce"});READS=(r[2]||[]).map(function(d){return d.notification_id});
     if(!light){var st=(r[4]||[])[0]||{};CT={name:st.association_name||"",addr:st.address||"",phone:st.phone||"",line:st.line_url||"",hours:st.hours_text||"",ach:+st.auto_close_hours||0}}
-    OINV=Array.isArray(r[5])?r[5]:[];HO=Array.isArray(r[6])?r[6]:[];ASGN=Array.isArray(r[7])?r[7]:[];LVS=Array.isArray(r[8])?r[8]:[];ANN=(r[3]||[]).filter(function(a){return(a.audiences||[]).indexOf("พนักงาน")>-1});return true})})}
+    OINV=Array.isArray(r[5])?r[5]:[];HO=Array.isArray(r[6])?r[6]:[];ASGN=Array.isArray(r[7])?r[7]:[];LVS=Array.isArray(r[8])?r[8]:[];SUBH=Array.isArray(r[9])?r[9]:[];ANN=(r[3]||[]).filter(function(a){return(a.audiences||[]).indexOf("พนักงาน")>-1});return true})})}
 function feed(){var L=[];
  ANN.forEach(function(a){L.push({id:"a-"+a.id,from:"admin",title:"ประกาศ: "+a.title,text:a.body||"",at:a.created_at||(a.day+"T00:00:00Z")})});
  NT.forEach(function(n){L.push({id:"n-"+n.id,nid:n.id,from:"booking",title:n.title,text:n.body||"",at:n.created_at})});
@@ -387,7 +387,24 @@ function leaveCard(){var t=today(),mx=thAdd(t,60);
  return'<div class="day" role="group" aria-label="แจ้งลางาน"><h2>แจ้งลางาน</h2><p class="sub">เลือกวันที่ไม่สะดวกมาทำงาน ระบบแจ้งสมาคมและบริษัทที่เกี่ยวข้องทันที ลาล่วงหน้าได้ไม่เกิน 60 วัน ถ้าวันนั้นมีคิวจองแล้วต้องติดต่อสมาคมก่อน</p>'+
  '<label for="lvd">วันที่ลา</label><input id="lvd" type="date" min="'+t+'" max="'+mx+'" value="'+esc(S.lvd||"")+'"><label for="lvr">เหตุผล (ไม่เกิน 200 ตัวอักษร)</label><input id="lvr" type="text" maxlength="200" autocomplete="off" value="'+esc(S.lvr||"")+'">'+
  '<div class="mini" style="margin-top:6px"><button type="button" class="btn" data-a="lvadd"'+(S.busy?" disabled":"")+'>แจ้งลา</button></div>'+
- (LVS.length?'<h3>วันลาที่แจ้งไว้</h3>'+LVS.map(function(l){return'<div class="item"><b>'+thD(l.day)+'</b><br><small class="mute">'+esc(l.reason)+'</small><div class="mini" style="margin-top:6px"><button type="button" class="btn g" data-a="lvdel" data-id="'+l.day+'" aria-label="ยกเลิกการลาวันที่ '+thD(l.day)+'"'+(S.busy?" disabled":"")+'>ยกเลิกการลา</button></div></div>'}).join(""):'<p class="mute">ยังไม่มีการแจ้งลา</p>')+'</div>'}
+ (LVS.length?'<h3>วันลาที่แจ้งไว้</h3>'+LVS.map(function(l){return'<div class="item"><b>'+thD(l.day)+'</b><br><small class="mute">'+esc(l.reason)+'</small>'+subLine(l.day)+'<div class="mini" style="margin-top:6px"><button type="button" class="btn g" data-a="lvdel" data-id="'+l.day+'" aria-label="ยกเลิกการลาวันที่ '+thD(l.day)+'"'+(S.busy?" disabled":"")+'>ยกเลิกการลา</button></div></div>'}).join(""):'<p class="mute">ยังไม่มีการแจ้งลา</p>')+'</div>'}
+var SUBST={pending_admin:"รอแอดมินอนุมัติ",pending_staff:"รอเพื่อนตอบรับ",done:"มีคนไปแทนแล้ว"};
+function subAct(h){return["pending_admin","pending_staff","done"].indexOf(h.status)>-1}
+function subLine(day){var out="";
+ (ASGN||[]).forEach(function(a){if((a.days||[]).indexOf(dow(day))<0)return;
+  var hs=SUBH.filter(function(h){return h.role==="from"&&h.day===day&&h.place_id===a.place_id}),act=hs.filter(subAct)[0],last=hs.filter(function(h){return!subAct(h)})[0];
+  out+='<div class="item"><small><b>'+esc(a.name)+'</b>: ';
+  if(act){out+=SUBST[act.status]+' ('+esc(act.to_name)+')'+(act.status==="done"?'</small>':'</small><div class="mini" style="margin-top:6px"><button type="button" class="btn g" data-a="subcancel" data-id="'+act.id+'" aria-label="ยกเลิกคำขอหาคนแทน '+esc(a.name)+'"'+(S.busy?" disabled":"")+'>ยกเลิกคำขอ</button></div>')}
+  else if(S.sub&&S.sub.day===day&&S.sub.place===a.place_id){var B=S.sub;
+   out+='ค้นหาเพื่อนที่ว่างในวันนั้น</small>'+(B.err?'<div class="toast" role="alert">'+esc(B.err)+'</div>':'')+(B.cands===null?'<p class="mute" role="status">กำลังโหลดรายชื่อ…</p>':!B.cands.length?'<p class="mute" role="status">ไม่มีเพื่อนที่ว่างในวันนี้ ติดต่อสมาคมเพื่อจัดคนแทน</p>':
+    '<label for="subto">เลือกเพื่อนที่จะไปแทน</label><select id="subto"><option value="">เลือก</option>'+B.cands.map(function(c){return'<option value="'+c.id+'"'+(B.sel===c.id?" selected":"")+'>'+esc(c.name)+'</option>'}).join("")+'</select><label for="subre">เหตุผล (ไม่บังคับ)</label><input id="subre" type="text" maxlength="300" autocomplete="off" value="'+esc(B.reason||"")+'"><div class="mini" style="display:flex;gap:6px;margin-top:6px"><button type="button" class="btn" data-a="subsend"'+(S.busy?" disabled":"")+'>ส่งคำขอ</button><button type="button" class="btn g" data-a="subclose">ปิด</button></div>')+(B.cands===null||!B.cands.length?'<div class="mini" style="margin-top:6px"><button type="button" class="btn g" data-a="subclose">ปิด</button></div>':'')}
+  else{out+=(last?(last.status==="rejected"?'แอดมินไม่อนุมัติ'+(last.admin_note?' ('+esc(last.admin_note)+')':''):esc(last.to_name)+' ไม่สะดวกไปแทน')+' ':'ยังไม่มีคนแทน ')+'</small><div class="mini" style="margin-top:6px"><button type="button" class="btn g" data-a="subopen" data-id="'+day+'" data-pl="'+a.place_id+'"'+(S.busy?" disabled":"")+'>หาคนมาแทน</button></div>'}
+  out+='</div>'});
+ return out}
+function subCard(){var IN=SUBH.filter(function(h){return h.role==="to"&&h.status==="pending_staff"}),OK=SUBH.filter(function(h){return h.role==="to"&&h.status==="done"}),hm=function(t){return String(t||"").slice(0,5)};
+ if(!IN.length&&!OK.length)return"";
+ return'<div class="day" role="group" aria-label="งานแทนบริษัท"><h2>งานแทนบริษัท</h2>'+IN.map(function(h){return'<div class="item"><b>ขอให้คุณไปแทน '+esc(h.from_name)+'</b><br><small class="mute">'+esc(h.place_name)+' '+thD(h.day)+' เวลา '+hm(h.open)+'-'+hm(h.close)+(h.reason?' ('+esc(h.reason)+')':'')+'</small><div class="mini" style="display:flex;gap:6px;margin-top:6px"><button type="button" class="btn" data-a="subresp" data-id="'+h.id+'" data-ok="1"'+(S.busy?" disabled":"")+'>รับไปแทน</button><button type="button" class="btn g" data-a="subresp" data-id="'+h.id+'" data-ok="0"'+(S.busy?" disabled":"")+'>ไม่สะดวก</button></div></div>'}).join("")+
+  OK.map(function(h){return'<div class="item"><b>ไปแทน '+esc(h.from_name)+'</b><br><small class="mute">'+esc(h.place_name)+' '+thD(h.day)+' เวลา '+hm(h.open)+'-'+hm(h.close)+'</small></div>'}).join("")+'</div>'}
 function thAdd(d,n){return new Date(Date.parse(d+"T00:00:00Z")+n*86400000).toISOString().slice(0,10)}
 function oinvCard(){var L=OINV.filter(function(i){return i.status==="pending"&&i.req_status==="invited"}),D2=OINV.filter(function(i){return i.status==="accepted"&&["invited","awaiting_payment","paid_review","confirmed"].indexOf(i.req_status)>-1}),IN=HO.filter(function(x){return x.role==="to"&&x.status==="pending_staff"});
  var hm5=function(t){return String(t||"").slice(0,5)},line=function(i){return esc(i.org_name)+' เขต'+esc(i.district||"")+'<br><small class="mute">'+thD(i.service_date)+' เวลา '+hm5(i.start_time)+'-'+hm5(i.end_time)+(i.lunch_start?' (พัก '+hm5(i.lunch_start)+'-'+hm5(i.lunch_end)+')':'')+' รวม '+(+i.hours)+' ชม.</small>'};
@@ -414,7 +431,7 @@ function view(){var t=today(),h="";
    groups="",last=null,lateShown=false;
   EM.cx="ไม่มีงานที่ถูกยกเลิกใน 7 วันล่าสุด";
   list.forEach(function(j){if(cur[0]!=="done"&&cur[0]!=="cx"&&ended(j)&&!lateShown){lateShown=true;last=null;groups+='<h2 style="margin-top:20px">เลยเวลานัดแล้ว</h2>'}var d=bkDate(Date.parse(j.starts_at));if(d!==last){last=d;groups+='<h3 style="margin:14px 0 6px;font-size:1rem">'+(d===t?"วันนี้, ":"")+thD(d)+'</h3>'}groups+=jobCard(j,false)});
-  h=banner()+compCard()+leaveCard()+oinvCard()+'<h1>คิวงาน</h1><p class="sub">'+esc(ME.place)+'</p><div class="nf" role="tablist" aria-label="หมวดคิวงาน">'+TAB.map(function(x){return'<button type="button" role="tab" data-a="qt" data-id="'+x[0]+'" class="'+(x[0]===cur[0]?"on":"")+'" aria-selected="'+(x[0]===cur[0])+'">'+x[1]+' ('+x[2].length+')</button>'}).join("")+'</div>'+
+  h=banner()+compCard()+leaveCard()+subCard()+oinvCard()+'<h1>คิวงาน</h1><p class="sub">'+esc(ME.place)+'</p><div class="nf" role="tablist" aria-label="หมวดคิวงาน">'+TAB.map(function(x){return'<button type="button" role="tab" data-a="qt" data-id="'+x[0]+'" class="'+(x[0]===cur[0]?"on":"")+'" aria-selected="'+(x[0]===cur[0])+'">'+x[1]+' ('+x[2].length+')</button>'}).join("")+'</div>'+
    (list.length?groups:'<div class="empty">'+EM[cur[0]]+'</div>')+
    (cur[0]==="done"?'<p class="sub" style="text-align:center;margin-top:12px">แสดงเฉพาะงานของวันนี้ ดูงานวันอื่นและยอดส่วนแบ่งย้อนหลังได้ที่เมนูรายได้</p><button type="button" class="btn g" data-a="tab" data-id="inc">ไปที่เมนูรายได้</button>'
     :cur[0]==="cx"?'<p class="sub" style="text-align:center;margin-top:12px">แสดงเฉพาะงานที่ถูกยกเลิกหรือเลื่อนคิวใน 7 วันล่าสุด</p>':"")}
@@ -464,6 +481,12 @@ document.addEventListener("click",function(e){
  if(a==="hocancel"){S.busy=true;S.err="";S.ok="";draw();rpc("staff_handover_cancel",{p_id:id}).then(function(){S.busy=false;S.ok="ยกเลิกการมอบหมายแล้ว";return loadAll(true)}).then(function(){draw();ann(S.ok)},function(e){S.busy=false;S.err=errTh(e,"ยกเลิกไม่สำเร็จ");draw()});return}
  if(a==="horesp"){var hok=el.dataset.ok==="1";S.busy=true;S.err="";S.ok="";draw();rpc("staff_handover_respond",{p_id:id,p_accept:hok}).then(function(){S.busy=false;S.ok=hok?"รับช่วงงานแล้ว งานนี้เป็นของท่านเรียบร้อย":"แจ้งไม่สะดวกแล้ว";return loadAll(true)}).then(function(){draw();ann(S.ok)},function(e){S.busy=false;if(e&&e.status===401){doLogout();return}S.err=errTh(e,"ทำรายการไม่สำเร็จ");draw();ann(S.err,true)});return}
  if(a==="lvadd"){var lvd=(document.getElementById("lvd")||{}).value||"",lvr=((document.getElementById("lvr")||{}).value||"").trim();S.lvd=lvd;S.lvr=lvr;if(!lvd){S.err="กรุณาเลือกวันที่ลา";S.ok="";draw();ann(S.err,true);return}if(!lvr){S.err="กรุณาใส่เหตุผลการลา";S.ok="";draw();ann(S.err,true);return}S.busy=true;S.err="";S.ok="";draw();rpc("staff_leave_add",{p_day:lvd,p_reason:lvr}).then(function(){S.busy=false;S.lvd="";S.lvr="";S.ok="แจ้งลาวันที่ "+thD(lvd)+" แล้ว สมาคมและบริษัทได้รับแจ้งแล้ว";if(OFFS.indexOf(lvd)<0)OFFS.push(lvd);return loadAll(true)}).then(function(){draw();ann(S.ok)},function(e){S.busy=false;if(e&&e.status===401){doLogout();return}S.err=errTh(e,"แจ้งลาไม่สำเร็จ");draw();ann(S.err,true)});return}
+ if(a==="subopen"){var spl=el.dataset.pl;S.sub={day:id,place:spl,cands:null,sel:"",reason:"",err:""};draw();ann("กำลังโหลดรายชื่อเพื่อนที่ว่าง");rpc("staff_sub_candidates",{p_place:spl,p_day:id}).then(function(c){if(S.sub&&S.sub.day===id&&S.sub.place===spl){S.sub.cands=c||[];draw();ann(S.sub.cands.length?"มีเพื่อนว่าง "+S.sub.cands.length+" คน":"ไม่มีเพื่อนที่ว่างในวันนี้")}},function(e){if(S.sub&&S.sub.day===id){S.sub.cands=[];S.sub.err=errTh(e,"โหลดรายชื่อไม่สำเร็จ");draw()}});return}
+ if(a==="subclose"){S.sub=null;draw();ann("ปิดแล้ว");return}
+ if(a==="subsend"){var B=S.sub;if(!B)return;B.sel=(document.getElementById("subto")||{}).value||"";B.reason=((document.getElementById("subre")||{}).value||"").trim();if(!B.sel){B.err="กรุณาเลือกเพื่อนที่จะไปแทน";draw();ann(B.err,true);return}
+  S.busy=true;S.err="";S.ok="";B.err="";draw();rpc("staff_sub_request",{p_place:B.place,p_day:B.day,p_to:B.sel,p_reason:B.reason}).then(function(){S.busy=false;S.sub=null;S.ok="ส่งคำขอให้แอดมินแล้ว ท่านยังเป็นผู้ลาจนกว่าเพื่อนจะตอบรับ";return loadAll(true)}).then(function(){draw();ann(S.ok)},function(e){S.busy=false;if(e&&e.status===401){doLogout();return}B.err=errTh(e,"ส่งคำขอไม่สำเร็จ");draw();ann(B.err,true)});return}
+ if(a==="subcancel"){S.busy=true;S.err="";S.ok="";draw();rpc("staff_sub_cancel",{p_id:id}).then(function(){S.busy=false;S.ok="ยกเลิกคำขอหาคนแทนแล้ว";return loadAll(true)}).then(function(){draw();ann(S.ok)},function(e){S.busy=false;if(e&&e.status===401){doLogout();return}S.err=errTh(e,"ยกเลิกไม่สำเร็จ");draw();ann(S.err,true)});return}
+ if(a==="subresp"){var sok=el.dataset.ok==="1";S.busy=true;S.err="";S.ok="";draw();rpc("staff_company_sub_respond",{p_id:id,p_accept:sok}).then(function(){S.busy=false;S.ok=sok?"รับไปแทนแล้ว":"แจ้งไม่สะดวกแล้ว";return loadAll(true)}).then(function(){draw();ann(S.ok)},function(e){S.busy=false;if(e&&e.status===401){doLogout();return}S.err=errTh(e,"ทำรายการไม่สำเร็จ");draw();ann(S.err,true)});return}
  if(a==="lvdel"){S.busy=true;S.err="";S.ok="";draw();rpc("staff_leave_cancel",{p_day:id}).then(function(){S.busy=false;S.ok="ยกเลิกการลาวันที่ "+thD(id)+" แล้ว";OFFS=OFFS.filter(function(d){return d!==id});return loadAll(true)}).then(function(){draw();ann(S.ok)},function(e){S.busy=false;if(e&&e.status===401){doLogout();return}S.err=errTh(e,"ยกเลิกการลาไม่สำเร็จ");draw();ann(S.err,true)});return}
  if(a==="oinv"){var okv=el.dataset.ok==="1";S.busy=true;S.err="";S.ok="";draw();rpc("staff_org_invite_respond",{p_invite:id,p_accept:okv}).then(function(){S.busy=false;S.ok=okv?"รับงานแล้ว รอผู้ขอชำระเงิน สมาคมจะแจ้งเมื่อยืนยัน":"ปฏิเสธคำเชิญแล้ว";return loadAll(true)}).then(function(){draw();ann(S.ok)},function(e){S.busy=false;if(e&&e.status===401){doLogout();return}S.err=errTh(e,"ทำรายการไม่สำเร็จ");draw()});return}
 if(a==="cfmno"){S.cfm=null;draw();focusJob(id);return}
