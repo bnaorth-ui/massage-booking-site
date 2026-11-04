@@ -9,6 +9,8 @@
   Cache-Control: public, max-age=0, must-revalidate
 /manifest.webmanifest
   Cache-Control: public, max-age=86400
+/th-address.json
+  Cache-Control: public, max-age=86400
 /icon-*.png
   Cache-Control: public, max-age=2592000, immutable
 
