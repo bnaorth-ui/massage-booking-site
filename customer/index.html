@@ -528,7 +528,7 @@ function bind(){
   if(V.manual){V.manual=false;V.loc=null;V.locName=""}
   V.msg="กำลังหาตำแหน่ง...";render(true);
   navigator.geolocation.getCurrentPosition(function(p){V.loc={lat:p.coords.latitude,lng:p.coords.longitude};V.locName="";V.msg="";nearbyCheck(true);watchLoc();if(!S.view&&S.step===0)render(true);locName(V.loc.lat,V.loc.lng);ann("อัปเดตตำแหน่งของคุณแล้ว")},function(er){if(V.loc){V.msg="";if(!S.view&&S.step===0)render(true);ann("ตอนนี้อัปเดตตำแหน่งใหม่ไม่ได้ ระบบใช้ตำแหน่งล่าสุดที่ได้ไว้",1);return}V.msg=locErrMsg(er);if(!S.view&&S.step===0)render(true);ann(V.msg,1)},{timeout:15000})}});
- q("[data-pl]").forEach(function(e){e.onclick=function(){S=fresh();S.place=find(PLACES,e.dataset.pl);if(fixedDate(S.place))S.date=S.place.sdate;S.step=1;render()}});
+ q("[data-pl]").forEach(function(e){e.onclick=function(){if(orgHas(e.dataset.pl)){orgHasMsg();return}S=fresh();S.place=find(PLACES,e.dataset.pl);if(fixedDate(S.place))S.date=S.place.sdate;S.step=1;render()}});
  q("[data-qty]").forEach(function(e){e.onclick=function(){var id=e.dataset.qty,d=+e.dataset.dir,q=(S.qty[id]||0)+d;if(q<0||(d>0&&totalQty()>=MAXU))return;S.qty[id]=q;rebuild();S.date=null;S.time=null;S.sts=[];S.asg={};render(true)}});
  if(g("sim"))g("sim").onchange=function(){S.sim=this.checked;comb();S.date=null;S.time=null;S.sts=[];S.asg={};render(true)};
  q("[data-svc]").forEach(function(e){e.onclick=function(){var v=svcOf(S.place,e.dataset.svc);S.svcs=[unit(v,1,1)];comb();S.date=fixedDate(S.place)?S.place.sdate:null;S.time=null;S.sts=[];S.asg={};render(true)}});
@@ -594,7 +594,7 @@ function mapBk(r){var all=r.items||[],its=all.filter(function(i){return i.active
  return{uid:ME?ME.id:"",ref:r.ref,place:r.place_id,ptype:r.place_type==="shop"?"shop":"org",placeName:r.place_name,svc:asg[0]?asg[0].svc:"",svcs:asg.map(function(a){return a.svc}),svcName:uniq(asg.map(function(a){return a.svcName})).join(", "),phone:r.phone||"",promo:r.promo||"",disc:+r.discount||0,asg:asg,staff:uniq(asg.map(function(a){return a.staff})),
   staffName:asg.length>1?asg.map(function(a){return a.svcName+": "+a.staffName}).join(", "):names.join(", "),date:s.date,time:s.min,min:Math.max(1,Math.round((Date.parse(r.ends_at)-t0)/60000)),pu:+r.points_used||0,pd:+r.points_discount||0,price:+r.total||0,customer:r.customer_name,status:STTH[r.status]||"ยืนยันแล้ว",id:r.id,st0:r.status,noShow:r.status==="no_show",movedFrom:r.moved_from,movedTo:r.moved_to,at:r.created_at,jobs:jobs,cancelH:r.cancel_hours}}
 function loadPoints(){return sbApi("/rest/v1/rpc/my_points",{method:"POST",json:1,body:"{}"}).then(function(a){PT=a||null}).catch(function(){})}
-function loadBookings(){return sbApi("/rest/v1/rpc/my_bookings",{method:"POST",json:1,body:"{}"}).then(function(a){BK=(a||[]).map(mapBk)}).then(function(){return loadChatUnread()})}
+function loadBookings(){return sbApi("/rest/v1/rpc/my_bookings",{method:"POST",json:1,body:"{}"}).then(function(a){BK=(a||[]).map(mapBk);if(S&&S.place&&S.step>0&&S.step<4&&!S.movedFrom&&orgHas(S.place.id)){S=fresh();render(true);orgHasMsg()}}).then(function(){return loadChatUnread()})}
 function loadNotes(){return sbApi("/rest/v1/notifications?select=id,kind,title,body,created_at,booking_id&audience=eq.user&order=created_at.desc&limit=60").then(function(a){NOTES=(a||[]).filter(function(n){return n.kind!=="announce"}).map(function(n){return{kind:"user",id:n.id,at:new Date(n.created_at).toISOString(),title:n.title,text:n.body||"",ref:n.booking_id?"1":"",auto:(n.kind==="preopen"||n.kind==="promo"||n.kind==="newshop"),orq:n.kind==="orgreq"}})})}
 function refreshUser(){var v=S.view;return Promise.all([loadBookings().catch(function(){}),loadNotes().catch(function(){}),loadPoints(),loadReviews(),loadFavs(),ORQ.list!==null?orqLoad(1):null]).then(function(){if(S.view===v)render(true)})}
 /* เวลาว่างของพนักงาน: ถามฐานข้อมูลเฉพาะช่วงที่ไม่ว่าง (ไม่เห็นข้อมูลลูกค้าคนอื่น) */
@@ -904,7 +904,9 @@ function orqLinkGo(){var id=ORGLINK;try{id=id||sessionStorage.getItem("orgLink")
  ORGLINK="";try{sessionStorage.removeItem("orgLink")}catch(e){}
  if(id.slice(0,2)==="q:"){orqLinkReq(id.slice(2));return}
  var p=find(PLACES,id);if(!p||p.type!=="org"||placeState(p)){setTimeout(function(){ann("ลิงก์จองนี้ไม่พร้อมใช้งานแล้ว อาจหมดอายุหรือยังไม่เปิดรับจอง")},300);return}
- S=fresh();S.place=p;if(fixedDate(p))S.date=p.sdate;S.step=1;V.orq=false}
+ if(orgHas(p.id)){setTimeout(orgHasMsg,300);return}S=fresh();S.place=p;if(fixedDate(p))S.date=p.sdate;S.step=1;V.orq=false}
+function orgHas(id){var p=find(PLACES,id);return!!p&&p.type==="org"&&BK.some(function(b){return b.place===id&&(b.st0==="confirmed"||b.st0==="completed")})}
+function orgHasMsg(){orqLinkMsg('ท่านจองคิวของงานนี้แล้ว (จองได้คนละ 1 คิว) ดูคิวของท่านได้ที่เมนูคิวของฉัน หากต้องการเปลี่ยนเวลา ให้เลื่อนคิวเดิม')}
 function orqLinkUrl(r){return location.origin+location.pathname+(r.status==="confirmed"&&r.place_id?"?org="+r.place_id:"?orq="+r.id)}
 function orqLinkCan(r){return r.status==="confirmed"&&!!r.place_id||ORQG.act.indexOf(r.status)>-1}
 function orqLinkMsg(t){var old=document.getElementById("orqlm");if(old)old.remove();var d=document.createElement("div");d.id="orqlm";d.setAttribute("role","alert");d.style.cssText="position:fixed;left:12px;right:12px;top:max(12px,env(safe-area-inset-top));z-index:100;background:#fff;color:#1b2b27;border:3px solid #1b2b27;border-radius:14px;padding:14px;font-size:1rem;box-shadow:0 6px 24px rgba(0,0,0,.25)";var p=document.createElement("p");p.style.margin="0 0 10px";p.textContent=t;var b=document.createElement("button");b.type="button";b.className="btn";b.textContent="ปิดข้อความ";b.onclick=function(){d.remove()};d.appendChild(p);d.appendChild(b);document.body.appendChild(d);ann(t)}

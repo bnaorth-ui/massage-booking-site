@@ -244,6 +244,9 @@ await p.goto(require('./config').page('customer-booking.html')+'?orq=rq1');await
 ok('confirmed request link opens booking page',await p.$eval('#app',e=>e.textContent.includes('สำนักงานพัฒนาสังคม')&&!e.querySelector('[data-pl]')));
 await p.goto(require('./config').page('customer-booking.html')+'?orq=nope');await p.waitForSelector('#orqlm',{timeout:6000});
 ok('unknown request link says not found',(await p.textContent('#orqlm')).includes('ไม่พบงาน'));
+BKS.push({ref:'BK-OG1-1',place_id:'og1',place_name:'สำนักงานพัฒนาสังคม',place_type:'org',phone:'0811111111',s:Date.now()+3*86400000,e:Date.now()+3*86400000+3600000,total:400,discount:0,promo:null,status:'confirmed',moved_from:null,moved_to:null,items:[]});
+await p.goto(require('./config').page('customer-booking.html')+'?org=og1');await p.waitForSelector('#orqlm',{timeout:6000});
+ok('one booking per person: second attempt blocked with message',(await p.textContent('#orqlm')).includes('จองได้คนละ 1 คิว')&&!!(await p.$('[data-pl]')));
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)
 })()
 
