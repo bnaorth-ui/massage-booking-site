@@ -631,7 +631,16 @@ function qCard(b){var c=qCat(b),its=(b.booking_items||[]).slice().sort(function(
  tg=b.status==="no_show"?'<span class="tag b">ลูกค้าไม่มา</span>':b.status==="cancelled"?'<span class="tag b">ยกเลิก</span>':b.status==="rescheduled"?'<span class="tag s">เลื่อนคิว'+(b.moved_to?' → '+esc(b.moved_to):'')+'</span>':c==="done"?'<span class="tag">เสร็จสิ้น</span>':'<span class="tag w">รอให้บริการ</span>';
  return'<div class="card" style="margin-bottom:10px"><div class="row" style="border:0;padding:0 0 6px"><b>'+qHM(b.starts_at)+'-'+qHM(b.ends_at)+' น.</b>'+tg+'</div><b>'+esc(b.customer_name)+'</b>'+(b.phone?'<small style="display:block">โทร <a href="tel:'+esc(b.phone)+'">'+esc(b.phone)+'</a></small>':'')+
  its.map(function(i){return'<small style="display:block">'+esc(i.service_name)+', '+i.minutes+' นาที, พนักงาน '+esc(qStaff(i.staff_id))+(c==="wait"&&i.active?', '+QJOB[i.job]:'')+'</small>'}).join("")+
- '<small style="display:block">เลขที่ '+esc(b.ref)+', '+baht(b.total_price||0)+(b.promo_title?', '+esc(b.promo_title):'')+'</small>'+chatBtn(b.id,"shop",b.ref,b.customer_name,b.ends_at,b.status!=="rescheduled")+'</div>'}
+ '<small style="display:block">เลขที่ '+esc(b.ref)+', '+baht(b.total_price||0)+(b.promo_title?', '+esc(b.promo_title):'')+'</small>'+qCancelUi(b,c)+chatBtn(b.id,"shop",b.ref,b.customer_name,b.ends_at,b.status!=="rescheduled")+'</div>'}
+var QCR=["พนักงานไม่สะดวก","ร้านปิดทำการ","เหตุฉุกเฉิน","อื่นๆ (ระบุเหตุผล)"];
+function qCanCancel(b,c){return c==="wait"&&b.status==="confirmed"&&Date.parse(b.starts_at)>Date.now()&&!(b.booking_items||[]).some(function(i){return i.active&&(i.job==="in_progress"||i.job==="done")})}
+function qCancelUi(b,c){if(!qCanCancel(b,c))return"";
+ if(S.qx!==b.id)return'<div class="acts" style="margin-top:8px"><button type="button" class="btn g" data-a="qcx" data-id="'+b.id+'" aria-label="ยกเลิกคิว เลขที่ '+esc(b.ref)+' ของ '+esc(b.customer_name)+'">ยกเลิกคิวนี้</button></div>';
+ return'<div class="pinbox" role="group" aria-labelledby="qcxh_'+b.id+'" style="margin-top:8px"><b id="qcxh_'+b.id+'" tabindex="-1">ยืนยันยกเลิกคิว เลขที่ '+esc(b.ref)+'</b><p class="hint2" style="margin:0">ระบบจะแจ้งลูกค้าและพนักงาน พร้อมคืนแต้มที่ลูกค้าใช้ (ถ้ามี) ยกเลิกแล้วย้อนกลับไม่ได้</p>'+
+  '<div><label for="qcr_'+b.id+'">เหตุผลที่ยกเลิก</label><select class="in" id="qcr_'+b.id+'">'+QCR.map(function(x,i){return'<option value="'+i+'">'+x+'</option>'}).join("")+'</select></div>'+
+  '<div><label for="qco_'+b.id+'">รายละเอียดเพิ่มเติม (ไม่เกิน 100 ตัวอักษร)</label><input class="in" id="qco_'+b.id+'" maxlength="100"></div>'+
+  '<div id="qce_'+b.id+'" role="alert" style="color:var(--bad)"></div>'+
+  '<div class="acts"><button type="button" class="btn d" data-a="qcxok" data-id="'+b.id+'">ยืนยันยกเลิกคิว</button><button type="button" class="btn g" data-a="qcxno" data-id="'+b.id+'">ไม่ยกเลิก</button></div></div>'}
 /* ===== แชต (ผูกกับการจอง) ===== */
 var CHOK=false,CU={},CH=null,chT=null,chBusy=false;
 function chKey(b,r){return b+"|"+r}
@@ -834,7 +843,7 @@ function draw(){drawHeader();
 /* รีเฟรชเบื้องหลัง: ไม่ล้างฟอร์มที่กำลังกรอกอยู่ */
 function softDraw(){drawHeader();
  navDraw();
- var busyForm=S.form||S.wmode||S.slipDraft||S.tab==="set"||S.tab==="cls"||S.tab==="share"||S.tab==="rp"||S.busy||S.chat||S.rvReply;
+ var busyForm=S.form||S.wmode||S.slipDraft||S.tab==="set"||S.tab==="cls"||S.tab==="share"||S.tab==="rp"||S.busy||S.chat||S.rvReply||S.qx;
  if(!busyForm){document.getElementById("main").innerHTML=view();
   if(S.tab==="wal"&&S.tpshow){var tq=byId(D.tx,S.tpshow),pq=ppInfo();if(tq&&tq.st==="รอยืนยัน"){if(pq.on)drawQr("qrbox",ppPayload(pq.type,pq.id,tq.amt));var sc=document.getElementById("slipcur");if(sc&&tq.slipPath)loadSlip(tq.slipPath,sc)}}}}
 function refresh(){if(!D||S.busy)return Promise.resolve();return loadLive().then(function(){if(S.tab==="nt"){openNt()}if(S.tab==="rv"&&!S.rvReply)rvLoad();softDraw()},function(e){if(e&&e.status===401)doLogout()})}
@@ -882,6 +891,12 @@ document.addEventListener("click",function(e){
  if(a==="rvmore"){RV.show+=20;draw();return}
  if(a==="ntf"){S.ntf=id;draw();return}
  if(a==="qt"){S.qt=id;draw();return}
+ if(a==="qcx"){S.qx=id;draw();var h=g("qcxh_"+id);if(h)h.focus();return}
+ if(a==="qcxno"){S.qx=null;draw();var bb=document.querySelector('[data-a="qcx"][data-id="'+id+'"]');if(bb)bb.focus();return}
+ if(a==="qcxok"){var bk=byId(D.bk,id);if(!bk)return;var ri=+val("qcr_"+id),ot=val("qco_"+id).trim(),qe=g("qce_"+id);
+  if(ri===QCR.length-1&&!ot){if(qe)qe.textContent="กรุณาระบุเหตุผล";var oi=g("qco_"+id);if(oi)oi.focus();return}
+  var why=(ri===QCR.length-1?"":QCR[ri])+(ri!==QCR.length-1&&ot?" - ":"")+ot;
+  OKM="ยกเลิกคิวเลขที่ "+bk.ref+" แล้ว ระบบแจ้งลูกค้าและพนักงานแล้ว";act(function(){return rpc("cancel_booking",{p_ref:bk.ref,p_reason:why}).then(loadBk)},function(){S.qx=null});return}
  if(a==="wt"){S.wt=id==="gp"||id==="his"?id:"bal";draw();return}
  if(a==="new"){S.form={t:t,id:null};draw();return}
  if(a==="edit"){S.form={t:t,id:id};draw();return}
