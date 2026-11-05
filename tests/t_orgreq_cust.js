@@ -101,6 +101,7 @@ ok('districts from server only',JSON.stringify(await p.$$eval('#orq_dist option'
 ok('only central therapists listed',JSON.stringify(await p.$$eval('[data-orqs]',o=>o.map(x=>x.dataset.orqs)))===JSON.stringify(['st3','st4']));
 // ---- ตรวจความถูกต้อง
 const err=async()=>await p.textContent('#orq_err');
+const pick=async ymd=>{for(let i=0;i<8&&!(await p.$('[data-orqd="'+ymd+'"]'));i++)await p.click('[data-orqm="1"]');await p.click('[data-orqd="'+ymd+'"]')};
 await p.click('[data-orq=send]');ok('empty name rejected',(await err()).includes('ชื่อหน่วยงาน'));
 await p.fill('#orq_name','บริษัท ทดสอบ จำกัด');await p.click('[data-orq=send]');ok('district required',(await err()).includes('เลือกเขต'));
 await p.selectOption('#orq_dist','ปทุมวัน');await p.fill('#orq_addr','88 ถนนพระราม 1');await p.click('[data-orq=send]');ok('pin required',(await err()).includes('ปักหมุด'));
@@ -111,10 +112,10 @@ await p.click('[data-orq=pin]');await p.waitForSelector('#mpov');await p.fill('#
 ok('pin in Bangkok accepted',(await p.textContent('#orq_pin')).includes('13.74660')&&(await err())==='');
 await p.fill('#orq_cn','สมหมาย');await p.fill('#orq_cp','12345');await p.click('[data-orq=send]');ok('bad phone rejected',(await err()).includes('เบอร์'));
 await p.fill('#orq_cp','0899999999');await p.click('[data-orq=send]');ok('date required',(await err()).includes('วันที่'));
-await p.fill('#orq_date',bkk(0));await p.click('[data-orq=send]');ok('date too soon rejected',(await err()).includes('10 วันถัดไป'));
-await p.fill('#orq_date',bkk(5));await p.click('[data-orq=send]');ok('date within 10 days rejected',(await err()).includes('10 วันถัดไป'));
-ok('lead/pay rule shown near date + min attr',(await p.textContent('#orqf')).includes('ล่วงหน้าอย่างน้อย 10 วัน')&&(await p.textContent('#orqf')).includes('ภายใน 3 วันก่อนวันให้บริการ')&&(await p.getAttribute('#orq_date','min'))===bkk(10));
-await p.fill('#orq_date',bkk(15));
+ok('calendar: today is not shown at all',(await p.$('[data-orqd="'+bkk(0)+'"]'))===null);
+ok('calendar: day 5 (inside the 10-day lead) is not shown',(await p.$('[data-orqd="'+bkk(5)+'"]'))===null&&(await p.$('[data-orqd="'+bkk(9)+'"]'))===null);
+ok('lead/pay rule shown near date + min attr',(await p.textContent('#orqf')).includes('ล่วงหน้าอย่างน้อย 10 วัน')&&(await p.textContent('#orqf')).includes('ภายใน 3 วันก่อนวันให้บริการ')&&(await p.$('[data-orqd="'+bkk(10)+'"]'))!==null);
+await pick(bkk(15));
 await p.selectOption('#orq_s','15:00');await p.selectOption('#orq_e','09:00');await p.click('[data-orq=send]');ok('end before start rejected',(await err()).includes('หลังเวลาเริ่ม'));
 await p.selectOption('#orq_s','09:00');await p.selectOption('#orq_e','15:00');
 await p.click('[data-orq=send]');ok('service required first',(await err()).includes('รูปแบบการนวด'));
@@ -128,15 +129,15 @@ ok('estimate: 5 hrs (9-15 minus lunch) x400 = 2,000',await p.$eval('#orq_est',e=
 await p.check('[data-orqs=st4]');ok('estimate: 2 therapists = 4,000',await p.$eval('#orq_est',e=>e.textContent.includes('4,000')));
 // กรองหมอนวดตามวันที่: วันที่ st3 ไม่ว่าง -> ซ่อนและเอาออกจากที่เลือก + ประกาศ
 ok('date picked -> free list requested',FREECALLS.includes(bkk(15)));
-await p.fill('#orq_date',bkk(19));await p.waitForFunction(()=>document.querySelectorAll('[data-orqs]').length===1,null,{timeout:4000});
+await pick(bkk(19));await p.waitForFunction(()=>document.querySelectorAll('[data-orqs]').length===1,null,{timeout:4000});
 ok('busy therapist hidden for that date',JSON.stringify(await p.$$eval('[data-orqs]',o=>o.map(x=>x.dataset.orqs)))===JSON.stringify(['st4']));
 ok('still-free therapist keeps selection',await p.isChecked('[data-orqs=st4]'));
 await p.waitForFunction(()=>/ไม่ว่างในวันนี้/.test((document.getElementById('sr')||{}).textContent||''),null,{timeout:3000}).catch(()=>{});
 ok('removal announced in live region',(await p.textContent('#sr')).includes('ไม่ว่างในวันนี้')&&(await p.textContent('#sr')).includes('คุณนุ่น'));
 ok('hint shows count',(await p.textContent('#orq_stf')).includes('ที่ว่างในวันที่เลือก 1 คน'));
-await p.fill('#orq_date',bkk(22));await p.waitForFunction(()=>document.querySelectorAll('[data-orqs]').length===0,null,{timeout:4000});
+await pick(bkk(22));await p.waitForFunction(()=>document.querySelectorAll('[data-orqs]').length===0,null,{timeout:4000});
 ok('nobody free message',(await p.textContent('#orq_stf')).includes('ไม่มีหมอนวดที่ว่างในวันที่เลือก'));
-await p.fill('#orq_date',bkk(15));await p.waitForFunction(()=>document.querySelectorAll('[data-orqs]').length===2,null,{timeout:4000});
+await pick(bkk(15));await p.waitForFunction(()=>document.querySelectorAll('[data-orqs]').length===2,null,{timeout:4000});
 await p.check('[data-orqs=st3]');await p.check('[data-orqs=st4]');
 await p.selectOption('#orq_ls','');await p.selectOption('#orq_le','');
 ok('estimate: no lunch -> 6 hrs',await p.$eval('#orq_est',e=>e.textContent.includes('6 ชั่วโมง')&&e.textContent.includes('2,400')));
@@ -195,7 +196,7 @@ await p.dispatchEvent('[data-orq=lqr]','click');ok('QR can be hidden',!(await p.
 await p.click('[data-orq=new]');await p.waitForSelector('#orqf');
 ok('draft cleared after submit -> new form blank',(await p.inputValue('#orq_name'))==='');
 await p.fill('#orq_name','ห้างทดสอบ');await p.selectOption('#orq_dist','พญาไท');await p.fill('#orq_addr','1 ถนนพหลโยธิน');await p.click('[data-orq=pin]');await p.waitForSelector('#mpov');await p.fill('#mp_lat','13.78');await p.fill('#mp_lng','100.54');await p.click('[data-mp=ok]');
-await p.fill('#orq_date',bkk(17));await p.check('[data-orqv=sv30]');await p.check('[data-orqs=st3]');await p.check('#orq_terms');SUBFAIL='อัตราค่าบริการมีการเปลี่ยนแปลง กรุณาโหลดหน้าใหม่แล้วตรวจเงื่อนไขอีกครั้ง';
+await pick(bkk(17));await p.check('[data-orqv=sv30]');await p.check('[data-orqs=st3]');await p.check('#orq_terms');SUBFAIL='อัตราค่าบริการมีการเปลี่ยนแปลง กรุณาโหลดหน้าใหม่แล้วตรวจเงื่อนไขอีกครั้ง';
 await p.click('[data-orq=send]');await p.waitForFunction(()=>(document.getElementById('orq_err')||{}).textContent,null,{timeout:3000});
 ok('server error shown, form kept',(await err()).includes('อัตราค่าบริการมีการเปลี่ยนแปลง')&&(await p.inputValue('#orq_name'))==='ห้างทดสอบ');
 // ---- แท็บแบ่งคำขอ / ส่งซ้ำ / ติดต่อสมาคม / ใบสรุป PDF
