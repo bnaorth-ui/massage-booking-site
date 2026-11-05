@@ -82,7 +82,11 @@ await p.fill('#lph','0844444444');await p.fill('#lpw','staffpass1');await p.clic
 let t=await T0(p);
 ok('queue page has no leave card',!t.includes('แจ้งลางาน')&&!(await p.$('#lvd')));
 await p.click('[data-a=tab][data-id=ac]');await sleep(500);t=await T0(p);
-ok('leave card shown in account tab',t.includes('แจ้งลางาน')&&t.includes('ยังไม่มีการแจ้งลา')&&!!(await p.$('#lvd'))&&!!(await p.$('#lvr')));
+ok('account tab: leave is a button, form not on the page',(await p.textContent('[data-a=lvopen]')).trim()==='แจ้งลางาน'&&!(await p.$('#lvd')));
+await p.click('[data-a=lvopen]');await sleep(300);t=await T0(p);
+ok('leave page opens with its own heading, focus on heading',t.includes('ยังไม่มีการแจ้งลา')&&!!(await p.$('#lvd'))&&!!(await p.$('#lvr'))&&await p.evaluate(()=>document.activeElement&&document.activeElement.id==='lvt'&&document.activeElement.tagName==='H1'&&document.activeElement.textContent==='แจ้งลางาน'));
+ok('leave page: heading not repeated, back button first',(await p.$$eval('#app h1,#app h2',e=>e.filter(x=>x.textContent.trim()==='แจ้งลางาน').length))===1&&(await p.textContent('[data-a=lvno]')).includes('กลับ'));
+ok('leave page: other account sections hidden',!(await p.$('[data-a=pv]'))&&!(await p.$('[data-a=lvopen]')));
 ok('date input bounded to 60 days',(await p.getAttribute('#lvd','max'))===addD(todayS,60)&&(await p.getAttribute('#lvd','min'))===todayS);
 await p.click('[data-a=lvadd]');await sleep(300);t=await T0(p);
 ok('requires date',t.includes('กรุณาเลือกวันที่ลา')&&lvCalls.length===0);
@@ -95,6 +99,9 @@ ok('server block (has bookings) shown, input kept',t.includes('มีคิว�
 await p.click('[data-a=lvdel]');await sleep(800);t=await T0(p);
 ok('cancel leave rpc',lvCalls[lvCalls.length-1][0]==='del'&&lvCalls[lvCalls.length-1][1].p_day===addD(todayS,5)&&t.includes('ยกเลิกการลาวันที่')&&!(await p.$('[data-a=lvdel]')));
 await p.screenshot({path:'leave_staff.png',fullPage:true});
+await p.click('[data-a=lvno]');await sleep(300);
+ok('back: account page with focus on the leave button',!!(await p.$('[data-a=pv]'))&&!(await p.$('#lvd'))&&await p.evaluate(()=>document.activeElement&&document.activeElement.dataset.a==='lvopen'));
+await p.click('[data-a=lvopen]');await sleep(300);
 // ---- หาคนแทน (บริษัท ไทยออฟฟิศ ประจำจันทร์/พุธ)
 let mon=null;for(let k=3;k<30;k++){const dd=addD(todayS,k),w=new Date(dd+'T00:00:00Z').getUTCDay();if(w===1){mon=dd;break}}
 await p.fill('#lvd',mon);await p.fill('#lvr','ลาป่วย');await p.click('[data-a=lvadd]');await sleep(800);t=await T0(p);
@@ -117,4 +124,6 @@ await p.click('[data-a=hv][data-id=co]');await sleep(300);t=await T0(p);
 ok('incoming substitute request card',t.includes('งานแทนบริษัท')&&t.includes('ขอให้คุณไปแทน คุณแพร')&&t.includes('บริษัท ไทยออฟฟิศ'));
 await p.click('[data-a=subresp][data-ok="1"]');await sleep(800);t=await T0(p);
 ok('accept rpc then listed as upcoming substitute job',shCalls[3][0]==='resp'&&shCalls[3][1].p_accept===true&&t.includes('รับไปแทนแล้ว')&&t.includes('ไปแทน คุณแพร'));
+await p.click('[data-a=tab][data-id=ac]');await sleep(400);
+ok('leaving to another menu closes the leave page; button shows how many days',!(await p.$('#lvd'))&&/^แจ้งลางาน \(แจ้งไว้ \d+ วัน\)$/.test((await p.textContent('[data-a=lvopen]')).trim()));
 console.log('errors:',errs.join('|')||'none');await p.context().browser().close();process.exit(0)})();

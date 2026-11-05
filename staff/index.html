@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>สำหรับพนักงานนวด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="apple-mobile-web-app-title" content="หมอนวด"><meta name="app-version" content="1.6"><meta name="app-name" content="ระบบจองนวด สำหรับพนักงาน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="apple-mobile-web-app-title" content="หมอนวด"><meta name="app-version" content="1.7"><meta name="app-name" content="ระบบจองนวด สำหรับพนักงาน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -405,8 +405,9 @@ function dlView(){if(!DL.loaded||DL.off)return"";
  return h+'<p><b>ก่อนยืนยัน โปรดทราบ</b></p><ul class="pvl"><li>ชื่อ เบอร์โทร รูปโปรไฟล์ ข้อความแชต และการแจ้งเตือนของคุณจะถูกลบ</li><li>คุณจะเข้าสู่ระบบด้วยบัญชีนี้ไม่ได้อีก และไม่ปรากฏให้ลูกค้าเลือกจอง</li><li>คิวงาน รีวิว และยอดส่วนแบ่งที่ร้านใช้ทำรายงานยังอยู่ แต่ไม่ระบุว่าเป็นของคุณ</li><li>กู้คืนไม่ได้เมื่อ'+who+'อนุมัติแล้ว</li></ul><div class="mini" style="display:flex;gap:6px"><button type="button" class="btn" data-a="dlok"'+(DL.busy?" disabled":"")+'>ยืนยันขอลบบัญชี</button><button type="button" class="btn g" data-a="dlno">ยกเลิก</button></div></div>'}
 function dlDo(fn,ok){if(DL.busy)return;DL.busy=true;DL.err="";DL.ok="";draw();fn().then(function(){DL.busy=false;DL.confirm=false;DL.ok=ok;return rpc("staff_delete_status")}).then(function(j){DL.st=j&&j.status||"none";DL.note=j&&j.note||"";DL.open=j&&j.open_jobs||0;DL.by=j&&j.by||DL.by;draw();if(DL.ok)ann(DL.ok)},function(e){DL.busy=false;if(e&&e.status===401){doLogout();return}DL.err=errTh(e,"ทำรายการไม่สำเร็จ");DL.confirm=false;draw()})}
 function acView(){var ph=ME.photo_path?pubUrl(ME.photo_path):null;
+ if(S.lv)return'<div style="margin-bottom:10px"><button type="button" class="btn g" data-a="lvno">← กลับ</button></div><h1 id="lvt" tabindex="-1">แจ้งลางาน</h1>'+leaveCard(true);
  if(S.pv)return'<div style="margin-bottom:10px"><button type="button" class="btn g" data-a="pvno">← กลับ</button></div><h1 id="pvt" tabindex="-1">นโยบายความเป็นส่วนตัว (พนักงาน)</h1>'+pvBody(CT.name||"สมาคมวิทยากรฝึกอาชีพคนตาบอด",CT.phone);
- return'<h1>บัญชี</h1><div class="ctc"><div class="prof"><span class="av" aria-hidden="true">'+(ph?'<img loading="lazy" decoding="async" src="'+esc(ph)+'" alt="">':esc(ini(ME.name)))+'</span><div class="pn"><b>'+esc(ME.name)+'</b><small>'+esc(ME.place)+'</small><small>'+esc(ME.phone||"")+'</small></div></div><button type="button" class="btn g" id="avb" style="margin-top:10px">เปลี่ยนรูปโปรไฟล์</button><input type="file" id="photo" accept="image/*" hidden></div>'+leaveCard()+pwView()+rvView()+dlView()+ctView()+'<button type="button" class="btn g" data-a="pv" style="margin-top:14px">นโยบายความเป็นส่วนตัว</button><button type="button" class="btn g" id="logout" style="margin-top:14px">ออกจากระบบ</button>'}
+ return'<h1>บัญชี</h1><div class="ctc"><div class="prof"><span class="av" aria-hidden="true">'+(ph?'<img loading="lazy" decoding="async" src="'+esc(ph)+'" alt="">':esc(ini(ME.name)))+'</span><div class="pn"><b>'+esc(ME.name)+'</b><small>'+esc(ME.place)+'</small><small>'+esc(ME.phone||"")+'</small></div></div><button type="button" class="btn g" id="avb" style="margin-top:10px">เปลี่ยนรูปโปรไฟล์</button><input type="file" id="photo" accept="image/*" hidden></div>'+'<button type="button" class="btn g" data-a="lvopen" style="margin-top:14px;width:100%">แจ้งลางาน'+(LVS.length?' (แจ้งไว้ '+LVS.length+' วัน)':'')+'</button>'+pwView()+rvView()+dlView()+ctView()+'<button type="button" class="btn g" data-a="pv" style="margin-top:14px">นโยบายความเป็นส่วนตัว</button><button type="button" class="btn g" id="logout" style="margin-top:14px">ออกจากระบบ</button>'}
 function focusJob(id){var e=document.querySelector('[data-id="'+id+'"][data-a=job],[data-id="'+id+'"][data-a=fin]')||document.querySelector('[data-id="'+id+'"][data-a=ns]');if(e)e.focus()}
 function fail(t){S.err=t;draw()}
 function srClear(){var b=document.querySelectorAll("div.sr[aria-live]");for(var i=0;i<b.length;i++)b[i].textContent=""}
@@ -440,8 +441,8 @@ function hoCancel(h){return'<div class="mini" style="margin-top:6px"><button typ
 function hoCan(i){var t=new Date(Date.now()+7*3600000).toISOString().slice(0,10);return i.service_date>t&&!HO.some(function(x){return x.invite_id===i.id&&x.role==="from"&&hoOpen(x)})}
 function compCard(){if(!ASGN.length)return"";var hm=function(t){return String(t||"").slice(0,5)};
  return'<div class="day" role="group" aria-label="งานประจำ"><h2>งานประจำ (บริษัท)</h2>'+ASGN.map(function(a){return'<div class="item"><b>'+esc(a.name)+'</b><br><small class="mute">ทุก'+(a.days||[]).map(function(d){return DAYF[d]}).join(", ")+' เวลา '+hm(a.open)+'-'+hm(a.close)+'</small></div>'}).join("")+'<p class="sub">วันประจำเป็นงานหลัก งานหน่วยงานนอกสถานที่เป็นงานเสริมและจะไม่ถูกจัดชนกับวันเหล่านี้</p></div>'}
-function leaveCard(){var t=today(),mx=thAdd(t,60);
- return(S.ok?'<div class="okb">'+esc(S.ok)+'</div>':'')+(S.err?'<div class="toast" role="alert">'+esc(S.err)+'</div>':'')+'<div class="day" role="group" aria-label="แจ้งลางาน"><h2>แจ้งลางาน</h2><p class="sub">เลือกวันที่ไม่สะดวกมาทำงาน ระบบแจ้งสมาคมและบริษัทที่เกี่ยวข้องทันที ลาล่วงหน้าได้ไม่เกิน 60 วัน ถ้าวันนั้นมีคิวจองแล้วต้องติดต่อสมาคมก่อน</p>'+
+function leaveCard(own){var t=today(),mx=thAdd(t,60);
+ return(S.ok?'<div class="okb">'+esc(S.ok)+'</div>':'')+(S.err?'<div class="toast" role="alert">'+esc(S.err)+'</div>':'')+'<div class="day" role="group" aria-label="แจ้งลางาน">'+(own?'':'<h2>แจ้งลางาน</h2>')+'<p class="sub">เลือกวันที่ไม่สะดวกมาทำงาน ระบบแจ้งสมาคมและบริษัทที่เกี่ยวข้องทันที ลาล่วงหน้าได้ไม่เกิน 60 วัน ถ้าวันนั้นมีคิวจองแล้วต้องติดต่อสมาคมก่อน</p>'+
  '<label for="lvd">วันที่ลา</label><input id="lvd" type="date" min="'+t+'" max="'+mx+'" value="'+esc(S.lvd||"")+'"><label for="lvr">เหตุผล (ไม่เกิน 200 ตัวอักษร)</label><input id="lvr" type="text" maxlength="200" autocomplete="off" value="'+esc(S.lvr||"")+'">'+
  '<div class="mini" style="margin-top:6px"><button type="button" class="btn" data-a="lvadd"'+(S.busy?" disabled":"")+'>แจ้งลา</button></div>'+
  (LVS.length?'<h3>วันลาที่แจ้งไว้</h3>'+LVS.map(function(l){return'<div class="item"><b>'+thD(l.day)+'</b><br><small class="mute">'+esc(l.reason)+'</small>'+subLine(l.day)+'<div class="mini" style="margin-top:6px"><button type="button" class="btn g" data-a="lvdel" data-id="'+l.day+'" aria-label="ยกเลิกการลาวันที่ '+thD(l.day)+'"'+(S.busy?" disabled":"")+'>ยกเลิกการลา</button></div></div>'}).join(""):'<p class="mute">ยังไม่มีการแจ้งลา</p>')+'</div>'}
@@ -515,7 +516,7 @@ function draw(){if(!ME)return;
 /* ===================== การกระทำ ===================== */
 document.addEventListener("click",function(e){
  var el=e.target.closest&&e.target.closest("[data-a]");if(!el||!ME)return;var a=el.dataset.a,id=el.dataset.id;
- if(a==="tab"){srClear();S.tab=id;S.err="";S.ok="";S.cfm=null;S.rvReply=null;if(id==="nt")openNt();if(id==="ac"){rvLoad();DL.confirm=false;DL.err="";DL.ok="";dlLoad()}S.pwOpen=false;S.pwErr="";S.pwOk="";S.pv=false;if(id==="nt")S.ntf="all";if(id==="inc"){INC.ym=today().slice(0,7);incLoad()}draw();return}
+ if(a==="tab"){srClear();S.tab=id;S.lv=false;S.err="";S.ok="";S.cfm=null;S.rvReply=null;if(id==="nt")openNt();if(id==="ac"){rvLoad();DL.confirm=false;DL.err="";DL.ok="";dlLoad()}S.pwOpen=false;S.pwErr="";S.pwOk="";S.pv=false;if(id==="nt")S.ntf="all";if(id==="inc"){INC.ym=today().slice(0,7);incLoad()}draw();return}
  if(a==="rvreply"){S.rvReply=id;draw();var ta=document.getElementById("rvtxt");if(ta)ta.focus();return}
  if(a==="rvno"){S.rvReply=null;draw();return}
  if(a==="rvsend"){rvSend(id);return}
@@ -531,6 +532,8 @@ document.addEventListener("click",function(e){
  if(a==="dlcancel"){dlDo(function(){return rpc("staff_cancel_delete")},"ยกเลิกคำขอลบบัญชีแล้ว");return}
  if(a==="pv"){S.pv=true;draw();var tp=document.getElementById("pvt");if(tp)tp.focus();window.scrollTo(0,0);return}
  if(a==="pvno"){S.pv=false;draw();return}
+ if(a==="lvopen"){S.lv=true;S.err="";S.ok="";draw();var lt=document.getElementById("lvt");if(lt)lt.focus();window.scrollTo(0,0);return}
+ if(a==="lvno"){S.lv=false;S.err="";S.ok="";draw();var lb=document.querySelector("[data-a=lvopen]");if(lb)lb.focus();return}
  if(a==="pwno"){S.pwOpen=false;S.pwErr="";draw();return}
  if(a==="pwsave"){pwSave();return}
  if(a==="qt"){S.qt=id;draw();return}
