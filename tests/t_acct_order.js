@@ -81,8 +81,8 @@ BKS.push(mk('MS1',72,'confirmed'));for(let i=0;i<25;i++)BKS.push(mk('H'+i,-24*(i
 await p.waitForSelector('#lph');await p.fill('#lph','0811111111');await p.fill('#lpw','abc123');await p.click('button[type=submit]');await p.waitForSelector('[data-pl]',{timeout:4000});
 const names=async()=>await p.$$eval('[data-pl] b',a=>a.map(x=>x.textContent.trim()));
 const hist=async()=>{await p.click('[data-tab="bk"]');await p.waitForTimeout(400);await p.click('[data-bt=hist]');await p.waitForTimeout(300)};
-await p.waitForSelector('[data-favonly]',{timeout:3000}).catch(()=>{});let NM=await names();console.log(JSON.stringify(NM));
-ok('no fav yet: no filter chip text with heart on',(await p.$$('[data-favonly]')).length===1);
+await p.waitForSelector('[data-pl]',{timeout:3000}).catch(()=>{});let NM=await names();console.log(JSON.stringify(NM));
+ok('no fav filter chip on home',(await p.$$('[data-favonly]')).length===0);
 await hist();
 ok('hearts in history cards (place+staff)',(await p.$$('[data-fv^="p:"]')).length>=1&&(await p.$$('[data-fv^="s:"]')).length>=1);
 ok('no hearts in upcoming tab',await (async()=>{await p.click('[data-bt=up]');await p.waitForTimeout(200);const n=(await p.$$('[data-fv]')).length;await p.click('[data-bt=hist]');await p.waitForTimeout(200);return n===0})());
@@ -110,19 +110,12 @@ await p.evaluate(()=>{CAT.at=0;document.dispatchEvent(new Event('visibilitychang
 NM=await names();
 ok('sh1 fav first',NM[0].startsWith('ร้านสบายดี'));
 ok('tag โปรด on fav',(await p.textContent('[data-pl="sh1"]')).includes('♥ โปรด')&&!(await p.textContent('[data-pl="sh2"]')).includes('♥ โปรด'));
-await p.click('[data-favonly]');await p.waitForTimeout(300);NM=await names();
-ok('filter only fav',NM.length===1&&NM[0].startsWith('ร้านสบายดี')&&(await p.getAttribute('[data-favonly]','aria-pressed'))==='true');
-FP.length=0;await p.click('[data-tab="bk"]');await p.click('[data-tab=""]');await p.waitForTimeout(200);
-await p.evaluate(()=>{CAT.at=0;document.dispatchEvent(new Event('visibilitychange'))});await p.waitForTimeout(500);
-ok('empty fav state msg',(await p.textContent('#app')).includes('ยังไม่มีร้านโปรด')||NM.length===1);
-await p.click('[data-favonly]');await p.waitForTimeout(200);
-// my favorites page
+FP.length=0;
 await p.click('[data-tab="ac"]');await p.waitForTimeout(400);
 const pos=async sel=>await p.evaluate(s=>{const e=document.querySelector(s);if(!e)return -1;return e.getBoundingClientRect().top+scrollY},sel);
 const T=await p.textContent('#app');
 const idx=t=>T.indexOf(t);
-ok('order: points card then โปรดของฉัน',(await pos('[data-fvp=open]'))>0);
-ok('order: โปรดของฉัน is above the org-request bar',(await pos('[data-fvp=open]'))<(await pos('[data-orq=open]')));
+ok('order: no โปรดของฉัน button anymore, แนะนำเพื่อน sits right after the points card',!(await p.textContent('#app')).includes('โปรดของฉัน')&&(await pos('[data-inv]'))>0&&(await pos('[data-inv]'))<(await pos('[data-orq=open]')));
 ok('order: ติดต่อเรา is below the company bar',idx('ติดต่อเรา')>idx('สำหรับบริษัท'));
 ok('order: ติดต่อเรา is directly above นโยบายความเป็นส่วนตัว',idx('ติดต่อเรา')>-1&&idx('ติดต่อเรา')<idx('นโยบายความเป็นส่วนตัว')&&!T.slice(idx('ติดต่อเรา'),idx('นโยบายความเป็นส่วนตัว')).includes('ให้หมอนวดไปดูแล')&&!T.slice(idx('ติดต่อเรา'),idx('นโยบายความเป็นส่วนตัว')).includes('สำหรับบริษัท'));
 ok('order: privacy < change password < logout < delete',idx('นโยบายความเป็นส่วนตัว')<idx('เปลี่ยนรหัสผ่าน')&&idx('เปลี่ยนรหัสผ่าน')<idx('ออกจากระบบ')&&idx('ออกจากระบบ')<idx('ลบบัญชีของฉัน'));

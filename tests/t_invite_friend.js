@@ -81,8 +81,8 @@ BKS.push(mk('MS1',72,'confirmed'));for(let i=0;i<25;i++)BKS.push(mk('H'+i,-24*(i
 await p.waitForSelector('#lph');await p.fill('#lph','0811111111');await p.fill('#lpw','abc123');await p.click('button[type=submit]');await p.waitForSelector('[data-pl]',{timeout:4000});
 const names=async()=>await p.$$eval('[data-pl] b',a=>a.map(x=>x.textContent.trim()));
 const hist=async()=>{await p.click('[data-tab="bk"]');await p.waitForTimeout(400);await p.click('[data-bt=hist]');await p.waitForTimeout(300)};
-await p.waitForSelector('[data-favonly]',{timeout:3000}).catch(()=>{});let NM=await names();console.log(JSON.stringify(NM));
-ok('no fav yet: no filter chip text with heart on',(await p.$$('[data-favonly]')).length===1);
+await p.waitForSelector('[data-pl]',{timeout:3000}).catch(()=>{});let NM=await names();console.log(JSON.stringify(NM));
+ok('no fav filter chip on home',(await p.$$('[data-favonly]')).length===0);
 await hist();
 ok('hearts in history cards (place+staff)',(await p.$$('[data-fv^="p:"]')).length>=1&&(await p.$$('[data-fv^="s:"]')).length>=1);
 ok('no hearts in upcoming tab',await (async()=>{await p.click('[data-bt=up]');await p.waitForTimeout(200);const n=(await p.$$('[data-fv]')).length;await p.click('[data-bt=hist]');await p.waitForTimeout(200);return n===0})());
@@ -110,16 +110,10 @@ await p.evaluate(()=>{CAT.at=0;document.dispatchEvent(new Event('visibilitychang
 NM=await names();
 ok('sh1 fav first',NM[0].startsWith('ร้านสบายดี'));
 ok('tag โปรด on fav',(await p.textContent('[data-pl="sh1"]')).includes('♥ โปรด')&&!(await p.textContent('[data-pl="sh2"]')).includes('♥ โปรด'));
-await p.click('[data-favonly]');await p.waitForTimeout(300);NM=await names();
-ok('filter only fav',NM.length===1&&NM[0].startsWith('ร้านสบายดี')&&(await p.getAttribute('[data-favonly]','aria-pressed'))==='true');
-FP.length=0;await p.click('[data-tab="bk"]');await p.click('[data-tab=""]');await p.waitForTimeout(200);
-await p.evaluate(()=>{CAT.at=0;document.dispatchEvent(new Event('visibilitychange'))});await p.waitForTimeout(500);
-ok('empty fav state msg',(await p.textContent('#app')).includes('ยังไม่มีร้านโปรด')||NM.length===1);
-await p.click('[data-favonly]');await p.waitForTimeout(200);
-// my favorites page
+FP.length=0;
 await p.click('[data-tab="ac"]');await p.waitForTimeout(400);
 const T=async()=>await p.textContent('#app');
-ok('invite: button present right under โปรดของฉัน',await p.evaluate(()=>{const f=document.querySelector('[data-fvp=open]'),i=document.querySelector('[data-inv]');return !!f&&!!i&&f.nextElementSibling===i}));
+ok('invite: button present on the account page, above the org-request bar',await p.evaluate(()=>{const i=document.querySelector('[data-inv]'),o=document.querySelector('[data-orq]');return !!i&&!!o&&(i.compareDocumentPosition(o)&Node.DOCUMENT_POSITION_FOLLOWING)>0}));
 ok('invite: status line is a polite live region',(await p.getAttribute('#invmsg','aria-live'))==='polite'&&(await p.getAttribute('#invmsg','role'))==='status');
 // 1) มีหน้าต่างแชร์
 await p.evaluate(()=>{window.__sh=null;navigator.share=(o)=>{window.__sh=o;return Promise.resolve()}});
