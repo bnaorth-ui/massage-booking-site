@@ -2,7 +2,7 @@
    (2) เก็บตัวหน้าเว็บไว้ในเครื่อง เปิดซ้ำเร็วและเปิดได้แม้สัญญาณอ่อน: ส่งของที่เก็บไว้ทันที แล้วตรวจเวอร์ชันใหม่เบื้องหลัง
        ถ้ามีเวอร์ชันใหม่จะแจ้งให้หน้าเว็บแสดงปุ่ม "อัปเดต" (ไม่รีโหลดเองกลางคัน) ข้อมูลจาก Supabase ไม่ผ่านแคชนี้เลย
    เปลี่ยนเลข PAGE_CACHE เมื่อต้องการล้างแคชหน้าเว็บของทุกเครื่อง */
-var PAGE_CACHE='pages-v1';
+var PAGE_CACHE='pages-v2';
 self.addEventListener('install',function(){self.skipWaiting()});
 self.addEventListener('activate',function(e){e.waitUntil(caches.keys().then(function(ks){return Promise.all(ks.filter(function(k){return k!==PAGE_CACHE&&k.indexOf('pages-')===0}).map(function(k){return caches.delete(k)}))}).then(function(){return self.clients.claim()}))});
 function pageKey(u){return u.origin+u.pathname}
@@ -25,7 +25,10 @@ self.addEventListener('fetch',function(e){
  var key=pageKey(u);
  e.respondWith(caches.open(PAGE_CACHE).then(function(cache){
   return cache.match(key).then(function(hit){
-   if(hit){e.waitUntil(refreshPage(key,cache,hit));return hit}
+   if(hit){e.waitUntil(refreshPage(key,cache,hit));
+    /* สำเนาที่มีเครื่องหมายถูกเปลี่ยนเส้นทางใช้ตอบการเปิดหน้าไม่ได้ (เบราว์เซอร์ปฏิเสธ) จึงทำสำเนาใหม่ให้ */
+    if(hit.redirected)return hit.clone().blob().then(function(bl){return new Response(bl,{status:200,statusText:'OK',headers:{'content-type':hit.headers.get('content-type')||'text/html; charset=utf-8'}})});
+    return hit}
    /* ครั้งแรก: ใช้เครือข่ายตามปกติ แล้วเก็บสำเนาไว้ให้ครั้งหน้า */
    e.waitUntil(refreshPage(key,cache,null));
    return fetch(r)})})) });

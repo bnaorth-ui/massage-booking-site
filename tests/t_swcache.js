@@ -15,7 +15,7 @@ const p=await ctx.newPage();p.on('pageerror',e=>errs.push(e.message));
 const U=base+'/customer-booking.html';
 await p.goto(U);await p.evaluate(()=>navigator.serviceWorker.ready.then(()=>1));
 for(let i=0;i<40;i++){const n=await p.evaluate(()=>caches.keys().then(async ks=>{let c=0;for(const k of ks){c+=(await (await caches.open(k)).keys()).length}return c}));if(n>0)break;await sleep(150)}
-ok('page copy stored in cache after first visit',(await p.evaluate(()=>caches.keys())).includes('pages-v1')&&(await p.evaluate(()=>caches.open('pages-v1').then(c=>c.keys()).then(k=>k.length)))>=1);
+ok('page copy stored in cache after first visit',(await p.evaluate(()=>caches.keys())).includes('pages-v2')&&(await p.evaluate(()=>caches.open('pages-v2').then(c=>c.keys()).then(k=>k.length)))>=1);
 ok('first load shows V1',(await p.textContent('#swver'))==='V1');
 await p.reload();await p.waitForSelector('#swver');
 ok('page is controlled by the service worker',await p.evaluate(()=>!!navigator.serviceWorker.controller));
@@ -31,5 +31,5 @@ ok('update banner appears with button',!!(await p.$('div[role=status] button:has
 await p.click('div[role=status] button:has-text("อัปเดตเดี๋ยวนี้")');await p.waitForSelector('#swver');await sleep(300);
 ok('after tapping update, new version shown',(await p.textContent('#swver'))==='V2');
 // ไม่ยุ่งกับคำขอที่ไม่ใช่การเปิดหน้า
-ok('only navigation is cached (no API/other GET cached)',(await p.evaluate(()=>caches.open('pages-v1').then(c=>c.keys()).then(k=>k.map(x=>new URL(x.url).pathname))))+''==='/customer-booking.html');
+ok('only navigation is cached (no API/other GET cached)',(await p.evaluate(()=>caches.open('pages-v2').then(c=>c.keys()).then(k=>k.map(x=>new URL(x.url).pathname))))+''==='/customer-booking.html');
 console.log('errors:',errs.join('|')||'none');await b.close();srv.close();process.exit(0)})();

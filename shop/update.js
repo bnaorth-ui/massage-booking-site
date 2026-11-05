@@ -43,7 +43,9 @@
    if(!window.caches)return;
    var u=new URL(pageUrl),keys=[u.origin+u.pathname];if(/\/$/.test(u.pathname))keys.push(u.origin+u.pathname+"index.html");else if(/\/index\.html$/.test(u.pathname))keys.push(u.origin+u.pathname.replace(/index\.html$/,""));
    /* เก็บหน้าใหม่ลงแคชของ service worker ถ้าเก็บไม่ได้ ให้ล้างแคชหน้าเว็บทิ้งแทน (ครั้งหน้าจะโหลดจากเครือข่าย) ไม่ให้การอัปเดตล้มเพราะเรื่องแคช */
-   return caches.keys().then(function(ns){return Promise.all(ns.filter(function(n){return n.indexOf("pages-")===0}).map(function(n){return caches.open(n).then(function(c){return Promise.all(keys.map(function(k){return c.put(k,res.clone())}))})}))}).catch(function(){return dropCaches()})})}
+   /* ต้องเก็บเป็นสำเนาใหม่ที่ไม่มีเครื่องหมาย "ถูกเปลี่ยนเส้นทาง" มิฉะนั้นเบราว์เซอร์จะปฏิเสธตอน service worker ส่งหน้านี้ให้ (Response served by service worker has redirections) */
+   var ct=res.headers.get("content-type")||"text/html; charset=utf-8";
+   return res.blob().then(function(bl){return caches.keys().then(function(ns){return Promise.all(ns.filter(function(n){return n.indexOf("pages-")===0}).map(function(n){return caches.open(n).then(function(c){return Promise.all(keys.map(function(k){return c.put(k,new Response(bl,{status:200,statusText:"OK",headers:{"content-type":ct}}))}))})}))})}).catch(function(){return dropCaches()})})}
  var ac=window.AbortController?new AbortController():null;
  fetch(verUrl,{cache:"no-store",signal:ac?ac.signal:undefined}).then(function(x){if(!x.ok)throw new Error("x");return x.json()}).then(function(r){
   if(done)return;done=true;
