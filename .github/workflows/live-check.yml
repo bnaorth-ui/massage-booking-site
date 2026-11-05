@@ -1,0 +1,47 @@
+name: live-check
+
+# ตรวจเว็บจริงทั้ง 4 แอปทุกเช้า 06:23 น. (เวลาไทย) และกดสั่งเองได้จากแท็บ Actions
+# อ่านอย่างเดียว: เปิดหน้าแรก/หน้าล็อกอิน ไม่ล็อกอิน ไม่สร้างหรือแก้ข้อมูล ไม่ใช้รหัสลับใดๆ
+# ถ้าพบปัญหา: เปิด issue ใน repository (เจ้าของได้รับอีเมล) ถ้ามี issue เดิมเปิดค้างอยู่จะเพิ่มความเห็นแทน
+on:
+  schedule:
+    - cron: '23 23 * * *'   # 23:23 UTC = 06:23 น. เวลาไทย
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  live:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: ติดตั้ง Playwright และเบราว์เซอร์
+        working-directory: tests
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: ตรวจเว็บจริง
+        working-directory: tests
+        run: node live_check.js
+      - name: แจ้งปัญหาเป็น issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          TITLE="ตรวจเว็บจริงประจำวัน: พบปัญหา"
+          BODY_FILE=tests/live_fail.md
+          [ -f "$BODY_FILE" ] || echo "การตรวจเว็บจริงประจำวันทำงานไม่จบ (เช่น ติดตั้งเบราว์เซอร์ไม่สำเร็จ)" > "$BODY_FILE"
+          printf '\nรายละเอียด: %s\n' "$RUN_URL" >> "$BODY_FILE"
+          NUM=$(gh issue list --state open --search "\"$TITLE\" in:title" --json number --jq '.[0].number')
+          if [ -n "$NUM" ]; then
+            gh issue comment "$NUM" --body-file "$BODY_FILE"
+          else
+            gh issue create --title "$TITLE" --body-file "$BODY_FILE"
+          fi
