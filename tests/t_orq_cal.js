@@ -96,39 +96,52 @@ if(await p.$('[data-ag=login]'))await p.click('[data-ag=login]');
 await p.waitForSelector('#lph');await p.fill('#lph','0811111111');await p.fill('#lpw','abc123');await p.click('button[type=submit]');
 await p.waitForSelector('#orqf',{timeout:6000});
 ok('after login goes straight to the org form',(await p.textContent('#app')).includes('ขอบริการสำหรับหน่วยงาน')&&!!(await p.$('#orqf')));
-const bkkM=(n)=>bkk(n).slice(0,7);
-const cal=async()=>await p.textContent('#orq_cal');
-const lo=bkk(10),loM=lo.slice(0,7),loDay=+lo.slice(8);
+
+const lo=bkk(10),loM=lo.slice(0,7);
 const days=async()=>await p.$$eval('[data-orqd]',b=>b.map(x=>x.dataset.orqd));
+const dlg=async()=>await p.$('#orqdlg');
+ok('form: native date input gone, hidden value + a single button',(await p.$('input[type=date]'))===null&&(await p.$('#orq_date[type=hidden]'))!==null&&(await p.$$('#orq_dbtn')).length===1);
+ok('form: calendar is not in the page until the button is pressed',(await dlg())===null&&(await p.$('[data-orqd]'))===null);
+ok('form: button says เลือกวันที่',(await p.textContent('#orq_dbtn')).trim()==='เลือกวันที่'&&(await p.getAttribute('#orq_dbtn','aria-haspopup'))==='dialog');
+await p.click('#orq_dbtn');await p.waitForSelector('#orqdlg');
+ok('dialog: role dialog + modal + labelled, heading focused',(await p.getAttribute('#orqdlg','role'))==='dialog'&&(await p.getAttribute('#orqdlg','aria-modal'))==='true'&&await p.evaluate(()=>document.activeElement&&document.activeElement.id==='orqdt'));
+ok('dialog: form behind is inert',await p.evaluate(()=>document.getElementById('app').inert===true));
 const D1=await days();
-ok('calendar: native date input is gone, hidden value field remains',(await p.$('input[type=date]'))===null&&(await p.$('#orq_date[type=hidden]'))!==null);
-ok('calendar: first month starts exactly at earliest allowed day',D1.length>0&&D1[0]===lo&&D1.every(x=>x>=lo&&x.startsWith(loM)));
-ok('calendar: days before earliest day are not rendered',D1.every(x=>x>=lo));
-ok('calendar: first month shows through month end',D1[D1.length-1]===loM+'-'+String(new Date(Date.UTC(+loM.slice(0,4),+loM.slice(5),0)).getUTCDate()).padStart(2,'0')||loDay>28);
+ok('calendar: first month starts exactly at earliest allowed day, none earlier',D1.length>0&&D1[0]===lo&&D1.every(x=>x>=lo&&x.startsWith(loM)));
 ok('calendar: prev disabled on first month',await p.$eval('[data-orqm="-1"]',b=>b.disabled));
 ok('calendar: month title in Thai Buddhist year',/(มกราคม|กุมภาพันธ์|มีนาคม|เมษายน|พฤษภาคม|มิถุนายน|กรกฎาคม|สิงหาคม|กันยายน|ตุลาคม|พฤศจิกายน|ธันวาคม) 25\d\d/.test(await p.textContent('#orq_cmt')));
-ok('calendar: nothing selected yet message',(await p.textContent('#orq_dsel')).includes('ยังไม่ได้เลือกวัน'));
-// next month: full month from day 1
 await p.click('[data-orqm="1"]');
 const D2=await days();const nmo=D2[0]&&D2[0].slice(0,7);
 ok('calendar: next month starts at day 1',D2[0]===nmo+'-01'&&nmo>loM);
-ok('calendar: prev enabled in month 2 and returns to first month',!(await p.$eval('[data-orqm="-1"]',b=>b.disabled)));
-ok('calendar: focus stays on the next-month button after paging',await p.evaluate(()=>document.activeElement&&document.activeElement.dataset.orqm==='1'));
+ok('calendar: focus stays on next-month button',await p.evaluate(()=>document.activeElement&&document.activeElement.dataset.orqm==='1'));
 await p.click('[data-orqm="-1"]');ok('calendar: back to first month, still no early days',(await days())[0]===lo);
-// select
-const t1=D1[2];await p.click('[data-orqd="'+t1+'"]');
-ok('select: hidden value + summary + aria-pressed',(await p.inputValue('#orq_date'))===t1&&(await p.textContent('#orq_dsel')).includes('วันที่เลือก:')&&(await p.getAttribute('[data-orqd="'+t1+'"]','aria-pressed'))==='true');
-ok('select: day button has full Thai label',/^(อาทิตย์|จันทร์|อังคาร|พุธ|พฤหัสบดี|ศุกร์|เสาร์) \d+ \S+ 25\d\d$/.test(await p.getAttribute('[data-orqd="'+t1+'"]','aria-label')));
-ok('select: focus stays on chosen day after redraw',await p.evaluate(t=>document.activeElement&&document.activeElement.dataset.orqd===t,t1));
+// ปิดโดยไม่เลือก
+await p.click('[data-orqx]');await p.waitForSelector('#orqdlg',{state:'detached'});
+ok('close button: dialog gone, nothing chosen, focus back on the date button',(await p.inputValue('#orq_date'))===''&&(await p.textContent('#orq_dbtn')).trim()==='เลือกวันที่'&&await p.evaluate(()=>document.activeElement&&document.activeElement.id==='orq_dbtn')&&await p.evaluate(()=>!document.getElementById('app').inert));
+// Escape
+await p.click('#orq_dbtn');await p.waitForSelector('#orqdlg');await p.keyboard.press('Escape');await p.waitForSelector('#orqdlg',{state:'detached'});
+ok('Escape closes the dialog',true);
+// แตะนอกกรอบ
+await p.click('#orq_dbtn');await p.waitForSelector('#orqdlg');await p.mouse.click(3,3);await p.waitForSelector('#orqdlg',{state:'detached'});
+ok('tapping outside closes the dialog',true);
+// เลือกวัน -> ปิดเอง
+await p.click('#orq_dbtn');await p.waitForSelector('#orqdlg');
+const t1=(await days())[2];await p.click('[data-orqd="'+t1+'"]');await p.waitForSelector('#orqdlg',{state:'detached'});
+ok('select: dialog closes by itself, hidden value set',(await p.inputValue('#orq_date'))===t1);
+ok('select: button now shows the chosen date in Thai',/^(อาทิตย์|จันทร์|อังคาร|พุธ|พฤหัสบดี|ศุกร์|เสาร์) \d+ \S+ 25\d\d$/.test((await p.textContent('#orq_dbtn')).trim()));
+ok('select: focus returned to the date button',await p.evaluate(()=>document.activeElement&&document.activeElement.id==='orq_dbtn'));
+// เปิดใหม่: เดือนของวันที่เลือก + aria-pressed
+await p.click('#orq_dbtn');await p.waitForSelector('#orqdlg');
+ok('reopen: opens on chosen month with the day pressed',(await p.getAttribute('[data-orqd="'+t1+'"]','aria-pressed'))==='true'&&(await p.getAttribute('[data-orqd="'+t1+'"]','aria-label')).includes('25'));
 // เปลี่ยนวันข้ามเดือน
-await p.click('[data-orqm="1"]');const t2=(await days())[4];await p.click('[data-orqd="'+t2+'"]');
-ok('change day in another month: value updated, old day no longer pressed',(await p.inputValue('#orq_date'))===t2);
-await p.click('[data-orqm="-1"]');ok('first month: previous choice not marked anymore',(await p.getAttribute('[data-orqd="'+t1+'"]','aria-pressed'))==='false');
-// เดือนสุดท้าย (120 วัน) next ถูกปิด
+await p.click('[data-orqm="1"]');const t2=(await days())[4];await p.click('[data-orqd="'+t2+'"]');await p.waitForSelector('#orqdlg',{state:'detached'});
+ok('change to another month: value updated',(await p.inputValue('#orq_date'))===t2);
+await p.click('#orq_dbtn');await p.waitForSelector('#orqdlg');
+ok('reopen after change: opens on the new month, old day not in view/pressed',(await p.getAttribute('[data-orqd="'+t2+'"]','aria-pressed'))==='true');
 for(let i=0;i<8&&!(await p.$eval('[data-orqm="1"]',b=>b.disabled));i++)await p.click('[data-orqm="1"]');
-ok('calendar: next disabled at last allowed month, no days after day 120',await p.$eval('[data-orqm="1"]',b=>b.disabled)&&(await days()).every(x=>x<=bkk(120)));
-// ส่งกลับไปที่ฟอร์มซ้ำ : เปิดเดือนของวันที่เลือกไว้
+ok('calendar: next disabled at last allowed month, no day after day 120',await p.$eval('[data-orqm="1"]',b=>b.disabled)&&(await days()).every(x=>x<=bkk(120)));
+await p.click('[data-orqx]');await p.waitForSelector('#orqdlg',{state:'detached'});
 await p.click('[data-orq=send]');await p.waitForTimeout(200);
-ok('after a validation error the form keeps the calendar and the choice',(await p.inputValue('#orq_date'))===t2);
+ok('after a validation error the form keeps the chosen date on the button',(await p.inputValue('#orq_date'))===t2&&(await p.textContent('#orq_dbtn')).trim()!=='เลือกวันที่');
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)
 })()

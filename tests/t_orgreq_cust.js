@@ -101,7 +101,8 @@ ok('districts from server only',JSON.stringify(await p.$$eval('#orq_dist option'
 ok('only central therapists listed',JSON.stringify(await p.$$eval('[data-orqs]',o=>o.map(x=>x.dataset.orqs)))===JSON.stringify(['st3','st4']));
 // ---- ตรวจความถูกต้อง
 const err=async()=>await p.textContent('#orq_err');
-const pick=async ymd=>{for(let i=0;i<8&&!(await p.$('[data-orqd="'+ymd+'"]'));i++)await p.click('[data-orqm="1"]');await p.click('[data-orqd="'+ymd+'"]')};
+const pick=async ymd=>{await p.click('#orq_dbtn');await p.waitForSelector('#orqdlg');for(let i=0;i<8&&!(await p.$('[data-orqd="'+ymd+'"]'));i++)await p.click('[data-orqm="1"]');await p.click('[data-orqd="'+ymd+'"]');await p.waitForSelector('#orqdlg',{state:'detached'})};
+const openCal=async()=>{await p.click('#orq_dbtn');await p.waitForSelector('#orqdlg')};const closeCal=async()=>{await p.click('[data-orqx]');await p.waitForSelector('#orqdlg',{state:'detached'})};
 await p.click('[data-orq=send]');ok('empty name rejected',(await err()).includes('ชื่อหน่วยงาน'));
 await p.fill('#orq_name','บริษัท ทดสอบ จำกัด');await p.click('[data-orq=send]');ok('district required',(await err()).includes('เลือกเขต'));
 await p.selectOption('#orq_dist','ปทุมวัน');await p.fill('#orq_addr','88 ถนนพระราม 1');await p.click('[data-orq=send]');ok('pin required',(await err()).includes('ปักหมุด'));
@@ -112,9 +113,9 @@ await p.click('[data-orq=pin]');await p.waitForSelector('#mpov');await p.fill('#
 ok('pin in Bangkok accepted',(await p.textContent('#orq_pin')).includes('13.74660')&&(await err())==='');
 await p.fill('#orq_cn','สมหมาย');await p.fill('#orq_cp','12345');await p.click('[data-orq=send]');ok('bad phone rejected',(await err()).includes('เบอร์'));
 await p.fill('#orq_cp','0899999999');await p.click('[data-orq=send]');ok('date required',(await err()).includes('วันที่'));
-ok('calendar: today is not shown at all',(await p.$('[data-orqd="'+bkk(0)+'"]'))===null);
+await openCal();ok('calendar: today is not shown at all',(await p.$('[data-orqd="'+bkk(0)+'"]'))===null);
 ok('calendar: day 5 (inside the 10-day lead) is not shown',(await p.$('[data-orqd="'+bkk(5)+'"]'))===null&&(await p.$('[data-orqd="'+bkk(9)+'"]'))===null);
-ok('lead/pay rule shown near date + min attr',(await p.textContent('#orqf')).includes('ล่วงหน้าอย่างน้อย 10 วัน')&&(await p.textContent('#orqf')).includes('ภายใน 3 วันก่อนวันให้บริการ')&&(await p.$('[data-orqd="'+bkk(10)+'"]'))!==null);
+ok('lead/pay rule shown near date + min attr',(await p.textContent('#orqf')).includes('ล่วงหน้าอย่างน้อย 10 วัน')&&(await p.textContent('#orqf')).includes('ภายใน 3 วันก่อนวันให้บริการ')&&(await p.$('[data-orqd="'+bkk(10)+'"]'))!==null);await closeCal();
 await pick(bkk(15));
 await p.selectOption('#orq_s','15:00');await p.selectOption('#orq_e','09:00');await p.click('[data-orq=send]');ok('end before start rejected',(await err()).includes('หลังเวลาเริ่ม'));
 await p.selectOption('#orq_s','09:00');await p.selectOption('#orq_e','15:00');
