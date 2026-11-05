@@ -34,7 +34,7 @@ function paint(){if(!pill)return;var label="",bg="#1f6f5c",fg="#fff";
  else if(state==="denied"){label="🔕 แจ้งเตือนถูกบล็อก";bg="#b3402a"}
  else if(state==="ios"){label="🔔 เปิดแจ้งเตือน (iPhone)"}
  if(busy)label="กำลังดำเนินการ…";if(msg)label=msg;
- pill.textContent=label;pill.style.background=bg;pill.style.color=fg;pill.disabled=busy}
+ pill.textContent=label;pill.style.background=bg;pill.style.color=fg;pill.disabled=busy;setTimeout(ask,600)}
 function say(t,ms){msg=t;paint();clearTimeout(say._t);say._t=setTimeout(function(){msg="";paint()},ms||6000)}
 function reg(){return navigator.serviceWorker.register("sw.js").then(function(){return navigator.serviceWorker.ready})}
 function sendReg(sub){var j=sub.toJSON(),k=j.keys||{};return C.api("/rest/v1/rpc/register_push",{method:"POST",json:1,body:JSON.stringify({p_endpoint:j.endpoint,p_p256dh:k.p256dh,p_auth:k.auth})})}
@@ -60,6 +60,36 @@ function enable(){
      navigator.serviceWorker.ready.then(function(rg){rg.showNotification("เปิดแจ้งเตือนแล้ว",{body:"ต่อไปนี้จะมีเสียงเตือนเมื่อมีรายการใหม่ แม้ปิดหน้านี้อยู่",icon:"icon-192.png",tag:"welcome"})}).catch(function(){})})})})
  }).catch(function(e){busy=false;var m=String(e&&e.message||"");
   say(m==="NOKEY"?"ผู้ดูแลยังไม่ได้ตั้งค่ากุญแจแจ้งเตือน (VAPID) ในระบบ":m==="NET"?"เชื่อมต่อไม่ได้ ลองใหม่":/register_push|schema cache|does not exist/i.test(m)?"ฐานข้อมูลยังไม่ได้รัน SQL ชุดที่ 6":"เปิดแจ้งเตือนไม่สำเร็จ: "+m,9000)})}
+/* ---------- หน้าต่างชวนเปิดแจ้งเตือน (หลังเข้าสู่ระบบ ถามไม่เกินวันละครั้ง) ---------- */
+var askEl=null,askShown=false,askInert=[];
+function askKey(){return "pushAsk:"+(C&&C.uid?C.uid():"")}
+function askRecent(){try{var t=+localStorage.getItem(askKey())||0;return Date.now()-t<20*3600*1000}catch(e){return false}}
+function askStamp(){try{localStorage.setItem(askKey(),String(Date.now()))}catch(e){}}
+function askClose(){if(!askEl)return;try{askEl.parentNode&&askEl.parentNode.removeChild(askEl)}catch(e){}askInert.forEach(function(e){e.inert=false});askInert=[];var el=askEl;askEl=null;if(el._prev&&el._prev.focus)try{el._prev.focus()}catch(e){}}
+function ask(){
+ if(askShown||askEl||window.__NO_PUSH_ASK===true||(navigator.webdriver&&window.__NO_PUSH_ASK!==false))return; /* เบราว์เซอร์ที่ถูกควบคุมด้วยโปรแกรมทดสอบไม่ขึ้นหน้าต่างนี้ เว้นแต่ข้อสอบตั้ง __NO_PUSH_ASK=false */
+ if(!C||!C.uid||!C.uid()||(state!=="off"&&state!=="ios")||busy)return;
+ if(document.getElementById("updcov")||document.hidden||!document.body)return; /* รอหน้า "มีเวอร์ชันใหม่" ปิดก่อน แล้วลองใหม่รอบถัดไป */
+ if(askRecent())return;
+ askShown=true;askStamp();
+ var ios=state==="ios";
+ var d=document.createElement("div");d.id="pushask";d.setAttribute("role","dialog");d.setAttribute("aria-modal","true");d.setAttribute("aria-labelledby","pushaskh");d._prev=document.activeElement;
+ d.style.cssText="position:fixed;left:0;top:0;right:0;bottom:0;z-index:2147482000;background:rgba(18,49,42,.55);display:flex;align-items:center;justify-content:center;padding:20px";
+ var bs="width:100%;min-height:52px;border-radius:14px;font:inherit;font-size:1.1rem;font-weight:700;cursor:pointer;";
+ d.innerHTML='<div style="background:#fff;color:#12312a;border-radius:20px;padding:24px 20px;max-width:380px;width:100%;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.35)">'+
+  '<img src="icon-logo-192.png" alt="" width="72" height="72" style="width:72px;height:72px;border-radius:50%">'+
+  '<h2 id="pushaskh" tabindex="-1" style="margin:12px 0 8px;font-size:1.35rem;outline:none">เปิดการแจ้งเตือน</h2>'+
+  (ios?'<p style="margin:0 0 16px;color:#4a6b62;text-align:left">บน iPhone ต้องติดตั้งแอปก่อนจึงจะเปิดแจ้งเตือนได้ ให้กดปุ่มแชร์ของ Safari เลือก "เพิ่มลงในหน้าจอโฮม" เปิดแอปจากไอคอนนั้น แล้วเข้าสู่ระบบอีกครั้ง จะมีหน้านี้ให้กดเปิดแจ้งเตือน</p>'
+   :'<p style="margin:0 0 16px;color:#4a6b62">รับแจ้งเตือนเรื่องการจอง การเปลี่ยนแปลง และข้อความ แม้ปิดแอปอยู่ เปิดครั้งเดียวใช้ได้ต่อเนื่อง</p>')+
+  (ios?'':'<button type="button" id="pushaskgo" style="'+bs+'border:0;background:#1f6f5c;color:#fff">เปิดแจ้งเตือน</button>')+
+  '<button type="button" id="pushasklater" style="'+bs+(ios?'border:0;background:#1f6f5c;color:#fff':'margin-top:10px;min-height:48px;border:2px solid #1f6f5c;background:#fff;color:#1f6f5c;font-weight:600')+'">'+(ios?'รับทราบ':'ไว้ทีหลัง')+'</button></div>';
+ document.body.appendChild(d);askEl=d;
+ [].slice.call(document.body.children).forEach(function(e){if(e===d||e.tagName==="SCRIPT"||e.inert===true)return;e.inert=true;askInert.push(e)});
+ var go=d.querySelector("#pushaskgo"),lt=d.querySelector("#pushasklater");
+ if(go)go.onclick=function(){askClose();unlock();enable()};
+ lt.onclick=askClose;
+ d.addEventListener("keydown",function(ev){if(ev.key==="Escape")askClose()});
+ var h=d.querySelector("#pushaskh");try{h.focus()}catch(e){}}
 function onPill(){unlock();if(busy)return;
  if(state==="ios"){say("iPhone: กดปุ่มแชร์ แล้วเลือก \"เพิ่มลงในหน้าจอโฮม\" เปิดแอปจากไอคอนนั้น แล้วกดปุ่มนี้อีกครั้ง",12000);return}
  if(state==="denied"){say("เปิดสิทธิ์แจ้งเตือนของเว็บนี้ในตั้งค่าเบราว์เซอร์ แล้วโหลดหน้าใหม่",10000);return}
