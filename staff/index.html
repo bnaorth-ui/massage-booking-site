@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>สำหรับพนักงานนวด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-192.png"><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.0"><meta name="app-name" content="ระบบจองนวด สำหรับพนักงาน"><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -583,7 +583,7 @@ function insOpen(){var u=insUrl(),k=insKind();
  try{if(k==="ios-app")location.href="x-safari-"+u;else if(k==="app")location.href="intent://"+u.replace(/^https?:\/\//,"")+"#Intent;scheme="+(/^http:/.test(u)?"http":"https")+";package=com.android.chrome;end"}catch(x){}
  setTimeout(function(){insMsg("ถ้าไม่เปิด ให้กดปุ่มคัดลอกลิงก์ แล้วนำไปวางในเบราว์เซอร์")},1500)}
 function insBt(){var u=insUrl().replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");return '<div class="insbt"><button type="button" class="btn wide" data-ins="copy">คัดลอกลิงก์</button><button type="button" class="btn g wide" data-ins="open">ติดตั้งแอป</button></div><p class="insmsg" id="insmsg" role="status" aria-live="polite"></p><p class="insurl">'+u+'</p>'}
-function insBody(){var k=insKind(),h='<img class="insic" src="icon-192.png" alt=""><h1 id="inst" tabindex="-1">ติดตั้งแอปรับงานพนักงาน</h1>';
+function insBody(){var k=insKind(),h='<img class="insic" src="icon-logo-192.png" alt=""><h1 id="inst" tabindex="-1">ติดตั้งแอปรับงานพนักงาน</h1>';
  if(INS.done||!k)return h+'<div class="flash" role="status">ติดตั้งแล้ว เปิดแอปจากหน้าจอโฮมได้เลย</div>';
  h+='<p class="asub">ติดตั้งไว้ที่หน้าจอโฮม เปิดได้เหมือนแอป และรับแจ้งเตือนเมื่อมีงานใหม่</p>';
  h+=insFt();

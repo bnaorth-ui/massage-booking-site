@@ -17,7 +17,7 @@ exports.tmp = name => path.join(os.tmpdir(), name);
 exports.serveDir = () => {
   const d = fs.mkdtempSync(path.join(os.tmpdir(), 'pages-'));
   for (const n of Object.keys(DIR)) fs.copyFileSync(pageFile(n), path.join(d, n));
-  for (const f of ['sw.js', 'push.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png']) {
+  for (const f of ['sw.js', 'push.js', 'update.js', 'version.json', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'icon-logo-192.png', 'icon-logo-512.png']) {
     for (const dd of Object.values(DIR)) { const s = path.join(ROOT, dd, f); if (fs.existsSync(s) && !fs.existsSync(path.join(d, f))) fs.copyFileSync(s, path.join(d, f)); }
   }
   return d;

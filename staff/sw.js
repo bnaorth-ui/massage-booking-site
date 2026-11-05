@@ -35,7 +35,7 @@ self.addEventListener('push',function(e){
  e.waitUntil(self.clients.matchAll({type:'window',includeUncontrolled:true}).then(function(list){
   list.forEach(function(c){c.postMessage({type:'push',title:title,body:body,page:d.page||''})});
   if(list.some(function(c){return c.visibilityState==='visible'}))return; /* หน้าเว็บเปิดอยู่ จะมีเสียงและแบนเนอร์ในหน้าเอง */
-  return self.registration.showNotification(title,{body:body,icon:'icon-192.png',badge:'icon-192.png',tag:d.tag||'msg',renotify:true,vibrate:[200,100,200,100,400],data:{page:d.page||'index.html'}});
+  return self.registration.showNotification(title,{body:body,icon:'icon-logo-192.png',badge:'icon-192.png',tag:d.tag||'msg',renotify:true,vibrate:[200,100,200,100,400],data:{page:d.page||'index.html'}});
  }));
 });
 self.addEventListener('notificationclick',function(e){
