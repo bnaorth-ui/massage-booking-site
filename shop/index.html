@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>สำหรับร้านนวด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.5"><meta name="app-name" content="ระบบจองนวด สำหรับร้านค้า"><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.6"><meta name="app-name" content="ระบบจองนวด สำหรับร้านค้า"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -96,7 +96,7 @@ textarea.in{resize:vertical}
    หน้าร้านค้า, เชื่อมต่อ Supabase (REST ตรง ไม่ต้องใช้ไลบรารี)
    Publishable key ออกแบบให้อยู่ในหน้าเว็บได้ ความปลอดภัยมาจากกฎ RLS ในฐานข้อมูล
    ===================================================================== */
-var SB={url:"https://dwdnmfwepydyweeqfdxn.supabase.co",key:"sb_publishable_4xaAEuN8jFIxGjyhtzABow_FsbGcoI3",alias:"gmail.com"};
+var SB={url:"https://dwdnmfwepydyweeqfdxn.supabase.co",key:"sb_publishable_4xaAEuN8jFIxGjyhtzABow_FsbGcoI3",alias:"gmail.com"};if(window.ErrLog)ErrLog.attach({app:"shop",url:SB.url,key:SB.key,menu:function(){return S&&S.tab}});
 var SSK="sbSessionShop",SBS=null;
 function rd(k,d){try{var v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}}
 function wr(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}
@@ -106,7 +106,7 @@ function sbReq(path,o){o=o||{};var h={apikey:SB.key};if(o.json)h["Content-Type"]
  return fetch(SB.url+path,{method:o.method||"GET",headers:h,body:o.body}).then(function(r){
   if(o.blob&&r.ok)return r.blob();
   return r.text().then(function(tx){var j=null;try{j=tx?JSON.parse(tx):null}catch(e){}
-  if(!r.ok){var er=new Error((j&&(j.msg||j.message||j.error_description||j.error))||("HTTP "+r.status));er.status=r.status;er.code=j&&(j.error_code||j.code)||"";throw er}return j})},function(){throw new Error("NET")})}
+  if(!r.ok){var er=new Error((j&&(j.msg||j.message||j.error_description||j.error))||("HTTP "+r.status));er.status=r.status;er.code=j&&(j.error_code||j.code)||"";if(window.ErrLog)ErrLog.server(path,r.status,er.code);throw er}return j})},function(){throw new Error("NET")})}
 function sbSave(s){SBS=s;if(s)wr(SSK,s);else try{localStorage.removeItem(SSK)}catch(e){}}
 function sbSet(j){var s={access_token:j.access_token,refresh_token:j.refresh_token,expires_at:j.expires_at||Math.floor(Date.now()/1000)+(j.expires_in||3600),user:j.user};sbSave(s);return s}
 function sbEnsure(){if(!SBS)return Promise.reject(new Error("NOSESS"));if(SBS.expires_at-60>Date.now()/1000)return Promise.resolve(SBS);

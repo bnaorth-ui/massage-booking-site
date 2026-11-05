@@ -112,7 +112,7 @@ await p.fill('#sn','แอดมิน หนึ่ง');await p.fill('#sph','08
 await p.waitForTimeout(800);
 await p.click('#tabs [data-id=sys]');await p.waitForTimeout(400);
 const subs=await p.$$eval('#main .subtabs [data-id]',e=>e.map(x=>x.textContent.trim()));
-ok('sys tabs end with ประวัติการทำงาน',subs[subs.length-1]==='ประวัติการทำงาน'&&subs[subs.length-2].startsWith('สถานะระบบ'));
+ok('sys tabs end with ประวัติการทำงาน',subs[subs.length-1]==='ประวัติการทำงาน'&&subs[subs.length-2].startsWith('ข้อผิดพลาดหน้าเว็บ')&&subs[subs.length-3].startsWith('สถานะระบบ'));
 await p.click('#main .subtabs [data-id=au]');await p.waitForTimeout(600);
 let t=await p.evaluate(()=>document.body.innerText);
 ok('loads once',auCalls.length===1);
