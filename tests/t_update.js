@@ -10,7 +10,8 @@ async function open(app,ver,pageRes){
  await ctx.addInitScript(()=>{window.__APP_VER_URL='https://ver.test/version.json';window.__APP_PAGE_URL='https://ver.test/page.html'});
  await ctx.route('**/*',async r=>{const u=new URL(r.request().url());if(u.protocol==='file:')return r.continue();
   if(u.host==='ver.test'&&u.pathname==='/version.json'){if(ver.delay)await sleep(ver.delay);try{return await r.fulfill({status:ver.status||200,contentType:'application/json',headers:{'access-control-allow-origin':'*'},body:ver.raw!==undefined?ver.raw:JSON.stringify(ver.body)})}catch(e){return}}
-  if(u.host==='ver.test'&&u.pathname==='/page.html'){st.pageHits++;const pr=pageRes||{status:200};return r.fulfill({status:pr.status,contentType:'text/html; charset=utf-8',headers:{'access-control-allow-origin':'*'},body:'<html></html>'})}
+  if(u.host==='ver.test'&&u.pathname==='/page2.html'){st.pageHits++;return r.fulfill({status:200,contentType:'text/html; charset=utf-8',headers:{'access-control-allow-origin':'*'},body:'<html>ok</html>'})}
+  if(u.host==='ver.test'&&u.pathname==='/page.html'){st.pageHits++;const pr=pageRes||{status:200};return r.fulfill({status:pr.status,contentType:'text/html; charset=utf-8',headers:Object.assign({'access-control-allow-origin':'*'},pr.location?{location:pr.location}:{}),body:'<html></html>'})}
   return r.abort()});
  const p=await ctx.newPage();p.on('pageerror',e=>errs.push(e.message));
  await p.goto(cfg.page(app));return {p,ctx,st}}
@@ -49,6 +50,10 @@ for(const [app,label] of APPS){
  s=await open(app,{body:{v:'9.9',required:true}},{status:500});await s.p.waitForSelector('#updgo',{timeout:3000});await s.p.click('#updgo');
  await s.p.waitForFunction(()=>document.getElementById('updmsg')&&document.getElementById('updmsg').textContent.includes('อัปเดตไม่สำเร็จ'),null,{timeout:4000});
  ok(label+': failed update shows message and re-enables button',!(await s.p.$eval('#updgo',e=>e.disabled))&&!!(await cov(s.p)));await s.ctx.close();
+ // 6c ข้อความล้มเหลวมีรหัส (ไม่ใช่เหมาแล้วว่าไม่มีอินเทอร์เน็ต)
+ s=await open(app,{body:{v:'9.9',required:true}},{status:500});await s.p.waitForSelector('#updgo',{timeout:3000});await s.p.click('#updgo');
+ await s.p.waitForFunction(()=>document.getElementById('updmsg')&&document.getElementById('updmsg').textContent.includes('อัปเดตไม่สำเร็จ'),null,{timeout:4000});
+ ok(label+': server error shows code, not "check internet"',(await s.p.textContent('#updmsg')).includes('รหัส http500')&&!(await s.p.textContent('#updmsg')).includes('สัญญาณอินเทอร์เน็ต'));await s.ctx.close();
  // 7 เช็กช้าเกิน 1.5 วินาที -> เข้าแอปเลย
  s=await open(app,{body:{v:'9.9'},delay:3500});await sleep(2100);
  ok(label+': slow check -> app opens without update screen',(await cov(s.p))===null);await s.ctx.close();

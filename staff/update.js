@@ -32,12 +32,18 @@
   setInert(true);if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",function(){if(cov.parentNode)setInert(true)});var h=document.getElementById("updh");if(h)try{h.focus()}catch(x){}
   var go=document.getElementById("updgo"),lt=document.getElementById("updlater"),msg=document.getElementById("updmsg");
   if(lt)lt.onclick=function(){ss.set("upd-later",String(r.v));hide()};
-  go.onclick=function(){go.disabled=true;go.style.opacity=".6";msg.style.color="#4a6b62";msg.textContent="กำลังอัปเดต กรุณารอสักครู่";apply(r).then(function(){ss.set("upd-tried",String(r.v));location.reload()},function(){go.disabled=false;go.style.opacity="1";msg.style.color="#b00020";msg.textContent="อัปเดตไม่สำเร็จ ตรวจสอบสัญญาณอินเทอร์เน็ตแล้วกดอีกครั้ง"})}}
+  go.onclick=function(){go.disabled=true;go.style.opacity=".6";msg.style.color="#4a6b62";msg.textContent="กำลังอัปเดต กรุณารอสักครู่";apply(r).then(function(){ss.set("upd-tried",String(r.v));location.reload()},function(e){go.disabled=false;go.style.opacity="1";msg.style.color="#b00020";var c=e&&e.code;msg.textContent=c?"อัปเดตไม่สำเร็จ (รหัส "+c+") กรุณาลองกดอีกครั้ง หรือปิดแอปแล้วเปิดใหม่":"อัปเดตไม่สำเร็จ ตรวจสอบสัญญาณอินเทอร์เน็ตแล้วกดอีกครั้ง"})}}
+ function fail(c){var e=new Error(c);e.code=c;return e}
+ function dropCaches(){return window.caches?caches.keys().then(function(ns){return Promise.all(ns.filter(function(n){return n.indexOf("pages-")===0}).map(function(n){return caches.delete(n)}))}).catch(function(){}):Promise.resolve()}
  function apply(r){return fetch(pageUrl,{cache:"reload",credentials:"same-origin"}).then(function(res){
-   if(!res||!res.ok||res.redirected||!/text\/html/i.test(res.headers.get("content-type")||""))throw new Error("bad");
+   /* ยอมให้ถูกเปลี่ยนเส้นทางภายในเว็บเดียวกันได้ (เช่น /index.html -> /) แต่ต้องเป็น HTML ที่โหลดได้จริง */
+   var same=false;try{same=!res.url||new URL(res.url).origin===new URL(pageUrl).origin}catch(x){}
+   if(!res||!res.ok)throw fail("http"+(res?res.status:0));
+   if(!same||!/text\/html/i.test(res.headers.get("content-type")||""))throw fail("type");
    if(!window.caches)return;
    var u=new URL(pageUrl),keys=[u.origin+u.pathname];if(/\/$/.test(u.pathname))keys.push(u.origin+u.pathname+"index.html");else if(/\/index\.html$/.test(u.pathname))keys.push(u.origin+u.pathname.replace(/index\.html$/,""));
-   return caches.keys().then(function(ns){return Promise.all(ns.filter(function(n){return n.indexOf("pages-")===0}).map(function(n){return caches.open(n).then(function(c){return Promise.all(keys.map(function(k){return c.put(k,res.clone())}))})}))})})}
+   /* เก็บหน้าใหม่ลงแคชของ service worker ถ้าเก็บไม่ได้ ให้ล้างแคชหน้าเว็บทิ้งแทน (ครั้งหน้าจะโหลดจากเครือข่าย) ไม่ให้การอัปเดตล้มเพราะเรื่องแคช */
+   return caches.keys().then(function(ns){return Promise.all(ns.filter(function(n){return n.indexOf("pages-")===0}).map(function(n){return caches.open(n).then(function(c){return Promise.all(keys.map(function(k){return c.put(k,res.clone())}))})}))}).catch(function(){return dropCaches()})})}
  var ac=window.AbortController?new AbortController():null;
  fetch(verUrl,{cache:"no-store",signal:ac?ac.signal:undefined}).then(function(x){if(!x.ok)throw new Error("x");return x.json()}).then(function(r){
   if(done)return;done=true;
