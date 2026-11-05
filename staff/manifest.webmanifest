@@ -1,6 +1,6 @@
 {
-  "name": "ระบบจองนวด - พนักงาน",
-  "short_name": "พนักงาน",
+  "name": "ระบบจองนวด - หมอนวด",
+  "short_name": "หมอนวด",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
