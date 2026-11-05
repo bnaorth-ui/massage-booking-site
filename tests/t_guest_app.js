@@ -73,6 +73,7 @@ for(const [t,h] of [['bk','รายการ'],['nt','แจ้งเตือ�
  const tx=await p.textContent('#app');
  ok('installed guest tab '+h+': heading + login prompt',tx.includes(h)&&tx.includes('เข้าสู่ระบบเพื่อ')&&!!(await p.$('[data-gb=reg]')));
  ok('installed guest tab '+h+': current tab marked',(await p.$eval('#tabs button.on',e=>e.dataset.tab))===t);}
+ok('installed guest account tab: shows app version',(await p.textContent('#app')).includes('เวอร์ชันแอป '+(await p.getAttribute('meta[name=app-version]','content'))));
 ok('installed guest account tab: contact + privacy',(await p.textContent('#app')).includes('ติดต่อ')&&!!(await p.$('[data-view=pv]')));
 ok('no authenticated data calls as guest',!calls.some(c=>/my_bookings|my_points|chat_unread/.test(c.path)));
 await p.click('[data-view=pv]');ok('guest privacy page opens',(await p.textContent('#app')).includes('นโยบายความเป็นส่วนตัว'));
