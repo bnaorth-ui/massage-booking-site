@@ -16,20 +16,20 @@ async function open(app,ver,pageRes){
  await p.goto(cfg.page(app));return {p,ctx,st}}
 const cov=p=>p.$('#updcov');
 for(const [app,label] of APPS){
- console.log('--- '+label);
+ console.log('--- '+label);const CUR=/name="app-version" content="([^"]+)"/.exec(require('fs').readFileSync(cfg.page(app).replace('file://',''),'utf8'))[1];
  // 1 เลขตรงกัน
- let s=await open(app,{body:{v:'1.0',required:false,notes:[]}});await sleep(700);
+ let s=await open(app,{body:{v:CUR,required:false,notes:[]}});await sleep(700);
  ok(label+': same version -> no update screen',(await cov(s.p))===null);await s.ctx.close();
  // 2 ขณะรอผลเช็ก ต้องมีหน้าปิดบัง (ไม่เห็นหน้าแอปเก่า) แล้วหายเมื่อเลขตรง
- s=await open(app,{body:{v:'1.0'},delay:600});await sleep(150);
+ s=await open(app,{body:{v:CUR},delay:600});await sleep(150);
  ok(label+': checking cover shown while waiting',!!(await cov(s.p))&&(await s.p.textContent('#updcov')).includes('กำลังตรวจสอบเวอร์ชัน'));
  await sleep(900);ok(label+': cover gone after same-version result',(await cov(s.p))===null);await s.ctx.close();
  // 3 มีเวอร์ชันใหม่ (ปกติ)
- s=await open(app,{body:{v:'1.1',required:false,notes:['ข้อหนึ่ง','ข้อสอง','ข้อสาม','ข้อสี่ห้ามขึ้น']}});await s.p.waitForSelector('#updh',{timeout:3000});
+ s=await open(app,{body:{v:'9.9',required:false,notes:['ข้อหนึ่ง','ข้อสอง','ข้อสาม','ข้อสี่ห้ามขึ้น']}});await s.p.waitForSelector('#updh',{timeout:3000});
  const t=await s.p.textContent('#updcov');
  ok(label+': update screen has association name, app name, heading',t.includes('สมาคมวิทยากรฝึกอาชีพคนตาบอด')&&t.includes('ระบบจองนวด')&&t.includes('มีเวอร์ชันใหม่ของแอป'));
  ok(label+': shows up to 3 notes only',t.includes('ข้อสาม')&&!t.includes('ข้อสี่ห้ามขึ้น'));
- ok(label+': shows version 1.0 -> 1.1',t.includes('เวอร์ชันของคุณ 1.0 → ใหม่ 1.1'));
+ ok(label+': shows version current -> new',t.includes('เวอร์ชันของคุณ '+CUR+' → ใหม่ 9.9'));
  ok(label+': has update and later buttons',!!(await s.p.$('#updgo'))&&!!(await s.p.$('#updlater')));
  ok(label+': logo is the association logo file',(await s.p.getAttribute('#updcov img','src'))==='icon-logo-192.png');
  ok(label+': dialog semantics + focus on heading',(await s.p.getAttribute('#updcov','role'))==='dialog'&&(await s.p.getAttribute('#updcov','aria-modal'))==='true'&&(await s.p.evaluate(()=>document.activeElement&&document.activeElement.id))==='updh');
@@ -37,20 +37,20 @@ for(const [app,label] of APPS){
  await s.p.click('#updlater');ok(label+': later closes screen and un-inerts',(await cov(s.p))===null&&await s.p.evaluate(()=>[...document.body.children].every(x=>x.inert!==true)));
  await s.p.reload();await sleep(700);ok(label+': later remembered for this session (not asked again)',(await cov(s.p))===null);await s.ctx.close();
  // 4 บังคับ
- s=await open(app,{body:{v:'1.1',required:true,notes:['แก้ฐานข้อมูล']}});await s.p.waitForSelector('#updh',{timeout:3000});
+ s=await open(app,{body:{v:'9.9',required:true,notes:['แก้ฐานข้อมูล']}});await s.p.waitForSelector('#updh',{timeout:3000});
  ok(label+': required has no later button',!(await s.p.$('#updlater'))&&(await s.p.textContent('#updcov')).includes('จำเป็นต้องอัปเดตจึงจะใช้งานต่อได้'));
  await s.p.reload();await s.p.waitForSelector('#updh',{timeout:3000});ok(label+': required asked again after reload',true);await s.ctx.close();
  // 5 กดอัปเดต
- s=await open(app,{body:{v:'1.1',required:false}});await s.p.waitForSelector('#updgo',{timeout:3000});
+ s=await open(app,{body:{v:'9.9',required:false}});await s.p.waitForSelector('#updgo',{timeout:3000});
  const nav=s.p.waitForEvent('load',{timeout:5000}).catch(()=>null);await s.p.click('#updgo');await nav;await sleep(900);
  ok(label+': update fetched the page and reloaded',s.st.pageHits===1);
- ok(label+': no loop after update even if version still differs',(await cov(s.p))===null&&(await s.p.evaluate(()=>sessionStorage.getItem('upd-tried')))==='1.1');await s.ctx.close();
+ ok(label+': no loop after update even if version still differs',(await cov(s.p))===null&&(await s.p.evaluate(()=>sessionStorage.getItem('upd-tried')))==='9.9');await s.ctx.close();
  // 6 อัปเดตไม่สำเร็จ
- s=await open(app,{body:{v:'1.1',required:true}},{status:500});await s.p.waitForSelector('#updgo',{timeout:3000});await s.p.click('#updgo');
+ s=await open(app,{body:{v:'9.9',required:true}},{status:500});await s.p.waitForSelector('#updgo',{timeout:3000});await s.p.click('#updgo');
  await s.p.waitForFunction(()=>document.getElementById('updmsg')&&document.getElementById('updmsg').textContent.includes('อัปเดตไม่สำเร็จ'),null,{timeout:4000});
  ok(label+': failed update shows message and re-enables button',!(await s.p.$eval('#updgo',e=>e.disabled))&&!!(await cov(s.p)));await s.ctx.close();
  // 7 เช็กช้าเกิน 1.5 วินาที -> เข้าแอปเลย
- s=await open(app,{body:{v:'1.1'},delay:3500});await sleep(2100);
+ s=await open(app,{body:{v:'9.9'},delay:3500});await sleep(2100);
  ok(label+': slow check -> app opens without update screen',(await cov(s.p))===null);await s.ctx.close();
  // 8 ไฟล์เวอร์ชันเสีย
  s=await open(app,{raw:'not json'});await sleep(800);ok(label+': broken version file -> no update screen',(await cov(s.p))===null);await s.ctx.close();
