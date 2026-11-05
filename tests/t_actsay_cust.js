@@ -97,6 +97,12 @@ await p.fill('#pwo','abc123');await p.fill('#pwn','newpass1');await p.fill('#pwn
 ok('pw changed: SR announces',(await SR()).includes('เปลี่ยนรหัสผ่านเรียบร้อยแล้ว'));
 ok('pw changed: toast shown',await p.evaluate(()=>{const t=document.getElementById('atoast');return !t.hidden&&t.textContent.includes('เปลี่ยนรหัสผ่าน')}));
 ok('pw changed: banner visible without role=status',await p.evaluate(()=>{const f=document.querySelector('#app .flash');return !!f&&!f.hasAttribute('role')&&f.textContent.includes('เปลี่ยนรหัสผ่านเรียบร้อยแล้ว')}));
+// ข้อความในกล่อง VoiceOver ต้องไม่ค้าง: หายเองหลังราว 6 วินาที และหายทันทีเมื่อเปลี่ยนเมนู
+await p.waitForTimeout(6600);
+ok('SR text clears itself after ~6s',await p.evaluate(()=>[...document.querySelectorAll('div.sr[aria-live]')].every(x=>x.textContent==='')));
+await p.evaluate(()=>{document.querySelector('div#sr').textContent='ข้อความเก่าค้าง'});
+await p.click('[data-tab="bk"]');await p.waitForTimeout(150);
+ok('SR text cleared on menu change',await p.evaluate(()=>document.querySelector('div#sr').textContent!=='ข้อความเก่าค้าง'));
 ok('no page errors',errs.length===0);
 if(errs.length)console.log(errs.join('\n'));
 await b.close();

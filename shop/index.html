@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>สำหรับร้านนวด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.4"><meta name="app-name" content="ระบบจองนวด สำหรับร้านค้า"><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.5"><meta name="app-name" content="ระบบจองนวด สำหรับร้านค้า"><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -870,7 +870,8 @@ document.addEventListener("change",function(e){var t=e.target;if(!t||!D)return;
    .catch(function(x){er.textContent=errTh(x,"บันทึกรูปไม่สำเร็จ")})},function(){er.textContent="อ่านรูปนี้ไม่ได้ ลองไฟล์อื่น"})}});
 function showErr(m){var x=document.getElementById("err");if(x&&(S.form||S.tab==="set"||S.wmode)){x.textContent=m}else{S.hmsg=m;draw()}}
 var OKM="";
-function announce(m,u){var r=document.getElementById(u?"sra":"sr"),t=document.getElementById("toast");if(r){r.textContent="";setTimeout(function(){r.textContent=m},60)}if(t){t.textContent=m;t.className="toast"+(u?" bad":"");t.hidden=false;clearTimeout(announce.t);announce.t=setTimeout(function(){t.hidden=true},6000)}}
+function srClear(){var b=document.querySelectorAll("div.sr[aria-live]");for(var i=0;i<b.length;i++)b[i].textContent=""}
+function announce(m,u){var r=document.querySelector(u?"div#sra":"div#sr"),t=document.getElementById("toast");if(r){r.textContent="";clearTimeout(announce.c);announce.c=setTimeout(function(){r.textContent=m;announce.c=setTimeout(function(){if(r.textContent===m)r.textContent=""},6000)},60)}if(t){t.textContent=m;t.className="toast"+(u?" bad":"");t.hidden=false;clearTimeout(announce.t);announce.t=setTimeout(function(){t.hidden=true},6000)}}
 function actDone(m){var b=document.querySelectorAll("#main .saved[role=status],#main .closed[role=status]");for(var i=0;i<b.length;i++)b[i].removeAttribute("role");var h=document.querySelector("#main h1");if(h){h.setAttribute("tabindex","-1");try{h.focus({preventScroll:true})}catch(x){}}announce(m)}
 function act(fn,onOk){var mk=OKM;OKM="";if(S.busy)return;S.busy=true;S.hmsg="";
  fn().then(function(){S.busy=false;if(onOk)onOk();draw();actDone(mk||"ทำรายการสำเร็จแล้ว")},function(e){S.busy=false;if(e&&e.status===401){doLogout();return}showErr(errTh(e,"ทำรายการไม่สำเร็จ"))})}
@@ -888,7 +889,7 @@ document.addEventListener("click",function(e){
   if(!navigator.geolocation){ps.innerHTML='<p class="hint2" style="color:var(--bad)">อุปกรณ์นี้ไม่รองรับ ใช้การวางลิงก์หรือพิกัดแทน</p>';return}
   ps.innerHTML='<p class="hint2">กำลังหาตำแหน่ง...</p>';
   navigator.geolocation.getCurrentPosition(function(p){setPin(p.coords.latitude.toFixed(6),p.coords.longitude.toFixed(6))},function(){ps.innerHTML='<p class="hint2" style="color:var(--bad)">ใช้ตำแหน่งปัจจุบันไม่ได้ ตรวจสอบสิทธิ์ตำแหน่ง หรือวางลิงก์/พิกัดแทน</p>'},{timeout:10000});return}
- if(a==="tab"){if(id==="mg")id=S.mg;if(inMg(id))S.mg=id;if(id==="nt"){S.ntf=null;S.ntNew=[];openNt()}if(id==="rv")rvLoad();S.clmsg="";S.clc=0;S.tab=id;S.form=null;S.del=null;S.saved=false;S.pwdone=false;S.shareok=false;S.sdc=null;S.sdn=null;S.stmsg="";S.stnew=null;S.pv=false;S.wmode=null;S.werr="";S.hmsg="";draw();if(id==="wal"||id==="nt"||id==="q")refresh();return}
+ if(a==="tab"){srClear();S.slipMsg="";if(id==="mg")id=S.mg;if(inMg(id))S.mg=id;if(id==="nt"){S.ntf=null;S.ntNew=[];openNt()}if(id==="rv")rvLoad();S.clmsg="";S.clc=0;S.tab=id;S.form=null;S.del=null;S.saved=false;S.pwdone=false;S.shareok=false;S.sdc=null;S.sdn=null;S.stmsg="";S.stnew=null;S.pv=false;S.wmode=null;S.werr="";S.hmsg="";draw();if(id==="wal"||id==="nt"||id==="q")refresh();return}
  if(a==="rvreply"){S.rvReply=id;draw();var ta=document.getElementById("rvtxt");if(ta)ta.focus();return}
  if(a==="rvno"){S.rvReply=null;draw();return}
  if(a==="rvsend"){rvSend(id);return}

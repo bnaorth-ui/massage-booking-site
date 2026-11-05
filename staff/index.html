@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>สำหรับพนักงานนวด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="apple-mobile-web-app-title" content="หมอนวด"><meta name="app-version" content="1.4"><meta name="app-name" content="ระบบจองนวด สำหรับพนักงาน"><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="apple-mobile-web-app-title" content="หมอนวด"><meta name="app-version" content="1.5"><meta name="app-name" content="ระบบจองนวด สำหรับพนักงาน"><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -409,7 +409,8 @@ function acView(){var ph=ME.photo_path?pubUrl(ME.photo_path):null;
  return'<h1>บัญชี</h1><div class="ctc"><div class="prof"><span class="av" aria-hidden="true">'+(ph?'<img loading="lazy" decoding="async" src="'+esc(ph)+'" alt="">':esc(ini(ME.name)))+'</span><div class="pn"><b>'+esc(ME.name)+'</b><small>'+esc(ME.place)+'</small><small>'+esc(ME.phone||"")+'</small></div></div><button type="button" class="btn g" id="avb" style="margin-top:10px">เปลี่ยนรูปโปรไฟล์</button><input type="file" id="photo" accept="image/*" hidden></div>'+leaveCard()+pwView()+rvView()+dlView()+ctView()+'<button type="button" class="btn g" data-a="pv" style="margin-top:14px">นโยบายความเป็นส่วนตัว</button><button type="button" class="btn g" id="logout" style="margin-top:14px">ออกจากระบบ</button>'}
 function focusJob(id){var e=document.querySelector('[data-id="'+id+'"][data-a=job],[data-id="'+id+'"][data-a=fin]')||document.querySelector('[data-id="'+id+'"][data-a=ns]');if(e)e.focus()}
 function fail(t){S.err=t;draw()}
-function ann(m,u){var r=document.getElementById(u?"sra":"sr"),t=document.getElementById("atoast");if(r){r.textContent="";setTimeout(function(){r.textContent=m},60)}if(t){t.textContent=m;t.className="atoast"+(u?" bad":"");t.hidden=false;clearTimeout(ann.t);ann.t=setTimeout(function(){t.hidden=true},6000)}}
+function srClear(){var b=document.querySelectorAll("div.sr[aria-live]");for(var i=0;i<b.length;i++)b[i].textContent=""}
+function ann(m,u){var r=document.querySelector(u?"div#sra":"div#sr"),t=document.getElementById("atoast");if(r){r.textContent="";clearTimeout(ann.c);ann.c=setTimeout(function(){r.textContent=m;ann.c=setTimeout(function(){if(r.textContent===m)r.textContent=""},6000)},60)}if(t){t.textContent=m;t.className="atoast"+(u?" bad":"");t.hidden=false;clearTimeout(ann.t);ann.t=setTimeout(function(){t.hidden=true},6000)}}
 function saveSelf(o){var acc=o.accepting==null?ME.accepting:o.accepting,wd=o.wd||ME.work_days,keep=o.photo==null;
  S.busy=true;S.err="";
  return rpc("staff_save_self",{p_accepting:acc,p_work_days:wd,p_photo:keep?null:o.photo,p_keep_photo:keep}).then(function(){
@@ -514,7 +515,7 @@ function draw(){if(!ME)return;
 /* ===================== การกระทำ ===================== */
 document.addEventListener("click",function(e){
  var el=e.target.closest&&e.target.closest("[data-a]");if(!el||!ME)return;var a=el.dataset.a,id=el.dataset.id;
- if(a==="tab"){S.tab=id;S.err="";S.ok="";S.cfm=null;S.rvReply=null;if(id==="nt")openNt();if(id==="ac"){rvLoad();DL.confirm=false;DL.err="";DL.ok="";dlLoad()}S.pwOpen=false;S.pwErr="";S.pwOk="";S.pv=false;if(id==="nt")S.ntf="all";if(id==="inc"){INC.ym=today().slice(0,7);incLoad()}draw();return}
+ if(a==="tab"){srClear();S.tab=id;S.err="";S.ok="";S.cfm=null;S.rvReply=null;if(id==="nt")openNt();if(id==="ac"){rvLoad();DL.confirm=false;DL.err="";DL.ok="";dlLoad()}S.pwOpen=false;S.pwErr="";S.pwOk="";S.pv=false;if(id==="nt")S.ntf="all";if(id==="inc"){INC.ym=today().slice(0,7);incLoad()}draw();return}
  if(a==="rvreply"){S.rvReply=id;draw();var ta=document.getElementById("rvtxt");if(ta)ta.focus();return}
  if(a==="rvno"){S.rvReply=null;draw();return}
  if(a==="rvsend"){rvSend(id);return}

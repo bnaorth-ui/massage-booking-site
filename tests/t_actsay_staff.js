@@ -84,6 +84,12 @@ await p.click('#nav button:nth-child(5)');await sleep(400);
 await p.click('[data-a=dlask]');await p.click('[data-a=dlok]');await sleep(600);
 ok('delete request: SR announces',(await SR()).length>0&&(await SR()).includes('ลบบัญชี'));
 ok('no role=status success banner left',await p.evaluate(()=>document.querySelectorAll('.okb[role=status]').length===0));
+// ข้อความในกล่อง VoiceOver ต้องไม่ค้าง: หายเองหลังราว 6 วินาที และหายทันทีเมื่อเปลี่ยนเมนู
+await p.waitForTimeout(6600);
+ok('SR text clears itself after ~6s',await p.evaluate(()=>[...document.querySelectorAll('div.sr[aria-live]')].every(x=>x.textContent==='')));
+await p.evaluate(()=>{document.querySelector('div#sr').textContent='ข้อความเก่าค้าง'});
+await p.click('[data-a=tab][data-id=nt]');await p.waitForTimeout(150);
+ok('SR text cleared on menu change',await p.evaluate(()=>document.querySelector('div#sr').textContent!=='ข้อความเก่าค้าง'));
 ok('no page errors',errs.length===0);
 if(errs.length)console.log(errs.join('\n'));
 await b.close();

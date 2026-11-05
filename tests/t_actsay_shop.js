@@ -130,6 +130,12 @@ ok('no leftover role=status banner after action',(await noRoleBanner())===0);
 await p.click('[role=tab][data-id=set]').catch(()=>{});await sleep(300);
 const sv=await p.$('[data-a=setsave]')||await p.$('[data-a=saveset]');
 if(sv){await sv.click();await sleep(900);ok('settings: SR announces',(await SR()).includes('บันทึกการตั้งค่าแล้ว'))}
+// ข้อความในกล่อง VoiceOver ต้องไม่ค้าง: หายเองหลังราว 6 วินาที และหายทันทีเมื่อเปลี่ยนเมนู
+await p.waitForTimeout(6600);
+ok('SR text clears itself after ~6s',await p.evaluate(()=>[...document.querySelectorAll('div.sr[aria-live]')].every(x=>x.textContent==='')));
+await p.evaluate(()=>{document.querySelector('div#sr').textContent='ข้อความเก่าค้าง'});
+await p.click('#tabs [data-id=wal]');await p.waitForTimeout(150);
+ok('SR text cleared on menu change',await p.evaluate(()=>document.querySelector('div#sr').textContent!=='ข้อความเก่าค้าง'));
 // error path stays quiet
 ok('no page errors',errs.length===0);
 if(errs.length)console.log(errs.join('\n'));
