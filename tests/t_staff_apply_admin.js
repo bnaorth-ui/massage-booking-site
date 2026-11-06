@@ -144,11 +144,14 @@ const Q=()=>p.evaluate(()=>document.getElementById('spq')?document.getElementByI
 let c=await Q();
 ok('panel shows posting, counts, new badge',c.includes('รับสมัครหมอนวด')&&c.includes('รับสมัครหมอนวดประจำ')&&c.includes('เปิดรับสมัคร')&&c.includes('ผู้สมัคร 1 คน (ใหม่ 1)')&&c.includes('ใหม่ 1'));
 await p.click('[data-a=spline][data-id=po1]');
-ok('LINE share url has link',await p.evaluate(()=>window.__open.length===1&&window.__open[0].startsWith('https://line.me/R/share?text=')&&decodeURIComponent(window.__open[0]).includes('?apply=po1')));
+ok('panel says all postings share one short link',c.includes('ทุกประกาศใช้ลิงก์เดียวกัน')&&c.includes('https://massage-staff-bna.pages.dev/apply'));
+const LT=await p.evaluate(()=>decodeURIComponent(window.__open[0].replace('https://line.me/R/share?text=','')));
+ok('LINE share: full announcement with title, slots, documents',LT.includes('รับสมัครหมอนวด: รับสมัครหมอนวดประจำ')&&LT.includes('รับ 5 คน')&&LT.includes('สำเนาบัตรคนพิการ')&&LT.includes('รูปถ่าย 1 นิ้ว 5 รูป')&&LT.includes('ใช้เวลาประมาณ 3 นาที'));
+ok('LINE share: short link alone on its own line, no posting id',LT.includes('\nสมัครที่นี่\nhttps://massage-staff-bna.pages.dev/apply')&&!LT.includes('?apply=')&&!/·/.test(LT));
 await p.click('[data-a=spfb][data-id=po1]');
-ok('Facebook share url has link',await p.evaluate(()=>window.__open[1].startsWith('https://www.facebook.com/sharer/sharer.php?u=')&&decodeURIComponent(window.__open[1]).includes('massage-staff-bna.pages.dev/?apply=po1')));
+ok('Facebook share uses the short link (card comes from /apply page)',await p.evaluate(()=>window.__open[1]==='https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent('https://massage-staff-bna.pages.dev/apply')));
 await p.click('[data-a=spcopy][data-id=po1]');await p.waitForTimeout(300);
-ok('copy link works',await p.evaluate(()=>window.__clip[0]==='https://massage-staff-bna.pages.dev/?apply=po1'));
+ok('copy: copies the same full announcement and says so',await p.evaluate(t=>window.__clip[0]===t,LT)&&(await p.textContent('body')).includes('คัดลอกข้อความประกาศแล้ว'));
 await p.click('[data-a=spnew]');await p.fill('#sp_t','รับสมัครรอบ 2');await p.fill('#sp_d','รับ 3 คน');await p.fill('#sp_n','3');await p.click('[data-a=spsave]');await p.waitForTimeout(500);
 ok('create posting sent and listed',SPC[0][0]==='save'&&SPC[0][1].p.title==='รับสมัครรอบ 2'&&SPC[0][1].p.id===null&&(await Q()).includes('รับสมัครรอบ 2'));
 await p.click('[data-a=spopen][data-id=po9]');await p.waitForTimeout(500);

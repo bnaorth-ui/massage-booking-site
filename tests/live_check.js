@@ -41,6 +41,8 @@ for(const a of APPS){
  }
  if(a.app==='shop'){let rg=null;try{rg=await ctx.request.get(urlOf(a).replace(/\/?$/,'/')+'reg',{maxRedirects:3})}catch(e){}
   const body=rg?await rg.text():'';ok(L+'ลิงก์ชวนสมัคร /reg เปิดได้และมีการ์ดตัวอย่างลิงก์',!!rg&&rg.status()<400&&body.includes('property="og:title" content="ขอเชิญร้านนวดเข้าร่วมระบบจองนวดออนไลน์"'),rg?'HTTP '+rg.status():'เปิดไม่ได้')}
+ if(a.app==='staff'){let ap=null;try{ap=await ctx.request.get(urlOf(a).replace(/\/?$/,'/')+'apply',{maxRedirects:3})}catch(e){}
+  const body=ap?await ap.text():'';ok(L+'ลิงก์รับสมัคร /apply เปิดได้และมีการ์ดตัวอย่างลิงก์',!!ap&&ap.status()<400&&body.includes('property="og:title" content="รับสมัครหมอนวด สมาคมวิทยากรฝึกอาชีพคนตาบอด"'),ap?'HTTP '+ap.status():'เปิดไม่ได้')}
  if(a.app==='admin')ok(L+'ฐานข้อมูลตอบ admin_exists',sb.admin_exists===200,'admin_exists '+(sb.admin_exists||'ไม่ได้เรียก'));
  const sbBad=Object.entries(sb).filter(([k,s])=>s>=500);
  ok(L+'ฐานข้อมูลไม่ตอบผิดพลาด (5xx)',!sbBad.length,sbBad.map(([k,s])=>k+' '+s).join(', '));
