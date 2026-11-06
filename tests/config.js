@@ -61,4 +61,13 @@ exports.serveDir = () => {
   }
   return d;
 };
-
+// รอจนเงื่อนไขฝั่งข้อสอบ (เช่น ข้อมูลในฐานข้อมูลจำลอง หรือคำขอที่ส่งมา) เป็นจริง ไม่เกิน ms มิลลิวินาที
+// ใช้แทนการเช็กทันทีหลังกดปุ่ม ซึ่งล้มเป็นพักๆ เมื่อเครื่องทำงานหนัก (ผ่านทันทีเมื่อเงื่อนไขเป็นจริง ไม่ช้าลง)
+exports.waitFor = async (fn, ms = 8000) => {
+  const t0 = Date.now();
+  for (;;) {
+    try { if (fn()) return true; } catch (e) {}
+    if (Date.now() - t0 > ms) { try { return !!fn(); } catch (e) { return false; } }
+    await new Promise(r => setTimeout(r, 50));
+  }
+};

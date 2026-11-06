@@ -1,4 +1,4 @@
-const {chromium}=require('playwright');
+const {chromium}=require('playwright');const W=require('./config').waitFor;
 const PNG=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==','base64');
 (async()=>{const b=await chromium.launch(require('./config').launch);
 const ctx=await b.newContext({timezoneId:'Asia/Bangkok',locale:'th-TH'});const errs=[],calls=[],stor=[];
@@ -71,7 +71,7 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
 const p=await ctx.newPage();await p.setViewportSize({width:420,height:900});p.on('pageerror',e=>errs.push(e.message));p.on('dialog',d=>{errs.push('DIALOG '+d.message());d.dismiss()});
 const ok=(nm,c)=>console.log((c?'PASS ':'FAIL ')+nm);
 const txt=async s=>await p.textContent(s||'body');
-const until=async(f,a)=>{try{await p.waitForFunction(f,a,{timeout:4000});return true}catch(e){return false}};
+const until=async(f,a)=>{try{await p.waitForFunction(f,a,{timeout:10000});return true}catch(e){return false}};
 const has=async t=>until(x=>document.body.innerText.includes(x),t);
 const wait=async ms=>p.waitForTimeout(ms);
 await p.goto(require('./config').page('admin-panel.html'));
@@ -81,8 +81,8 @@ await p.fill('#sn','แอดมิน หนึ่ง');await p.fill('#sph','08
 await p.fill('#spw','adminpass1');await p.fill('#spw2','adminpass2');await p.click('button[type=submit]');ok('mismatch blocked',await has('ไม่ตรงกัน'));
 await p.fill('#spw2','adminpass1');await p.click('button[type=submit]');
 ok('first admin created and app opens',await until(()=>document.getElementById('tabs').textContent.includes('หน้าหลัก')));
-ok('claim_first_admin called with bearer',calls.some(c=>c.path.endsWith('claim_first_admin')&&c.auth==='at-u1'));
-ok('admin id stored in admins',T.admins[0]==='u1');
+ok('claim_first_admin called with bearer',await W(()=>calls.some(c=>c.path.endsWith('claim_first_admin')&&c.auth==='at-u1')));
+ok('admin id stored in admins',await W(()=>T.admins[0]==='u1'));
 ok('place tab shows 2 new shops',(await p.textContent('#tabs')).includes('สถานที่และคน')&&(await p.textContent('#tabs')).includes('2'));
 // ---- รีโหลดคงอยู่ + ออกจากระบบ
 await p.reload();ok('session persists',await until(()=>document.getElementById('tabs').textContent.includes('หน้าหลัก')));
@@ -101,7 +101,7 @@ await p.screenshot({path:require('./config').tmp('a0.png')});
 await p.click('#tabs [data-id=pl]');await p.waitForTimeout(400);ok('shops listed (new-registration + all shops)',(await txt('#main')).includes('ร้านสมัครใหม่ (2)')&&(await txt('#main')).includes('ร้านทั้งหมด (2)'));
 ok('temporarily-closed shop counted',(await txt('#main')).includes('ร้านปิดชั่วคราว (1)'));
 ok('registration shows GP acceptance',(await p.textContent('#main')).includes('ยอมรับค่า GP 10%')&&(await p.textContent('#main')).includes('ยังไม่มีบันทึกการยอมรับค่า GP'));await p.click('[data-a=reglic][data-id=r1]');ok('licence loaded via authenticated read',await until(()=>document.querySelector('#lic_r1 img')));
-ok('licence fetched with admin bearer from licenses bucket',calls.some(c=>c.path==='/storage/v1/object/authenticated/licenses/u8/license-x.jpg'&&c.auth==='at-u1'));
+ok('licence fetched with admin bearer from licenses bucket',await W(()=>calls.some(c=>c.path==='/storage/v1/object/authenticated/licenses/u8/license-x.jpg'&&c.auth==='at-u1')));
 await p.fill('#rg_r1','150');await p.click('[data-a=regok][data-id=r1]');ok('GP range validation',await has('0-100'));
 await p.fill('#rg_r1','12');await p.fill('#rc_r1','500');await p.click('[data-a=regok][data-id=r1]');
 ok('approved info message',await has('อนุมัติร้าน ร้านใหม่หนึ่ง แล้ว'));
@@ -125,7 +125,7 @@ ok('balance refreshed to 1,160',(await txt('#lst')).includes('1,160'));
 await p.click('[data-a=tog][data-t=shop][data-id=sh2]');await wait(200);
 ok('reopen clears auto_closed',(x=>x.active===true&&x.auto_closed===false)(T.places.find(x=>x.id==='sh2')));
 await p.click('[data-a=del][data-t=shop][data-id=sh1]');ok('delete asks twice',await has('กดอีกครั้งเพื่อลบ'));await p.click('[data-a=del][data-t=shop][data-id=sh1]');
-ok('delete with refs -> friendly message',await has('ให้ปิดการใช้งานแทนการลบ'));ok('shop still there',T.places.some(x=>x.id==='sh1'));
+ok('delete with refs -> friendly message',await has('ให้ปิดการใช้งานแทนการลบ'));ok('shop still there',await W(()=>T.places.some(x=>x.id==='sh1')));
 // ค้นหา
 await p.fill('#q_shop','0898');ok('search by owner phone',(await txt('#lst')).includes('ร้านปิดอัตโนมัติ')&&!(await txt('#lst')).includes('ร้านสบายดี'));await p.fill('#q_shop','');
 // ---- บริการกลาง
@@ -137,7 +137,7 @@ ok('rest select defaults to none, has 5',(await p.$eval('#sr',e=>e.value))==='0'
 await p.fill('#sn','นวด 15 นาที พัก 5');await p.fill('#sp','150');await p.selectOption('#sm','15');await p.selectOption('#sr','5');await p.click('[data-a=save]');await has('พักต่อ 5 นาที');
 const rv=T.services.find(x=>x.name==='นวด 15 นาที พัก 5');ok('rest_minutes saved with service',rv&&rv.minutes===15&&rv.rest_minutes===5&&rv.place_id===null);ok('list shows rest',(await p.textContent('#main')).includes('15 นาที พัก 5 นาที'));
 await p.click('[data-a=new][data-t=svc]');await p.fill('#sn','บริการฟรี');await p.fill('#sp','0');await p.click('[data-a=save]');await has('บริการฟรี');ok('admin service price 0 saved',(T.services.find(x=>x.name==='บริการฟรี')||{}).price===0);
-await p.click(`[data-a=tog][data-t=svc][data-id=${sv.id}]`);await wait(150);ok('toggle svc',T.services.find(x=>x.id===sv.id).active===false);
+await p.click(`[data-a=tog][data-t=svc][data-id=${sv.id}]`);await wait(150);ok('toggle svc',await W(()=>T.services.find(x=>x.id===sv.id).active===false));
 // ---- พนักงาน
 await p.click('#tabs [data-id=pl]');await p.click('[data-a=tab][data-id=staff]');ok('staff list shows link status',(await txt('#main')).includes('เชื่อมบัญชีแล้ว')&&(await txt('#main')).includes('รอพนักงานสมัครสมาชิก'));
 await p.click('[data-a=new][data-t=staff]');ok('service picker shows rest time',(await p.$$eval('.dchk label',ls=>ls.map(l=>l.textContent))).some(x=>x.includes(', 15 นาที พัก 5 นาที, ')));await p.fill('#fn','คุณใหม่');await p.fill('#fph','0866666666');await p.click('.sv >> nth=0');await p.click('[data-a=save]');ok('duplicate phone blocked client-side',await has('ถูกใช้กับพนักงานคนอื่นแล้ว'));
@@ -148,13 +148,13 @@ await p.click('.card [data-a=stshare]');ok('no link set -> hint',await has('ย�
 ok('list has share btn only for unlinked active',(await p.$$('#lst [data-a=stshare]')).length===T.staff.filter(x=>x.phone&&!x.user_id&&x.active!==false).length||true);
 // ---- หมวดหมู่
 await p.click('#tabs [data-id=sys]');await p.click('[data-a=tab][data-id=cat]');await p.click('[data-a=new][data-t=cat]');await p.click('[data-a=save]');ok('cat name required',await has('กรุณากรอกชื่อหมวดหมู่'));
-await p.fill('#cn','ร้านสปา');await p.selectOption('#ck','shop');await p.click('[data-a=save]');await has('ร้านสปา');ok('cat created',T.categories.some(c=>c.name==='ร้านสปา'&&c.kind==='shop'));
+await p.fill('#cn','ร้านสปา');await p.selectOption('#ck','shop');await p.click('[data-a=save]');await has('ร้านสปา');ok('cat created',await W(()=>T.categories.some(c=>c.name==='ร้านสปา'&&c.kind==='shop')));
 await p.click('[data-a=new][data-t=cat]');await p.fill('#cn','ร้านสปา');await p.selectOption('#ck','shop');await p.click('[data-a=save]');ok('duplicate cat blocked',await has('มีหมวดหมู่ชื่อนี้อยู่แล้ว'));await p.click('[data-a=cancel]');
 // ---- ประกาศ
 await p.click('#tabs [data-id=sys]');await p.click('[data-a=tab][data-id=ann]');await p.click('[data-a=new][data-t=ann]');await p.fill('#at','ปิดปรับปรุง');await p.fill('#ab','คืนนี้');await p.uncheck('.au[value="ผู้ใช้งาน"]');await p.click('[data-a=save]');ok('aud required',await has('เลือกกลุ่มผู้รับ'));
 await p.check('.au[value="ร้านค้า"]');await p.check('.au[value="พนักงาน"]');await p.click('[data-a=save]');await has('ปิดปรับปรุง');
 const an=T.announcements.find(x=>x.title==='ปิดปรับปรุง');ok('announcement saved',an&&an.audiences.join()==='ร้านค้า,พนักงาน'&&/^\d{4}-\d\d-\d\d$/.test(an.day));
-await p.click(`[data-a=tog][data-t=ann][data-id=${an.id}]`);await wait(150);ok('hide announcement',T.announcements.find(x=>x.id===an.id).active===false);
+await p.click(`[data-a=tog][data-t=ann][data-id=${an.id}]`);await wait(150);ok('hide announcement',await W(()=>T.announcements.find(x=>x.id===an.id).active===false));
 // ---- หน่วยงาน
 await p.click('#tabs [data-id=pl]');await p.click('[data-a=tab][data-id=org]');ok('org listed with staff and date',(await txt('#lst')).includes('สำนักงานเขต')&&(await txt('#lst')).includes('คุณกลาง'));
 await p.click('[data-a=new][data-t=org]');await p.fill('#on','หน่วยงานใหม่');await p.click('[data-a=save]');ok('org date required',await has('เลือกวันที่ให้บริการ'));
@@ -176,7 +176,7 @@ await p.click('[data-a=sday][data-d="1"]');await p.click('[data-a=sday][data-d="
 await p.click('[data-a=save]');await has('บริษัทใหม่');await p.waitForTimeout(800);const c2=T.places.find(x=>x.name==='บริษัทใหม่');
 ok('company rpc with weekdays',c2&&c2.type==='company'&&c2.fixed_date===null&&T.place_staff.some(x=>x.place_id===c2.id&&x.weekdays.join()==='1,3'));
 ok('company list shows weekdays',(await txt('#lst')).includes('จ พ'));
-await p.click(`[data-a=tog][data-t=comp][data-id=${c2.id}]`);await wait(150);ok('toggle company',T.places.find(x=>x.id===c2.id).active===false);
+await p.click(`[data-a=tog][data-t=comp][data-id=${c2.id}]`);await wait(150);ok('toggle company',await W(()=>T.places.find(x=>x.id===c2.id).active===false));
 // ---- ผู้ประสานงานบริษัท (ดูรายงานรายเดือน)
 await p.click('#tabs [data-id=pl]');await p.click('[data-a=tab][data-id=comp]');await p.click(`[data-a=edit][data-t=comp][data-id=${c2.id}]`);await p.waitForSelector('#ccph',{timeout:4000});
 ok('contacts box shown when editing saved company',(await txt('#ccbox')).includes('ยังไม่มีผู้ประสานงาน'));
@@ -197,11 +197,11 @@ await p.click('[data-a=slipview][data-id=t1]');ok('slip enlarged',await until(()
 await p.click('[data-a=slipview][data-id=t1]');
 await p.click('[data-a=tab][data-id=ppac]');await p.fill('#ppi','12345');await p.click('[data-a=ppsave]');ok('invalid promptpay blocked',await has('หมายเลขพร้อมเพย์ไม่ถูกต้อง'));
 await p.fill('#ppi','0812345678');await p.fill('#ppn','สมาคมฯ');await p.click('[data-a=ppsave]');await p.screenshot({path:require('./config').tmp('a1.png'),fullPage:true});ok('promptpay saved + QR',await until(()=>document.querySelector('#ppqr canvas,#ppqr img,#ppqr small'))&&T.app_settings[0].promptpay_id==='0812345678');
-ok('settings patched by id=eq.true',calls.some(c=>c.m==='PATCH'&&c.path==='/rest/v1/app_settings'&&c.q.includes('id=eq.true')));
+ok('settings patched by id=eq.true',await W(()=>calls.some(c=>c.m==='PATCH'&&c.path==='/rest/v1/app_settings'&&c.q.includes('id=eq.true'))));
 await p.click('[data-a=tab][data-id=pprq]');await p.click('[data-a=tpok][data-id=t1]');ok('confirm asks twice',await has('กดอีกครั้งเพื่อยืนยันรับเงิน'));
 await p.click('[data-a=tpok][data-id=t1]');for(let i=0;i<30&&T.topup_requests[0].status!=='confirmed';i++)await wait(100);await until(()=>!document.querySelector('[data-a=tpok][data-id=t1]'));
 ok('confirm rpc + status shown',(c=>c&&c.body.p_id==='t1'&&c.body.p_ok===true)(calls.filter(c=>c.path.endsWith('confirm_topup')).pop())&&(await txt('#main')).includes('ยืนยันแล้ว'));
-await p.click('[data-a=tprej][data-id=t2]');await p.click('[data-a=tprej][data-id=t2]');await until(()=>!document.querySelector('[data-a=tprej][data-id=t2]'));ok('reject rpc',T.topup_requests[1].status==='rejected');
+await p.click('[data-a=tprej][data-id=t2]');await p.click('[data-a=tprej][data-id=t2]');await until(()=>!document.querySelector('[data-a=tprej][data-id=t2]'));ok('reject rpc',await W(()=>T.topup_requests[1].status==='rejected'));
 await until(()=>/การเงิน\s*1/.test(document.getElementById('tabs').textContent));ok('badge down to 1',(await p.textContent('#tabs')).match(/การเงิน\s*1/));
 // ---- แจ้งเตือน
 await p.click('[data-a=tab][data-id=nt]');ok('3 unread total in header',(await txt('#main')).includes('3 ใหม่'));
@@ -221,13 +221,13 @@ await p.fill('#d19','150');await p.fill('#d20','60');await p.selectOption('#d8',
 await p.setInputFiles('#aimg',{name:'logo.png',mimeType:'image/png',buffer:PNG});await until(()=>document.querySelector('#imgprev img'));
 await p.check('.rm[value="1440"]');await p.check('.rm[value="15"]');await p.uncheck('.rm[value="60"]');await p.check('.poh[value="2"]');await p.check('.poh[value="3"]');await p.fill('#por','0.5');await p.check('.rm[value="5"]');await p.check('.rm[value="10"]');await p.fill('#mr','6');await p.uncheck('#mon');await p.fill('#ato','10');await p.click('[data-a=setsave]');ok('settings saved banner',await has('บันतึกการตั้งค่าแล้ว'.replace('บันतึก','บันทึก')));ok('multi reminder checkboxes exist',(await p.$$('.rm')).length===9);
 const st=T.app_settings[0];ok('app_settings patched',st.association_name==='สมาคมทดสอบ'&&st.default_minutes===90&&st.shop_radius_km===12&&st.notify_staff===false&&st.notify_user===true&&st.wallet_warn1===150&&st.wallet_warn2===60&&/^place-images\/0{8}-0{4}-0{4}-0{4}-0{12}\/logo-/.test(st.logo_path));
-ok('decimal radius inputs use decimal keypad',await p.$eval('#por',e=>e.inputMode==='decimal'&&e.step==='any')&&await p.$eval('#d9',e=>e.inputMode==='decimal'));ok('radius 0.5 accepted',T.app_settings[0].pre_open_radius_km===0.5);ok('5 and 10 min reminders saved',JSON.stringify(T.app_settings[0].remind_mins)==='[1440,15,10,5]'||JSON.stringify(T.app_settings[0].remind_mins)==='[1440,15,10,5]');ok('accept timeout saved',T.app_settings[0].accept_timeout_min===10);ok('nearby settings saved',JSON.stringify(T.app_settings[0].pre_open_hours)==='[1,2,3]'&&T.app_settings[0].pre_open_radius_km===0.5&&T.app_settings[0].promo_radius_km===6&&T.app_settings[0].promo_alert_on===false&&T.app_settings[0].pre_open_on===true);ok('remind_mins saved as multi',JSON.stringify(T.app_settings[0].remind_mins)==='[1440,15,10,5]');
+ok('decimal radius inputs use decimal keypad',await p.$eval('#por',e=>e.inputMode==='decimal'&&e.step==='any')&&await p.$eval('#d9',e=>e.inputMode==='decimal'));ok('radius 0.5 accepted',await W(()=>T.app_settings[0].pre_open_radius_km===0.5));ok('5 and 10 min reminders saved',JSON.stringify(T.app_settings[0].remind_mins)==='[1440,15,10,5]'||JSON.stringify(T.app_settings[0].remind_mins)==='[1440,15,10,5]');ok('accept timeout saved',await W(()=>T.app_settings[0].accept_timeout_min===10));ok('nearby settings saved',JSON.stringify(T.app_settings[0].pre_open_hours)==='[1,2,3]'&&T.app_settings[0].pre_open_radius_km===0.5&&T.app_settings[0].promo_radius_km===6&&T.app_settings[0].promo_alert_on===false&&T.app_settings[0].pre_open_on===true);ok('remind_mins saved as multi',JSON.stringify(T.app_settings[0].remind_mins)==='[1440,15,10,5]');
 ok('header logo switched to uploaded logo',await p.$eval('#alogo',i=>i.src.includes('/storage/v1/object/public/place-images/')));
 await p.click('[data-a=sub][data-id=a]');ok('admins listed (self marked)',await until(()=>document.body.innerText.includes('แอดมิน หนึ่ง (คุณ)')));
 await p.fill('#adph','0899999999');await p.click('[data-a=addadmin]');ok('add unknown phone message',await has('ไม่พบบัญชีที่ใช้เบอร์นี้'));
 await p.fill('#adph','0833333333');await p.click('[data-a=addadmin]');ok('add admin by phone',await has('เพิ่มแอดมินแล้ว')&&T.admins.includes('u3')&&(await txt('#main')).includes('ลูกค้า'));
 await p.click('[data-a=rmadmin][data-id=u3]');ok('remove asks twice',await has('กดอีกครั้งเพื่อถอดสิทธิ์'));await p.click('[data-a=rmadmin][data-id=u3]');await has('ถอดสิทธิ์แอดมินแล้ว');ok('admin removed',!T.admins.includes('u3'));
-ok('all REST calls carry admin bearer',calls.filter(c=>c.path.startsWith('/rest/v1/')&&!c.path.endsWith('admin_exists')).every(c=>c.auth==='at-u1'||c.auth==='at-u3'));
+ok('all REST calls carry admin bearer',await W(()=>calls.filter(c=>c.path.startsWith('/rest/v1/')&&!c.path.endsWith('admin_exists')).every(c=>c.auth==='at-u1'||c.auth==='at-u3')));
 // ---- เครือข่ายล่ม
 mode.netDown=true;await p.click('#tabs [data-id=sys]');await p.click('[data-a=tab][data-id=svc]');await p.click('[data-a=new][data-t=svc]');await p.fill('#sn','x');await p.fill('#sp','10');await p.click('[data-a=save]');ok('network error shown in form, form kept',await has('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้')&&(await p.inputValue('#sn'))==='x');
 console.log('page errors:',errs.length?errs:'none');

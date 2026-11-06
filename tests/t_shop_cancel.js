@@ -1,4 +1,4 @@
-const {chromium}=require('playwright');
+const {chromium}=require('playwright');const W=require('./config').waitFor;
 const PNG=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==','base64');
 (async()=>{const b=await chromium.launch(require('./config').launch);
 const ctx=await b.newContext({timezoneId:'Asia/Bangkok',locale:'th-TH'});const errs=[],calls=[],stor=[];
@@ -86,7 +86,7 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
  return J(404,{message:'nf'})});
 const p=await ctx.newPage();p.on('pageerror',e=>errs.push(e.message));p.on('dialog',d=>{errs.push('DIALOG '+d.message());d.dismiss()});
 const ok=(nm,c)=>console.log((c?'PASS ':'FAIL ')+nm);
-const until=async(f,a)=>{try{await p.waitForFunction(f,a,{timeout:4000});return true}catch(e){return false}};
+const until=async(f,a)=>{try{await p.waitForFunction(f,a,{timeout:10000});return true}catch(e){return false}};
 await p.goto(require('./config').page('shop-owner.html'));
 await p.evaluate(()=>localStorage.clear());await p.reload();
 await until(()=>document.querySelector('#gph'));await p.fill('#gph','0811111111');await p.fill('#gpw','abc123');await p.click('[data-g=login]');
@@ -124,6 +124,6 @@ await p.click('[data-a=qnsno][data-id=b10]');
 ok('declining restores focus to button',await until(()=>document.activeElement&&document.activeElement.getAttribute('data-a')==='qns'));
 await p.click('[data-a=qns][data-id=b10]');await p.click('[data-a=qnsok][data-id=b10]');
 await until(()=>!document.querySelector('[data-a=qns][data-id=b10]'));
-ok('rpc shop_mark_no_show sent',calls.some(c=>c.path.endsWith('/rpc/shop_mark_no_show')&&c.body.p_ref==='MS10'));
+ok('rpc shop_mark_no_show sent',await W(()=>calls.some(c=>c.path.endsWith('/rpc/shop_mark_no_show')&&c.body.p_ref==='MS10')));
 await p.click('[data-a=qt][data-id=cx]');ok('no-show card in cancelled tab',(await p.textContent('#main')).includes('ลูกค้าJ')&&(await p.textContent('#main')).includes('ลูกค้าไม่มา'));
 console.log('errors:',errs.join('|')||'none');await b.close()})();

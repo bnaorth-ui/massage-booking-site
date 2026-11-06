@@ -1,4 +1,4 @@
-const {chromium}=require('playwright');
+const {chromium}=require('playwright');const W=require('./config').waitFor;
 const PNG=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==','base64');
 (async()=>{const b=await chromium.launch(require('./config').launch);
 const ctx=await b.newContext({timezoneId:'Asia/Bangkok',locale:'th-TH'});const errs=[],calls=[],stor=[];
@@ -70,9 +70,9 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
 const p=await ctx.newPage();p.on('pageerror',e=>errs.push(e.message));p.on('dialog',d=>{errs.push('DIALOG '+d.message());d.dismiss()});
 const ok=(nm,c)=>console.log((c?'PASS ':'FAIL ')+nm);
 const txt=async s=>await p.textContent(s||'body');
-const sub=async id=>{if(!(await p.$('[role=tab][data-id='+id+']')))await p.click('#tabs [data-id=mg]');await p.click('[role=tab][data-id='+id+']')};
+const sub=async id=>{const sel='[role=tab][data-id='+id+']';for(let i=0;i<3&&!(await p.$(sel));i++){await p.click('#tabs [data-id=mg]');await p.waitForSelector(sel,{timeout:4000}).catch(()=>{})}await p.click(sel)};
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-const until=async(f,a)=>{try{await p.waitForFunction(f,a,{timeout:4000});return true}catch(e){return false}};
+const until=async(f,a)=>{try{await p.waitForFunction(f,a,{timeout:10000});return true}catch(e){return false}};
 const has=async t=>until(x=>document.body.innerText.includes(x),t);
 const URLF=require('./config').page('shop-owner.html');
 const STUB=`(function(){var W=window;function LL(a,b){return{lat:a,lng:b}}
@@ -99,7 +99,7 @@ await p.fill('#gph','123');await p.click('[data-g=login]');ok('bad phone validat
 // ---- ลงทะเบียนร้านใหม่
 await p.click('[data-g=reg]');await until(()=>document.querySelector('#rc option'));
 ok('categories loaded anon',(await p.$$eval('#rc option',o=>o.map(x=>x.textContent))).join()==='ร้านนวดแผนไทย,สปา');
-ok('category fetch without bearer',calls.find(c=>c.path.endsWith('/categories')).auth==='');
+ok('category fetch without bearer',await W(()=>calls.find(c=>c.path.endsWith('/categories')).auth===''));
 await p.fill('#rn','ร้านใหม่ทดสอบ');await p.fill('#rph','0833333333');await p.fill('#rpw','secret1');await p.fill('#rpw2','secret1');
 await p.check('#rpv');await p.check('#rgp');await p.click('[data-g=regsend]');ok('licence required',await has('กรุณาแนบรูปใบอนุญาต'));
 await p.fill('#rn','ร้านใหม่ทดสอบ');await p.fill('#rph','0833333333');await p.fill('#rpw','secret1');await p.fill('#rpw2','secret2');
@@ -127,7 +127,7 @@ ok('owner enters app',await until(()=>!document.getElementById('main').hidden&&d
 ok('gate hidden',await p.$eval('#gate',e=>e.hidden));
 await sub('svc');await sleep(300);
 ok('services listed',(await txt('#main')).includes('นวดไทย')&&(await txt('#main')).includes('400 บาท'));
-ok('REST carries owner bearer',calls.filter(c=>c.path.startsWith('/rest/v1/services')).slice(-1).every(c=>c.auth==='at-u1'));
+ok('REST carries owner bearer',await W(()=>calls.filter(c=>c.path.startsWith('/rest/v1/services')).slice(-1).every(c=>c.auth==='at-u1')));
 // เพิ่มบริการ
 await p.click('[data-a=new][data-t=svc]');await p.fill('#sn','นวดน้ำมัน');await p.fill('#sp','750');await p.selectOption('#sm','90');await p.fill('#sd','อโรมา');
 await p.setInputFiles('#simg',{name:'a.png',mimeType:'image/png',buffer:PNG});await until(()=>document.querySelector('#imgprev img'));
@@ -141,10 +141,10 @@ await p.click('[data-a=save]').catch(()=>{});
 await p.click('[data-a=new][data-t=svc]');await p.click('[data-a=save]');ok('name validation',await has('กรุณากรอกชื่อบริการ'));await p.fill('#sn','x');await p.click('[data-a=save]');ok('price validation',await has('ราคาต้องมากกว่า 0'));await p.click('[data-a=cancel]');
 // แก้ไข
 await p.click('[data-a=edit][data-id=v1]');await p.fill('#sp','450');await p.click('[data-a=save]');await until(()=>document.body.innerText.includes('450 บาท'));
-ok('edit service price',T.services.find(s=>s.id==='v1').price===450);
+ok('edit service price',await W(()=>T.services.find(s=>s.id==='v1').price===450));
 // สลับเปิด/ปิด
 await p.click('[data-a=tog][data-t=svc][data-id=v1]');await until(()=>document.body.innerText.includes('ปิดชั่วคราว'));
-ok('toggle service off',T.services.find(s=>s.id==='v1').active===false);
+ok('toggle service off',await W(()=>T.services.find(s=>s.id==='v1').active===false));
 // ลบ (ต้องกดสองครั้ง)
 await p.click('[data-a=del][data-t=svc][data-id=v1]');ok('delete asks twice',await has('กดอีกครั้งเพื่อลบ'));await p.click('[data-a=del][data-t=svc][data-id=v1]');
 await until(()=>!document.body.innerText.includes('กดอีกครั้ง'));
@@ -162,7 +162,7 @@ ok('duplicate phone message from server',await has('เบอร์มือถ�
 await p.fill('#fph','12');await p.click('[data-a=save]');ok('phone format validation',await has('เบอร์มือถือต้องเป็นตัวเลข 10 หลัก'));
 await p.fill('#fph','0877777777');await p.click('[data-a=save]');ok('staff saved',await has('รอพนักงานสมัครสมาชิกด้วยเบอร์นี้'));
 const ns=T.staff.find(s=>s.name==='คุณใหม่');ok('staff rpc body',ns&&ns.phone==='0877777777'&&T.staff_services.some(q=>q.staff_id===ns.id)&&calls.find(c=>c.path.endsWith('shop_save_staff')).body.p_place==='sh1');
-await p.click(`[data-a=tog][data-t=staff][data-id=${ns.id}]`);await until(()=>document.body.innerText.includes('ระงับ'));ok('staff suspended',T.staff.find(s=>s.id===ns.id).active===false);
+await p.click(`[data-a=tog][data-t=staff][data-id=${ns.id}]`);await until(()=>document.body.innerText.includes('ระงับ'));ok('staff suspended',await W(()=>T.staff.find(s=>s.id===ns.id).active===false));
 // ---- โปรโมชั่น
 await sub('promo');ok('promo listed',(await txt('#main')).includes('ลดนวดเท้า')&&(await txt('#main')).includes('ลด 10%'));
 await p.click('[data-a=new][data-t=promo]');await p.fill('#mt','ลด 50 บาท');await p.selectOption('#mty','baht');await p.fill('#mv','50');await p.fill('#ms1','2026-10-20');await p.fill('#me1','2026-10-10');
@@ -170,7 +170,7 @@ await p.click('[data-a=save]');ok('promo date validation',await has('วัน�
 await p.fill('#me1','2026-11-20');await p.click('[data-a=save]');await has('ลด 50 บาท');
 const np=T.promotions.find(x=>x.title==='ลด 50 บาท');ok('promo saved as amount',np&&np.type==='amount'&&np.value===50&&np.applies_all===true);
 ok('promo shows baht discount',(await txt('#main')).includes('ลด 50 บาท'));
-await p.click(`[data-a=tog][data-t=promo][data-id=${np.id}]`);await until(()=>true);await p.waitForTimeout(150);ok('promo toggled off',T.promotions.find(x=>x.id===np.id).active===false);
+await p.click(`[data-a=tog][data-t=promo][data-id=${np.id}]`);await until(()=>true);await p.waitForTimeout(150);ok('promo toggled off',await W(()=>T.promotions.find(x=>x.id===np.id).active===false));
 await p.click(`[data-a=del][data-t=promo][data-id=${np.id}]`);await p.click(`[data-a=del][data-t=promo][data-id=${np.id}]`);await p.waitForTimeout(200);ok('promo deleted',!T.promotions.some(x=>x.id===np.id));
 // ---- กระเป๋าเงิน
 await p.click('[data-a=tab][data-id=wal]');await has('960');
@@ -190,7 +190,7 @@ ok('slip stored in slips bucket under place',stor.some(s=>new RegExp('^slips/sh1
 ok('slip preview loaded via authenticated read',await until(()=>document.querySelector('#slipcur img')));
 await p.click('[role=tab][data-a=wt][data-id=his]');ok('topup in history waiting',(await txt('#main')).includes('รอยืนยัน')&&(await txt('#main')).includes('แนบสลิปแล้ว'));
 await p.click('[role=tab][data-a=wt][data-id=bal]');
-await p.click('[data-a=tpcancel]');await has('ยกเลิก');ok('topup cancelled',T.topup_requests[0].status==='cancelled');
+await p.click('[data-a=tpcancel]');await has('ยกเลิกคำขอเติมเงินแล้ว');ok('topup cancelled',await W(()=>T.topup_requests[0].status==='cancelled'));
 // admin confirms another topup -> server side adds wallet row; client sees after refresh
 T.wallet_tx.push({id:'w9',place_id:'sh1',type:'topup',amount:500,note:'เติมเงินผ่านพร้อมเพย์ (อ้างอิง TPX)',ref:'TPX',status:'success',created_at:now()});
 await sub('svc');await p.click('[data-a=tab][data-id=wal]');ok('refresh picks up admin-confirmed topup',await has('1,460 บาท'));
