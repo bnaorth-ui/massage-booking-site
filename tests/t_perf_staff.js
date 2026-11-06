@@ -1,4 +1,4 @@
-const {chromium}=require('playwright');
+const {chromium}=require('playwright');require('./config').pinClock({ctx:false});
 const PNG=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==','base64');
 (async()=>{const b=await chromium.launch(require('./config').launch);
 const sleep0=ms=>new Promise(r=>setTimeout(r,ms));const ctx=await b.newContext({timezoneId:'Asia/Bangkok',locale:'th-TH'});const errs=[],calls=[],stor=[];
@@ -44,7 +44,7 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
  return J(404,{message:'nf '+path})});
 const p=await ctx.newPage();await p.setViewportSize({width:420,height:900});p.on('pageerror',e=>errs.push(e.message));p.on('dialog',d=>{errs.push('DIALOG '+d.message());d.dismiss()});
 const ok=(nm,c)=>console.log((c?'PASS ':'FAIL ')+nm);const txt=async s=>await p.textContent(s||'body');const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-await p.clock.install();await p.goto(require('./config').page('staff-app.html'));await sleep(300);
+await p.clock.install({time:Date.now()});await p.goto(require('./config').page('staff-app.html'));await sleep(300);
 ok('login gate shown',(await txt()).includes('เข้าสู่ระบบพนักงาน'));
 ok('nav hidden at gate',await p.$eval('#navb',e=>getComputedStyle(e).display)==='none');
 // bad password
