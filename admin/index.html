@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>แอดมิน - สมาคมวิทยากรฝึกอาชีพคนตาบอด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.8"><meta name="app-name" content="ระบบจองนวด สำหรับแอดมิน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.9"><meta name="app-name" content="ระบบจองนวด สำหรับแอดมิน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -425,12 +425,12 @@ function sdrCard(){if(D.sdrOff||!(D.sdr||[]).length)return"";
   (r.open_jobs>0?'<p style="color:var(--bad);margin:6px 0">ยังมีคิวที่ยังไม่เสร็จ '+r.open_jobs+' คิว อนุมัติไม่ได้จนกว่าจะเสร็จหรือยกเลิก</p>':'')+
   (S.sdn===r.id?'<div style="margin-top:8px"><label for="sdn_'+r.id+'" style="font-size:.9rem;color:var(--mute)">เหตุผลที่ไม่อนุมัติ (พนักงานจะเห็นข้อความนี้)</label><input class="in" id="sdn_'+r.id+'" maxlength="200"></div>':'')+
   '<div class="acts"><button class="btn d" data-a="sdrok" data-id="'+r.id+'"'+(r.open_jobs>0?" disabled":"")+'>'+(S.sdc===r.id?"กดอีกครั้งเพื่อยืนยันลบ":"อนุมัติ (ลบบัญชี)")+'</button><button class="btn g" data-a="sdrno" data-id="'+r.id+'">'+(S.sdn===r.id?"บันทึกการไม่อนุมัติ":"ไม่อนุมัติ")+'</button>'+(S.sdc===r.id||S.sdn===r.id?'<button class="btn g" data-a="sdrx">ยกเลิก</button>':'')+'</div></div>'}).join("")+'</div>'}
-function shInvLink(){var b=(D.set&&D.set.reg)||"";if(!b)return"";return b+(b.indexOf("?")>-1?"&":"?")+"reg=1&openExternalBrowser=1"}
-function shInvMsg(){var st=D.set||{},a=st.assoc||"สมาคมวิทยากรฝึกอาชีพคนตาบอด";
- return a+" ขอเชิญร้านนวดเข้าร่วมระบบจองนวดออนไลน์\nลูกค้าที่อยู่ใกล้ร้านค้นหาร้าน เลือกบริการ เลือกหมอนวด และจองคิวล่วงหน้าได้เอง ร้านได้รับแจ้งเตือนทุกการจองผ่านแอป\nคุณสมบัติ: เป็นร้านนวดที่ได้รับอนุญาตจัดตั้งสถานประกอบการเพื่อสุขภาพ (แนบรูปใบอนุญาตตอนลงทะเบียน)\nค่าบริการระบบ (GP) 10% ของราคาหลังหักโปรโมชัน หักจากกระเป๋าเงินของร้านเมื่อหมอนวดกดเสร็จสิ้นงาน\nลงทะเบียนที่นี่: "+shInvLink()+(st.phone?"\nสอบถาม: "+st.phone:"")}
+function invText(a,ph,gp,link){return (a||"สมาคมวิทยากรฝึกอาชีพคนตาบอด")+" ขอเชิญร้านนวดเข้าร่วมระบบจองนวดออนไลน์\nลูกค้าที่อยู่ใกล้ร้านค้นหาร้าน เลือกบริการ เลือกหมอนวด และจองคิวล่วงหน้าได้เอง ร้านได้รับแจ้งเตือนทุกการจองผ่านแอป\nคุณสมบัติ: เป็นร้านนวดที่ได้รับอนุญาตจัดตั้งสถานประกอบการเพื่อสุขภาพ (แนบรูปใบอนุญาตตอนลงทะเบียน)\nค่าบริการระบบ (GP) "+gp+"% ของราคาหลังหักโปรโมชัน หักจากกระเป๋าเงินของร้านเมื่อหมอนวดกดเสร็จสิ้นงาน\nลงทะเบียนที่นี่\n"+link+(ph?"\nสอบถาม: "+ph:"")}
+function shInvLink(){var b=String((D.set&&D.set.reg)||"").trim().split("#")[0].split("?")[0];if(!b)return"";return b.replace(/\/+$/,"")+"/reg"}
+function shInvMsg(){var st=D.set||{};return invText(st.assoc,st.phone,10,shInvLink())}
 function shInvCard(){var m=S.shmsg?'<div class="'+(S.shok?"saved":"closed")+'" role="status">'+esc(S.shmsg)+'</div>':'';
  if(!shInvLink())return m+'<div class="card"><b>ชวนร้านนวดมาสมัคร</b><p class="hint2" style="margin:4px 0 0">ยังไม่ได้ตั้งลิงก์ลงทะเบียนร้านนวด ตั้งได้ที่เมนู จัดการระบบ > การตั้งค่า > ลิงก์ลงทะเบียนร้านนวด</p></div>';
- return m+'<div class="card"><b>ชวนร้านนวดมาสมัคร</b><p class="hint2" style="margin:4px 0 8px">ส่งข้อความนี้ทาง LINE, Facebook หรือ SMS ร้านที่กดลิงก์จะเข้าฟอร์มลงทะเบียนทันที แล้วคำขอจะมารอที่แถบนี้</p>'
+ return m+'<div class="card"><b>ชวนร้านนวดมาสมัคร</b><p class="hint2" style="margin:4px 0 8px">ส่งข้อความนี้ทาง LINE, Facebook หรือ SMS ร้านที่กดลิงก์จะเข้าฟอร์มลงทะเบียนทันที (ถ้าเปิดจาก LINE จะเด้งไปเบราว์เซอร์ของเครื่อง) แล้วคำขอจะมารอที่แถบนี้ ลิงก์แสดงเป็นการ์ดตัวอย่างใน LINE และ Facebook ได้ แม้แชร์ต่อไปแค่ลิงก์</p>'
  +'<div class="hint2" id="shinvtxt" style="white-space:pre-line;margin:0 0 10px;padding:10px;border:1px solid var(--line);border-radius:10px">'+esc(shInvMsg())+'</div>'
  +'<div class="acts">'+(navigator.share?'<button type="button" class="btn" data-a="shinv" data-id="share">แชร์ผ่านมือถือ</button>':'')+'<button type="button" class="btn g" data-a="shinv" data-id="copy">คัดลอกข้อความ</button></div></div>'}
 function shInvShare(copyOnly){if(!shInvLink()){S.shmsg="ยังไม่ได้ตั้งลิงก์ลงทะเบียนร้านนวด ตั้งได้ที่เมนู จัดการระบบ > การตั้งค่า";S.shok=false;draw();return}

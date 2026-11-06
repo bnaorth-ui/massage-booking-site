@@ -121,7 +121,7 @@ if(process.env.NOREG){
  const msg=await p.textContent('#shinvtxt');
  ok('message: association name + invitation',msg.startsWith('สมาคมวิทยากรฝึกอาชีพคนตาบอด ขอเชิญร้านนวดเข้าร่วมระบบจองนวดออนไลน์'));
  ok('message: licence requirement and GP 10%',msg.includes('ได้รับอนุญาตจัดตั้งสถานประกอบการเพื่อสุขภาพ')&&msg.includes('(GP) 10% ของราคาหลังหักโปรโมชัน'));
- ok('message: link opens the form directly (reg=1) in an external browser',msg.includes('ลงทะเบียนที่นี่: https://shop.example/?reg=1&openExternalBrowser=1'));
+ ok('message: short link /reg alone on its own line (no ? & =)',msg.includes('\nลงทะเบียนที่นี่\nhttps://shop.example/reg\n')&&!/reg=1|openExternalBrowser|[?&]/.test(msg.split('ลงทะเบียนที่นี่')[1].split('\n')[1]));
  ok('message: association phone',msg.includes('สอบถาม: 021234567'));
  ok('message: no middle dot separator, no emoji',!/[·\u{1F300}-\u{1FAFF}]/u.test(msg));
  await p.evaluate(()=>{window.__cp=null;Object.defineProperty(navigator,'clipboard',{value:{writeText:t=>{window.__cp=t;return Promise.resolve()}},configurable:true})});
@@ -130,7 +130,7 @@ if(process.env.NOREG){
  ok('copy: status shown',(await p.textContent('#main')).includes('คัดลอกข้อความชวนร้านนวดแล้ว'));
  const shareBtn=await p.$('[data-a=shinv][data-id=share]');
  if(shareBtn){await p.evaluate(()=>{window.__sh=null;navigator.share=o=>{window.__sh=o;return Promise.resolve()}});await shareBtn.click();await p.waitForTimeout(250);
-  const sh=await p.evaluate(()=>window.__sh);ok('share: native share with title and full text',!!sh&&sh.title==='ชวนร้านนวดเข้าร่วมระบบจองนวด'&&sh.text.includes('reg=1'))}
+  const sh=await p.evaluate(()=>window.__sh);ok('share: native share with title and full text',!!sh&&sh.title==='ชวนร้านนวดเข้าร่วมระบบจองนวด'&&sh.text.includes('https://shop.example/reg'))}
  else ok('share button only when the device can share',!(await p.evaluate(()=>!!navigator.share)));
  await p.click('[data-a=ss][data-id=all]');await p.waitForTimeout(200);
  ok('other shop tabs: no invite card, status cleared',!(await p.$('#shinvtxt'))&&!(await p.textContent('#main')).includes('คัดลอกข้อความชวนร้านนวดแล้ว'));

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ขอเชิญร้านนวดเข้าร่วมระบบจองนวดออนไลน์</title>
+<!-- ลิงก์ชวนร้านนวดมาสมัคร (สั้น ไม่มี ? & = จึงไม่ขาดเวลาคัดลอกต่อ)
+     1) ข้อมูลตัวอย่างลิงก์ (og:*) ให้ LINE/Facebook แสดงเป็นการ์ด แม้แชร์ไปแค่ลิงก์
+     2) เปิดใน LINE: เติม openExternalBrowser=1 ให้ LINE เด้งไปเบราว์เซอร์ของเครื่อง
+     3) แล้วไปหน้าแอปร้านนวด /?reg=1 ซึ่งเปิดฟอร์มลงทะเบียนทันที
+     ถ้าย้ายเว็บไปโดเมนใหม่ ให้แก้ og:url และ og:image ให้เป็นโดเมนใหม่ด้วย -->
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="สมาคมวิทยากรฝึกอาชีพคนตาบอด ขอเชิญร้านนวดที่ได้รับอนุญาตจัดตั้งสถานประกอบการเพื่อสุขภาพ เข้าร่วมระบบจองนวดออนไลน์ ลูกค้าใกล้ร้านค้นหาและจองคิวได้ทางมือถือ ค่าบริการระบบ (GP) 10%">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ระบบจองนวด สมาคมวิทยากรฝึกอาชีพคนตาบอด">
+<meta property="og:title" content="ขอเชิญร้านนวดเข้าร่วมระบบจองนวดออนไลน์">
+<meta property="og:description" content="สมาคมวิทยากรฝึกอาชีพคนตาบอด ขอเชิญร้านนวดที่ได้รับอนุญาตจัดตั้งสถานประกอบการเพื่อสุขภาพ เข้าร่วมระบบจองนวดออนไลน์ ลูกค้าใกล้ร้านค้นหาและจองคิวได้ทางมือถือ ค่าบริการระบบ (GP) 10% กดเพื่อลงทะเบียน">
+<meta property="og:url" content="https://massage-shop-bna.pages.dev/reg">
+<meta property="og:image" content="https://massage-shop-bna.pages.dev/icon-logo-512.png">
+<meta property="og:image:width" content="512">
+<meta property="og:image:height" content="512">
+<meta property="og:locale" content="th_TH">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="../icon-192.png">
+<style>
+:root{--bg:#f6faf8;--ink:#14302a;--mute:#4d635c;--brand:#0f6e56}
+@media (prefers-color-scheme:dark){:root{--bg:#10201b;--ink:#e6f2ee;--mute:#a9c2ba;--brand:#5fd1a8}}
+body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.6 system-ui,-apple-system,"Sarabun",sans-serif}
+main{max-width:520px;margin:0 auto;padding:32px 16px;text-align:center}
+img{width:96px;height:96px}
+a{display:inline-block;margin-top:16px;padding:12px 22px;border-radius:12px;background:var(--brand);color:#fff;text-decoration:none;font-weight:600}
+p{color:var(--mute)}
+</style>
+<script>
+(function(){
+ var ua=navigator.userAgent||"",q=location.search||"";
+ /* เปิดอยู่ในแอป LINE: ขอให้ LINE เปิดในเบราว์เซอร์ของเครื่อง (ทำครั้งเดียว ถ้า LINE ไม่เด้ง ฟอร์มจะมีปุ่มให้กดเอง) */
+ if(/Line\//i.test(ua)&&!/[?&]openExternalBrowser=1/.test(q)){location.replace(location.pathname+(q?q+"&":"?")+"openExternalBrowser=1");return}
+ location.replace("/?reg=1");
+})();
+</script>
+</head>
+<body>
+<main>
+<img src="../icon-logo-192.png" alt="">
+<h1>ขอเชิญร้านนวดเข้าร่วมระบบจองนวดออนไลน์</h1>
+<p>กำลังเปิดหน้าลงทะเบียนร้านนวด</p>
+<a href="/?reg=1">ไปหน้าลงทะเบียน</a>
+</main>
+</body>
+</html>
