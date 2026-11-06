@@ -82,11 +82,12 @@ await p.fill('#lph','0844444444');await p.fill('#lpw','staffpass1');await p.clic
 let t=await T0(p);
 ok('queue page has no leave card',!t.includes('แจ้งลางาน')&&!(await p.$('#lvd')));
 await p.click('[data-a=tab][data-id=ac]');await sleep(500);t=await T0(p);
+ok('staff account: version line is last, matches meta app-version',await p.evaluate(()=>{const v=document.getElementById('appver'),m=document.querySelector('meta[name="app-version"]').content;return !!v&&v.textContent==='เวอร์ชันแอป '+m&&!v.nextElementSibling&&v.parentElement.id==='app'}));
 ok('account tab: leave is a button, form not on the page',(await p.textContent('[data-a=lvopen]')).trim()==='แจ้งลางาน'&&!(await p.$('#lvd')));
 await p.click('[data-a=lvopen]');await sleep(300);t=await T0(p);
 ok('leave page opens with its own heading, focus on heading',t.includes('ยังไม่มีการแจ้งลา')&&!!(await p.$('#lvd'))&&!!(await p.$('#lvr'))&&await p.evaluate(()=>document.activeElement&&document.activeElement.id==='lvt'&&document.activeElement.tagName==='H1'&&document.activeElement.textContent==='แจ้งลางาน'));
 ok('leave page: heading not repeated, back button first',(await p.$$eval('#app h1,#app h2',e=>e.filter(x=>x.textContent.trim()==='แจ้งลางาน').length))===1&&(await p.textContent('[data-a=lvno]')).includes('กลับ'));
-ok('leave page: other account sections hidden',!(await p.$('[data-a=pv]'))&&!(await p.$('[data-a=lvopen]')));
+ok('leave page: other account sections hidden',!(await p.$('[data-a=pv]'))&&!(await p.$('[data-a=lvopen]'))&&!(await p.$('#appver')));
 ok('date input bounded to 60 days',(await p.getAttribute('#lvd','max'))===addD(todayS,60)&&(await p.getAttribute('#lvd','min'))===todayS);
 await p.click('[data-a=lvadd]');await sleep(300);t=await T0(p);
 ok('requires date',t.includes('กรุณาเลือกวันที่ลา')&&lvCalls.length===0);

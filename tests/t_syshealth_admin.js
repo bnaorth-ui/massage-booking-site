@@ -112,6 +112,7 @@ let t=await p.evaluate(()=>document.body.innerText);
 const subs=await p.$$eval('#main .subtabs [data-id]',e=>e.map(x=>x.textContent.trim()));
 ok('sys has tab สถานะระบบ, then ข้อผิดพลาดหน้าเว็บ, then ประวัติการทำงาน',subs[subs.length-1]==='ประวัติการทำงาน'&&subs[subs.length-2].startsWith('ข้อผิดพลาดหน้าเว็บ')&&subs[subs.length-3].startsWith('สถานะระบบ'));
 await p.click('#main .subtabs [data-id=hl]');await p.waitForTimeout(600);
+ok('admin status: version line is last, matches meta app-version',await p.evaluate(()=>{const v=document.getElementById('appver'),m=document.querySelector('meta[name="app-version"]').content;return !!v&&v.textContent==='เวอร์ชันแอป '+m&&!v.nextElementSibling&&v.parentElement.id==='main'}));
 t=await p.evaluate(()=>document.body.innerText);
 ok('loads via rpc once',hlCalls.length===1);
 ok('healthy banner',t.includes('ปกติ')&&t.includes('ไม่พบเรื่องค้าง')&&t.includes('ไม่มี'));

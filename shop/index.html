@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>สำหรับร้านนวด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.6"><meta name="app-name" content="ระบบจองนวด สำหรับร้านค้า"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.7"><meta name="app-name" content="ระบบจองนวด สำหรับร้านค้า"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -728,13 +728,14 @@ function clsCard(){var s=D.shop,c=D.cls,h='<div class="card form"><b>ปิด�
   (bl.length?'<p style="color:var(--bad);margin:0 0 8px">ขอปิดบัญชีไม่ได้ในตอนนี้: '+bl.map(esc).join(", ")+'</p>':'')+
   '<div><label for="clr">เหตุผล (ไม่บังคับ)</label><input class="in" id="clr" maxlength="200"></div>'+
   '<button type="button" class="btn d" id="clsask" data-a="clsask"'+(bl.length?" disabled":"")+'>ขอปิดบัญชีร้าน</button></div>'}
+function verTxt(){var m=document.querySelector('meta[name="app-version"]'),v=m&&m.getAttribute("content");return v?'<p id="appver" style="text-align:center;margin:22px 0 6px;color:var(--mute);font-size:.92rem">เวอร์ชันแอป '+esc(v)+'</p>':''}
 function setView(){var s=D.shop,o=s.ov||{};
  return '<div class="head"><h1>ตั้งค่าร้าน</h1></div>'+(S.saved?'<div class="saved" role="status">บันทึกการตั้งค่าแล้ว</div>':'')+
  '<div class="card form"><b>ข้อมูลร้าน</b><div><label for="s1">ชื่อร้าน</label><input class="in" id="s1" value="'+esc(s.name)+'"></div><div><label for="s2">คำอธิบายร้าน (ไม่บังคับ)</label><input class="in" id="s2" value="'+esc(s.desc||"")+'"></div><div><label for="s5">พื้นที่/ที่ตั้ง (เช่น เขต อำเภอ)</label><input class="in" id="s5" value="'+esc(s.area||"")+'"></div><div><label for="pimg">รูปโปรไฟล์ร้าน</label><div class="pimgrow"><span id="imgprev">'+avatar(56)+'</span><input class="in" type="file" id="pimg" accept="image/*"></div><p class="hint2" style="margin:6px 0 0">ระบบครอปเป็นรูปสี่เหลี่ยมจัตุรัสและย่อขนาดให้อัตโนมัติ รูปจะเปลี่ยนทันทีที่เลือก</p><div id="imgerr" style="color:var(--bad)"></div></div></div>'+
  '<div class="card form"><b>เวลาทำการ</b><div><label>วันที่เปิดให้บริการ</label><div class="dchk">'+DAYN.map(function(n,i){return '<label><input type="checkbox" class="fd" value="'+i+'"'+(s.days.indexOf(i)>-1?" checked":"")+'> '+n+'</label>'}).join("")+'</div></div><div class="two"><div><label for="s3">เวลาเปิด</label><select class="in" id="s3">'+hsel(s.open)+'</select></div><div><label for="s4">เวลาปิด</label><select class="in" id="s4">'+hsel(s.close)+'</select></div></div></div>'+
  loginCard()+pwCard()+pinHtml(s)+
  '<div class="card form"><b>กฎการจองของร้าน</b><p class="hint2" style="margin:0">เว้นว่าง = ใช้ค่าเริ่มต้นของสมาคม (ตัวเลขจางๆ คือค่าเริ่มต้น)</p><div class="two">'+num("r2","จองล่วงหน้า (วัน)",o.adv,DEF.adv)+num("r3","ยกเลิกก่อนนัด (ชม.)",o.cancelH,DEF.cancelH)+'</div></div>'+
- '<div id="err" style="color:var(--bad);margin-bottom:10px"></div><button class="btn w" data-a="setsave">บันทึกการตั้งค่า</button><div style="margin-top:18px"><button class="btn g" data-a="logout">ออกจากระบบ</button></div>'}
+ '<div id="err" style="color:var(--bad);margin-bottom:10px"></div><button class="btn w" data-a="setsave">บันทึกการตั้งค่า</button><div style="margin-top:18px"><button class="btn g" data-a="logout">ออกจากระบบ</button></div>'+verTxt()}
 /* ===================== ข้อมูลร้าน (โหลดจาก Supabase) ===================== */
 var D=null,WID=null,CFG={pp:{on:false,none:true},w1:100,w2:50},CT={},started=false;
 var DEF={adv:14,cancelH:24};

@@ -129,6 +129,7 @@ ok('no leftover role=status banner after action',(await noRoleBanner())===0);
 // settings save
 await p.click('[role=tab][data-id=set]').catch(()=>{});await sleep(300);
 const sv=await p.$('[data-a=setsave]')||await p.$('[data-a=saveset]');
+ok('shop settings: version line is last, matches meta app-version',await p.evaluate(()=>{const v=document.getElementById('appver'),m=document.querySelector('meta[name="app-version"]').content;return !!v&&v.textContent==='เวอร์ชันแอป '+m&&!v.nextElementSibling&&v.parentElement.id==='main'}));
 if(sv){await sv.click();await sleep(900);ok('settings: SR announces',(await SR()).includes('บันทึกการตั้งค่าแล้ว'))}
 // ข้อความในกล่อง VoiceOver ต้องไม่ค้าง: หายเองหลังราว 6 วินาที และหายทันทีเมื่อเปลี่ยนเมนู
 await p.waitForTimeout(6600);

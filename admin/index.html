@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>แอดมิน - สมาคมวิทยากรฝึกอาชีพคนตาบอด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.6"><meta name="app-name" content="ระบบจองนวด สำหรับแอดมิน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.7"><meta name="app-name" content="ระบบจองนวด สำหรับแอดมิน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -578,7 +578,8 @@ function hlBody(){var d=HL.d,h="";
  h+=jobs.map(function(j){var nm=HLJ[j.name]||j.name,lt=hlLate(j,d.now),f=+j.failed_7d||0,st=!j.active?"ปิดอยู่":!j.last_run?"รอรอบแรก":f>0?"ล้มเหลว "+f+" ครั้งใน 7 วัน":lt?"ไม่รันตามกำหนด":"ปกติ";
   return'<div class="card hlc"><b>'+esc(nm)+'</b> <span class="'+(f>0||lt?"closed":"saved")+'" style="padding:2px 8px;border-radius:99px;font-size:.85rem">'+esc(st)+'</span><small>รัน'+esc(hlSch(j.schedule))+'</small><small>ครั้งล่าสุด '+esc(hlT(j.last_run))+'</small>'+(f>0&&j.last_fail_msg?'<small>ข้อความล่าสุด: '+esc(j.last_fail_msg)+'</small>':'')+'</div>'}).join("");
  return h}
-function hlView(){return'<div class="head"><h1>สถานะระบบ</h1><button type="button" class="btn g" id="hlbtn" data-a="hlre"'+(HL.busy?' aria-busy="true"':'')+'>'+(HL.busy?"กำลังตรวจ…":"ตรวจใหม่")+'</button></div><p class="hint2">ระบบตรวจตัวเองทุกวันเวลา 04:00 น. และแจ้งเตือนถึงแอดมินเมื่อพบเรื่องค้าง หน้านี้แสดงผลตรวจ ณ ตอนนี้และสถานะงานตั้งเวลา</p><div id="hlbody">'+hlBody()+'</div>'}
+function verTxt(){var m=document.querySelector('meta[name="app-version"]'),v=m&&m.getAttribute("content");return v?'<p id="appver" style="text-align:center;margin:22px 0 6px;color:var(--mute);font-size:.92rem">เวอร์ชันแอป '+esc(v)+'</p>':''}
+function hlView(){return'<div class="head"><h1>สถานะระบบ</h1><button type="button" class="btn g" id="hlbtn" data-a="hlre"'+(HL.busy?' aria-busy="true"':'')+'>'+(HL.busy?"กำลังตรวจ…":"ตรวจใหม่")+'</button></div><p class="hint2">ระบบตรวจตัวเองทุกวันเวลา 04:00 น. และแจ้งเตือนถึงแอดมินเมื่อพบเรื่องค้าง หน้านี้แสดงผลตรวจ ณ ตอนนี้และสถานะงานตั้งเวลา</p><div id="hlbody">'+hlBody()+'</div>'+verTxt()}
 var CE={d:null,err:"",busy:false,app:""},CEA={customer:"ผู้ใช้งาน",shop:"ร้านนวด",staff:"หมอนวด",admin:"แอดมิน"},CEK={js:"สคริปต์",promise:"สคริปต์ (ระหว่างรอผล)",server:"เซิร์ฟเวอร์"};
 function ceN(){return CE.d?(+CE.d.today||0):0}
 function ceSync(){var sb=document.querySelector('.subtabs [data-id=ce]');if(sb)sb.textContent="ข้อผิดพลาดหน้าเว็บ"+(ceN()?" ("+ceN()+")":"");if(S.tab!=="ce")return;var b=document.getElementById("cebody"),btn=document.getElementById("cebtn");if(!b||!btn){draw();return}b.innerHTML=ceBody();btn.textContent=CE.busy?"กำลังโหลด…":"โหลดใหม่";if(CE.busy)btn.setAttribute("aria-busy","true");else btn.removeAttribute("aria-busy")}
