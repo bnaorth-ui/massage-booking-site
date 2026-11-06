@@ -95,6 +95,7 @@ await p.click('[data-g=regsend]');ok('password mismatch',await has('รหัส
 await p.fill('#rpw','secret1');await p.fill('#rpw2','secret1');await p.setInputFiles('#rimg',{name:'s.png',mimeType:'image/png',buffer:PNG});await until(()=>document.querySelector('#gprev img'));
 await p.click('[data-g=regsend]');
 ok('registration -> pending status',await has('ส่งคำขอลงทะเบียนแล้ว รอแอดมินอนุมัติ'));
+ok('desktop: no install steps under the pending status',!(await p.$('#insbox')));
 const lic=stor.find(s=>s.path.startsWith('licenses/u'));const shopimg=stor.find(s=>s.path.startsWith('avatars/u'));
 ok('licence uploaded to private bucket under uid',!!lic&&/^licenses\/u\d+\/license-.*\.jpg$/.test(lic.path)&&lic.len>100);
 ok('shop image uploaded to avatars/uid',!!shopimg);

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>แอดมิน - สมาคมวิทยากรฝึกอาชีพคนตาบอด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.7"><meta name="app-name" content="ระบบจองนวด สำหรับแอดมิน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.8"><meta name="app-name" content="ระบบจองนวด สำหรับแอดมิน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -295,7 +295,7 @@ function shopView(){var pend=D.regs.filter(function(r){return r.status==="pendin
  if(S.form&&S.form.t==="shop")return h+shopForm();
  var TB=[["new","ร้านสมัครใหม่",pend.length],["all","ร้านทั้งหมด",D.shops.length],["off","ร้านปิดชั่วคราว",off.length],["cls","ร้านปิดบัญชีแล้ว",cls.length],["rej","ร้านถูกยกเลิก",rj.length]],ss=TB.some(function(x){return x[0]===S.ss})?S.ss:"new";S.ss=ss;
  h+='<div class="nf" role="tablist" aria-label="หมวดร้านนวด">'+TB.map(function(x){return '<button type="button" role="tab" data-a="ss" data-id="'+x[0]+'" class="'+(x[0]===ss?"on":"")+'" aria-selected="'+(x[0]===ss)+'">'+x[1]+' ('+x[2]+')</button>'}).join("")+'</div>';
- if(ss==="new")return h+'<p class="hint2">ร้านนวดลงทะเบียนเองจากหน้าร้านค้า แล้วมาอนุมัติที่นี่ ผู้ลงทะเบียนต้องแนบใบอนุญาตจัดตั้งร้านนวด</p><div class="card">'+(pend.length?pend.map(regCard).join(""):'<div class="empty">ไม่มีคำขอที่รออนุมัติ</div>')+'</div>';
+ if(ss==="new")return h+shInvCard()+'<p class="hint2">ร้านนวดลงทะเบียนเองจากหน้าร้านค้า แล้วมาอนุมัติที่นี่ ผู้ลงทะเบียนต้องแนบใบอนุญาตจัดตั้งร้านนวด</p><div class="card">'+(pend.length?pend.map(regCard).join(""):'<div class="empty">ไม่มีคำขอที่รออนุมัติ</div>')+'</div>';
  if(ss==="rej")return h+'<p class="hint2">คำขอลงทะเบียนที่ไม่อนุมัติ (แสดงล่าสุด 100 รายการ)</p><div class="card">'+(rj.length?rj.map(rejCard).join(""):'<div class="empty">ไม่มีร้านที่ถูกยกเลิก</div>')+'</div>';
  return h+searchBox("shop","ค้นหาชื่อร้านหรือเบอร์เจ้าของ")+'<div id="lst">'+shopList()+'</div>'}
 /* ---- รายงานสำหรับหน่วยงาน / บริษัท ---- */
@@ -425,6 +425,19 @@ function sdrCard(){if(D.sdrOff||!(D.sdr||[]).length)return"";
   (r.open_jobs>0?'<p style="color:var(--bad);margin:6px 0">ยังมีคิวที่ยังไม่เสร็จ '+r.open_jobs+' คิว อนุมัติไม่ได้จนกว่าจะเสร็จหรือยกเลิก</p>':'')+
   (S.sdn===r.id?'<div style="margin-top:8px"><label for="sdn_'+r.id+'" style="font-size:.9rem;color:var(--mute)">เหตุผลที่ไม่อนุมัติ (พนักงานจะเห็นข้อความนี้)</label><input class="in" id="sdn_'+r.id+'" maxlength="200"></div>':'')+
   '<div class="acts"><button class="btn d" data-a="sdrok" data-id="'+r.id+'"'+(r.open_jobs>0?" disabled":"")+'>'+(S.sdc===r.id?"กดอีกครั้งเพื่อยืนยันลบ":"อนุมัติ (ลบบัญชี)")+'</button><button class="btn g" data-a="sdrno" data-id="'+r.id+'">'+(S.sdn===r.id?"บันทึกการไม่อนุมัติ":"ไม่อนุมัติ")+'</button>'+(S.sdc===r.id||S.sdn===r.id?'<button class="btn g" data-a="sdrx">ยกเลิก</button>':'')+'</div></div>'}).join("")+'</div>'}
+function shInvLink(){var b=(D.set&&D.set.reg)||"";if(!b)return"";return b+(b.indexOf("?")>-1?"&":"?")+"reg=1&openExternalBrowser=1"}
+function shInvMsg(){var st=D.set||{},a=st.assoc||"สมาคมวิทยากรฝึกอาชีพคนตาบอด";
+ return a+" ขอเชิญร้านนวดเข้าร่วมระบบจองนวดออนไลน์\nลูกค้าที่อยู่ใกล้ร้านค้นหาร้าน เลือกบริการ เลือกหมอนวด และจองคิวล่วงหน้าได้เอง ร้านได้รับแจ้งเตือนทุกการจองผ่านแอป\nคุณสมบัติ: เป็นร้านนวดที่ได้รับอนุญาตจัดตั้งสถานประกอบการเพื่อสุขภาพ (แนบรูปใบอนุญาตตอนลงทะเบียน)\nค่าบริการระบบ (GP) 10% ของราคาหลังหักโปรโมชัน หักจากกระเป๋าเงินของร้านเมื่อหมอนวดกดเสร็จสิ้นงาน\nลงทะเบียนที่นี่: "+shInvLink()+(st.phone?"\nสอบถาม: "+st.phone:"")}
+function shInvCard(){var m=S.shmsg?'<div class="'+(S.shok?"saved":"closed")+'" role="status">'+esc(S.shmsg)+'</div>':'';
+ if(!shInvLink())return m+'<div class="card"><b>ชวนร้านนวดมาสมัคร</b><p class="hint2" style="margin:4px 0 0">ยังไม่ได้ตั้งลิงก์ลงทะเบียนร้านนวด ตั้งได้ที่เมนู จัดการระบบ > การตั้งค่า > ลิงก์ลงทะเบียนร้านนวด</p></div>';
+ return m+'<div class="card"><b>ชวนร้านนวดมาสมัคร</b><p class="hint2" style="margin:4px 0 8px">ส่งข้อความนี้ทาง LINE, Facebook หรือ SMS ร้านที่กดลิงก์จะเข้าฟอร์มลงทะเบียนทันที แล้วคำขอจะมารอที่แถบนี้</p>'
+ +'<div class="hint2" id="shinvtxt" style="white-space:pre-line;margin:0 0 10px;padding:10px;border:1px solid var(--line);border-radius:10px">'+esc(shInvMsg())+'</div>'
+ +'<div class="acts">'+(navigator.share?'<button type="button" class="btn" data-a="shinv" data-id="share">แชร์ผ่านมือถือ</button>':'')+'<button type="button" class="btn g" data-a="shinv" data-id="copy">คัดลอกข้อความ</button></div></div>'}
+function shInvShare(copyOnly){if(!shInvLink()){S.shmsg="ยังไม่ได้ตั้งลิงก์ลงทะเบียนร้านนวด ตั้งได้ที่เมนู จัดการระบบ > การตั้งค่า";S.shok=false;draw();return}
+ var t=shInvMsg(),done=function(m){S.shmsg=m;S.shok=true;draw()},copy=function(){
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){done("คัดลอกข้อความชวนร้านนวดแล้ว นำไปวางใน LINE, Facebook หรือ SMS ได้เลย")},function(){S.shmsg="คัดลอกไม่สำเร็จ ลองกดอีกครั้ง";S.shok=false;draw()})}
+  else{S.shmsg="เครื่องนี้คัดลอกอัตโนมัติไม่ได้ ลิงก์คือ "+shInvLink();S.shok=false;draw()}};
+ if(!copyOnly&&navigator.share){navigator.share({title:"ชวนร้านนวดเข้าร่วมระบบจองนวด",text:t}).then(function(){done("เปิดเมนูแชร์ให้แล้ว")},function(e){if(e&&e.name==="AbortError")return;copy()})}else copy()}
 function stLink(p){var b=(D.set&&D.set.staff)||"";if(!b||!p||!p.phone)return"";return b+(b.indexOf("?")>-1?"&":"?")+"join="+encodeURIComponent(p.phone)+"&openExternalBrowser=1"}
 function stMsg(p){return"สวัสดีค่ะ/ครับ คุณ"+p.name+" สมาคมเพิ่มคุณเข้าระบบรับงานแล้ว\nกดลิงก์ แล้วทำตามขั้นตอนติดตั้งในหน้านั้น: "+stLink(p)+"\nสมัครด้วยเบอร์ "+p.phone+" แล้วตั้งรหัสผ่านเอง"}
 function stNewCard(){var nw=S.stnew?D.staff.filter(function(x){return x.phone===S.stnew})[0]:null;if(!nw||nw.linked)return"";
@@ -932,7 +945,8 @@ document.addEventListener("click",function(e){
  if(a==="rpprint"){rpPrint();return}
  if(a==="rppdf"){rpPdf();return}
  if(a==="rpcsv"){rpCsv();return}
- if(a==="ss"){S.ss=id;S.form=null;S.lic=null;S.rej=null;draw();return}
+ if(a==="ss"){S.ss=id;S.form=null;S.lic=null;S.rej=null;S.shmsg="";draw();return}
+ if(a==="shinv"){shInvShare(id==="copy");return}
  if(a==="tab"){srClear();if(S.last[id])id=S.last[id];var gg=groupOf(id);if(S.last[gg])S.last[gg]=id;if(id==="pprq"||id==="ppac"){S.pps=id.slice(2);id="pp"}S.tab=id;S.sdc=null;S.sdn=null;S.ppsaved=false;S.form=null;S.del=null;S.saved=false;S.info="";S.stnew=null;S.stmsg="";S.hmsg="";S.rej=null;S.lic=null;S.tpc=null;S.tpr=null;S.slipv=null;S.oqr=null;S.oqS=null;draw();if(id==="nt"||id==="pp"||id==="shop"||id==="q")refresh();if(id==="rvw")rvwLoad();if(id==="usr")usrLogLoad();if(id==="hl")hlLoad();if(id==="ce")ceLoad();if(id==="au")auLoad();if(id==="fm")fmLoad();if(id==="set"&&S.sub==="a")loadAdmins().then(draw);return}
  if(a==="sub"){S.saved=false;S.del=null;var sv=document.querySelector(".saved");if(sv)sv.remove();subTo(id);if(id==="c"){SLP.msg="";SLP.cfm=false;slipCount()}if(id==="a")loadAdmins().then(function(){var h=document.querySelector("[data-sg=a]");if(h&&S.sub==="a")h.innerHTML=adminHtml()},function(x){showErr(errTh(x))});return}
  if(a==="ntf"){S.ntf=id;draw();return}

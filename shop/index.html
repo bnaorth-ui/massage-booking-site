@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>สำหรับร้านนวด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.7"><meta name="app-name" content="ระบบจองนวด สำหรับร้านค้า"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.8"><meta name="app-name" content="ระบบจองนวด สำหรับร้านค้า"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -187,7 +187,7 @@ function insOpen(){var u=insUrl(),k=insKind();
  try{if(k==="ios-app")location.href="x-safari-"+u;else if(k==="app")location.href="intent://"+u.replace(/^https?:\/\//,"")+"#Intent;scheme="+(/^http:/.test(u)?"http":"https")+";package=com.android.chrome;end"}catch(x){}
  setTimeout(function(){insMsg("ถ้าไม่เปิด ให้กดปุ่มคัดลอกลิงก์ แล้วนำไปวางในเบราว์เซอร์")},1500)}
 function insBt(){var u=insUrl().replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");return '<div class="insbt"><button type="button" class="btn" style="width:100%" data-g="inscopy">คัดลอกลิงก์</button><button type="button" class="btn g" style="width:100%" data-g="insopen">ติดตั้งแอป</button></div><p class="insmsg" id="insmsg" role="status" aria-live="polite"></p><p class="insurl">'+u+'</p>'}
-function insBody(){var k=insKind(),h='<img class="insic" src="icon-logo-192.png" alt=""><h1 id="inst" tabindex="-1" style="margin:0 0 8px">ติดตั้งแอปร้านนวด</h1>';
+function insBody(sub){var k=insKind(),h='<img class="insic" src="icon-logo-192.png" alt="">'+(sub?'<h2 id="inst" style="margin:0 0 8px">ติดตั้งแอปร้านนวดไว้รอผลอนุมัติ</h2>':'<h1 id="inst" tabindex="-1" style="margin:0 0 8px">ติดตั้งแอปร้านนวด</h1>');
  if(INS.done||!k)return h+'<div class="flash" role="status">ติดตั้งแล้ว เปิดแอปจากหน้าจอโฮมได้เลย</div>';
  h+='<p class="hint2">ติดตั้งไว้ที่หน้าจอโฮม เปิดได้เหมือนแอป และรับแจ้งเตือนเรื่องการจองและยอดเงินได้</p>';
  h+=insFt();
@@ -198,7 +198,7 @@ function insBody(){var k=insKind(),h='<img class="insic" src="icon-logo-192.png"
   h+=insSt([["share","กดปุ่ม <b>แชร์</b> (รูปสี่เหลี่ยมมีลูกศรชี้ขึ้น) ที่แถบด้านล่างของ Safari"],["add","เลื่อนหาและเลือก <b>เพิ่มไปยังหน้าจอโฮม</b>"],["ok","กด <b>เพิ่ม</b> ที่มุมขวาบน แล้วเปิดแอปจากหน้าจอโฮม"]])+'<p class="hint2">ต้องติดตั้งไว้ที่หน้าจอโฮมก่อน จึงจะรับแจ้งเตือนบน iPhone ได้</p>'}
  return h}
 function insGo(){var e=INS.ev;if(!e)return;INS.ev=null;try{e.prompt();e.userChoice.then(function(r){if(r&&r.outcome==="accepted")INS.done=true;insRefresh()},function(){insRefresh()})}catch(x){insRefresh()}}
-function insRefresh(){if(G.mode==="ins"&&!WHO)gRender()}
+function insRefresh(){if((G.mode==="ins"&&!WHO)||G.mode==="status")gRender()}
 window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();INS.ev=e;insRefresh()});
 window.addEventListener("appinstalled",function(){INS.done=true;wr("insSeen",true);insRefresh()});
 function gRender(){var h=gateTitle();
@@ -216,7 +216,7 @@ function gRender(){var h=gateTitle();
  else if(G.mode==="reg2")h+=regForm(true);
  else if(G.mode==="status"){var r=G.reg;
   h+='<div class="card form"><b>'+(r.status==="pending"?"ส่งคำขอลงทะเบียนแล้ว รอแอดมินอนุมัติ":"คำขอลงทะเบียนไม่ได้รับอนุมัติ")+'</b><p class="hint2" style="margin:0">ร้าน '+esc(r.name)+'</p>'+(r.status==="pending"?'<p class="hint2" style="margin:0">ระบบแจ้งแอดมินให้ตรวจสอบใบอนุญาตแล้ว เมื่ออนุมัติแล้วเข้าสู่ระบบด้วยเบอร์มือถือและรหัสผ่านเดิมได้ทันที (กด "ตรวจสอบสถานะ" เพื่อดูผลล่าสุด)</p>':'<p class="hint2" style="margin:0;color:var(--bad)">เหตุผล: '+esc(r.reject_reason||"ไม่ระบุ")+'</p>')+errBox()+
-   (r.status==="pending"?'<button type="button" class="btn" data-g="retry">ตรวจสอบสถานะ</button>':'<button type="button" class="btn" data-g="reg2">ลงทะเบียนใหม่</button>')+'<button type="button" class="btn g" data-g="logout">ออกจากระบบ</button></div>'}
+   (r.status==="pending"?'<button type="button" class="btn" data-g="retry">ตรวจสอบสถานะ</button>':'<button type="button" class="btn" data-g="reg2">ลงทะเบียนใหม่</button>')+'<button type="button" class="btn g" data-g="logout">ออกจากระบบ</button></div>'+(r.status==="pending"&&insKind()?'<div class="card" id="insbox">'+insBody(true)+'</div>':'')}
  box.innerHTML=h;
  if(G.mode==="pv"){var tp=document.getElementById("pvt");if(tp)tp.focus()}
  if(G.draft&&(G.mode==="reg"||G.mode==="reg2")){var d=G.draft;["rn","rc","rph","rpw","rpw2"].forEach(function(k){var e=document.getElementById(k);if(e&&d[k]!=null&&d[k]!=="")e.value=d[k]});var cb=document.getElementById("rpv");if(cb)cb.checked=!!d.rpv;var cg=document.getElementById("rgp");if(cg)cg.checked=!!d.rgp;G.draft=null}}
@@ -1002,7 +1002,9 @@ function startMain(){if(started){draw();return}started=true;S={tab:"q",mg:"svc",
 /* ---------- เริ่มทำงาน ---------- */
 showGate(true);
 SBS=rd(SSK,null);
-if(SBS&&SBS.refresh_token){afterLogin()}else{SBS=null;gMode(insKind()&&!rd("insSeen",false)?"ins":"in")}
+/* ลิงก์ชวนสมัครจากแอดมิน (?reg=1) เปิดฟอร์มลงทะเบียนทันที แล้วลบออกจากที่อยู่ กดรีโหลดจะไม่เปิดซ้ำ */
+var REGQ=/[?&]reg=1(&|$)/.test(location.search);if(REGQ)try{var qs=location.search.replace(/([?&])reg=1(&|$)/,function(a,b,c){return c?b:""}).replace(/[?&]$/,"");history.replaceState(null,"",location.pathname+qs+location.hash)}catch(e){}
+if(SBS&&SBS.refresh_token){afterLogin()}else{SBS=null;if(REGQ){G.mode="load";gRender();loadCats().then(function(){gMode("reg")},function(){gMode("reg")})}else gMode(insKind()&&!rd("insSeen",false)?"ins":"in")}
 
 })();
 </script>

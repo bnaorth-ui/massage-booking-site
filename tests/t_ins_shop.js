@@ -122,4 +122,25 @@ a=await mk(UAS.ios);t=await T0(a);ok('iOS',t.includes('เพิ่มไปย�
 a=await mk(UAS.iosline);t=await T0(a);ok('iOS LINE',t.includes('เปิดใน Safari'));await a.close();
 // forgot/register links still reachable after skip
 a=await mk(UAS.android);await a.click('[data-g=insskip] >> nth=-1');await sleep(200);await a.click('[data-g=reg]');await sleep(300);ok('register reachable',!!(await a.$('#rn')));await a.close();
+// ลิงก์ชวนสมัครจากแอดมิน: ?reg=1 เปิดฟอร์มลงทะเบียนทันที (ข้ามหน้าติดตั้ง) แล้วลบออกจากที่อยู่ เก็บพารามิเตอร์อื่นไว้
+a=await ctx.newPage();a.on('pageerror',e=>errs.push(e.message));await a.addInitScript(u=>{Object.defineProperty(navigator,'userAgent',{get:()=>u});},UAS.android);
+await a.goto(URLB);await a.evaluate(()=>localStorage.clear());await a.goto(URLB+'?reg=1&openExternalBrowser=1');await sleep(700);t=await T0(a);
+ok('reg link: registration form opens directly, not the install page',!!(await a.$('#rn'))&&t.includes('ลงทะเบียนร้านนวดใหม่')&&!t.includes('ติดตั้งแอปร้านนวด'));
+ok('reg link: reg=1 removed from address, other params kept',!/[?&]reg=1/.test(a.url())&&/[?&]openExternalBrowser=1/.test(a.url()));
+ok('reg link: categories loaded into the form',(await a.$$eval('#rc option',e=>e.map(x=>x.textContent))).some(x=>x.includes('ร้านนวดแผนไทย')));
+await a.reload();await sleep(500);ok('reload after reg link: normal start (install intro), form not reopened',!(await a.$('#rn'))&&(await T0(a)).includes('ติดตั้งแอปร้านนวด'));
+await a.goto(URLB+'?reg=1');await sleep(600);await a.click('[data-g=back]');await sleep(300);ok('reg link: back goes to login',!!(await a.$('#gph')));
+await a.close();
+// หลังส่งคำขอ (สถานะรออนุมัติ) บนมือถือที่ยังไม่ได้ติดตั้ง: แสดงวิธีติดตั้งต่อท้ายการ์ดสถานะ
+for(const [k,ua,want] of [['android',UAS.android,'⋮'],['ios',UAS.ios,'เพิ่มไปยังหน้าจอโฮม'],['line',UAS.line,'เปิดใน Chrome']]){
+ a=await mk(ua);const sk=await a.$('[data-g=insskip]');if(sk){await a.click('[data-g=insskip] >> nth=-1');await sleep(200)}
+ await a.fill('#gph','0822222222');await a.fill('#gpw','abc123');await a.click('[data-g=login]');await sleep(900);t=await T0(a);
+ ok(k+': pending status then install steps below it',t.includes('ส่งคำขอลงทะเบียนแล้ว รอแอดมินอนุมัติ')&&t.indexOf('ติดตั้งแอปร้านนวดไว้รอผลอนุมัติ')>t.indexOf('ส่งคำขอลงทะเบียนแล้ว')&&t.includes(want));
+ ok(k+': install heading is h2 (one h1-level result on the page), no skip button',await a.$eval('#insbox h2',e=>e.textContent)==='ติดตั้งแอปร้านนวดไว้รอผลอนุมัติ'&&!(await a.$('#insbox h1'))&&!(await a.$('[data-g=insskip]')));
+ ok(k+': focus not moved to install section',await a.evaluate(()=>!document.activeElement||!document.getElementById('insbox').contains(document.activeElement)));
+ await a.close()}
+// แอปติดตั้งแล้ว (เปิดจากหน้าจอโฮม): ไม่แสดง
+a=await ctx.newPage();await a.addInitScript(u=>{Object.defineProperty(navigator,'userAgent',{get:()=>u});Object.defineProperty(navigator,'standalone',{get:()=>true})},UAS.ios);await a.goto(URLB);await a.evaluate(()=>localStorage.clear());await a.goto(URLB);await sleep(500);
+await a.fill('#gph','0822222222');await a.fill('#gpw','abc123');await a.click('[data-g=login]');await sleep(900);t=await T0(a);
+ok('installed app: pending status without install steps',t.includes('ส่งคำขอลงทะเบียนแล้ว รอแอดมินอนุมัติ')&&!(await a.$('#insbox')));await a.close();
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)})();
