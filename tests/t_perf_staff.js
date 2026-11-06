@@ -1,4 +1,4 @@
-const {chromium}=require('playwright');require('./config').pinClock({ctx:false});
+const {chromium}=require('playwright');require('./config').pinClock();
 const PNG=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==','base64');
 (async()=>{const b=await chromium.launch(require('./config').launch);
 const sleep0=ms=>new Promise(r=>setTimeout(r,ms));const ctx=await b.newContext({timezoneId:'Asia/Bangkok',locale:'th-TH'});const errs=[],calls=[],stor=[];
