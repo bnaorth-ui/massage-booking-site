@@ -119,8 +119,8 @@ ok('invite: status line is a polite live region',(await p.getAttribute('#invmsg'
 await p.evaluate(()=>{window.__sh=null;navigator.share=(o)=>{window.__sh=o;return Promise.resolve()}});
 await p.click('[data-inv]');await p.waitForTimeout(200);
 const sh=await p.evaluate(()=>window.__sh);
-ok('share: called with the agreed text',!!sh&&sh.text==='ลองจองหมอนวดผ่านสมาคมวิทยากรฝึกอาชีพคนตาบอด สะดวก ได้ช่วยสร้างอาชีพให้คนตาบอดด้วย');
-ok('share: called with the agreed link',!!sh&&sh.url==='https://massage-customer-bna.pages.dev/');
+ok('share: one text with the message, then the link on its own line',!!sh&&sh.text==='ลองจองหมอนวดผ่านสมาคมวิทยากรฝึกอาชีพคนตาบอด สะดวก ได้ช่วยสร้างอาชีพให้คนตาบอดด้วย\nhttps://massage-customer-bna.pages.dev/');
+ok('share: link not sent separately (some apps keep only one part)',!!sh&&sh.url===undefined);
 ok('share: no error message shown on success',(await p.textContent('#invmsg')).trim()==='');
 // 2) ผู้ใช้ยกเลิกหน้าต่างแชร์ -> ไม่ขึ้นข้อความผิดพลาด ไม่คัดลอก
 await p.evaluate(()=>{window.__cp=null;Object.defineProperty(navigator,'clipboard',{value:{writeText:(t)=>{window.__cp=t;return Promise.resolve()}},configurable:true});navigator.share=()=>Promise.reject(Object.assign(new Error('x'),{name:'AbortError'}))});
