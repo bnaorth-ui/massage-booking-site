@@ -107,6 +107,7 @@ await p.fill('#c8','http://bad.example/');await p.click('[data-a=setsave]');awai
 ok('http rejected',(await p.textContent('#main')).includes('ต้องขึ้นต้นด้วย https://')&&T.app_settings[0].staff_url==='https://old.example/');
 await p.fill('#c8','https://staff.example.pages.dev/');await p.click('[data-a=setsave]');await p.waitForTimeout(800);
 ok('saved',T.app_settings[0].staff_url==='https://staff.example.pages.dev/');
+ok('no Longdo field when column missing, save leaves it out',!(await p.$('#c9'))&&!('longdo_key' in T.app_settings[0]));
 await p.fill('#c8','');await p.click('[data-a=setsave]');await p.waitForTimeout(800);
 ok('can clear',T.app_settings[0].staff_url==='');
 }

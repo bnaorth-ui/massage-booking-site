@@ -10,7 +10,7 @@
 <meta property="og:title" content="จองนวดออนไลน์ ร้านนวดใกล้ฉัน"><meta property="og:description" content="นวดโดยคนพิการทางการเห็น ผู้ให้บริการขึ้นทะเบียนถูกต้อง จองคิวได้ทันที"><meta property="og:url" content="https://massage-customer-bna.pages.dev/"><meta property="og:image" content="https://massage-customer-bna.pages.dev/icon-512.png">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"สมาคมวิทยากรฝึกอาชีพคนตาบอด","url":"https://bna.or.th","logo":"https://massage-customer-bna.pages.dev/icon-512.png"}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"จองนวดออนไลน์ต้องทำอย่างไร?","acceptedAnswer":{"@type":"Answer","text":"เลือกร้านและบริการ เลือกวันเวลาและพนักงาน แล้วสมัครสมาชิกหรือเข้าสู่ระบบด้วยเบอร์โทรเพื่อยืนยันการจอง"}},{"@type":"Question","name":"ใครเป็นผู้ให้บริการนวด?","acceptedAnswer":{"@type":"Answer","text":"ผู้ให้บริการเป็นคนพิการทางการเห็นที่ขึ้นทะเบียนกับกรมสนับสนุนบริการสุขภาพ กระทรวงสาธารณสุข และร้านนวดจดทะเบียนตามกฎหมายสถานประกอบการเพื่อสุขภาพ"}},{"@type":"Question","name":"เลื่อนนัดหรือยกเลิกการจองได้ไหม?","acceptedAnswer":{"@type":"Answer","text":"ทำได้เองในแอป ตามเงื่อนไขของแต่ละร้าน"}},{"@type":"Question","name":"ติดต่อร้านหรือพนักงานได้อย่างไร?","acceptedAnswer":{"@type":"Answer","text":"แชตกับร้านหรือพนักงานได้ในแอป"}},{"@type":"Question","name":"มีแต้มสะสมหรือรีวิวไหม?","acceptedAnswer":{"@type":"Answer","text":"มี สะสมแต้มจากการใช้บริการ และรีวิวร้านที่ใช้บริการได้"}},{"@type":"Question","name":"หน่วยงานขอให้หมอนวดไปให้บริการนอกสถานที่ได้ไหม และคิดค่าบริการเท่าไร?","acceptedAnswer":{"@type":"Answer","text":"ได้ เฉพาะหน่วยงานในกรุงเทพมหานคร ค่าบริการ 400 บาทต่อหมอนวด 1 คน ต่อชั่วโมง ไม่รวมช่วงพักเที่ยง ชำระเงินหลังสมาคมอนุมัติและหมอนวดตอบรับแล้ว โดยต้องชำระภายใน 3 วันก่อนวันให้บริการ และขอบริการล่วงหน้าอย่างน้อย 10 วัน"}},{"@type":"Question","name":"ใครจัดทำระบบนี้?","acceptedAnswer":{"@type":"Answer","text":"สมาคมวิทยากรฝึกอาชีพคนตาบอด เพื่อให้คนพิการทางการเห็นมีช่องทางประกอบอาชีพและเข้าถึงลูกค้าได้ง่ายขึ้น"}}]}</script>
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.13"><meta name="app-name" content="ระบบจองนวด สำหรับผู้ใช้งาน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.14"><meta name="app-name" content="ระบบจองนวด สำหรับผู้ใช้งาน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -300,6 +300,36 @@ function revGeo(lat,lng,cb){var k=lat.toFixed(5)+","+lng.toFixed(5);if(RGC[k]!==
  RGTM=setTimeout(function(){RGTM=null;var q=RGQ;RGQ=null;if(!q)return;RGT=Date.now();
   try{var ac=window.AbortController?new AbortController():null,tm=ac?setTimeout(function(){ac.abort()},8000):0;
    fetch("https://nominatim.openstreetmap.org/reverse?format=jsonv2&addressdetails=1&zoom=18&accept-language=th&lat="+q.lat.toFixed(6)+"&lon="+q.lng.toFixed(6),ac?{signal:ac.signal}:{}).then(function(r){clearTimeout(tm);return r.ok?r.json():Promise.reject()}).then(function(j){var n=nmFmt(j);if(n)RGC[q.k]=n;q.cb(n)},function(){clearTimeout(tm);q.cb("")})}catch(e){q.cb("")}},Math.max(0,RGT+1100-Date.now()))}
+/* ---- Longdo Map (บริษัทไทย ข้อมูลสถานที่ในไทยละเอียดกว่า) ใช้เมื่อแอดมินใส่รหัสในหน้าตั้งค่า (SET.lgk)
+   ค้นหาด้วย JSONP (ไม่ติดเรื่อง CORS) และแสดงบนแผนที่ Longdo ตามเงื่อนไขการใช้งานของ Longdo
+   ถ้าไม่มีรหัส โหลดไม่ได้ หรือค้นไม่สำเร็จ ใช้ OpenStreetMap แบบเดิมแทนทันที ---- */
+var LGN=0,LGQ=null,LGBAD=false;
+function lgSearch(q,bkk,cb){var k="lg:"+(bkk?"b:":"t:")+q.toLowerCase();if(SRC[k]){cb(SRC[k]);return}
+ var fn="__lgcb"+(++LGN),sc=document.createElement("script"),done=false,fin=function(r){if(done)return;done=true;clearTimeout(tm);try{delete window[fn]}catch(e){window[fn]=undefined}if(sc.parentNode)sc.parentNode.removeChild(sc);cb(r)},tm=setTimeout(function(){fin(null)},8000);
+ window[fn]=function(j){try{var a=j&&(j.data||j.result)||(Array.isArray(j)?j:[]),strip=function(t){return String(t==null?"":t).replace(/<[^>]*>/g,"").replace(/\s+/g," ").trim()};
+  var L2=a.map(function(x){var la=parseFloat(x.lat),ln=parseFloat(x.lon!=null?x.lon:x.lng);return {lat:la,lng:ln,name:strip(x.name||x.title).slice(0,120),addr:strip(x.address||x.addr).slice(0,160)}}).filter(function(x){return x.name&&!isNaN(x.lat)&&!isNaN(x.lng)&&(!bkk||(x.lat>=13.49&&x.lat<=13.96&&x.lng>=100.33&&x.lng<=100.94))}).slice(0,5);
+  SRC[k]=L2;fin(L2)}catch(e){fin(null)}};
+ sc.onerror=function(){fin(null)};sc.src="https://search.longdo.com/mapsearch/json/search?keyword="+encodeURIComponent(q)+"&limit="+(bkk?15:5)+"&locale=th&key="+encodeURIComponent(SET.lgk)+"&callback="+fn;document.head.appendChild(sc)}
+/* โหลดสคริปต์แผนที่ Longdo ครั้งเดียว ถ้าสคริปต์เรียก document.write ระหว่างโหลด จะแปลงเป็นการแทรกไฟล์แทน (กันหน้าเว็บถูกล้าง) */
+function loadLongdo(cb){if(window.longdo&&window.longdo.Map){cb(true);return}if(LGBAD||!SET.lgk){cb(false);return}if(LGQ){LGQ.push(cb);return}LGQ=[cb];
+ var dw=document.write,dwl=document.writeln,inj=function(h){String(h).replace(/<script[^>]*src=["']([^"']+)["'][^>]*>/gi,function(m,u){var x=document.createElement("script");x.src=u;x.async=false;document.head.appendChild(x);return m}).replace(/<link[^>]*href=["']([^"']+)["'][^>]*>/gi,function(m,u){var x=document.createElement("link");x.rel="stylesheet";x.href=u;document.head.appendChild(x);return m})};
+ document.write=inj;document.writeln=inj;
+ var t0=Date.now(),fin=function(ok){var q=LGQ;LGQ=null;document.write=dw;document.writeln=dwl;if(!ok)LGBAD=true;q.forEach(function(f){f(ok)})},
+  poll=function(){if(!LGQ)return;if(window.longdo&&window.longdo.Map){fin(true);return}if(Date.now()-t0>12000){fin(false);return}setTimeout(poll,100)};
+ var sc=document.createElement("script");sc.src="https://api.longdo.com/map3/?key="+encodeURIComponent(SET.lgk);sc.onerror=function(){if(LGQ)fin(false)};document.head.appendChild(sc);poll()}
+/* ทำให้แผนที่ Longdo ใช้คำสั่งชุดเดียวกับ Leaflet ที่โค้ดหน้าต่างแผนที่เรียกอยู่ (panTo, setView, ขยับหมุดทีละ 16 จุด) */
+function lgAdapt(box,st){var g=window.longdo,m=new g.Map({placeholder:box,location:{lon:MP.lng,lat:MP.lat},zoom:st.z,lastView:false,language:"th"}),
+ Z=function(){try{var z=m.zoom();return typeof z==="number"?z:st.z}catch(e){return st.z}},W=function(){return 256*Math.pow(2,Z())},
+ my=function(la){var r=la*Math.PI/180;return (1-Math.log(Math.tan(r)+1/Math.cos(r))/Math.PI)/2},C=function(){try{var c=m.location();if(c&&c.lat!=null)return{lat:+c.lat,lng:+(c.lon!=null?c.lon:c.lng)}}catch(e){}return{lat:MP.lat,lng:MP.lng}},
+ A={_lg:m,panTo:function(a){try{m.location({lon:a[1],lat:a[0]},true)}catch(e){}},setView:function(a,z){try{m.location({lon:a[1],lat:a[0]},false);m.zoom(z,false)}catch(e){}return A},
+  latLngToContainerPoint:function(a){var c=C();return{x:(a[1]-c.lng)/360*W(),y:(my(a[0])-my(c.lat))*W()}},
+  containerPointToLatLng:function(p){var c=C(),y=my(c.lat)+p.y/W(),n=Math.PI*(1-2*y);return{lat:180/Math.PI*Math.atan(0.5*(Math.exp(n)-Math.exp(-n))),lng:c.lng+p.x/W()*360}},
+  remove:function(){},invalidateSize:function(){try{m.resize()}catch(e){}}},
+ mk=new g.Marker({lon:MP.lng,lat:MP.lat},{title:"จุดที่เลือก",draggable:true});
+ m.Overlays.add(mk);
+ try{m.Event.bind("click",function(){try{var l=m.location(g.LocationMode.Pointer);if(l&&l.lat!=null){mpSet(+l.lat,+l.lon,false);mpMsg("")}}catch(e){}})}catch(e){}
+ try{m.Event.bind("overlayDrop",function(o){if(o!==mk)return;try{var l=mk.location();mpSet(+l.lat,+l.lon,false);mpMsg("")}catch(e){}})}catch(e){}
+ return {map:A,mk:{setLatLng:function(a){try{mk.location({lon:a[1],lat:a[0]})}catch(e){}}}}}
 /* ---- ค้นหาสถานที่ด้วยชื่อ (OpenStreetMap Nominatim) ค้นเมื่อกดปุ่มเท่านั้น จำผลไว้ เว้นช่วง >= 1.1 วินาที (ใช้ตัวนับเดียวกับ revGeo) ---- */
 var SRC={},SRB=false;
 function nmSearch(q,bkk,cb){var k=(bkk?"b:":"t:")+q.toLowerCase();if(SRC[k]){cb(SRC[k]);return}
@@ -313,12 +343,13 @@ function mpFind(){if(!MP||SRB)return;var i=document.getElementById("mp_q"),q=i?i
  var say=function(t){if(st)st.textContent=t};if(box)box.innerHTML="";
  if(q.length<2){say("พิมพ์ชื่อสถานที่อย่างน้อย 2 ตัวอักษร");return}
  SRB=true;if(b)b.disabled=true;say("กำลังค้นหา...");var bk=MP.bkk;
- nmSearch(q,bk,function(L2){SRB=false;if(b)b.disabled=false;if(!MP)return;MP.res=L2||[];
+ var go=function(L2){SRB=false;if(b)b.disabled=false;if(!MP)return;MP.res=L2||[];
   if(L2===null){say("ค้นหาไม่สำเร็จ ตรวจสอบอินเทอร์เน็ตแล้วลองใหม่");return}
   if(!L2.length){say("ไม่พบ \""+q+"\""+(bk?" ในกรุงเทพมหานคร":"")+" ลองพิมพ์ชื่อถนน ย่าน หรือสถานที่ใกล้ๆ แทน");return}
   say("พบ "+L2.length+" แห่ง เลือกแห่งที่ต้องการ");
   if(box){box.innerHTML=L2.map(function(x,n){return '<li><button type="button" class="mpr" data-mpr="'+n+'"><b>'+esc(x.name)+'</b>'+(x.addr?'<small>'+esc(x.addr)+'</small>':'')+'</button></li>'}).join("");
-   box.querySelectorAll("[data-mpr]").forEach(function(e){e.onclick=function(){mpPick(+e.dataset.mpr)}})}})}
+   box.querySelectorAll("[data-mpr]").forEach(function(e){e.onclick=function(){mpPick(+e.dataset.mpr)}})}};
+ if(SET.lgk)lgSearch(q,bk,function(L2){if(L2===null)nmSearch(q,bk,go);else go(L2)});else nmSearch(q,bk,go)}
 function mpPick(n){if(!MP||!MP.res||!MP.res[n])return;var x=MP.res[n],la=+x.lat.toFixed(6),ln=+x.lng.toFixed(6),nm=x.name+(x.addr?", "+x.addr:"");
  clearTimeout(MP.nt);mpSet(la,ln,false,true);if(MP.map)MP.map.setView([la,ln],17);MP.name=nm;MP.nameFor=la+","+ln;mpPlace(nm);mpMsg("");
  var box=document.getElementById("mp_res");if(box)box.innerHTML="";var st=document.getElementById("mp_rs");if(st)st.textContent="";
@@ -356,13 +387,16 @@ function openPicker(opt){closePicker();var st=(opt&&opt.start)||mpStart();MP={la
  ["mp_lat","mp_lng"].forEach(function(id){document.getElementById(id).onchange=function(){var la=parseFloat(document.getElementById("mp_lat").value),ln=parseFloat(document.getElementById("mp_lng").value);if(!isNaN(la)&&!isNaN(ln)&&la>=-90&&la<=90&&ln>=-180&&ln<=180){MP.lat=la;MP.lng=ln}}});
  document.getElementById("mp_q").onkeydown=function(ev){if(ev.key==="Enter"){ev.preventDefault();mpFind()}};
  document.getElementById(opt&&opt.search?"mp_q":"mp_h").focus();
- loadLeaflet(function(ok){var box=document.getElementById("mpm");if(!MP||!box)return;
+ var leaf=function(){loadLeaflet(function(ok){var box=document.getElementById("mpm");if(!MP||!box)return;
   if(!ok){box.innerHTML='<div class="mpe">โหลดแผนที่ไม่สำเร็จ (ตรวจสอบอินเทอร์เน็ต) ยังกรอกละติจูดและลองจิจูดด้านล่างได้ หรือปิดแล้วกด "ใช้ตำแหน่งของฉัน"</div>';return}
   box.innerHTML="";var m=L.map(box,{zoomControl:true}).setView([MP.lat,MP.lng],st.z);
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(m);
   var mk=L.marker([MP.lat,MP.lng],{draggable:true,keyboard:false,icon:L.divIcon({className:"mpin",html:"📍",iconSize:[30,30],iconAnchor:[15,28]})}).addTo(m);
   MP.map=m;MP.mk=mk;mk.on("dragend",function(){var ll=mk.getLatLng();mpSet(ll.lat,ll.lng,false);mpMsg("")});
-  m.on("click",function(ev){mpSet(ev.latlng.lat,ev.latlng.lng,false);mpMsg("")});setTimeout(function(){if(MP&&MP.map)MP.map.invalidateSize()},50)})}
+  m.on("click",function(ev){mpSet(ev.latlng.lat,ev.latlng.lng,false);mpMsg("")});setTimeout(function(){if(MP&&MP.map)MP.map.invalidateSize()},50)})};
+ if(!SET.lgk){leaf();return}
+ loadLongdo(function(ok){var box=document.getElementById("mpm");if(!MP||!box)return;if(!ok){leaf();return}
+  try{box.innerHTML="";box.setAttribute("data-lg","1");var r=lgAdapt(box,st);MP.map=r.map;MP.mk=r.mk;setTimeout(function(){if(MP&&MP.map)MP.map.invalidateSize()},50)}catch(e){box.removeAttribute("data-lg");box.innerHTML="";MP.map=null;MP.mk=null;LGBAD=true;leaf()}})}
 function locName(la,ln){revGeo(la,ln,function(n){if(V.loc&&Math.abs(V.loc.lat-la)<1e-6&&Math.abs(V.loc.lng-ln)<1e-6){V.locName=n;if(!S.view&&S.step===0)render(true)}})}
 var watching=false;
 function locErrMsg(er){var c=er&&er.code,ios=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1),tail=" ระบบจะแสดงทุกแห่งแทน";
@@ -616,7 +650,7 @@ function applyCatalog(R){
  PROMOS=(R.promos||[]).map(function(m){return{id:m.id,shop:m.place_id,title:m.title,desc:m.description||"",type:m.type==="percent"?"percent":"baht",value:+m.value,all:!!m.applies_all,svcs:(R.promo_services||[]).filter(function(q){return q.promotion_id===m.id}).map(function(q){return q.service_id}),start:m.start_date,end:m.end_date,on:1,img:pubUrl("place-images",m.image_path)}});
  OFF={};(R.days_off||[]).forEach(function(x){(OFF[x.staff_id]=OFF[x.staff_id]||[]).push(x.day)});
  CLOSED={};(R.overrides||[]).forEach(function(x){(CLOSED[x.place_id]=CLOSED[x.place_id]||{})[x.day]=true});
- var st=R.settings;if(st){SET.defShop.radius=+st.shop_radius_km;SET.defOrg.radius=+st.org_radius_km;if(st.book_open_min!=null)SET.defOrg.openAt=+st.book_open_min;SET.ct={name:st.association_name||"",addr:st.address||"",phone:st.phone||"",email:st.email||"",line:st.line_url||"",hours:st.hours_text||"",reg:st.register_url||""}}
+ var st=R.settings;if(st){SET.defShop.radius=+st.shop_radius_km;SET.defOrg.radius=+st.org_radius_km;if(st.book_open_min!=null)SET.defOrg.openAt=+st.book_open_min;SET.ct={name:st.association_name||"",addr:st.address||"",phone:st.phone||"",email:st.email||"",line:st.line_url||"",hours:st.hours_text||"",reg:st.register_url||""};SET.lgk=/^[A-Za-z0-9]{16,64}$/.test(st.longdo_key||"")?st.longdo_key:""}
  ANN=(R.ann||[]).map(function(x){return{title:x.title,body:x.body||"",auds:x.audiences||[],on:1}});seoCt()}
 var JOBTH={pending:"รอรับงาน",accepted:"รับงานแล้ว",in_progress:"กำลังนวด",done:"นวดเสร็จ"},STTH={confirmed:"ยืนยันแล้ว",cancelled:"ยกเลิก",rescheduled:"เลื่อนแล้ว",no_show:"ยกเลิก",completed:"ยืนยันแล้ว"};
 function mapBk(r){var all=r.items||[],its=all.filter(function(i){return i.active}),use=its.length?its:all,t0=Date.parse(r.starts_at),s=bdate(t0),
