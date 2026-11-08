@@ -13,6 +13,8 @@ for(const a of apps){const d=path.join(ROOT,a);
  const mf=JSON.parse(fs.readFileSync(path.join(d,'manifest.webmanifest'),'utf8'));ok(a+': manifest icons exist (logo)',mf.icons.every(i=>/icon-logo-/.test(i.src)&&fs.existsSync(path.join(d,i.src))));
  ok(a+': badge icon file kept',fs.existsSync(path.join(d,'icon-192.png')));}
 ok('update.js identical in all four apps',hashes.size===1);
+// ไฟล์ที่ใช้ร่วมกันต้องเหมือนกันทุกแอป (แก้ที่เดียวแล้วคัดลอกไปอีก 3 แอป)
+for(const f of ['push.js','sw.js','errlog.js'])ok(f+' identical in all four apps',new Set(apps.map(a=>md5(path.join(ROOT,a,f)))).size===1);
 // ชื่อแอปบนหน้าจอโฮมของฝั่งพนักงาน (Android: manifest, iOS: apple-mobile-web-app-title)
 {const mf=JSON.parse(fs.readFileSync(path.join(ROOT,'staff','manifest.webmanifest'),'utf8')),hx=fs.readFileSync(path.join(ROOT,'staff','index.html'),'utf8');
 ok('staff app home-screen name (Android short_name) is หมอนวด',mf.short_name==='หมอนวด');
