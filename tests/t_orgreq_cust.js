@@ -80,7 +80,8 @@ await ctx.route('**/*supabase.co/**',async r=>{const q=r.request(),u=new URL(q.u
    return J(200,ref)}
  return J(404,{message:'nf '+path})});
 await ctx.route('**/unpkg.com/**',r=>r.abort());
-await ctx.route('**/nominatim.openstreetmap.org/**',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify({display_name:'ถนนทดสอบ เขตปทุมวัน',address:{road:'ถนนทดสอบ',city_district:'ปทุมวัน'}})}));
+const NMS=[];await ctx.route('**/nominatim.openstreetmap.org/**',r=>{const u=new URL(r.request().url());if(u.pathname.startsWith('/search')){NMS.push(u.search);return r.fulfill({status:200,contentType:'application/json',body:JSON.stringify([{lat:'13.7466',lon:'100.5347',name:'สยามพารากอน',display_name:'สยามพารากอน, ถนนพระรามที่ 1, ปทุมวัน, กรุงเทพมหานคร',address:{road:'ถนนพระรามที่ 1',city_district:'ปทุมวัน',state:'กรุงเทพมหานคร'}}])})}
+ return r.fulfill({status:200,contentType:'application/json',body:JSON.stringify({display_name:'ถนนทดสอบ เขตปทุมวัน',address:{road:'ถนนทดสอบ',city_district:'ปทุมวัน'}})})});
 await ctx.route('**/cdnjs.cloudflare.com/ajax/libs/qrcodejs/**',r=>r.fulfill({status:200,contentType:'application/javascript',body:"window.QRCode=function(el,o){el.setAttribute('data-qr',o.text);el.innerHTML='<canvas></canvas>'};window.QRCode.CorrectLevel={M:0};"}));
 const p=await ctx.newPage();p.on('pageerror',e=>errs.push(e.message));p.on('dialog',d=>{errs.push('DIALOG '+d.message());d.dismiss()});
 await p.goto(require('./config').page('customer-booking.html'));
@@ -109,6 +110,14 @@ await p.selectOption('#orq_dist','ปทุมวัน');await p.fill('#orq_add
 // ปักหมุดนอกกรุงเทพฯ
 await p.click('[data-orq=pin]');await p.waitForSelector('#mpov');await p.fill('#mp_lat','14.5');await p.fill('#mp_lng','100.5');await p.click('[data-mp=ok]');await p.waitForTimeout(200);
 ok('pin outside Bangkok rejected',(await err()).includes('นอกพื้นที่กรุงเทพมหานคร')&&(await p.textContent('#orq_pin')).includes('ยังไม่ได้ปักหมุด'));
+// ค้นหาสถานที่ (เฉพาะกรุงเทพ)
+ok('search button next to the pin button',!!(await p.$('.orqp [data-orq=pinfind]'))&&(await p.textContent('.orqp [data-orq=pinfind]')).trim()==='ค้นหาสถานที่');
+await p.click('[data-orq=pinfind]');await p.waitForSelector('#mpov');
+ok('search: cursor in the search box, label says Bangkok only',await p.evaluate(()=>document.activeElement&&document.activeElement.id==='mp_q')&&(await p.textContent('label[for=mp_q]')).includes('ในกรุงเทพมหานคร'));
+await p.fill('#mp_q','พารากอน');await p.keyboard.press('Enter');await p.waitForSelector('[data-mpr]',{timeout:6000});
+ok('search: limited to Bangkok area',NMS.length===1&&/bounded=1/.test(NMS[0])&&/viewbox=100\.33%2C13\.96%2C100\.94%2C13\.49|viewbox=100\.33,13\.96,100\.94,13\.49/.test(NMS[0])&&/countrycodes=th/.test(NMS[0]));
+await p.click('[data-mpr="0"]');await p.click('[data-mp=ok]');await p.waitForTimeout(200);
+ok('search: picked place becomes the pin',(await p.textContent('#orq_pin')).includes('13.74660')&&(await err())==='');
 await p.click('[data-orq=pin]');await p.waitForSelector('#mpov');await p.fill('#mp_lat','13.7466');await p.fill('#mp_lng','100.5347');await p.click('[data-mp=ok]');await p.waitForTimeout(200);
 ok('pin in Bangkok accepted',(await p.textContent('#orq_pin')).includes('13.74660')&&(await err())==='');
 await p.fill('#orq_cn','สมหมาย');await p.fill('#orq_cp','12345');await p.click('[data-orq=send]');ok('bad phone rejected',(await err()).includes('เบอร์'));
