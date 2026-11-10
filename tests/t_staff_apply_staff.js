@@ -61,10 +61,10 @@ await p.check('[name=ap_tr][value=guide]');await sub();ok('consent required',(aw
 await p.check('#ap_terms');await sub();await sleep(600);
 ok('submitted with right payload',SUBM.length===1&&SUBM[0].p_posting==='po1'&&SUBM[0].p.province==='กรุงเทพมหานคร'&&SUBM[0].p.amphoe==='บางรัก'&&!!SUBM[0].p.tambon&&SUBM[0].p.address==='99 ถ.สีลม'&&SUBM[0].p.area===undefined&&SUBM[0].p.experience==='gt3'&&SUBM[0].p.course==='hss255'&&SUBM[0].p.has_disability_card===true&&SUBM[0].p.has_hss_reg===false&&JSON.stringify(SUBM[0].p.weekdays)==='[1,5]'&&SUBM[0].p.travel==='guide'&&SUBM[0].p.consent==='true');
 t=await p.evaluate(()=>document.body.innerText);
-ok('success: message, status, docs, no form',t.includes('ส่งใบสมัครแล้ว')&&t.includes('รอสมาคมตรวจสอบ')&&t.includes('อย่างละ 5 ชุด')&&!(await p.$('#apf')));
+ok('success: message, status, docs, no form',t.includes('ส่งใบสมัครแล้ว')&&t.includes('รอเจ้าหน้าที่ตรวจสอบ')&&t.includes('อย่างละ 5 ชุด')&&!(await p.$('#apf')));
 ok('install-app box shown inline (staff app install)',t.includes('ติดตั้งแอปรับงานพนักงาน'));
 ok('no dialog popups',errs.every(e=>!e.startsWith('DIALOG')));
 await p.reload();await sleep(900);t=await p.evaluate(()=>document.body.innerText);
-ok('reopen app later (no link): still shows application status, not denied',t.includes('ใบสมัครหมอนวดของฉัน')&&t.includes('รอสมาคมตรวจสอบ')&&!t.includes('ยังไม่ผูกกับพนักงาน'));
+ok('reopen app later (no link): still shows application status, not denied',t.includes('ใบสมัครหมอนวดของฉัน')&&t.includes('รอเจ้าหน้าที่ตรวจสอบ')&&!t.includes('ยังไม่ผูกกับพนักงาน'));
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)
 })()

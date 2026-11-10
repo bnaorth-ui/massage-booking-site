@@ -102,7 +102,9 @@ ok('districts from server only',JSON.stringify(await p.$$eval('#orq_dist option'
 ok('only central therapists listed',JSON.stringify(await p.$$eval('[data-orqs]',o=>o.map(x=>x.dataset.orqs)))===JSON.stringify(['st3','st4']));
 // ---- ตรวจความถูกต้อง
 const err=async()=>await p.textContent('#orq_err');
-const pick=async ymd=>{await p.click('#orq_dbtn');await p.waitForSelector('#orqdlg');for(let i=0;i<8&&!(await p.$('[data-orqd="'+ymd+'"]'));i++)await p.click('[data-orqm="1"]');await p.click('[data-orqd="'+ymd+'"]');await p.waitForSelector('#orqdlg',{state:'detached'})};
+const pick=async ymd=>{await p.click('#orq_dbtn');await p.waitForSelector('#orqdlg');/* ปฏิทินจำเดือนที่เปิดค้างไว้: ย้อนไปเดือนแรกก่อน แล้วค่อยเลื่อนไปข้างหน้า (กันพังเมื่อวันที่เลือกอยู่คนละเดือน) */
+ for(let i=0;i<8&&!(await p.$('[data-orqd="'+ymd+'"]'))&&!(await p.$eval('[data-orqm="-1"]',e=>e.disabled));i++)await p.click('[data-orqm="-1"]');
+ for(let i=0;i<8&&!(await p.$('[data-orqd="'+ymd+'"]'));i++)await p.click('[data-orqm="1"]');await p.click('[data-orqd="'+ymd+'"]');await p.waitForSelector('#orqdlg',{state:'detached'})};
 const openCal=async()=>{await p.click('#orq_dbtn');await p.waitForSelector('#orqdlg')};const closeCal=async()=>{await p.click('[data-orqx]');await p.waitForSelector('#orqdlg',{state:'detached'})};
 await p.click('[data-orq=send]');ok('empty name rejected',(await err()).includes('ชื่อหน่วยงาน'));
 await p.fill('#orq_name','บริษัท ทดสอบ จำกัด');await p.click('[data-orq=send]');ok('district required',(await err()).includes('เลือกเขต'));
@@ -156,7 +158,7 @@ await p.click('[data-orq=send]');ok('terms required',(await err()).includes('ย
 await p.evaluate(()=>Object.defineProperty(navigator,'userAgent',{get:()=>'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Safari/604.1',configurable:true}));
 await p.check('#orq_terms');await p.click('[data-orq=send]');await p.waitForSelector('.orqc',{timeout:4000});
 ok('submit payload correct',SUBS.length===1&&SUBS[0].name==='บริษัท ทดสอบ จำกัด'&&SUBS[0].district==='ปทุมวัน'&&SUBS[0].lat===13.7466&&SUBS[0].start==='09:00'&&SUBS[0].end==='15:00'&&SUBS[0].lunch_start==='12:00'&&SUBS[0].lunch_end==='13:00'&&SUBS[0].staff.length===2&&SUBS[0].service==='sv15'&&SUBS[0].terms===true&&SUBS[0].rate===400&&SUBS[0].contact_phone==='0899999999');
-ok('list shows pending request',await p.$eval('.orqc',e=>e.textContent.includes('รอสมาคมตรวจสอบ')&&e.textContent.includes('ORG-TEST-0001')));
+ok('list shows pending request',await p.$eval('.orqc',e=>e.textContent.includes('รอเจ้าหน้าที่ตรวจสอบ')&&e.textContent.includes('ORG-TEST-0001')));
 ok('SR announces org request sent',await p.waitForFunction(t=>document.getElementById('sr').textContent.includes(t),'ส่งคำขอแล้ว',{timeout:4000}).then(()=>true,()=>false));
 ok('flash after submit',(await p.textContent('.flash')).includes('ส่งคำขอแล้ว'));
 ok('install tip shown after submit (not installed)',await p.$eval('#orq_instip',e=>e.textContent.includes('ก่อนวันให้บริการ 3 วัน')&&!!e.querySelector('[data-insp=open]')));
@@ -178,11 +180,11 @@ ok('pay page shows amount + account',await p.$eval('#app',e=>e.textContent.inclu
 ok('send disabled without slip',await p.$eval('[data-orq=slipsend]',e=>e.disabled));
 await p.setInputFiles('#orq_slip',{name:'slip.png',mimeType:'image/png',buffer:PNG});await p.waitForSelector('#orq_sprev img',{timeout:3000});
 ok('slip preview + send enabled',await p.$eval('[data-orq=slipsend]',e=>!e.disabled));
-await p.click('[data-orq=slipsend]');await p.waitForSelector('[data-orq=back]');await p.waitForFunction(()=>document.querySelector('.orqc')&&document.querySelector('.orqc').textContent.includes('รอสมาคมตรวจสลิป'),null,{timeout:4000});
+await p.click('[data-orq=slipsend]');await p.waitForSelector('[data-orq=back]');await p.waitForFunction(()=>document.querySelector('.orqc')&&document.querySelector('.orqc').textContent.includes('รอเจ้าหน้าที่ตรวจสลิป'),null,{timeout:4000});
 ok('slip uploaded to own folder',UPL.length===1&&UPL[0].path.startsWith('/storage/v1/object/licenses/uuid-1/orgslip-')&&/Bearer at$/.test(UPL[0].auth));
 ok('attach rpc sent with same path',ATT.length===1&&ATT[0].p_id==='rq1'&&UPL[0].path.endsWith(ATT[0].p_path));
 ok('SR announces slip sent',await p.waitForFunction(t=>document.getElementById('sr').textContent.includes(t),'ส่งสลิปแล้ว',{timeout:4000}).then(()=>true,()=>false));
-ok('status now awaiting review',(await p.textContent('.orqc')).includes('ส่งสลิปแล้ว รอสมาคมตรวจสอบ'));
+ok('status now awaiting review',(await p.textContent('.orqc')).includes('ส่งสลิปแล้ว รอเจ้าหน้าที่ตรวจสอบ'));
 // ---- สมาคมปฏิเสธสลิป -> กลับมารอชำระเงินพร้อมหมายเหตุ
 ORL[0].status='awaiting_payment';ORL[0].note='ไม่พบยอดโอน';await p.click('[data-orq=open]').catch(()=>{});
 await p.click('[data-tab=ac]');await p.click('[data-orq=open]');await p.waitForSelector('[data-orq=pay]');
@@ -236,7 +238,7 @@ ok('contact buttons (tel + LINE) on card',await p.$eval('.orqc',e=>!!e.querySele
  ok('report PDF downloads',d.suggestedFilename()==='report-ORG-TEST-0001.pdf'&&buf.slice(0,5).toString()==='%PDF-'&&buf.length>5000);
  await p.click('#orqtab_done');}
 {ORL.find(x=>x.id==='rq9').status='invited';await p.evaluate(()=>orqLoad(1));
- ok('status change alerts requester (SR + flash)',await p.waitForFunction(t=>document.getElementById('sr').textContent.includes(t),'สมาคมอนุมัติคำขอแล้ว',{timeout:4000}).then(()=>true,()=>false)&&(await p.textContent('#app')).includes('สมาคมอนุมัติคำขอแล้ว'));
+ ok('status change alerts requester (SR + flash)',await p.waitForFunction(t=>document.getElementById('sr').textContent.includes(t),'เจ้าหน้าที่อนุมัติคำขอแล้ว',{timeout:4000}).then(()=>true,()=>false)&&(await p.textContent('#app')).includes('เจ้าหน้าที่อนุมัติคำขอแล้ว'));
  ok('status change plays sound + toast',await p.evaluate(()=>!!document.querySelector('[role=status]')&&document.body.textContent.includes('ความคืบหน้าคำขอหน่วยงาน')));
  ORL.find(x=>x.id==='rq9').status='pending';}
 await p.click('[data-orq=again]');await p.waitForSelector('#orqf',{timeout:4000});

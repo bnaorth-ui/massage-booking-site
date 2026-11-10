@@ -113,7 +113,7 @@ await until(()=>document.querySelector('#tabs'));await sleep(500);
 const TX=async()=>await p.evaluate(()=>document.body.innerText);
 const goSet=async()=>{await p.click('#tabs [data-id=mg]');await p.click('[role=tab][data-id=cls]');await sleep(300)};
 const goSettings=async()=>{await p.click('#tabs [data-id=mg]');await p.click('[role=tab][data-id=set]');await sleep(300)};
-if(process.env.NOSQL){await goSet();const tt=await TX();ok('SQL not run yet: fallback text, no crash',tt.includes('ให้ติดต่อสมาคม')&&!(await p.$('#clsask')));console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)}
+if(process.env.NOSQL){await goSet();const tt=await TX();ok('SQL not run yet: fallback text, no crash',tt.includes('ให้ติดต่อเจ้าหน้าที่')&&!(await p.$('#clsask')));console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)}
 await goSettings();ok('settings page no longer has the close card',!(await p.$('#clsask'))&&!(await p.$$eval('#main .card',c=>c.some(x=>x.textContent.includes('ขอปิดบัญชีได้เมื่อ')))));
 {const order=await p.$$eval('[role=tab][data-a=tab]',b=>b.map(x=>x.getAttribute('data-id')));const i=order.indexOf('cls');ok('tab order: set, cls, ct ('+order.join(',')+')',i>0&&order[i-1]==='set'&&order[i+1]==='ct');}
 await goSet();let t=await TX();
@@ -127,7 +127,7 @@ ok('confirm state reset after leaving',(await p.textContent('#clsask')).trim()==
 await p.fill('#clr','เลิกกิจการ');await p.click('#clsask');await p.click('#clsask');await sleep(800);
 ok('rpc called with place+reason',clsCalls.length===1&&clsCalls[0][0]==='req'&&clsCalls[0][1].p_place==='sh1'&&clsCalls[0][1].p_reason==='เลิกกิจการ');
 ok('tab label shows pending status',(await p.textContent('[role=tab][data-id=cls]')).includes('(รอตรวจ)'));
-t=await TX();ok('pending state + cancel button',t.includes('ส่งคำขอปิดบัญชีแล้ว รอสมาคม')&&!!(await p.$('[data-a=clscancel]'))&&!(await p.$('#clsask')));
+t=await TX();ok('pending state + cancel button',t.includes('ส่งคำขอปิดบัญชีแล้ว รอเจ้าหน้าที่')&&!!(await p.$('[data-a=clscancel]'))&&!(await p.$('#clsask')));
 await p.click('[data-a=clscancel]');await sleep(800);
 t=await TX();ok('cancelled -> can request again',clsCalls[1][0]==='cancel'&&t.includes('ยกเลิกคำขอปิดบัญชีแล้ว')&&!!(await p.$('#clsask')));
 // blocked states
@@ -139,7 +139,7 @@ await p.reload();await until(()=>document.querySelector('#tabs'));await sleep(60
 ok('blocked by debt: message + disabled',t.includes('ยังมียอดค้างชำระ 300 บาท')&&await p.$eval('#clsask',e=>e.disabled));
 CLS={...CLS,balance:0,pending_topups:1};
 await p.reload();await until(()=>document.querySelector('#tabs'));await sleep(600);await goSet();t=await TX();
-ok('blocked by pending topup',t.includes('คำขอเติมเงินที่รอสมาคมยืนยัน 1 รายการ')&&await p.$eval('#clsask',e=>e.disabled));
+ok('blocked by pending topup',t.includes('คำขอเติมเงินที่รอเจ้าหน้าที่ยืนยัน 1 รายการ')&&await p.$eval('#clsask',e=>e.disabled));
 CLS={status:'rejected',note:'ยังมีเอกสารค้าง',open_bookings:0,balance:0,pending_topups:0,closed:false};
 await p.reload();await until(()=>document.querySelector('#tabs'));await sleep(600);await goSet();t=await TX();
 ok('rejected shows admin note and allows re-request',t.includes('ไม่ได้รับการอนุมัติ: ยังมีเอกสารค้าง')&&await p.$eval('#clsask',e=>!e.disabled));

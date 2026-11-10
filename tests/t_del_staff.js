@@ -71,7 +71,7 @@ ok('confirm shows warnings',t.includes('ก่อนยืนยัน โปร
 await p.screenshot({path:'dl_staff.png',fullPage:true});
 await p.click('[data-a=dlno]');await sleep(200);ok('cancel confirm',!!(await p.$('[data-a=dlask]'))&&dlCalls.length===0);
 await p.click('[data-a=dlask]');await p.click('[data-a=dlok]');await sleep(500);t=await T0(p);
-ok('request sent -> pending view (shop staff waits for shop)',dlCalls.join()==='req'&&t.includes('รอร้านที่สังกัดตรวจสอบและอนุมัติ')&&!t.includes('รอสมาคม')&&!!(await p.$('[data-a=dlcancel]'))&&!(await p.$('[data-a=dlask]')));
+ok('request sent -> pending view (shop staff waits for shop)',dlCalls.join()==='req'&&t.includes('รอร้านที่สังกัดตรวจสอบและอนุมัติ')&&!t.includes('รอเจ้าหน้าที่')&&!!(await p.$('[data-a=dlcancel]'))&&!(await p.$('[data-a=dlask]')));
 await p.click('[data-a=dlcancel]');await sleep(500);t=await T0(p);
 ok('cancel request -> back to ask',dlCalls.join()==='req,cancel'&&t.includes('ยกเลิกคำขอลบบัญชีแล้ว')&&!!(await p.$('[data-a=dlask]')));
 // rejected state
@@ -82,8 +82,8 @@ DL.st='none';DL.open=2;await p.click('#nav button:nth-child(1)');await p.click('
 ok('open jobs -> button disabled + message',t.includes('ยังมีคิวที่ยังไม่เสร็จ 2 คิว')&&await p.$eval('[data-a=dlask]',e=>e.disabled));
 // central staff -> association
 DL.by='admin';DL.st='none';DL.open=0;await p.click('#nav button:nth-child(1)');await p.click('#nav button:nth-child(5)');await sleep(500);
-await p.click('[data-a=dlask]');t=await T0(p);ok('central: confirm mentions สมาคม',t.includes('กู้คืนไม่ได้เมื่อสมาคมอนุมัติแล้ว'));
-await p.click('[data-a=dlok]');await sleep(500);t=await T0(p);ok('central: pending waits for สมาคม',t.includes('รอสมาคมตรวจสอบและอนุมัติ'));
+await p.click('[data-a=dlask]');t=await T0(p);ok('central: confirm mentions เจ้าหน้าที่',t.includes('กู้คืนไม่ได้เมื่อเจ้าหน้าที่ระบบอนุมัติแล้ว'));
+await p.click('[data-a=dlok]');await sleep(500);t=await T0(p);ok('central: pending waits for เจ้าหน้าที่',t.includes('รอเจ้าหน้าที่ระบบตรวจสอบและอนุมัติ'));
 DL.by='';
 // feature missing -> card hidden
 mode.dlOff=true;await p.click('#nav button:nth-child(1)');await p.click('#nav button:nth-child(5)');await sleep(500);t=await T0(p);

@@ -110,7 +110,7 @@ let t=await p.textContent('#main');
 ok('after-save box',t.includes('เพิ่มน้องใหม่แล้ว')&&!!(await p.$('[data-a=stshare]')));
 if(process.env.NOURL){
  await p.click('[data-a=stshare]');await sleep(200);
- ok('no url -> contact assoc msg',(await p.textContent('#main')).includes('สมาคมยังไม่ได้ตั้งลิงก์แอปพนักงาน')&&(await p.evaluate(()=>window.__sh.length+window.__cp.length))===0);
+ ok('no url -> contact assoc msg',(await p.textContent('#main')).includes('ยังไม่ได้ตั้งลิงก์แอปพนักงาน')&&(await p.evaluate(()=>window.__sh.length+window.__cp.length))===0);
 }else{
  await p.click('[data-a=stshare]');await sleep(300);
  const sh=await p.evaluate(()=>window.__sh);

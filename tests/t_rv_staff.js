@@ -74,7 +74,7 @@ await p.fill('#lph','0844444444');await p.fill('#lpw','staffpass1');await p.clic
 await p.click('#nav [data-id=ac]');await sleep(700);
 let t=await txt('#app');
 ok('section + avg ignoring hidden (4,5 => 4.5)',t.includes('รีวิวของฉัน')&&t.includes('4.5 จาก 5 (2 รีวิว)'));
-ok('hidden tagged',t.includes('สมาคมซ่อนไว้'));
+ok('hidden tagged',t.includes('เจ้าหน้าที่ซ่อนไว้'));
 ok('2 reply buttons (q1,q3 hidden none)',(await p.$$('[data-a=rvreply]')).length===1);
 await p.click('[data-a=rvreply][data-id=q1]');await sleep(200);
 ok('textarea focused',await p.evaluate(()=>document.activeElement&&document.activeElement.id==='rvtxt'));
