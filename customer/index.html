@@ -10,7 +10,7 @@
 <meta property="og:title" content="จองนวดออนไลน์ ร้านนวดใกล้ฉัน"><meta property="og:description" content="นวดโดยคนพิการทางการเห็น ผู้ให้บริการขึ้นทะเบียนถูกต้อง จองคิวได้ทันที"><meta property="og:url" content="https://massage-customer-bna.pages.dev/"><meta property="og:image" content="https://massage-customer-bna.pages.dev/icon-512.png">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"สมาคมวิทยากรฝึกอาชีพคนตาบอด","url":"https://bna.or.th","logo":"https://massage-customer-bna.pages.dev/icon-512.png"}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"จองนวดออนไลน์ต้องทำอย่างไร?","acceptedAnswer":{"@type":"Answer","text":"เลือกร้านและบริการ เลือกวันเวลาและพนักงาน แล้วสมัครสมาชิกหรือเข้าสู่ระบบด้วยเบอร์โทรเพื่อยืนยันการจอง"}},{"@type":"Question","name":"ใครเป็นผู้ให้บริการนวด?","acceptedAnswer":{"@type":"Answer","text":"ผู้ให้บริการเป็นคนพิการทางการเห็นที่ขึ้นทะเบียนกับกรมสนับสนุนบริการสุขภาพ กระทรวงสาธารณสุข และร้านนวดจดทะเบียนตามกฎหมายสถานประกอบการเพื่อสุขภาพ"}},{"@type":"Question","name":"เลื่อนนัดหรือยกเลิกการจองได้ไหม?","acceptedAnswer":{"@type":"Answer","text":"ทำได้เองในแอป ตามเงื่อนไขของแต่ละร้าน"}},{"@type":"Question","name":"ติดต่อร้านหรือพนักงานได้อย่างไร?","acceptedAnswer":{"@type":"Answer","text":"แชตกับร้านหรือพนักงานได้ในแอป"}},{"@type":"Question","name":"มีแต้มสะสมหรือรีวิวไหม?","acceptedAnswer":{"@type":"Answer","text":"มี สะสมแต้มจากการใช้บริการ และรีวิวร้านที่ใช้บริการได้"}},{"@type":"Question","name":"หน่วยงานขอให้หมอนวดไปให้บริการนอกสถานที่ได้ไหม และคิดค่าบริการเท่าไร?","acceptedAnswer":{"@type":"Answer","text":"ได้ เฉพาะหน่วยงานในกรุงเทพมหานคร ค่าบริการ 400 บาทต่อหมอนวด 1 คน ต่อชั่วโมง ไม่รวมช่วงพักเที่ยง ชำระเงินหลังเจ้าหน้าที่อนุมัติและหมอนวดตอบรับแล้ว โดยต้องชำระภายใน 3 วันก่อนวันให้บริการ และขอบริการล่วงหน้าอย่างน้อย 10 วัน"}},{"@type":"Question","name":"ใครจัดทำระบบนี้?","acceptedAnswer":{"@type":"Answer","text":"สมาคมวิทยากรฝึกอาชีพคนตาบอด เพื่อให้คนพิการทางการเห็นมีช่องทางประกอบอาชีพและเข้าถึงลูกค้าได้ง่ายขึ้น"}}]}</script>
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.17"><meta name="app-name" content="ระบบจองนวด สำหรับผู้ใช้งาน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.18"><meta name="app-name" content="ระบบจองนวด สำหรับผู้ใช้งาน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -409,7 +409,7 @@ function watchLoc(){if(watching||!navigator.geolocation||!navigator.geolocation.
 function autoWatch(){try{if(!navigator.geolocation)return;var ask=function(){navigator.geolocation.getCurrentPosition(function(p){if(V.manual)return;V.loc={lat:p.coords.latitude,lng:p.coords.longitude};V.msg="";nearbyCheck(true);watchLoc();if(!S.view&&S.step===0)render(true)},function(){},{timeout:15000,maximumAge:300000})};
  if(navigator.permissions&&navigator.permissions.query)navigator.permissions.query({name:"geolocation"}).then(function(r){if(r.state==="granted")watchLoc();else if(r.state==="prompt")ask()},function(){ask()});else ask()}catch(e){}}
 function tabsRender(){var t=document.getElementById("tabs");if(!t)return;var gA=guestApp();if((!ME&&!gA)||CAT.state!=="ok"){t.style.display="none";return}
- var u=gA?0:unread(),up=gA?0:allBk().filter(isUp).length,cur=S.view==="pv"?"ac":(S.view||""),T=[["","🏠","หน้าหลัก",0,""],["bk","📋","รายการ",up,"กำลังจะถึง "+up+" รายการ"],["fv","❤️","ร้านโปรด",0,""],["nt","🔔","แจ้งเตือน",u,"ยังไม่ได้อ่าน "+u+" รายการ"],["ac","👤","บัญชี",0,""]];
+ var u=gA?0:unread(),up=gA?0:allBk().filter(isUp).length,cur=S.view==="pv"||S.view==="tm"?"ac":(S.view||""),T=[["","🏠","หน้าหลัก",0,""],["bk","📋","รายการ",up,"กำลังจะถึง "+up+" รายการ"],["fv","❤️","ร้านโปรด",0,""],["nt","🔔","แจ้งเตือน",u,"ยังไม่ได้อ่าน "+u+" รายการ"],["ac","👤","บัญชี",0,""]];
  t.innerHTML="<div>"+T.map(function(x){return '<button type="button" data-tab="'+x[0]+'"'+(cur===x[0]?' class="on"':'')+'><span aria-hidden="true">'+x[1]+'</span><b>'+x[2]+'</b>'+(x[3]?'<i class="bdg'+(x[0]==="bk"?" b2":"")+'" aria-label="'+x[4]+'">'+x[3]+'</i>':'')+'</button>'}).join("")+"</div>";t.style.display="";
  t.querySelectorAll("[data-tab]").forEach(function(e){e.onclick=function(){srClear();var v=e.dataset.tab;V.del=false;V.pwc=false;V.pwok="";V.insp=false;V.orq=false;RF=null;RL=null;V.rv=false;V.cfm=null;V.prevSeen=null;var was=S.view;if(v){S.view=v;render();if(ME)refreshUser()}else{S.view=null;V.flash="";if(S.step===5||(!was&&S.step>=1&&S.step<=4))S=fresh();render();window.scrollTo(0,0)}}})}
 function okUrl(u){return /^https?:\/\//i.test(u||"")}
@@ -441,12 +441,14 @@ function viewRender(){var h="",b="";
    TB=[["up","รายการจอง",up],["hist","ประวัติ",hs],["cx","งานถูกยกเลิก",cxl]],cu=TB.filter(function(x){return x[0]===bt})[0]||TB[0],
    EMP={up:"ไม่มีรายการจองที่กำลังจะถึง",hist:"ยังไม่มีประวัติการจอง",cx:"ไม่มีงานที่ถูกยกเลิก"};
   h='<h1>รายการ</h1>'+(V.flash?'<div class="flash">'+esc(V.flash)+'</div>':'')+'<div class="tg" role="tablist" aria-label="หมวดรายการ">'+TB.map(function(x){return '<button type="button" role="tab" data-bt="'+x[0]+'" class="'+(x[0]===cu[0]?"on":"")+'" aria-selected="'+(x[0]===cu[0])+'">'+x[1]+' ('+x[2].length+')</button>'}).join("")+'</div>'+(cu[2].length?bkPage(cu):'<div class="empty">'+EMP[cu[0]]+'</div>')+(cu[0]!=="up"?'<p class="hint">แสดงประวัติย้อนหลัง 12 เดือน</p>':'')}
- if(S.view==="pv"){h=(ME?'<button type="button" class="lb" data-view="ac">← กลับไปหน้าบัญชี</button>':'<button type="button" class="lb" data-view="">← กลับหน้าหลัก</button>')+'<h1>นโยบายความเป็นส่วนตัว</h1>'+pvHtml()}
+ if(S.view==="tm"){h=(ME?'<button type="button" class="lb" data-view="ac">← กลับไปหน้าบัญชี</button>':'<button type="button" class="lb" data-view="">← กลับหน้าหลัก</button>')+'<h1>เงื่อนไขการใช้งาน</h1>'+tmHtml()}
+ if(S.view==="ac"&&V.blk){h=blkPage()}
+ if(S.view==="pv"){h=(ME?'<button type="button" class="lb" data-view="ac">← กลับไปหน้าบัญชี</button>':'<button type="button" class="lb" data-view="">← กลับหน้าหลัก</button>')+'<h1>นโยบายความเป็นส่วนตัว</h1>'+pvHtml()+(TMS&&TMS.need?'<button type="button" class="btn wide" id="tmback" style="margin-top:12px">กลับไปหน้ายอมรับเงื่อนไข</button>':'')}
  if(S.view==="ac"&&V.pwc){h='<button type="button" class="lb" data-pw="no">← กลับ</button><h1 id="pwt" tabindex="-1">เปลี่ยนรหัสผ่าน</h1><p class="sub">กรอกรหัสผ่านเดิม แล้วตั้งรหัสผ่านใหม่</p><form id="pwf" novalidate>'+fld("pwo","รหัสผ่านเดิม (หรือรหัสชั่วคราวที่เจ้าหน้าที่ให้)","password",'autocomplete="current-password"')+fld("pwn","รหัสผ่านใหม่ (อย่างน้อย 6 ตัวอักษร)","password",'autocomplete="new-password"')+fld("pwn2","ยืนยันรหัสผ่านใหม่","password",'autocomplete="new-password"')+'<p class="aerr" id="pwerr" role="alert"></p><div class="mbtns"><button type="button" class="btn ghost" data-pw="no">ยกเลิก</button><button type="submit" class="btn" id="pwgo">บันทึกรหัสผ่านใหม่</button></div></form>'}
  if(S.view==="fv"){h=fvTab()}
  if(S.view==="ac"&&V.insp){h='<button type="button" class="lb" data-insp="no">← กลับ</button>'+insBody()}
  if(S.view==="ac"&&V.orq){h=orqPage()}
- if(S.view==="ac"&&!V.pwc&&!V.insp&&!V.orq){h='<h1>บัญชี</h1>'+(V.pwok?'<div class="flash">'+esc(V.pwok)+'</div>':'')+profHtml()+ptsCard()+'<button type="button" class="btn wide ghost" data-inv="1" style="margin-top:14px">แนะนำเพื่อน</button><p class="hint" id="invmsg" role="status" aria-live="polite" style="margin:6px 0 0"></p>'+orqBar()+capBar(1)+cmpBar()+ctHtml()+'<button type="button" class="btn wide ghost" data-view="pv" style="margin-top:14px">นโยบายความเป็นส่วนตัว</button>'+(insKind()?'<button type="button" class="btn wide ghost" data-insp="open" style="margin-top:10px">วิธีติดตั้งแอป</button>':'')+'<button type="button" class="btn wide ghost" data-pw="ask" style="margin-top:10px">เปลี่ยนรหัสผ่าน</button><button type="button" class="btn wide ghost" data-auth="out" style="margin-top:14px">ออกจากระบบ</button><h2 class="stl">ลบบัญชี</h2><p class="hint">ลบบัญชีและข้อมูลส่วนตัวของคุณถาวร กู้คืนไม่ได้</p><button type="button" class="btn wide dgr ghost" data-del="ask" style="margin-top:8px">ลบบัญชีของฉัน</button>'+verTxt()}
+ if(S.view==="ac"&&!V.pwc&&!V.insp&&!V.orq&&!V.blk){h='<h1>บัญชี</h1>'+(V.pwok?'<div class="flash">'+esc(V.pwok)+'</div>':'')+profHtml()+ptsCard()+'<button type="button" class="btn wide ghost" data-inv="1" style="margin-top:14px">แนะนำเพื่อน</button><p class="hint" id="invmsg" role="status" aria-live="polite" style="margin:6px 0 0"></p>'+orqBar()+capBar(1)+cmpBar()+ctHtml()+'<button type="button" class="btn wide ghost" data-view="pv" style="margin-top:14px">นโยบายความเป็นส่วนตัว</button><button type="button" class="btn wide ghost" data-view="tm" style="margin-top:10px">เงื่อนไขการใช้งาน</button><button type="button" class="btn wide ghost" data-blk="open" style="margin-top:10px">ผู้ที่บล็อกไว้</button>'+(insKind()?'<button type="button" class="btn wide ghost" data-insp="open" style="margin-top:10px">วิธีติดตั้งแอป</button>':'')+'<button type="button" class="btn wide ghost" data-pw="ask" style="margin-top:10px">เปลี่ยนรหัสผ่าน</button><button type="button" class="btn wide ghost" data-auth="out" style="margin-top:14px">ออกจากระบบ</button><h2 class="stl">ลบบัญชี</h2><p class="hint">ลบบัญชีและข้อมูลส่วนตัวของคุณถาวร กู้คืนไม่ได้</p><button type="button" class="btn wide dgr ghost" data-del="ask" style="margin-top:8px">ลบบัญชีของฉัน</button>'+verTxt()}
  if(S.view==="ac"&&V.del){h='<button type="button" class="lb" data-del="no">← ยกเลิก ไม่ลบ</button><h1 id="delt" tabindex="-1">ลบบัญชีถาวร</h1><p>การลบนี้กู้คืนไม่ได้ สิ่งที่จะเกิดขึ้น</p><ul class="pvl"><li>โปรไฟล์ รูปโปรไฟล์ แต้มสะสม การแจ้งเตือน รายการโปรด และข้อความแชตที่คุณส่ง จะถูกลบ</li><li>ประวัติการจองจะถูกล้างชื่อและเบอร์โทร ไม่ผูกกับคุณอีก</li><li>รีวิวที่คุณเขียนยังอยู่ แต่ไม่ผูกกับบัญชีคุณ</li><li>ต้องไม่มีการจองที่ยังไม่เสร็จสิ้น</li></ul><form id="delf" novalidate>'+fld("delpw","กรอกรหัสผ่านเพื่อยืนยัน","password",'autocomplete="current-password"')+'<p class="aerr" id="delerr" role="alert"></p><div class="mbtns"><button type="button" class="btn" data-del="no">ยกเลิก ไม่ลบ</button><button type="submit" class="btn dgr" id="delgo">ยืนยันลบบัญชีถาวร</button></div></form>'}
  if(S.view==="nt"){var prev=V.prevSeen!=null?V.prevSeen:(V.prevSeen=seenAt()),notes=userNotes(),an=ANN.filter(function(x){return x.on&&(x.auds||[]).indexOf("ผู้ใช้งาน")>-1});
   try{localStorage.setItem("notifSeen",new Date().toISOString())}catch(e){}
@@ -463,6 +465,7 @@ function render(keep){
  try{tabsRender()}catch(e){}
  if(!ME&&!GUEST){if(!document.getElementById("authf"))authRender();return}
  if(CAT.state!=="ok"){catRender();return}
+ if(ME&&!GUEST){termsCheck();if(TMS&&TMS.need&&!(S.view==="pv"&&TMS.pv)){tmGate();return}}
  orqGoCheck();capGoCheck();
  cmpLoad();
  orqLinkGo();
@@ -559,8 +562,11 @@ function bind(){
  q("[data-mv]").forEach(function(e){e.onclick=function(){V.moving=null;V.moveKeys=[];V.moveItems=[];S=fresh();S.view="bk";render()}});
  q("[data-nt]").forEach(function(e){e.onclick=function(){V.nt=e.dataset.nt;render()}});
  q("[data-bt]").forEach(function(e){e.onclick=function(){V.bt=e.dataset.bt;V.cfm=null;render()}});
- q("[data-view]").forEach(function(e){e.onclick=function(){V.orq=false;V.cfm=null;V.prevSeen=null;S.view=e.dataset.view;render();if(S.view&&ME)refreshUser()}});
+ q("[data-view]").forEach(function(e){e.onclick=function(){V.orq=false;V.blk=false;V.cfm=null;V.prevSeen=null;S.view=e.dataset.view;render();if(S.view&&ME)refreshUser()}});
  q("[data-act=busy]").forEach(function(e){e.onclick=function(){S.busyErr="";render(true)}});
+ q("[data-blk]").forEach(function(e){e.onclick=function(){V.blk=e.dataset.blk==="open";if(V.blk)blkLoad();render();var t=document.getElementById(V.blk?"blkt":"");if(t)t.focus()}});
+ q("[data-ublk]").forEach(function(e){e.onclick=function(){e.disabled=true;sbApi("/rest/v1/rpc/chat_unblock",{method:"POST",json:1,body:JSON.stringify({p_id:e.dataset.ublk})}).then(function(){BLK.list=BLK.list.filter(function(x){return x.id!==e.dataset.ublk});render(1);var m=document.getElementById("blkm");if(m)m.textContent="ยกเลิกบล็อกแล้ว";ann("ยกเลิกบล็อกแล้ว");var t=document.getElementById("blkt");if(t)t.focus()},function(x){e.disabled=false;var m=document.getElementById("blkm");if(m)m.textContent=errTh(x,"ยกเลิกบล็อกไม่สำเร็จ")})}});
+ (function(){var tb=document.getElementById("tmback");if(tb)tb.onclick=function(){TMS.pv=false;S.view="";render()}})();
  q("[data-del]").forEach(function(e){e.onclick=function(){V.del=e.dataset.del==="ask";render();if(V.del){var t=document.getElementById("delt");if(t)t.focus()}else window.scrollTo(0,document.body.scrollHeight)}});
  if(g("delf"))g("delf").onsubmit=function(ev){ev.preventDefault();delAccount()};
  q("[data-insp]").forEach(function(e){e.onclick=function(){V.insp=e.dataset.insp==="open";if(V.insp)V.orq=false;render();if(V.insp){var t=document.getElementById("inst");if(t)t.focus()}}});
@@ -701,7 +707,7 @@ function avUrl(p){return p?SB.url+"/storage/v1/object/public/avatars/"+p:""}
 function loadProfile(){var uid=SBS.user.id,m=SBS.user.user_metadata||{};
  return sbApi("/rest/v1/profiles?id=eq."+uid+"&select=first_name,last_name,phone,avatar_path").then(function(a){var p=(a&&a[0])||{};
   return{id:uid,fn:p.first_name||m.first_name||"",ln:p.last_name||m.last_name||"",phone:p.phone||m.phone||"",img:avUrl(p.avatar_path),imgPath:p.avatar_path||null}})}
-function setMe(u){ME=u;if(u){GUEST=false;wr("hadAcct",true)}if(u)setTimeout(function(){try{saveLoc()}catch(e){}},800);CUSTOMER=u?(u.fn+" "+u.ln).trim():""}
+function setMe(u){ME=u;TMS=null;if(u){GUEST=false;wr("hadAcct",true)}if(u)setTimeout(function(){try{saveLoc()}catch(e){}},800);CUSTOMER=u?(u.fn+" "+u.ln).trim():""}
 function errTh(e,ctx){var m=String(e&&e.message||"");
  if(m==="NET")return"เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ ตรวจสอบอินเทอร์เน็ตแล้วลองใหม่";
  if(e&&e.code==="P0001")return m;
@@ -733,11 +739,11 @@ function chatBtns(b){if(!CHOK||!b.id||apptEnd(b).getTime()+3*3600000<Date.now())
 function chTime(iso){var d=new Date(iso),t=d.toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit",timeZone:"Asia/Bangkok"}),day=function(x){return new Date(x.getTime()+252e5).toISOString().slice(0,10)};return (day(d)===day(new Date())?"":d.toLocaleDateString("th-TH",{day:"numeric",month:"short",timeZone:"Asia/Bangkok"})+" ")+t+" น."}
 function chMsgHtml(m){var me=ME&&m.sender_id===ME.id;return '<div class="msg '+(me?"mine":"theirs")+'"><small>'+(me?"คุณ":esc(m.sender_name||"อีกฝ่าย"))+', '+chTime(m.created_at)+'</small><p>'+esc(m.body).replace(/\n/g,"<br>")+'</p></div>'}
 function chatRender(){if(!CH)return;var tb=document.getElementById("tabs");document.documentElement.style.setProperty("--nbh",(tb&&tb.style.display!=="none"?tb.offsetHeight:0)+"px");var who=CH.room==="shop"?"ร้าน":"พนักงาน";
- app.innerHTML='<div class="chh"><button type="button" class="btn ghost" id="chback">← กลับ</button></div><h1 id="chtitle" tabindex="-1">'+esc(CH.title)+'</h1><p class="sub">การจองเลขที่ '+esc(CH.ref)+', ข้อความนี้เห็นเฉพาะคุณกับ'+who+' ห้องแชตเปิดถึง 3 ชั่วโมงหลังการจองสิ้นสุด</p><div id="chl" class="chl" role="log" aria-live="polite" aria-label="ข้อความในห้องแชต">'+(CH.msgs.length?CH.msgs.map(chMsgHtml).join(""):'<p class="hint" id="chempty">ยังไม่มีข้อความ พิมพ์ข้อความแรกได้เลย</p>')+'</div><div id="che" class="err" role="alert" style="display:none"></div>'+
-  (CH.closed?'<p class="hint">ห้องแชตนี้ปิดแล้ว อ่านย้อนหลังได้อย่างเดียว</p>':'<form id="chf" class="chf"><label class="vh" for="chi">พิมพ์ข้อความ</label><textarea id="chi" class="sel" maxlength="500" rows="2" placeholder="พิมพ์ข้อความ (ไม่เกิน 500 ตัวอักษร)"></textarea><button class="btn" type="submit" id="chsend">ส่ง</button></form>');
+ app.innerHTML='<div class="chh"><button type="button" class="btn ghost" id="chback">← กลับ</button></div><h1 id="chtitle" tabindex="-1">'+esc(CH.title)+'</h1><p class="sub">การจองเลขที่ '+esc(CH.ref)+', ข้อความนี้เห็นเฉพาะคุณกับ'+who+' ห้องแชตเปิดถึง 3 ชั่วโมงหลังการจองสิ้นสุด</p><div id="chsx">'+chSafeHtml()+'</div><div id="chl" class="chl" role="log" aria-live="polite" aria-label="ข้อความในห้องแชต">'+(CH.msgs.length?CH.msgs.map(chMsgHtml).join(""):'<p class="hint" id="chempty">ยังไม่มีข้อความ พิมพ์ข้อความแรกได้เลย</p>')+'</div><div id="che" class="err" role="alert" style="display:none"></div>'+
+  '<div id="chfx">'+chFormHtml()+'</div>';
  bar.innerHTML="";bar.style.display="none";
  var bk=document.getElementById("chback");if(bk)bk.onclick=closeChat;
- var f=document.getElementById("chf");if(f)f.onsubmit=function(e){e.preventDefault();chatSend()};
+ chFormBind();chSafeBind();
  var l=document.getElementById("chl");if(l)l.scrollTop=l.scrollHeight;window.scrollTo(0,document.body.scrollHeight)}
 function chErr(t){var e=document.getElementById("che");if(!e)return;e.textContent=t||"";e.style.display=t?"":"none"}
 function chFetch(){if(!CH||chBusy)return Promise.resolve();chBusy=true;var c=CH,first=!c.loaded;
@@ -747,12 +753,74 @@ function chFetch(){if(!CH||chBusy)return Promise.resolve();chBusy=true;var c=CH,
   if(a.length){var l=document.getElementById("chl");if(l){var em=document.getElementById("chempty");if(em)em.remove();var near=l.scrollHeight-l.scrollTop-l.clientHeight<80;l.insertAdjacentHTML("beforeend",a.map(chMsgHtml).join(""));if(near)l.scrollTop=l.scrollHeight;window.scrollTo(0,document.body.scrollHeight)}
    if(a.some(function(m){return m.sender_id!==ME.id}))chatReadMark()}},function(e){chBusy=false;if(CH!==c)return;if(first){c.loaded=true;chatRender();chErr(errTh(e,"โหลดข้อความไม่สำเร็จ"))}})}
 function chatReadMark(){if(!CH)return;var c=CH;sbApi("/rest/v1/rpc/chat_mark_read",{method:"POST",json:1,body:JSON.stringify({p_booking:c.bid,p_room:c.room})}).then(function(){delete CU[chKey(c.bid,c.room)]}).catch(function(){})}
-function openChat(bid,room,ref,title){CH={bid:bid,room:room,ref:ref,title:title,msgs:[],ids:{},last:null,loaded:false,closed:false,sending:false};V.chat=true;tabsRender();app.innerHTML='<p class="sub" role="status">กำลังโหลดข้อความ</p>';bar.style.display="none";window.scrollTo(0,0);
+function openChat(bid,room,ref,title){CH={bid:bid,room:room,ref:ref,title:title,msgs:[],ids:{},last:null,loaded:false,closed:false,sending:false,st:null,rp:false,bq:false};chState(CH);V.chat=true;tabsRender();app.innerHTML='<p class="sub" role="status">กำลังโหลดข้อความ</p>';bar.style.display="none";window.scrollTo(0,0);
  chFetch();clearInterval(chT);chT=setInterval(function(){if(!document.hidden)chFetch()},4000)}
 function closeChat(){clearInterval(chT);chT=null;CH=null;V.chat=false;render();refreshUser()}
 function chatSend(){if(!CH||CH.sending)return;var c=CH,ta=document.getElementById("chi"),txt=ta?ta.value.trim():"";if(!txt){if(ta)ta.focus();return}
  c.sending=true;var bt=document.getElementById("chsend");if(bt)bt.disabled=true;chErr("");
- sbApi("/rest/v1/rpc/chat_send",{method:"POST",json:1,body:JSON.stringify({p_booking:c.bid,p_room:c.room,p_body:txt})}).then(function(){c.sending=false;if(CH!==c)return;if(ta)ta.value="";if(bt)bt.disabled=false;chBusy=false;return chFetch().then(function(){var t=document.getElementById("chi");if(t)t.focus()})},function(e){c.sending=false;if(bt)bt.disabled=false;var m=errTh(e,"ส่งข้อความไม่สำเร็จ");if(/ปิดแล้ว/.test(m))c.closed=true;chErr(m);if(c.closed){clearInterval(chT);var f=document.getElementById("chf");if(f)f.outerHTML='<p class="hint">ห้องแชตนี้ปิดแล้ว อ่านย้อนหลังได้อย่างเดียว</p>'}})}
+ sbApi("/rest/v1/rpc/chat_send",{method:"POST",json:1,body:JSON.stringify({p_booking:c.bid,p_room:c.room,p_body:txt})}).then(function(){c.sending=false;if(CH!==c)return;if(ta)ta.value="";if(bt)bt.disabled=false;chBusy=false;return chFetch().then(function(){var t=document.getElementById("chi");if(t)t.focus()})},function(e){c.sending=false;if(bt)bt.disabled=false;var m=errTh(e,"ส่งข้อความไม่สำเร็จ");if(/ปิดแล้ว/.test(m))c.closed=true;chErr(m);if(/บล็อก|ระงับ/.test(m))chState(c);if(c.closed){clearInterval(chT);var f=document.getElementById("chf");if(f)f.outerHTML='<p class="hint">ห้องแชตนี้ปิดแล้ว อ่านย้อนหลังได้อย่างเดียว</p>'}})}
+/* ===== ความปลอดภัยในแชต: รายงาน และ บล็อก (ฐานข้อมูล: chat_room_state, chat_report, chat_block, chat_unblock)
+   รายงาน: เจ้าหน้าที่เห็นสำเนาข้อความล่าสุดของห้องนี้ บล็อก: ทั้งสองฝ่ายส่งข้อความหากันไม่ได้ ทุกการจอง
+   ถ้าฐานข้อมูลยังไม่มีฟังก์ชันเหล่านี้ ปุ่มจะไม่แสดง แชตใช้งานได้ตามเดิม ===== */
+var RSN=[["abuse","ไม่สุภาพหรือคุกคาม"],["offplatform","ชวนติดต่อหรือนัดนอกระบบ"],["sexual","เนื้อหาทางเพศ"],["scam","หลอกลวง"],["other","อื่นๆ"]];
+function chWho(){return CH&&CH.room==="shop"?"ร้าน":"พนักงาน"}
+function chState(c){return sbApi("/rest/v1/rpc/chat_room_state",{method:"POST",json:1,body:JSON.stringify({p_booking:c.bid,p_room:c.room})}).then(function(j){if(CH!==c)return;c.st=j||null;chSafeUpdate()},function(){if(CH!==c)return;c.st=null;chSafeUpdate()})}
+function chLock(){var s=CH&&CH.st;if(!s)return"";if(s.suspended)return"บัญชีของคุณถูกระงับ ส่งแชตไม่ได้ สอบถามได้ที่เมนูติดต่อเรา";if(s.blocked_by_me)return"คุณบล็อก"+chWho()+"นี้ไว้ ส่งข้อความหากันไม่ได้ กดปุ่ม ยกเลิกบล็อก ถ้าต้องการคุยต่อ";if(s.blocked_by_other)return"อีกฝ่ายปิดรับข้อความจากคุณ ส่งข้อความในห้องนี้ไม่ได้";return""}
+function chFormHtml(){if(!CH)return"";if(CH.closed)return'<p class="hint">ห้องแชตนี้ปิดแล้ว อ่านย้อนหลังได้อย่างเดียว</p>';var lk=chLock();if(lk)return'<p class="hint" id="chlock">'+esc(lk)+'</p>';
+ return'<form id="chf" class="chf"><label class="vh" for="chi">พิมพ์ข้อความ</label><textarea id="chi" class="sel" maxlength="500" rows="2" placeholder="พิมพ์ข้อความ (ไม่เกิน 500 ตัวอักษร)"></textarea><button class="btn" type="submit" id="chsend">ส่ง</button></form>'}
+function chFormBind(){var f=document.getElementById("chf");if(f)f.onsubmit=function(e){e.preventDefault();chatSend()}}
+function chSafeHtml(){var s=CH&&CH.st,w=chWho();if(!s)return"";
+ if(CH.rp)return'<form id="chrf" class="card" style="margin:8px 0" novalidate><fieldset style="border:0;margin:0;padding:0"><legend id="chrl" tabindex="-1"><b>รายงานแชตนี้ถึงเจ้าหน้าที่</b></legend><p class="hint" style="margin:4px 0 8px">เจ้าหน้าที่จะเห็นข้อความล่าสุดในห้องนี้ เพื่อตรวจสอบ อีกฝ่ายจะไม่รู้ว่าใครรายงาน</p>'+
+  RSN.map(function(x){return'<label class="chk" for="chr_'+x[0]+'"><input type="radio" name="chr" id="chr_'+x[0]+'" value="'+x[0]+'"> '+x[1]+'</label>'}).join("")+'</fieldset>'+
+  '<label class="fl" for="chrd">รายละเอียดเพิ่มเติม (ต้องกรอกถ้าเลือก อื่นๆ)</label><textarea id="chrd" class="sel" maxlength="500" rows="2"></textarea>'+
+  '<div class="mbtns" style="margin-top:8px"><button type="submit" class="btn">ส่งรายงาน</button><button type="button" class="btn ghost" data-chs="rc">ยกเลิก</button></div><p id="chrm" class="aerr" role="alert"></p></form>';
+ if(CH.bq)return'<div class="card" style="margin:8px 0" role="group" aria-labelledby="chbq"><p id="chbq" tabindex="-1" style="margin:0 0 8px"><b>บล็อก'+w+'นี้?</b> ทั้งสองฝ่ายจะส่งข้อความหากันไม่ได้ ทุกการจอง ยกเลิกบล็อกได้ภายหลังที่หน้าบัญชี</p><div class="mbtns"><button type="button" class="btn" data-chs="bk">ยืนยันบล็อก</button><button type="button" class="btn ghost" data-chs="bc">ยกเลิก</button></div></div>';
+ return'<div class="mbtns chs" role="group" aria-label="ความปลอดภัยในแชต">'+(s.reported?'<button type="button" class="btn ghost" id="chrp" aria-disabled="true" style="opacity:.6">รายงานแล้ว รอเจ้าหน้าที่ตรวจสอบ</button>':'<button type="button" class="btn ghost" id="chrp" data-chs="rp">รายงาน</button>')+
+  (s.blocked_by_me?'<button type="button" class="btn ghost" id="chbk" data-chs="ub">ยกเลิกบล็อก</button>':'<button type="button" class="btn ghost" id="chbk" data-chs="bq">บล็อก</button>')+'</div><p id="chsm" class="hint" role="status" aria-live="polite" style="margin:4px 0 0"></p>'}
+function chSafeUpdate(focusId,msg){var sx=document.getElementById("chsx");if(!sx||!CH)return;sx.innerHTML=chSafeHtml();chSafeBind();
+ var fx=document.getElementById("chfx");if(fx){var had=!!document.getElementById("chf"),want=!CH.closed&&!chLock();if(had!==want){fx.innerHTML=chFormHtml();chFormBind()}}
+ if(msg){var m=document.getElementById("chsm");if(m)m.textContent=msg;ann(msg)}
+ if(focusId){var e=document.getElementById(focusId);if(e)e.focus()}}
+function chSafeBind(){var c=CH;if(!c)return;var call=function(fn,body){return sbApi("/rest/v1/rpc/"+fn,{method:"POST",json:1,body:JSON.stringify(body)})};
+ document.querySelectorAll("#chsx [data-chs]").forEach(function(b){b.onclick=function(){var a=b.dataset.chs;
+  if(a==="rp"){c.rp=true;c.bq=false;chSafeUpdate("chrl");return}
+  if(a==="rc"){c.rp=false;chSafeUpdate("chrp");return}
+  if(a==="bq"){c.bq=true;c.rp=false;chSafeUpdate("chbq");return}
+  if(a==="bc"){c.bq=false;chSafeUpdate("chbk");return}
+  if(a==="bk"){b.disabled=true;call("chat_block",{p_booking:c.bid,p_room:c.room}).then(function(id){if(CH!==c)return;c.bq=false;c.st.blocked_by_me=true;c.st.block_id=id;chSafeUpdate("chbk","บล็อกแล้ว ทั้งสองฝ่ายส่งข้อความหากันไม่ได้")},function(e){b.disabled=false;chErr(errTh(e,"บล็อกไม่สำเร็จ"))});return}
+  if(a==="ub"){b.disabled=true;call("chat_unblock",{p_id:c.st.block_id}).then(function(){if(CH!==c)return;c.st.blocked_by_me=false;c.st.block_id=null;chSafeUpdate("chbk","ยกเลิกบล็อกแล้ว")},function(e){b.disabled=false;chErr(errTh(e,"ยกเลิกบล็อกไม่สำเร็จ"))});return}}});
+ var f=document.getElementById("chrf");if(f)f.onsubmit=function(e){e.preventDefault();var r=f.querySelector("input[name=chr]:checked"),d=document.getElementById("chrd").value.trim(),m=document.getElementById("chrm");
+  if(!r){m.textContent="กรุณาเลือกเหตุผล";var x=document.getElementById("chr_abuse");if(x)x.focus();return}
+  if(r.value==="other"&&!d){m.textContent="กรุณาพิมพ์รายละเอียด";document.getElementById("chrd").focus();return}
+  var sb=f.querySelector("button[type=submit]");sb.disabled=true;m.textContent="";
+  call("chat_report",{p_booking:c.bid,p_room:c.room,p_reason:r.value,p_detail:d||null}).then(function(){if(CH!==c)return;c.rp=false;c.st.reported=true;chSafeUpdate("chrp","ส่งรายงานถึงเจ้าหน้าที่แล้ว ขอบคุณที่แจ้ง")},function(e){sb.disabled=false;m.textContent=errTh(e,"ส่งรายงานไม่สำเร็จ");if(/รายงานห้องนี้ไว้แล้ว/.test(m.textContent)){c.rp=false;c.st.reported=true;chSafeUpdate("chrp",m.textContent)}})}}
+/* ===== ผู้ที่บล็อกไว้ (หน้าบัญชี) ===== */
+var BLK=null;
+function blkLoad(){BLK={loading:true,list:[]};sbApi("/rest/v1/rpc/my_blocks",{method:"POST",json:1,body:JSON.stringify({p_app:"customer"})}).then(function(a){BLK={list:a||[]}},function(e){BLK={err:errTh(e,"โหลดรายชื่อไม่สำเร็จ"),list:[]}}).then(function(){if(V.blk&&S.view==="ac")render(1)})}
+function blkPage(){var b=BLK||{list:[]};return'<button type="button" class="lb" data-blk="no">← กลับไปหน้าบัญชี</button><h1 id="blkt" tabindex="-1">ผู้ที่บล็อกไว้</h1><p class="sub">ร้านหรือพนักงานที่คุณบล็อก ส่งข้อความหาคุณไม่ได้ และคุณส่งหาเขาไม่ได้ ทุกการจอง</p>'+
+ (b.loading?'<p class="hint" role="status">กำลังโหลด…</p>':b.err?'<p class="aerr" role="alert">'+esc(b.err)+'</p>':!b.list.length?'<div class="empty">ยังไม่ได้บล็อกใคร</div>':
+ '<ul class="list" style="list-style:none;padding:0">'+b.list.map(function(x){return'<li class="card" style="display:flex;gap:8px;align-items:center;justify-content:space-between"><span>'+esc(x.name||"-")+' ('+(x.kind==="shop"?"ร้าน":"พนักงาน")+')</span><button type="button" class="btn ghost" data-ublk="'+esc(x.id)+'" aria-label="ยกเลิกบล็อก '+esc(x.name||"")+'">ยกเลิกบล็อก</button></li>'}).join("")+'</ul>')+'<p id="blkm" class="hint" role="status" aria-live="polite"></p>'}
+/* ===== เงื่อนไขการใช้งาน (ฐานข้อมูล: terms_status, accept_terms; เลขฉบับอยู่ใน app_settings.terms_version) ===== */
+var TMS=null;
+function tmHtml(){var c=(typeof SET!=="undefined"&&SET.ct)||{},nm=c.name||"สมาคมวิทยากรฝึกอาชีพคนตาบอด";
+ var S2=function(t,b){return'<h2>'+t+'</h2>'+b},L=function(a){return'<ul>'+a.map(function(x){return'<li>'+x+'</li>'}).join("")+'</ul>'};
+ return'<div class="pv"><p>'+esc(nm)+' เป็นผู้ดูแลระบบจองคิวนวดนี้ การสมัครและใช้งานถือว่าคุณยอมรับเงื่อนไขต่อไปนี้</p>'+
+ S2("1. บัญชีของคุณ",L(["ใช้ชื่อจริงและเบอร์มือถือของคุณเอง 1 คนต่อ 1 บัญชี","เก็บรหัสผ่านไว้เป็นความลับ การจองที่เกิดจากบัญชีของคุณถือเป็นการจองของคุณ"]))+
+ S2("2. การจองและการยกเลิก",L(["ยกเลิกหรือเลื่อนคิวได้ภายในเวลาที่แต่ละร้านกำหนด ดูได้ในหน้ารายละเอียดร้าน","ถ้าจองแล้วไม่มาโดยไม่ยกเลิก หมอนวดจะบันทึกว่าไม่มาใช้บริการ และจะไม่ได้แต้มสะสมของการจองนั้น","ถ้าไม่มาซ้ำหลายครั้ง เจ้าหน้าที่อาจระงับการจองของบัญชีนั้น"]))+
+ S2("3. การนวดเพื่อสุขภาพเท่านั้น",L(["บริการในระบบนี้เป็นการนวดเพื่อสุขภาพ ไม่ใช่การรักษาโรค","ถ้าคุณมีโรคประจำตัว ตั้งครรภ์ หรือมีอาการบาดเจ็บ ให้แจ้งหมอนวดก่อนเริ่มนวด","ห้ามขอหรือเสนอบริการทางเพศโดยเด็ดขาด"]))+
+ S2("4. ความประพฤติ",L(["ให้เกียรติหมอนวด ร้าน และผู้ใช้คนอื่น","ห้ามใช้ถ้อยคำหยาบคาย คุกคาม ข่มขู่ หรือเลือกปฏิบัติ ทั้งในแชต รีวิว และระหว่างรับบริการ","ห้ามชวนหมอนวดรับงานหรือรับเงินนอกระบบ","ห้ามเขียนรีวิวเท็จ หรือรีวิวร้านที่ไม่ได้ใช้บริการจริง"]))+
+ S2("5. แชตและรีวิว",L(["ข้อความแชตเห็นเฉพาะคุณกับร้านหรือหมอนวดของการจองนั้น","ถ้าเจอข้อความไม่เหมาะสม กดปุ่ม รายงาน ในห้องแชตได้ เจ้าหน้าที่จะเห็นข้อความในห้องที่ถูกรายงาน เพื่อตรวจสอบ","กดปุ่ม บล็อก เพื่อหยุดรับข้อความจากอีกฝ่ายได้ทุกเมื่อ","ถ้าร้านหรือหมอนวดบล็อกคุณ คุณจะจองร้านหรือหมอนวดคนนั้นไม่ได้อีก แต่ยังจองที่อื่นได้"]))+
+ S2("6. การระงับบัญชี",L(["ถ้าทำผิดเงื่อนไข เจ้าหน้าที่อาจตักเตือน หรือระงับบัญชี","บัญชีที่ถูกระงับจะจองใหม่และส่งแชตไม่ได้ แต่ยังดูประวัติและขอลบบัญชีได้","เจ้าหน้าที่เป็นผู้ตัดสินเสมอ ระบบไม่ระงับบัญชีอัตโนมัติจากการถูกรายงาน"]))+
+ S2("7. บริการสำหรับหน่วยงาน",L(["ต้องขอล่วงหน้าอย่างน้อย 10 วัน และชำระเงินอย่างน้อย 3 วันก่อนวันให้บริการ","รายละเอียดและการคืนเงินเป็นไปตามที่แจ้งในขั้นตอนขอบริการ"]))+
+ S2("8. การเปลี่ยนแปลงเงื่อนไข",L(["สมาคมอาจปรับเงื่อนไขนี้ ถ้ามีการเปลี่ยนแปลงสำคัญ จะขอให้คุณกดยอมรับอีกครั้ง"]))+
+ S2("9. ติดต่อ",L(["สอบถามหรือร้องเรียน ติดต่อเจ้าหน้าที่ได้ในเมนูติดต่อเรา"]))+'</div>'}
+function termsCheck(){if(TMS)return;TMS={loading:true};var me=ME;sbApi("/rest/v1/rpc/terms_status",{method:"POST",json:1,body:JSON.stringify({p_app:"customer"})}).then(function(j){if(ME!==me)return;var need=!!(j&&j.current&&!(j.accepted>=j.current));TMS={need:need};if(need)render()},function(){if(ME!==me)return;TMS={need:false}})}
+function tmGate(){app.innerHTML='<h1 id="tmgt" tabindex="-1">เงื่อนไขการใช้งาน</h1><div class="flash">กรุณาอ่านและกดยอมรับเงื่อนไขการใช้งาน เพื่อใช้งานต่อ</div>'+tmHtml()+'<p class="aerr" id="tmge" role="alert"></p><button type="button" class="btn wide" id="tmacc">ยอมรับเงื่อนไขการใช้งาน</button><button type="button" class="btn wide ghost" data-view="pv" id="tmpv" style="margin-top:8px">อ่านนโยบายความเป็นส่วนตัว</button><button type="button" class="btn wide ghost" id="tmout" style="margin-top:8px">ออกจากระบบ</button>';
+ bar.innerHTML="";bar.style.display="none";
+ document.getElementById("tmacc").onclick=function(){var b=this;b.disabled=true;sbApi("/rest/v1/rpc/accept_terms",{method:"POST",json:1,body:JSON.stringify({p_app:"customer"})}).then(function(){TMS={need:false};ann("ยอมรับเงื่อนไขการใช้งานแล้ว");render()},function(e){b.disabled=false;document.getElementById("tmge").textContent=errTh(e,"บันทึกไม่สำเร็จ ลองใหม่อีกครั้ง")})};
+ document.getElementById("tmpv").onclick=function(){TMS.pv=true;S.view="pv";render()};
+ document.getElementById("tmout").onclick=function(){logout()};
+ var t=document.getElementById("tmgt");if(t)t.focus()}
 /* ===== รายการโปรด ===== */
 var FV={p:{},s:{}},FVOK=false,FVERR=false,FVB=false;
 function loadFavs(){return Promise.all([sbApi("/rest/v1/favorite_places?select=place_id"),sbApi("/rest/v1/favorite_staff?select=staff_id")]).then(function(r){FV={p:{},s:{}};(r[0]||[]).forEach(function(x){FV.p[x.place_id]=1});(r[1]||[]).forEach(function(x){FV.s[x.staff_id]=1});FVOK=true;FVERR=false}).catch(function(){if(!FVOK)FVERR=true})}
@@ -892,9 +960,9 @@ function pvHtml(){var c=(typeof SET!=="undefined"&&SET.ct)||{},tel=String(c.phon
  var S2=function(t,b){return '<h2 class="stl">'+t+'</h2>'+b},L=function(a){return '<ul class="pvl">'+a.map(function(x){return '<li>'+x+'</li>'}).join("")+'</ul>'};
  return '<div class="pv"><p>'+esc(nm)+' เป็นผู้ดูแลข้อมูลของคุณในระบบจองคิวนวดนี้</p>'+
   S2("เราเก็บข้อมูลอะไร",L(["ชื่อ เบอร์โทรศัพท์ และรูปโปรไฟล์ (ถ้าคุณเพิ่ม)","รายการจอง แต้มสะสม ข้อความแชต รีวิวที่คุณเขียน และร้านกับพนักงานที่คุณกดโปรด","ตำแหน่งโดยประมาณ เก็บเฉพาะเมื่อคุณกดอนุญาต","เมื่อคุณส่งคำขอบริการสำหรับหน่วยงาน: ชื่อหน่วยงาน ที่อยู่ พิกัดที่ปักหมุด ชื่อและเบอร์ผู้ติดต่อ และสลิปการโอน (ถ้าแนบ)"]))+
-  S2("เราใช้ข้อมูลทำอะไร",L(["ให้คุณจองคิว ยกเลิก เลื่อนคิว และคุยกับร้านหรือพนักงาน","แสดงร้านที่อยู่ใกล้ และแจ้งเตือนเรื่องการจอง โปรโมชั่น หรือร้านใหม่ใกล้คุณ","คำนวณแต้มสะสม และตรวจสอบรีวิวที่ถูกแจ้ง"]))+
-  S2("ใครเห็นข้อมูลของคุณ",L(["ร้านและพนักงานที่คุณจอง เห็นชื่อ เบอร์โทร และรายละเอียดของการจองนั้น","รีวิวของคุณแสดงเฉพาะชื่อต้น","คำขอบริการสำหรับหน่วยงาน: หมอนวดที่ได้รับเชิญเห็นเฉพาะชื่อหน่วยงาน เขต วันและเวลา ส่วนที่อยู่ละเอียดและเบอร์ผู้ติดต่อเห็นเฉพาะผู้ดูแลสมาคม","ผู้ดูแลของสมาคมเห็นข้อมูลเท่าที่จำเป็นต่อการดูแลระบบ","เมื่อคุณกดเลือกจุดบนแผนที่หรือใช้ตำแหน่งของฉัน พิกัดนั้นจะถูกส่งไปยังบริการแผนที่ OpenStreetMap เพื่อหาชื่อสถานที่ โดยไม่ระบุชื่อหรือเบอร์ของคุณ","เราไม่ขายข้อมูลของคุณให้ใคร"]))+
-  S2("เราเก็บนานแค่ไหน",L(["ชื่อและเบอร์โทรในรายการจองถูกลบหลังการใช้บริการผ่านไป 12 เดือน","ข้อความแชตถูกลบอัตโนมัติหลัง 90 วัน","เมื่อคุณลบบัญชี โปรไฟล์ รูป แต้มสะสม การแจ้งเตือน รายการโปรด และข้อความแชตที่คุณส่งจะถูกลบทันที รายการจองจะถูกล้างชื่อและเบอร์โทร","ข้อมูลอื่นเก็บไว้ตราบที่บัญชียังอยู่"]))+
+  S2("เราใช้ข้อมูลทำอะไร",L(["ให้คุณจองคิว ยกเลิก เลื่อนคิว และคุยกับร้านหรือพนักงาน","แสดงร้านที่อยู่ใกล้ และแจ้งเตือนเรื่องการจอง โปรโมชั่น หรือร้านใหม่ใกล้คุณ","คำนวณแต้มสะสม ตรวจสอบรีวิวและแชตที่ถูกรายงาน"]))+
+  S2("ใครเห็นข้อมูลของคุณ",L(["ร้านและพนักงานที่คุณจอง เห็นชื่อ เบอร์โทร และรายละเอียดของการจองนั้น","รีวิวของคุณแสดงเฉพาะชื่อต้น","คำขอบริการสำหรับหน่วยงาน: หมอนวดที่ได้รับเชิญเห็นเฉพาะชื่อหน่วยงาน เขต วันและเวลา ส่วนที่อยู่ละเอียดและเบอร์ผู้ติดต่อเห็นเฉพาะผู้ดูแลสมาคม","ผู้ดูแลของสมาคมเห็นข้อมูลเท่าที่จำเป็นต่อการดูแลระบบ","ข้อความแชตปกติเจ้าหน้าที่อ่านไม่ได้ ยกเว้นห้องที่มีผู้กดรายงาน เจ้าหน้าที่จะเห็นสำเนาข้อความล่าสุดของห้องนั้น เพื่อตรวจสอบ","เมื่อคุณกดเลือกจุดบนแผนที่หรือใช้ตำแหน่งของฉัน พิกัดนั้นจะถูกส่งไปยังบริการแผนที่ OpenStreetMap เพื่อหาชื่อสถานที่ และคำที่คุณพิมพ์ในช่องค้นหาสถานที่จะถูกส่งไปยังบริการแผนที่ Longdo Map หรือ OpenStreetMap โดยไม่ระบุชื่อหรือเบอร์ของคุณ","เราไม่ขายข้อมูลของคุณให้ใคร"]))+
+  S2("เราเก็บนานแค่ไหน",L(["ชื่อและเบอร์โทรในรายการจองถูกลบหลังการใช้บริการผ่านไป 12 เดือน","ข้อความแชตถูกลบอัตโนมัติหลัง 90 วัน","สำเนาข้อความในรายงานแชตเก็บไว้ 12 เดือน แล้วลบอัตโนมัติ","เมื่อคุณลบบัญชี โปรไฟล์ รูป แต้มสะสม การแจ้งเตือน รายการโปรด และข้อความแชตที่คุณส่งจะถูกลบทันที รายการจองจะถูกล้างชื่อและเบอร์โทร","ข้อมูลอื่นเก็บไว้ตราบที่บัญชียังอยู่"]))+
   S2("สิทธิ์ของคุณ",L(["ปิดการใช้ตำแหน่งได้ทุกเมื่อ (ปุ่ม &quot;ไม่ใช้ตำแหน่ง&quot; หน้าเลือกร้าน)","ลบบัญชีและข้อมูลของคุณได้เองที่ปุ่ม &quot;ลบบัญชีของฉัน&quot; ในหน้าบัญชี (ต้องไม่มีการจองที่ยังไม่เสร็จสิ้น)","ขอดูหรือแก้ไขข้อมูลได้โดยติดต่อสมาคม"]))+
   S2("ติดต่อเรา",'<p>'+esc(nm)+(tel?' โทร '+esc(tel):' (เบอร์โทรดูได้ที่หน้าบัญชี หลังเข้าสู่ระบบ)')+'</p>')+'</div>'}
 function seoCt(){var el=document.getElementById("seoct");if(!el)return;var c=(typeof SET!=="undefined"&&SET.ct)||null;if(!c){el.innerHTML="";return}
@@ -921,13 +989,15 @@ function authRender(){var tb=document.getElementById("tabs");if(tb)tb.style.disp
   '<form id="authf" novalidate><div class="avrow"><span id="avprev">'+avHtml({fn:"?",img:AU.img},true)+'</span><label class="lb avbtn" for="rimg">เลือกรูปโปรไฟล์</label><input id="rimg" type="file" accept="image/*" class="vh"></div>'+
   fld("rfn","ชื่อ","text",'autocomplete="given-name"')+fld("rln","นามสกุล","text",'autocomplete="family-name"')+fld("rph","เบอร์มือถือ","tel",'inputmode="tel" autocomplete="tel" placeholder="เช่น 0812345678"')+
   fld("rpw","รหัสผ่าน (อย่างน้อย 6 ตัวอักษร)","password",'autocomplete="new-password"')+fld("rpw2","ยืนยันรหัสผ่าน","password",'autocomplete="new-password"')+
-  '<label class="chk" for="rpv"><input type="checkbox" id="rpv"> ฉันได้อ่านและยอมรับนโยบายความเป็นส่วนตัว</label><div class="alinks"><button type="button" class="lb" data-ag="pv">อ่านนโยบายความเป็นส่วนตัว</button></div>'+
+  '<label class="chk" for="rpv"><input type="checkbox" id="rpv"> ฉันได้อ่านและยอมรับเงื่อนไขการใช้งานและนโยบายความเป็นส่วนตัว</label><div class="alinks"><button type="button" class="lb" data-ag="tm">อ่านเงื่อนไขการใช้งาน</button><button type="button" class="lb" data-ag="pv">อ่านนโยบายความเป็นส่วนตัว</button></div>'+
   '<p class="aerr" id="aerr" role="alert"></p><button class="btn wide" type="submit">ลงทะเบียน</button></form>'+
   '<div class="alinks"><button class="lb" data-ag="login">มีบัญชีแล้ว? เข้าสู่ระบบ</button><button type="button" class="lb" data-gb="browse">กลับไปดูร้านและบริการ</button></div>'}
  if(st==="ins"){
   h='<button type="button" class="btn ghost wide" data-ins="skip">ใช้งานต่อโดยไม่ติดตั้ง</button>'+insBody()+'<button type="button" class="btn wide ghost" data-ins="skip" style="margin-top:8px">ใช้งานต่อโดยไม่ติดตั้ง</button>'}
  if(st==="pv"){
   h='<div class="alinks"><button class="lb" data-ag="'+(AU.pvBack==="reg"?"reg":"login")+'">← กลับ</button></div><h1 id="pvt" tabindex="-1">นโยบายความเป็นส่วนตัว</h1>'+pvHtml()}
+ if(st==="tm"){
+  h='<div class="alinks"><button class="lb" data-ag="'+(AU.pvBack==="reg"?"reg":"login")+'">← กลับ</button></div><h1 id="pvt" tabindex="-1">เงื่อนไขการใช้งาน</h1>'+tmHtml()}
  if(st==="fp"){
   if(AU.ct===undefined&&!AU.ctLoading){AU.ctLoading=true;sbReq("/rest/v1/rpc/public_contact",{method:"POST",json:1,auth:false,body:"{}"}).then(function(j){AU.ct=j||null},function(){AU.ct=null}).then(function(){AU.ctLoading=false;if(AU.step==="fp"&&!SBS)authRender()})}
   var ct=AU.ct,tel=ct&&String(ct.phone||"").replace(/[^0-9+]/g,""),ln=ct&&/^https?:\/\//i.test(ct.line||"")?ct.line:"";
@@ -937,7 +1007,7 @@ function authRender(){var tb=document.getElementById("tabs");if(tb)tb.style.disp
   '<div class="alinks"><button class="lb" data-ag="login">กลับไปเข้าสู่ระบบ</button></div>'}
  a.innerHTML=h;window.scrollTo(0,0);AU.ok="";
  var g=function(i){return document.getElementById(i)},er=function(t){g("aerr").textContent=t},v=function(i){return g(i).value};
- document.querySelectorAll("[data-ag]").forEach(function(e){e.onclick=function(){var nx=e.dataset.ag;if(nx==="pv"){AU.pvBack=AU.step;if(AU.step==="reg"){AU.draft={rfn:v("rfn"),rln:v("rln"),rph:v("rph"),rpv:g("rpv").checked}}}else if(AU.step==="pv"&&nx==="reg"){}else AU.draft=null;AU.step=nx;if(nx==="login"||nx==="fp")AU.img=null;if(nx==="ins")INS.fd=false;authRender();if(nx==="pv"){var t=document.getElementById("pvt");if(t)t.focus()}}});
+ document.querySelectorAll("[data-ag]").forEach(function(e){e.onclick=function(){var nx=e.dataset.ag;if(nx==="pv"||nx==="tm"){AU.pvBack=AU.step==="pv"||AU.step==="tm"?AU.pvBack:AU.step;if(AU.step==="reg"){AU.draft={rfn:v("rfn"),rln:v("rln"),rph:v("rph"),rpv:g("rpv").checked}}}else if((AU.step==="pv"||AU.step==="tm")&&nx==="reg"){}else AU.draft=null;AU.step=nx;if(nx==="login"||nx==="fp")AU.img=null;if(nx==="ins")INS.fd=false;authRender();if(nx==="pv"){var t=document.getElementById("pvt");if(t)t.focus()}}});
  if(st==="reg"&&AU.draft){["rfn","rln","rph"].forEach(function(i){g(i).value=AU.draft[i]||""});g("rpv").checked=!!AU.draft.rpv;AU.draft=null}
  document.querySelectorAll("[data-gb=browse]").forEach(function(e){e.onclick=goBrowse});
  document.querySelectorAll("[data-ins]").forEach(function(e){e.onclick=function(){if(e.dataset.ins==="go"){insGo();return}if(e.dataset.ins==="copy"){insCopy();return}if(e.dataset.ins==="open"){insOpen();return}wr("insSeen",true);AU.step="login";goBrowse()}});
@@ -959,12 +1029,13 @@ function authRender(){var tb=document.getElementById("tabs");if(tb)tb.style.disp
    if(!/^0\d{8,9}$/.test(p)){er("กรอกเบอร์มือถือให้ถูกต้อง (เช่น 0812345678)");return}
    if(w.length<6){er("รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร");return}
    if(w!==w2){er("รหัสผ่านทั้งสองช่องไม่ตรงกัน");return}
-   if(!g("rpv").checked){er("กรุณาติ๊กยอมรับนโยบายความเป็นส่วนตัวก่อนลงทะเบียน");g("rpv").focus();return}
+   if(!g("rpv").checked){er("กรุณาติ๊กยอมรับเงื่อนไขการใช้งานและนโยบายความเป็นส่วนตัวก่อนลงทะเบียน");g("rpv").focus();return}
    busy(true);er("");var img=AU.img;
    sbReq("/auth/v1/signup",{method:"POST",json:1,auth:false,body:JSON.stringify({email:sbEmail(p),password:w,data:{first_name:fn,last_name:ln,phone:p}})}).then(function(j){
      if(!j||!j.access_token){var e=new Error("not confirmed");e.code="email_not_confirmed";throw e}
      sbSet(j);
-     if(!img)return;
+     var acc=sbApi("/rest/v1/rpc/accept_terms",{method:"POST",json:1,body:JSON.stringify({p_app:"customer"})}).catch(function(){});
+     if(!img)return acc;
      var path=j.user.id+"/avatar-"+Date.now()+".jpg";
      return fetch(img).then(function(r){return r.blob()}).then(function(bl){return sbReq("/storage/v1/object/avatars/"+path,{method:"POST",body:bl,headers:{"Content-Type":"image/jpeg","x-upsert":"true"}})})
       .then(function(){return sbReq("/rest/v1/profiles?id=eq."+j.user.id,{method:"PATCH",json:1,headers:{Prefer:"return=minimal"},body:JSON.stringify({avatar_path:path})})})
@@ -977,7 +1048,7 @@ function isApp(){try{return !!((window.matchMedia&&matchMedia("(display-mode: st
 function guestApp(){return !!(GUEST&&!ME&&isApp())}
 function verTxt(){var m=document.querySelector('meta[name="app-version"]'),v=m&&m.getAttribute("content");return v?'<p class="hint" id="appver" style="text-align:center;margin:22px 0 6px">เวอร์ชันแอป '+esc(v)+'</p>':''}
 function guestView(v){var T={bk:["รายการ","เข้าสู่ระบบเพื่อดูรายการจองของคุณ ทั้งที่กำลังจะถึงและประวัติการใช้บริการ"],fv:["ร้านโปรด","เข้าสู่ระบบเพื่อดูร้านโปรดของคุณ และกลับมาจองร้านเดิมได้รวดเร็ว"],nt:["แจ้งเตือน","เข้าสู่ระบบเพื่อดูแจ้งเตือนเกี่ยวกับการจอง ข้อความจากร้านและจากระบบ"],ac:["บัญชี","เข้าสู่ระบบเพื่อจัดการบัญชี แต้มสะสม และร้านโปรดของคุณ"]}[v];
- return'<h1>'+T[0]+'</h1><div class="card" role="group" aria-label="ต้องเข้าสู่ระบบ"><p style="margin:0 0 12px">'+T[1]+'</p><button type="button" class="btn wide" data-gb="login">เข้าสู่ระบบ</button><button type="button" class="btn wide ghost" data-gb="reg" style="margin-top:10px">สมัครสมาชิก</button></div>'+(v==="ac"?ctHtml()+'<button type="button" class="btn wide ghost" data-view="pv" style="margin-top:14px">นโยบายความเป็นส่วนตัว</button>'+verTxt():'')}
+ return'<h1>'+T[0]+'</h1><div class="card" role="group" aria-label="ต้องเข้าสู่ระบบ"><p style="margin:0 0 12px">'+T[1]+'</p><button type="button" class="btn wide" data-gb="login">เข้าสู่ระบบ</button><button type="button" class="btn wide ghost" data-gb="reg" style="margin-top:10px">สมัครสมาชิก</button></div>'+(v==="ac"?ctHtml()+'<button type="button" class="btn wide ghost" data-view="pv" style="margin-top:14px">นโยบายความเป็นส่วนตัว</button><button type="button" class="btn wide ghost" data-view="tm" style="margin-top:10px">เงื่อนไขการใช้งาน</button>'+verTxt():'')}
 function guestBar(){return '<div class="gbar"><button type="button" class="btn" data-gb="login">เข้าสู่ระบบ / สมัครสมาชิก</button>'+(insKind()?'<button type="button" class="btn ghost" data-gb="ins">ติดตั้งแอป</button>':'')+'</div>'}
 /* ===== ขอบริการสำหรับหน่วยงาน (คำขอ + ปักหมุด + ชำระเงินหลังอนุมัติ) ===== */
 var ORQ={info:null,list:null,mode:"list",d:null,busy:false,err:"",flash:"",pay:null,slip:null,slipMsg:"",pp:null,cfm:null,sb:false,free:null,freeFor:"",qr:null,tab:null,cur:null,more:null,edit:null,rep:{id:null,data:null,busy:false,err:""}},CSTF=[];

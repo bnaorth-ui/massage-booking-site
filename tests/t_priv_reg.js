@@ -69,7 +69,13 @@ BKS.push(mk('MS1',72,'confirmed'));for(let i=0;i<25;i++)BKS.push(mk('H'+i,-24*(i
 
 
 await p.waitForSelector('#lph');await p.click('[data-ag=reg]');await p.waitForTimeout(200);
+ok('sign-up consent covers terms and privacy, with links to both',(await p.textContent('label[for=rpv]')).includes('เงื่อนไขการใช้งานและนโยบายความเป็นส่วนตัว')&&!!(await p.$('[data-ag=tm]'))&&!!(await p.$('[data-ag=pv]')));
+await p.fill('#rfn','จำไว้');await p.click('[data-ag=tm]');await p.waitForTimeout(150);
+ok('terms page from sign-up',(await A()).includes('เงื่อนไขการใช้งาน')&&(await A()).includes('การระงับบัญชี'));
+await p.click('[data-ag=reg]');await p.waitForTimeout(150);
+ok('back to sign-up keeps typed name',(await p.inputValue('#rfn'))==='จำไว้');
 await p.fill('#rfn','สมศักดิ์');await p.fill('#rln','ทดสอบ');await p.fill('#rph','0812223333');await p.fill('#rpw','abc123');await p.fill('#rpw2','abc123');await p.check('#rpv');
 await p.click('button[type=submit]');await p.waitForSelector('[data-pl]',{timeout:4000}).catch(()=>{});
 ok('signup works when accepted',calls.some(c=>c.path==='/auth/v1/signup')&&!!(await p.$('[data-pl]')));
+ok('sign-up records terms acceptance (customer)',calls.some(c=>c.path==='/rest/v1/rpc/accept_terms'&&c.body&&c.body.p_app==='customer'));
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)})();

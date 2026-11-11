@@ -69,6 +69,9 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
    let p=body.p_id&&T.places.find(x=>x.id===body.p_id);if(!p){p={id:'pl'+(++n),type:body.p_type,status:'approved',active:true,auto_closed:false,gp_percent:10,area:'',created_at:'9'};T.places.push(p)}
    Object.assign(p,{name:body.p_name,category_id:body.p_category,lat:body.p_lat,lng:body.p_lng,open_time:body.p_open+':00',close_time:body.p_close+':00',fixed_date:body.p_type==='org'?body.p_fixed_date:null,advance_days:body.p_adv,cancel_hours:body.p_cancel,lunch_start:body.p_lunch_start?body.p_lunch_start+':00':null,lunch_end:body.p_lunch_end?body.p_lunch_end+':00':null});
    T.service_places=T.service_places.filter(x=>x.place_id!==p.id).concat(body.p_services.map(v=>({service_id:v,place_id:p.id})));T.place_staff=T.place_staff.filter(x=>x.place_id!==p.id).concat(body.p_staff.map(s=>({place_id:p.id,staff_id:s.staff_id,weekdays:s.weekdays})));return J(200,p.id)}
+  if(f==='admin_chat_reports'){CRC.push(body.p_status);return J(200,body.p_status==='open'?CRL.filter(x=>x.status==='open'):CRL)}
+  if(f==='admin_chat_report_resolve'){CRC.push(body);const x=CRL.find(r=>r.id===body.p_id);x.status=body.p_action;x.admin_note=body.p_note;x.decided_at=now();if(body.p_action==='suspended')CRL.forEach(r=>{if(r.target_id===x.target_id)r.target_suspended=true});return J(204,null)}
+  if(f==='admin_customer_unsuspend'){CRC.push(body);CRL.forEach(r=>{if(r.target_id===body.p_user)r.target_suspended=false});return J(204,null)}
   if(f==='admin_hide_review'){hides.push(body);const row=(body.p_kind==='shop'?T.reviews:T.review_staff).find(x=>x.id===body.p_id);row.hidden=body.p_hidden;row.reported=false;return J(204,null)}
   return J(404,{message:'no rpc '+f})}
  if(!me||!T.admins.includes(me.id))return J(403,{code:'42501',message:'permission denied'});
@@ -82,6 +85,9 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
  if(m==='DELETE'){const keep=T[tb].filter(x=>!filt([x]).length);if(tb==='places'&&sp.get('id')==='eq.sh1')return J(409,{code:'23503',message:'fk'});T[tb]=keep;return J(204,null)}
  return J(404,{message:'nf'})});
 
+const CRC=[];const CRL=[
+ {id:'cr1',ref:'MS101',place:'ร้านหนึ่ง',room:'shop',reporter_role:'shop',reporter_name:'ร้านหนึ่ง',target_kind:'customer',target_id:'cu9',target_name:'สมปอง',target_suspended:false,reason:'offplatform',detail:'ขอเบอร์ส่วนตัวหมอนวด',snapshot:[{at:'2026-11-10T10:00:00+07:00',role:'user',name:'สมปอง',body:'ขอเบอร์น้องหน่อย <b>x</b>'},{at:'2026-11-10T10:01:00+07:00',role:'shop',name:'ร้านหนึ่ง',body:'ไม่ได้ค่ะ'}],status:'open',created_at:'2026-11-10T10:05:00+07:00'},
+ {id:'cr2',ref:'MS102',place:'ร้านหนึ่ง',room:'staff:p1',reporter_role:'user',reporter_name:'สมชาย',target_kind:'staff',target_id:'p1',target_name:'คุณหนึ่ง',target_suspended:false,reason:'abuse',detail:null,snapshot:[],status:'open',created_at:'2026-11-10T09:00:00+07:00'}];
 const p=await ctx.newPage();await p.setViewportSize({width:420,height:900});p.on('pageerror',e=>errs.push(e.message));p.on('dialog',d=>{errs.push('DIALOG '+d.message());d.dismiss()});
 const hides=[];const ok=(nm,c)=>console.log((c?'PASS ':'FAIL ')+nm);
 const until=async(f,a)=>{try{await p.waitForFunction(f,a,{timeout:4000});return true}catch(e){return false}};
@@ -106,6 +112,24 @@ await p.click('[data-a=rvwf][data-id=rep]');await p.waitForTimeout(200);
 await p.click('[data-a=rvwask][data-id="shop:rv1"]');await p.waitForTimeout(200);
 ok('confirm shown',(await p.textContent('#main')).includes('ซ่อนรีวิวนี้ใช่ไหม'));
 await p.click('[data-a=rvwno]');await p.waitForTimeout(150);ok('cancel keeps',hides.length===0);
+// ---- รายงานแชต ----
+t=await p.textContent('#main');ok('chat-report filter with open count',t.includes('รายงานแชต (2)'));
+await p.click('[data-a=rvwf][data-id=chat]');await p.waitForTimeout(300);t=await p.textContent('#main');
+ok('chat reports listed with reporter, target, reason, room',t.includes('เลขที่ MS101')&&t.includes('ห้องลูกค้ากับร้าน')&&t.includes('ผู้รายงาน: ร้านหนึ่ง (ร้าน)')&&t.includes('ถูกรายงาน: สมปอง (ลูกค้า)')&&t.includes('ชวนติดต่อหรือนัดนอกระบบ')&&t.includes('ห้องลูกค้ากับหมอนวด'));
+ok('snapshot shown escaped inside a details box',(await p.$$('#main details')).length===2&&(await p.innerHTML('#main details')).includes('&lt;b&gt;x&lt;/b&gt;')&&t.includes('สำเนาข้อความ (2 ข้อความ)'));
+ok('suspend only offered for customer target',(await p.$$('[data-a=crask]')).length===1&&!!(await p.$('[data-a=crask][data-id=cr1]'))&&t.includes('ให้จัดการที่เมนูร้านนวดหรือหมอนวด'));
+await p.click('[data-a=crask][data-id=cr1]');await p.waitForTimeout(150);
+ok('suspend asks to confirm, focus on confirm',(await p.textContent('#main')).includes('ระงับบัญชี สมปอง ใช่ไหม')&&await p.evaluate(()=>document.activeElement&&document.activeElement.dataset.a==='crs'));
+await p.click('[data-a=crno]');await p.waitForTimeout(150);ok('cancel suspend: nothing sent',!CRC.some(c=>c.p_action));
+await p.fill('#crn-cr2','ไม่พบถ้อยคำไม่เหมาะสม');await p.click('[data-a=crd][data-id=cr2]');await p.waitForTimeout(400);
+ok('dismiss sends action and note',CRC.some(c=>c.p_id==='cr2'&&c.p_action==='dismissed'&&c.p_note==='ไม่พบถ้อยคำไม่เหมาะสม')&&(await p.textContent('#main')).includes('รายงานแชต (1)'));
+await p.fill('#crn-cr1','ขอเบอร์ส่วนตัว ผิดเงื่อนไข');await p.click('[data-a=crask][data-id=cr1]');await p.waitForTimeout(150);await p.click('[data-a=crs][data-id=cr1]');await p.waitForTimeout(400);
+ok('suspend sends action',CRC.some(c=>c.p_id==='cr1'&&c.p_action==='suspended')&&(await p.textContent('#main')).includes('ไม่มีรายงานที่รอตรวจ'));
+await p.click('[data-a=crm][data-id=all]');await p.waitForTimeout(400);t=await p.textContent('#main');
+ok('done tab lists decided reports with outcome and unsuspend button',t.includes('ระงับบัญชีแล้ว')&&t.includes('ไม่พบปัญหา')&&t.includes('ถูกระงับอยู่')&&!!(await p.$('[data-a=cru][data-id=cu9]')));
+await p.click('[data-a=cru][data-id=cu9]');await p.waitForTimeout(400);
+ok('unsuspend sent',CRC.some(c=>c.p_user==='cu9')&&!(await p.$('[data-a=cru]')));
+await p.click('[data-a=rvwf][data-id=rep]');await p.waitForTimeout(200);
 await p.click('[data-a=rvwask][data-id="shop:rv1"]');await p.click('[data-a=rvwhide]');await p.waitForTimeout(700);
 ok('hide payload',hides[0]&&hides[0].p_kind==='shop'&&hides[0].p_id==='rv1'&&hides[0].p_hidden===true);
 t=await p.textContent('#main');ok('moved out of reported + banner',t.includes('แจ้งตรวจสอบ (1)')&&t.includes('ซ่อนรีวิวแล้ว')&&!t.includes('แย่มาก'));
