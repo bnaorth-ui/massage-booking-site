@@ -1,6 +1,7 @@
 /* Service worker: (1) รับ Web Push แล้วแสดงแจ้งเตือน + เสียง/สั่น ของระบบเครื่อง แม้ปิดหน้าเว็บอยู่
    (2) เก็บตัวหน้าเว็บไว้ในเครื่อง เปิดซ้ำเร็วและเปิดได้แม้สัญญาณอ่อน: ส่งของที่เก็บไว้ทันที แล้วตรวจเวอร์ชันใหม่เบื้องหลัง
        ถ้ามีเวอร์ชันใหม่จะแจ้งให้หน้าเว็บแสดงปุ่ม "อัปเดต" (ไม่รีโหลดเองกลางคัน) ข้อมูลจาก Supabase ไม่ผ่านแคชนี้เลย
+   (3) เปิดครั้งแรกตอนไม่มีอินเทอร์เน็ต: แสดงหน้า "ไม่มีอินเทอร์เน็ต" ภาษาไทย พร้อมปุ่มลองใหม่
    เปลี่ยนเลข PAGE_CACHE เมื่อต้องการล้างแคชหน้าเว็บของทุกเครื่อง */
 var PAGE_CACHE='pages-v2';
 self.addEventListener('install',function(){self.skipWaiting()});
@@ -31,7 +32,17 @@ self.addEventListener('fetch',function(e){
     return hit}
    /* ครั้งแรก: ใช้เครือข่ายตามปกติ แล้วเก็บสำเนาไว้ให้ครั้งหน้า */
    e.waitUntil(refreshPage(key,cache,null));
-   return fetch(r)})})) });
+   return fetch(r).catch(function(){return offlinePage()})})})) });
+/* หน้าที่แสดงเมื่อเปิดครั้งแรกตอนไม่มีอินเทอร์เน็ต (ยังไม่มีสำเนาหน้าแอปในเครื่อง) แทนหน้าเตือนของเบราว์เซอร์ */
+function offlinePage(){
+ var h='<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ไม่มีอินเทอร์เน็ต</title>'+
+  '<style>body{margin:0;background:#f6faf8;color:#14302a;font:18px/1.6 system-ui,-apple-system,"Sarabun","Noto Sans Thai",sans-serif}main{max-width:480px;margin:0 auto;padding:48px 20px;text-align:center}'+
+  'button{margin-top:18px;width:100%;min-height:52px;border:0;border-radius:14px;background:#1f6f5c;color:#fff;font:700 1.1rem system-ui,sans-serif}p{color:#4d635c}'+
+  '@media (prefers-color-scheme:dark){body{background:#10201b;color:#e6f2ee}p{color:#a9c2ba}button{background:#5fd1a8;color:#10201b}}</style></head>'+
+  '<body><main><img src="icon-logo-192.png" alt="" width="96" height="96" onerror="this.remove()"><h1 tabindex="-1" id="oft">ไม่มีอินเทอร์เน็ต</h1>'+
+  '<p>เปิดแอปครั้งแรกต้องใช้อินเทอร์เน็ต ตรวจสอบ Wi-Fi หรือเน็ตมือถือ แล้วกดลองใหม่</p><button type="button" onclick="location.reload()">ลองใหม่</button></main>'+
+  '<script>try{document.getElementById("oft").focus()}catch(e){}addEventListener("online",function(){location.reload()})<\/script></body></html>';
+ return new Response(h,{status:200,headers:{'content-type':'text/html; charset=utf-8','cache-control':'no-store'}})}
 self.addEventListener('push',function(e){
  var d={};try{d=e.data?e.data.json():{}}catch(x){d={title:'แจ้งเตือนใหม่',body:e.data?e.data.text():''}}
  var title=d.title||'แจ้งเตือนใหม่',body=d.body||'';

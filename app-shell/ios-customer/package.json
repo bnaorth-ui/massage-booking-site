@@ -1,0 +1,17 @@
+{
+  "name": "massage-customer-ios",
+  "private": true,
+  "description": "ตัวห่อแอป iPhone ของแอปผู้ใช้งาน (เปิดเว็บ massage-customer-bna.pages.dev) สร้างบน Codemagic ดู app-shell/README.md",
+  "scripts": {
+    "sync": "cap sync ios"
+  },
+  "dependencies": {
+    "@capacitor/browser": "^8.0.0",
+    "@capacitor/core": "^8.5.0",
+    "@capacitor/ios": "^8.5.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.5.0"
+  }
+}

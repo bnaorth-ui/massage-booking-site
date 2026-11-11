@@ -1,0 +1,9 @@
+{
+  "_อธิบาย": "ข้อความที่ใส่ใน Info.plist ของแอป iPhone ตอนสร้างบน Codemagic (codemagic.yaml อ่านไฟล์นี้) ข้อความขออนุญาตต้องบอกเหตุผลให้ผู้ใช้เข้าใจ Apple ตรวจข้อนี้",
+  "CFBundleDisplayName": "จองคิวนวด",
+  "CFBundleDevelopmentRegion": "th",
+  "NSLocationWhenInUseUsageDescription": "ใช้ตำแหน่งของคุณเพื่อแสดงร้านนวดที่อยู่ใกล้ และช่วยปักหมุดสถานที่ เมื่อคุณกดใช้ตำแหน่งของฉันเท่านั้น",
+  "NSCameraUsageDescription": "ใช้กล้องเพื่อถ่ายรูปโปรไฟล์ หรือถ่ายสลิปการโอนเงินเพื่อแนบในคำขอ",
+  "NSPhotoLibraryUsageDescription": "ใช้รูปในเครื่องเพื่อเลือกรูปโปรไฟล์ หรือแนบสลิปการโอนเงิน",
+  "ITSAppUsesNonExemptEncryption": false
+}

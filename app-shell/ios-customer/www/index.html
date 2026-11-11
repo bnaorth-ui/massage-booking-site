@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>จองคิวนวด</title>
+<!-- หน้านี้อยู่ในตัวแอป iPhone ใช้เฉพาะตอนเปิดเว็บหลักไม่ได้ (เช่น ไม่มีอินเทอร์เน็ตตอนเปิดแอปครั้งแรก) -->
+<style>
+body{margin:0;background:#f6faf8;color:#14302a;font:18px/1.6 -apple-system,system-ui,sans-serif}
+main{max-width:480px;margin:0 auto;padding:calc(48px + env(safe-area-inset-top)) 20px 48px;text-align:center}
+p{color:#4d635c}
+button{margin-top:18px;width:100%;min-height:52px;border:0;border-radius:14px;background:#1f6f5c;color:#fff;font:700 1.1rem -apple-system,system-ui,sans-serif}
+@media (prefers-color-scheme:dark){body{background:#10201b;color:#e6f2ee}p{color:#a9c2ba}button{background:#5fd1a8;color:#10201b}}
+</style>
+</head>
+<body>
+<main>
+<h1 id="t" tabindex="-1">ไม่มีอินเทอร์เน็ต</h1>
+<p>แอปจองคิวนวดต้องใช้อินเทอร์เน็ต ตรวจสอบ Wi-Fi หรือเน็ตมือถือ แล้วกดลองใหม่</p>
+<button type="button" id="go">ลองใหม่</button>
+</main>
+<script>
+var U="https://massage-customer-bna.pages.dev/";
+try{document.getElementById("t").focus()}catch(e){}
+document.getElementById("go").onclick=function(){location.href=U};
+addEventListener("online",function(){location.href=U});
+</script>
+</body>
+</html>

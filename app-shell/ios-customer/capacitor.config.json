@@ -1,0 +1,14 @@
+{
+  "appId": "th.or.bna.massage",
+  "appName": "จองคิวนวด",
+  "webDir": "www",
+  "server": {
+    "url": "https://massage-customer-bna.pages.dev/",
+    "cleartext": false
+  },
+  "ios": {
+    "appendUserAgent": "BNAMassageApp/ios",
+    "contentInset": "never",
+    "scrollEnabled": true
+  }
+}

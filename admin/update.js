@@ -55,3 +55,20 @@
   panel(r)}).catch(function(){if(!done){done=true;hide()}});
  setTimeout(function(){if(!done&&ac)try{ac.abort()}catch(x){}},1500);
 })();
+/* แถบ "ไม่มีอินเทอร์เน็ต" (ทุกแอป): ขึ้นเมื่อเครื่องไม่มีเน็ต พร้อมปุ่มลองใหม่ หายเองเมื่อเน็ตกลับมา
+   อ่านออกเสียงให้โปรแกรมอ่านหน้าจอทั้งตอนเน็ตหลุดและตอนเน็ตกลับมา ไม่โหลดหน้าใหม่เอง (กันข้อความที่พิมพ์ค้างไว้หาย) */
+(function(){
+ if(window.__NETBAR)return;window.__NETBAR=1;
+ var bar=null,tm=null;
+ function mk(){if(bar)return bar;bar=document.createElement("div");bar.id="netbar";bar.setAttribute("role","alert");
+  bar.style.cssText="position:sticky;top:0;left:0;right:0;z-index:2147482000;display:none;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;padding:10px 14px calc(10px);background:#7a2e00;color:#fff;font:600 1rem/1.4 system-ui,-apple-system,'Sarabun','Noto Sans Thai',sans-serif;text-align:center";
+  bar.innerHTML='<span id="netmsg"></span><button type="button" id="netretry" style="min-height:44px;padding:6px 16px;border:2px solid #fff;border-radius:12px;background:transparent;color:#fff;font:inherit">ลองใหม่</button>';
+  document.body.insertBefore(bar,document.body.firstChild);
+  document.getElementById("netretry").onclick=function(){if(navigator.onLine===false){say("ยังไม่มีอินเทอร์เน็ต ตรวจสอบ Wi-Fi หรือเน็ตมือถือ แล้วกดลองใหม่อีกครั้ง",true);return}location.reload()};
+  return bar}
+ function say(t,retry){mk();var m=document.getElementById("netmsg"),b=document.getElementById("netretry");m.textContent="";b.style.display=retry?"":"none";bar.style.display="flex";setTimeout(function(){m.textContent=t},60)}
+ function off(){clearTimeout(tm);say("ไม่มีอินเทอร์เน็ต ข้อมูลในหน้านี้อาจไม่อัปเดต",true)}
+ function on(){if(!bar||bar.style.display==="none")return;say("เชื่อมต่ออินเทอร์เน็ตแล้ว",false);bar.style.background="#1f6f5c";clearTimeout(tm);tm=setTimeout(function(){bar.style.display="none";bar.style.background="#7a2e00"},3000)}
+ function start(){window.addEventListener("offline",function(){if(bar)bar.style.background="#7a2e00";off()});window.addEventListener("online",on);if(navigator.onLine===false)off()}
+ if(document.body)start();else document.addEventListener("DOMContentLoaded",start);
+})();

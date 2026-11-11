@@ -1,0 +1,56 @@
+# Codemagic: สร้างแอป iPhone ของแอปผู้ใช้งาน แล้วส่งขึ้น TestFlight (ไม่ต้องมีเครื่อง Mac)
+# ไฟล์นี้ต้องอยู่ที่ราก (root) ของที่เก็บโค้ด Codemagic จึงจะเห็น ไม่ขึ้นเว็บ (Cloudflare Pages ใช้แต่ละโฟลเดอร์แอป)
+# ไฟล์ของตัวห่อแอปอยู่ใน app-shell/ios-customer ขั้นตอนตั้งค่าบนเว็บ Codemagic ดู app-shell/README.md
+# ต้องตั้งใน Codemagic ก่อน (ไม่มีรหัสลับในไฟล์นี้):
+#   - Team settings > Integrations > Developer Portal: เชื่อม App Store Connect API key ตั้งชื่อว่า bna_asc
+#   - แอปต้องสร้างไว้ใน App Store Connect แล้ว ด้วยรหัสประจำแอป th.or.bna.massage
+workflows:
+  ios-customer:
+    name: แอปผู้ใช้งาน iPhone (TestFlight)
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    integrations:
+      app_store_connect: bna_asc
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: th.or.bna.massage
+      vars:
+        APP_STORE_APPLE_ID: "0000000000"   # เลข Apple ID ของแอป (ตัวเลข ดูใน App Store Connect > App Information) แก้ตรงนี้หลังสร้างแอป ไม่ใช่ข้อมูลลับ
+      node: 22
+      xcode: latest
+      cocoapods: default
+    working_directory: app-shell/ios-customer
+    triggering:
+      events: []            # สร้างเมื่อกดปุ่ม Start new build เท่านั้น ไม่สร้างเองทุกครั้งที่อัปโค้ด
+    scripts:
+      - name: ติดตั้งเครื่องมือ
+        script: npm install
+      - name: สร้างโปรเจกต์ iOS
+        script: |
+          if [ ! -d ios ]; then npx cap add ios --packagemanager CocoaPods; fi
+          npx cap sync ios
+      - name: ไอคอนแอป
+        script: npx capacitor-assets generate --ios --iconBackgroundColor '#ffffff'
+      - name: ข้อความขออนุญาตและชื่อแอป (จาก ios-info.json)
+        script: |
+          node -e '
+            const j=require("./ios-info.json"),cp=require("child_process"),PL="ios/App/App/Info.plist";
+            for (const [k,v] of Object.entries(j)) { if (k.startsWith("_")) continue;
+              cp.execFileSync("plutil",["-replace",k,typeof v==="boolean"?"-bool":"-string",String(v),PL],{stdio:"inherit"}) }'
+          plutil -lint ios/App/App/Info.plist
+      - name: ใช้ใบรับรองสำหรับ App Store
+        script: xcode-project use-profiles
+      - name: เลขรุ่นสร้าง (build number) เพิ่มทีละ 1
+        script: |
+          cd ios/App
+          agvtool new-version -all $(($(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID" 2>/dev/null || echo 0) + 1))
+      - name: สร้างไฟล์แอป (.ipa)
+        script: xcode-project build-ipa --workspace ios/App/App.xcworkspace --scheme App
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true

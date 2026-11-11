@@ -10,7 +10,7 @@
 <meta property="og:title" content="จองนวดออนไลน์ ร้านนวดใกล้ฉัน"><meta property="og:description" content="นวดโดยคนพิการทางการเห็น ผู้ให้บริการขึ้นทะเบียนถูกต้อง จองคิวได้ทันที"><meta property="og:url" content="https://massage-customer-bna.pages.dev/"><meta property="og:image" content="https://massage-customer-bna.pages.dev/icon-512.png">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"สมาคมวิทยากรฝึกอาชีพคนตาบอด","url":"https://bna.or.th","logo":"https://massage-customer-bna.pages.dev/icon-512.png"}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"จองนวดออนไลน์ต้องทำอย่างไร?","acceptedAnswer":{"@type":"Answer","text":"เลือกร้านและบริการ เลือกวันเวลาและพนักงาน แล้วสมัครสมาชิกหรือเข้าสู่ระบบด้วยเบอร์โทรเพื่อยืนยันการจอง"}},{"@type":"Question","name":"ใครเป็นผู้ให้บริการนวด?","acceptedAnswer":{"@type":"Answer","text":"ผู้ให้บริการเป็นคนพิการทางการเห็นที่ขึ้นทะเบียนกับกรมสนับสนุนบริการสุขภาพ กระทรวงสาธารณสุข และร้านนวดจดทะเบียนตามกฎหมายสถานประกอบการเพื่อสุขภาพ"}},{"@type":"Question","name":"เลื่อนนัดหรือยกเลิกการจองได้ไหม?","acceptedAnswer":{"@type":"Answer","text":"ทำได้เองในแอป ตามเงื่อนไขของแต่ละร้าน"}},{"@type":"Question","name":"ติดต่อร้านหรือพนักงานได้อย่างไร?","acceptedAnswer":{"@type":"Answer","text":"แชตกับร้านหรือพนักงานได้ในแอป"}},{"@type":"Question","name":"มีแต้มสะสมหรือรีวิวไหม?","acceptedAnswer":{"@type":"Answer","text":"มี สะสมแต้มจากการใช้บริการ และรีวิวร้านที่ใช้บริการได้"}},{"@type":"Question","name":"หน่วยงานขอให้หมอนวดไปให้บริการนอกสถานที่ได้ไหม และคิดค่าบริการเท่าไร?","acceptedAnswer":{"@type":"Answer","text":"ได้ เฉพาะหน่วยงานในกรุงเทพมหานคร ค่าบริการ 400 บาทต่อหมอนวด 1 คน ต่อชั่วโมง ไม่รวมช่วงพักเที่ยง ชำระเงินหลังเจ้าหน้าที่อนุมัติและหมอนวดตอบรับแล้ว โดยต้องชำระภายใน 3 วันก่อนวันให้บริการ และขอบริการล่วงหน้าอย่างน้อย 10 วัน"}},{"@type":"Question","name":"ใครจัดทำระบบนี้?","acceptedAnswer":{"@type":"Answer","text":"สมาคมวิทยากรฝึกอาชีพคนตาบอด เพื่อให้คนพิการทางการเห็นมีช่องทางประกอบอาชีพและเข้าถึงลูกค้าได้ง่ายขึ้น"}}]}</script>
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.19"><meta name="app-name" content="ระบบจองนวด สำหรับผู้ใช้งาน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.20"><meta name="app-name" content="ระบบจองนวด สำหรับผู้ใช้งาน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -143,7 +143,7 @@ h1{font-size:1.4rem;margin:8px 0 4px}
 <h3>เกี่ยวกับสมาคม</h3>
 <p>ระบบนี้จัดทำโดย <a href="https://bna.or.th" target="_blank" rel="noopener">สมาคมวิทยากรฝึกอาชีพคนตาบอด</a> เพื่อให้คนพิการทางการเห็นมีช่องทางประกอบอาชีพนวดและเข้าถึงลูกค้าได้ง่ายขึ้น</p>
 <div id="seoct"></div>
-<div class="seof"><p id="seoc"></p><button type="button" class="lb" data-view="pv">นโยบายความเป็นส่วนตัว</button></div>
+<div class="seof"><p id="seoc"></p><button type="button" class="lb" data-view="pv">นโยบายความเป็นส่วนตัว</button> <a class="lb" href="/delete-account/" style="text-decoration:none;display:inline-block">วิธีลบบัญชี</a></div>
 </section>
 <div class="bar" id="bar"></div>
 <div class="tabs" id="tabs" style="display:none"></div>
@@ -845,7 +845,7 @@ function fvTab(){var h='<h1 id="fvt" tabindex="-1">ร้านโปรด</h1>
   return pl?'<div class="fvc" style="margin-bottom:12px">'+placeItem(pl)+rm(id,"ร้าน"+pl.name)+'</div>':'<div class="fvc" style="margin-bottom:12px"><p class="hint">ร้านที่ไม่เปิดให้จองในขณะนี้</p>'+rm(id,"ร้านที่ไม่เปิดให้จอง")+'</div>'}).join("")+'</div>'}
 /* ===== แนะนำการติดตั้งแอป ===== */
 var INS={ev:null,done:false,fd:false};
-function insKind(){try{var ua=navigator.userAgent||"";if((window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone||INS.done)return null;
+function insKind(){try{var ua=navigator.userAgent||"";if((window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone||INS.done||storeApp())return null;
  var ios=/iPad|iPhone|iPod/.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1),an=/Android/i.test(ua),app=/Line\/|FBAN|FBAV|Instagram|MicroMessenger/i.test(ua);
  if(ios)return app?"ios-app":"ios";if(an)return app?"app":"android";return null}catch(e){return null}}
 var INSIC={"share": "<path d=\"M8 10H6.5A1.5 1.5 0 0 0 5 11.5v7A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 17.5 10H16\"/><path d=\"M12 15V3.5M8.5 7 12 3.5 15.5 7\"/>", "add": "<rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"3.5\"/><path d=\"M12 8.5v7M8.5 12h7\"/>", "ok": "<path d=\"M5 12.5l4.5 4.5L19 7.5\"/>", "dots": "<circle class=\"f\" cx=\"12\" cy=\"5.5\" r=\"1.7\"/><circle class=\"f\" cx=\"12\" cy=\"12\" r=\"1.7\"/><circle class=\"f\" cx=\"12\" cy=\"18.5\" r=\"1.7\"/>", "inst": "<path d=\"M12 4v11M7.5 10.5 12 15l4.5-4.5\"/><path d=\"M5 19h14\"/>", "ext": "<path d=\"M13.5 4.5h6v6M19.5 4.5 11 13\"/><path d=\"M17 14v3.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 5 17.5v-9A1.5 1.5 0 0 1 6.5 7H10\"/>"};
@@ -974,7 +974,7 @@ function seoCt(){var el=document.getElementById("seoct");if(!el)return;var c=(ty
  if(c.hours)h+='<p>เวลาทำการ '+esc(c.hours)+'</p>';
  if(okUrl(c.reg))h+='<p><a href="'+esc(c.reg)+'" target="_blank" rel="noopener">ลงทะเบียนร้านนวด</a></p>';
  el.innerHTML=h?'<h3>ติดต่อสมาคม</h3>'+h:""}
-function seoSet(on){var s=document.getElementById("seo"),sa=false;try{var fc=document.getElementById("seoc");if(fc)fc.textContent="© "+(new Date().getFullYear()+543)+" "+((typeof SET!=="undefined"&&SET.ct&&SET.ct.name)||"สมาคมวิทยากรฝึกอาชีพคนตาบอด")}catch(e){}try{sa=!!((window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone)}catch(e){}if(s)s.hidden=!on||sa}
+function seoSet(on){var s=document.getElementById("seo"),sa=false;try{var fc=document.getElementById("seoc");if(fc)fc.textContent="© "+(new Date().getFullYear()+543)+" "+((typeof SET!=="undefined"&&SET.ct&&SET.ct.name)||"สมาคมวิทยากรฝึกอาชีพคนตาบอด")}catch(e){}try{sa=!!((window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone||storeApp())}catch(e){}if(s)s.hidden=!on||sa}
 function authRender(){var tb=document.getElementById("tabs");if(tb)tb.style.display="none";
  var a=document.getElementById("app"),b=document.getElementById("bar"),h="",st=AU.step;b.innerHTML="";b.style.display="none";
  seoSet(false);
@@ -1044,7 +1044,20 @@ function authRender(){var tb=document.getElementById("tabs");if(tb)tb.style.disp
 }
 /* ===== โหมดผู้เยี่ยมชม: ดูร้าน/บริการ/เลือกเวลาได้ก่อน ล็อกอินหรือสมัครตอนกดยืนยันการจอง ===== */
 function regShopBar(){var u=SET.ct&&SET.ct.reg;if(!okUrl(u))return"";return '<div class="regbar"><b>เป็นเจ้าของร้านนวด?</b><span>นำร้านเข้าร่วมระบบจองคิวกับสมาคม</span><a class="btn ghost" href="'+esc(u)+'" target="_blank" rel="noopener" aria-label="ลงทะเบียนร้านนวด เปิดหน้าสมัครร้านค้าในแท็บใหม่">ลงทะเบียนร้านนวด</a></div>'}
-function isApp(){try{return !!((window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone===true)}catch(e){return false}}
+function isApp(){try{return !!((window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone===true||storeApp())}catch(e){return false}}
+/* ===== แอปจากร้านค้า (Google Play / App Store) =====
+   iPhone: ตัวห่อแอป (app-shell/) เติม "BNAMassageApp/ios" ต่อท้าย user agent
+   Android: แอปเปิดหน้าแรกเป็น /?src=twa และ Chrome ส่ง referrer เป็น android-app://th.or.bna.massage
+   จำไว้ใน sessionStorage (ไม่ใช้ localStorage เพราะแอป Android ใช้ที่เก็บข้อมูลร่วมกับ Chrome ของเครื่อง) */
+function storeApp(){try{var ua=navigator.userAgent||"";
+ if(/BNAMassageApp\/ios/.test(ua)||(window.Capacitor&&typeof Capacitor.isNativePlatform==="function"&&Capacitor.isNativePlatform()))return "ios";
+ if(/^android-app:\/\/th\.or\.bna\.massage/.test(document.referrer||"")||/[?&]src=twa(&|$)/.test(location.search||"")){try{sessionStorage.setItem("storeApp","android")}catch(e){}return "android"}
+ try{if(sessionStorage.getItem("storeApp")==="android")return "android"}catch(e){}return ""}catch(e){return ""}}
+/* ในแอป iPhone: ลิงก์ไปเว็บอื่น (แผนที่ LINE เว็บสมาคม) เปิดนอกแอป ไม่ค้างในแอปเรา ส่วน tel: mailto: ให้เครื่องจัดการตามปกติ */
+document.addEventListener("click",function(e){if(storeApp()!=="ios"||e.defaultPrevented)return;var a=e.target&&e.target.closest&&e.target.closest("a[href]");if(!a)return;
+ var u;try{u=new URL(a.getAttribute("href"),location.href)}catch(x){return}if(!/^https?:$/.test(u.protocol))return;
+ if(u.origin===location.origin&&a.target!=="_blank")return;e.preventDefault();
+ var B=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.Browser;if(B&&B.open){B.open({url:u.href});return}location.href=u.href});
 function guestApp(){return !!(GUEST&&!ME&&isApp())}
 function verTxt(){var m=document.querySelector('meta[name="app-version"]'),v=m&&m.getAttribute("content");return v?'<p class="hint" id="appver" style="text-align:center;margin:22px 0 6px">เวอร์ชันแอป '+esc(v)+'</p>':''}
 function guestView(v){var T={bk:["รายการ","เข้าสู่ระบบเพื่อดูรายการจองของคุณ ทั้งที่กำลังจะถึงและประวัติการใช้บริการ"],fv:["ร้านโปรด","เข้าสู่ระบบเพื่อดูร้านโปรดของคุณ และกลับมาจองร้านเดิมได้รวดเร็ว"],nt:["แจ้งเตือน","เข้าสู่ระบบเพื่อดูแจ้งเตือนเกี่ยวกับการจอง ข้อความจากร้านและจากระบบ"],ac:["บัญชี","เข้าสู่ระบบเพื่อจัดการบัญชี แต้มสะสม และร้านโปรดของคุณ"]}[v];

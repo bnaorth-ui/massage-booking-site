@@ -31,6 +31,10 @@
 5. ไฟล์ที่ใช้ร่วมกัน (`update.js`, `push.js`, `sw.js`) มีสำเนาในทุกแอป ต้องแก้ให้เหมือนกัน ทั้ง 4 แอปแล้วขึ้นเลขเวอร์ชันทั้ง 4 แอป
 6. ถ้าเปลี่ยน `sw.js` ให้พิจารณาเลข `PAGE_CACHE` (ใช้ล้างแคชหน้าเว็บของทุกเครื่อง)
 
+### หน้าสาธารณะและแอปในร้านค้า
+- `customer/privacy/` และ `customer/delete-account/` สร้างจาก `tools/gen-legal.js` ห้ามแก้ไฟล์ตรงๆ แก้นโยบาย (`pvHtml`) ในแอปแล้วรัน `node tools/gen-legal.js` (ข้อสอบ `t_legal_pages.js` เตือน)
+- ตัวห่อแอป Google Play / App Store อยู่ใน `app-shell/` (คู่มือ `app-shell/README.md`) และ `codemagic.yaml` ที่ราก รหัสประจำแอป `th.or.bna.massage`
+
 ### การทดสอบ
 - ชุดทดสอบอยู่ใน `tests/` (Playwright) รันทั้งหมด: `cd tests && JOBS=4 node run-all.js .` เฉพาะบางไฟล์: `node run-all.js . <ส่วนของชื่อไฟล์>` หรือรันไฟล์เดียว `node t_xxx.js`
 - ชื่อหน้าเว็บในข้อสอบเรียกผ่าน `require('./config').page('customer-booking.html' | 'shop-owner.html' | 'staff-app.html' | 'admin-panel.html')`
