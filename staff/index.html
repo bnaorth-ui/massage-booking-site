@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>สำหรับพนักงานนวด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="apple-mobile-web-app-title" content="หมอนวด"><meta name="app-version" content="1.11"><meta name="app-name" content="ระบบจองนวด สำหรับพนักงาน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="apple-mobile-web-app-title" content="หมอนวด"><meta name="app-version" content="1.12"><meta name="app-name" content="ระบบจองนวด สำหรับพนักงาน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -98,7 +98,7 @@ function sbSet(j){var s={access_token:j.access_token,refresh_token:j.refresh_tok
 function sbEnsure(){if(!SBS)return Promise.reject(new Error("NOSESS"));if(SBS.expires_at-60>Date.now()/1000)return Promise.resolve(SBS);
  return sbReq("/auth/v1/token?grant_type=refresh_token",{method:"POST",json:1,auth:false,body:JSON.stringify({refresh_token:SBS.refresh_token})}).then(sbSet,function(e){if(e&&e.message!=="NET")e.status=401;throw e})}
 function sbApi(path,o){return sbEnsure().then(function(){return sbReq(path,o)})}
-if(window.Push){Push.watch(function(){return ME?ntUnread():null});Push.attach({url:SB.url,key:SB.key,api:sbApi,token:function(){return SBS&&SBS.access_token},uid:function(){return SBS&&SBS.user&&SBS.user.id}});window.addEventListener("push-refresh",function(){try{refresh()}catch(e){}})}
+if(window.Push){Push.watch(function(){return ME?ntUnread():null});Push.attach({app:"staff",url:SB.url,key:SB.key,api:sbApi,token:function(){return SBS&&SBS.access_token},uid:function(){return SBS&&SBS.user&&SBS.user.id}});window.addEventListener("push-refresh",function(){try{refresh()}catch(e){}})}
 function rpc(name,args){return sbApi("/rest/v1/rpc/"+name,{method:"POST",json:1,body:JSON.stringify(args||{})})}
 function errTh(e,ctx){var m=String(e&&e.message||"");
  if(m==="NET")return"เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ ตรวจสอบอินเทอร์เน็ตแล้วลองใหม่";

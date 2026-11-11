@@ -19,6 +19,7 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.ori
  if(rm){const f=rm[1];
   if(f==='staff_me')return J(200,{id:'s1',name:'คุณนุ่น',phone:'0844444444',photo_path:null,active:true,accepting:true,work_days:[0,1,2,3,4,5,6],place:'ร้าน',open_min:600,close_min:1260});
   if(f==='my_jobs')return J(200,[]);
+  if(f==='register_push'&&process.env.OLDDB&&body&&body.p_app)return J(404,{code:'PGRST202',message:'Could not find the function public.register_push(p_app, p_auth, p_endpoint, p_p256dh) in the schema cache'});
   if(f==='register_push'){if(!body.p_endpoint)return J(400,{code:'P0001',message:'x'});subsDb=subsDb.filter(x=>x.endpoint!==body.p_endpoint).concat([{endpoint:body.p_endpoint,keys:[body.p_p256dh,body.p_auth],user:me.id}]);return J(204,null)}
   if(f==='unregister_push'){unreg.push(body.p_endpoint);subsDb=subsDb.filter(x=>x.endpoint!==body.p_endpoint);return J(204,null)}
   return J(404,{message:'no rpc '+f})}
@@ -45,6 +46,8 @@ await p.click('#pushpill');await sleep(2500);
 ok('subscribed with userVisibleOnly + 65-byte key',await p.evaluate(()=>window.__subscribeArgs&&window.__subscribeArgs.uvo===true&&window.__subscribeArgs.keyLen>0));
 ok('vapid read from app_settings',calls.some(c=>c.path.endsWith('/app_settings')));
 ok('register_push sent with endpoint+keys',calls.some(c=>c.path.endsWith('register_push')&&c.body.p_endpoint==='https://fcm.example/send/abc123'&&c.body.p_p256dh==='P256DHKEY'&&c.body.p_auth==='AUTHKEY'));
+if(process.env.OLDDB)ok('old database (no app name): falls back to registering without it',calls.some(c=>c.path.endsWith('register_push')&&c.body.p_app==='staff')&&calls.some(c=>c.path.endsWith('register_push')&&c.body.p_endpoint==='https://fcm.example/send/abc123'&&!('p_app' in c.body))&&subsDb.length===1);
+else ok('register_push names the app (staff) so pushes go only to this app',calls.some(c=>c.path.endsWith('register_push')&&c.body.p_endpoint==='https://fcm.example/send/abc123'&&c.body.p_app==='staff'));
 console.log('pill2:',await p.textContent('#pushpill'));ok('pill now says on',(await p.textContent('#pushpill')).includes('แล้ว')||(await p.textContent('#pushpill')).includes('เปิดอยู่'));
 await sleep(6500);ok('pill hides itself once on',(await p.$eval('#pushpill',e=>getComputedStyle(e).display))==='none');
 // SW registered

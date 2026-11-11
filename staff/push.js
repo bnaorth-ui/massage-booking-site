@@ -1,6 +1,6 @@
 /* =====================================================================
    แจ้งเตือนนอกหน้าจอ (Web Push) + เสียงเตือนในหน้า — ใช้ร่วมกันทั้ง 4 หน้า
-   หน้าเว็บเรียก Push.attach({url,key,api,token,uid}) หลังประกาศ sbApi
+   หน้าเว็บเรียก Push.attach({url,key,api,token,uid,app}) หลังประกาศ sbApi (app = customer, shop, staff หรือ admin)
    ===================================================================== */
 (function(){
 var C=null,pill=null,toastEl=null,state="hidden",lastUid=null,ctx=null,busy=false,msg="";
@@ -37,7 +37,11 @@ function paint(){if(!pill)return;var label="",bg="#1f6f5c",fg="#fff";
  pill.textContent=label;pill.style.background=bg;pill.style.color=fg;pill.disabled=busy;setTimeout(ask,600)}
 function say(t,ms){msg=t;paint();clearTimeout(say._t);say._t=setTimeout(function(){msg="";paint()},ms||6000)}
 function reg(){return navigator.serviceWorker.register("sw.js").then(function(){return navigator.serviceWorker.ready})}
-function sendReg(sub){var j=sub.toJSON(),k=j.keys||{};return C.api("/rest/v1/rpc/register_push",{method:"POST",json:1,body:JSON.stringify({p_endpoint:j.endpoint,p_p256dh:k.p256dh,p_auth:k.auth})})}
+/* ส่งชื่อแอป (customer/shop/staff/admin) ไปด้วย ระบบจะส่งแจ้งเตือนนอกหน้าจอเฉพาะแอปที่ตรงกับเรื่องนั้น
+   (เบอร์เดียวกันใช้ได้หลายแอป เช่น ผู้ใช้งาน + หมอนวด) ถ้าฐานข้อมูลยังเป็นรุ่นเก่าที่ไม่รับชื่อแอป จะลงทะเบียนแบบเดิมแทน */
+function sendReg(sub){var j=sub.toJSON(),k=j.keys||{},b={p_endpoint:j.endpoint,p_p256dh:k.p256dh,p_auth:k.auth},go=function(x){return C.api("/rest/v1/rpc/register_push",{method:"POST",json:1,body:JSON.stringify(x)})};
+ if(!C.app)return go(b);var b2={p_endpoint:b.p_endpoint,p_p256dh:b.p_p256dh,p_auth:b.p_auth,p_app:C.app};
+ return go(b2).catch(function(e){if(/p_app|register_push|schema cache|PGRST202|function/i.test(String(e&&e.message||e)))return go(b);throw e})}
 function refreshState(){
  if(!C||!C.uid()){state="hidden";lastUid=null;paint();return}
  if(IOS&&!STANDALONE){state="ios";paint();return}
