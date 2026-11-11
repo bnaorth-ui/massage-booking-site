@@ -76,7 +76,7 @@ await a.click('[data-ag=pvback]');await sleep(300);
 ok('draft restored',await a.evaluate(()=>['rfn','rln','rph','rpw','rpw2'].map(i=>document.getElementById(i).value).join('|')==='ใหม่|ทดสอบ|0866666666|abcdef|abcdef'&&document.getElementById('rpv').checked));
 // unchecked blocks signup
 await a.uncheck('#rpv');await a.click('#agf .btn[type=submit]');await sleep(300);
-ok('unchecked blocked',(await T0(a)).includes('ติ๊กยอมรับนโยบายความเป็นส่วนตัว')&&!calls.some(c=>c.path==='/auth/v1/signup'));
+ok('unchecked blocked',(await T0(a)).includes('ติ๊กยอมรับเงื่อนไขการใช้งานและนโยบายความเป็นส่วนตัว')&&!calls.some(c=>c.path==='/auth/v1/signup'));
 await a.check('#rpv');await a.click('#agf .btn[type=submit]');await sleep(700);
 ok('signup after consent',calls.some(c=>c.path==='/auth/v1/signup'));
 // join flow: phone readonly stays and draft not overwriting

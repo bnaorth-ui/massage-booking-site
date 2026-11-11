@@ -36,7 +36,7 @@ const T={
  app_settings:[{promptpay_on:true,promptpay_type:'mobile',promptpay_id:'0812345678',promptpay_name:'สมาคมฯ',association_name:'สมาคมทดสอบ',address:'1 ถนนทดสอบ',phone:'021234567',line_url:'https://line.me/R/ti/p/@x',hours_text:'จ-ศ 9-17',wallet_warn1:100,wallet_warn2:50}]};
 const sess=u=>({access_token:'at-'+u.id,refresh_token:'rt-'+u.id,expires_in:3600,user:{id:u.id,user_metadata:{phone:u.phone}}});
 for(const [ph,u] of Object.entries(users))u.phone=ph;
-const reps=[];let mode={fkErr:true,netDown:false};let MSGS=[{id:'m1',booking_id:'b1',room_key:'shop',sender_id:'cust',sender_role:'user',sender_name:'ลูกค้าA',body:'ขอเลื่อนเวลาได้ไหมคะ',created_at:'2026-10-29T10:00:00.000000+00:00'}];let UNR=[{booking_id:'b1',room:'shop',n:2}];let marks=[];
+const reps=[],ACC=[];let mode={fkErr:true,netDown:false};let MSGS=[{id:'m1',booking_id:'b1',room_key:'shop',sender_id:'cust',sender_role:'user',sender_name:'ลูกค้าA',body:'ขอเลื่อนเวลาได้ไหมคะ',created_at:'2026-10-29T10:00:00.000000+00:00'}];let UNR=[{booking_id:'b1',room:'shop',n:2}];let marks=[];
 await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.protocol==='file:')return r.continue();if(u.host==='cdnjs.cloudflare.com'&&/qrcode/.test(u.pathname))return r.fulfill({contentType:'application/javascript',body:"window.QRCode=function(el,o){var c=document.createElement('canvas');c.width=c.height=o.width;var x=c.getContext('2d');x.fillStyle='#000';x.fillRect(0,0,o.width/2,o.width/2);el.appendChild(c)};QRCode.CorrectLevel={M:0};"});if(!u.host.endsWith('supabase.co'))return r.abort();
  const m=q.method(),path=u.pathname,sp=u.searchParams;let body=null;try{body=JSON.parse(q.postData()||'null')}catch(e){}
  const hdr=q.headers(),auth=(hdr.authorization||'').replace('Bearer ',''),me=byTok(auth);calls.push({m,path,q:u.search,body,auth,pref:hdr.prefer||''});
@@ -62,6 +62,7 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
    T.promotion_services=T.promotion_services.filter(x=>x.promotion_id!==p.id).concat(body.p_services.map(v=>({promotion_id:p.id,service_id:v})));return J(200,p.id)}
   if(f==='attach_topup_slip'){const t=T.topup_requests.find(x=>x.id===body.p_id);if(!t||t.status!=='pending')return J(400,{code:'P0001',message:'รายการนี้ปิดแล้ว ส่งสลิปไม่ได้'});t.slip_path=body.p_path;t.slip_at=now();return J(204,null)}
   if(f==='cancel_topup'){const t=T.topup_requests.find(x=>x.id===body.p_id);t.status='cancelled';return J(204,null)}
+  if(f==='accept_terms'){ACC.push(body);return J(204,null)}
   if(f==='chat_unread')return J(200,UNR);
   if(f==='chat_mark_read'){marks.push(body);UNR=UNR.filter(x=>x.booking_id!==body.p_booking);return J(204,null)}
   if(f==='chat_send'){MSGS.push({id:'m'+(MSGS.length+1),booking_id:body.p_booking,room_key:body.p_room,sender_id:'u1',sender_role:'shop',sender_name:'ร้านสบายดี สปา',body:body.p_body,created_at:new Date().toISOString().replace('Z','000+00:00')});return J(200,'x')}
@@ -100,10 +101,11 @@ let t=await p.textContent('body');
 ok('login policy page',t.includes('นโยบายความเป็นส่วนตัว (ร้านค้า)')&&t.includes('เก็บไม่เกิน 1 ปี')&&t.includes('ตามที่สมาคมกำหนด')&&t.includes('02-123-4567'));
 await p.click('[data-g=pvback]');await until(()=>document.querySelector('#gph'));ok('back to login',!!(await p.$('#gph')));
 await p.click('[data-g=reg]');await until(()=>document.querySelector('#rn'));
-ok('consent checkbox present',!!(await p.$('#rpv')));
+ok('consent checkbox covers terms and privacy',!!(await p.$('#rpv'))&&(await p.textContent('label[for=rpv]')).includes('เงื่อนไขการใช้งานและนโยบายความเป็นส่วนตัว'));
+await p.click('[data-g=tm]');await sleep(300);ok('read terms from reg',(await p.textContent('#tmt')).includes('เงื่อนไขการใช้งาน (ร้านนวด)'));await p.click('[data-g=tmback]');await until(()=>document.querySelector('#rn'));
 await p.fill('#rn','ร้านใหม่');await p.fill('#rph','0833333333');await p.fill('#rpw','abc123');await p.fill('#rpw2','abc123');
 await p.click('[data-g=regsend]');await sleep(300);
-ok('blocked w/o consent',(await p.textContent('body')).includes('ติ๊กยอมรับนโยบาย')&&!T.shop_registrations.some(x=>x.name==='ร้านใหม่')&&(await p.inputValue('#rn'))==='ร้านใหม่');
+ok('blocked w/o consent',(await p.textContent('body')).includes('ติ๊กยอมรับเงื่อนไขการใช้งานและนโยบาย')&&!T.shop_registrations.some(x=>x.name==='ร้านใหม่')&&(await p.inputValue('#rn'))==='ร้านใหม่');
 await p.click('[data-g=pv]');await sleep(300);ok('read policy from reg',(await p.textContent('body')).includes('เราเก็บข้อมูลอะไร'));
 await p.click('[data-g=pvback]');await until(()=>document.querySelector('#rn'));await sleep(200);
 ok('draft restored',(await p.inputValue('#rn'))==='ร้านใหม่'&&(await p.inputValue('#rph'))==='0833333333'&&(await p.inputValue('#rpw'))==='abc123');
@@ -114,7 +116,7 @@ await p.uncheck('#rgp');await p.click('[data-g=regsend]');await sleep(400);
 ok('blocked w/o gp consent',(await p.textContent('body')).includes('ยอมรับเงื่อนไขค่า GP ก่อนส่งคำขอ')&&!T.shop_registrations.some(x=>x.name==='ร้านใหม่'));
 await p.check('#rgp');await p.click('[data-g=regsend]');await sleep(900);
 ok('registration sent',T.shop_registrations.some(x=>x.name==='ร้านใหม่'));
-ok('gp acceptance sent with registration',T.shop_registrations.some(x=>x.name==='ร้านใหม่'&&+x.gp_accepted_percent===10));
+ok('terms accepted after registration',ACC.some(x=>x.p_app==='shop'));ok('gp acceptance sent with registration',T.shop_registrations.some(x=>x.name==='ร้านใหม่'&&+x.gp_accepted_percent===10));
 await p.goto(require('./config').page('shop-owner.html'));await p.evaluate(()=>localStorage.clear());
 await p.goto(require('./config').page('shop-owner.html'));await until(()=>document.querySelector('#gph'));
 await p.fill('#gph','0811111111');await p.fill('#gpw','abc123');await p.click('[data-g=login]');
