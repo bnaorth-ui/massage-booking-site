@@ -71,7 +71,7 @@ await p.clock.setFixedTime(new Date(D0+'T10:12:00+07:00'));await refresh();BUSYQ
 let c=await card('sh1');
 ok('card: free today with staff count (10:30 skipped, under 30 min)',c.includes('ว่างวันนี้ 11:00 น., หมอว่าง 2 คน'));
 ok('card: one range request for all shop staff, 8 days',BUSYQ.some(q=>q.p_staff.includes('st1')&&q.p_staff.includes('bg1')&&(Date.parse(q.p_to)-Date.parse(q.p_from))===8*86400000));
-ok('card: note that times use the shortest service',(await p.textContent('#app')).includes('เวลาว่างบนการ์ดคิดจากบริการที่สั้นที่สุดของร้าน'));
+ok('card: no explanatory note above the list (removed at user request)',!(await p.textContent('#app')).includes('เวลาว่างบนการ์ด'));
 c=await card('sh2');ok('card: big shop shows "5 คนขึ้นไป", not the real number',c.includes('หมอว่าง 5 คนขึ้นไป')&&!c.includes('6 คน'));
 ok('card: emoji hidden from screen readers',await p.$eval('[data-pl="sh1"] .cq span',e=>e.getAttribute('aria-hidden')==='true'));
 busy('st2',D0,'10:00','12:00');await refresh();c=await card('sh1');
