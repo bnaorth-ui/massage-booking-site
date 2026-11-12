@@ -66,9 +66,9 @@ ok('installed guest: shop list shown',true);
 ok('installed guest: no top login bar',!(await p.$('.gbar'))&&!(await p.$('[data-gb=login]')));
 ok('installed guest: no bottom promo bars',(await p.$$('.regbar')).length===0&&!(await p.textContent('#app')).includes('เป็นเจ้าของร้านนวด')&&!(await p.textContent('#app')).includes('ให้หมอนวดไปดูแลคนในองค์กร')&&!(await p.textContent('#app')).includes('ดูแลพนักงานของคุณ'));
 ok('installed guest: no website (SEO) section',await p.$eval('#seo',e=>e.hidden||getComputedStyle(e).display==='none'));
-ok('installed guest: bottom tab bar visible with 5 tabs',await p.$eval('#tabs',e=>getComputedStyle(e).display!=='none')&&(await p.$$eval('#tabs [data-tab]',b=>b.map(x=>x.textContent.replace(/\s+/g,''))).then(a=>a.length===5&&a[0].includes('หน้าหลัก')&&a[1].includes('รายการ')&&a[2].includes('รายการโปรด')&&a[3].includes('แจ้งเตือน')&&a[4].includes('บัญชี'))));
+ok('installed guest: bottom tab bar visible with 5 tabs',await p.$eval('#tabs',e=>getComputedStyle(e).display!=='none')&&(await p.$$eval('#tabs [data-tab]',b=>b.map(x=>x.textContent.replace(/\s+/g,''))).then(a=>a.length===5&&a[0].includes('หน้าหลัก')&&a[1].includes('การจอง')&&a[2].includes('รายการโปรด')&&a[3].includes('แจ้งเตือน')&&a[4].includes('บัญชี'))));
 ok('installed guest: tabs have no unread/booking badges',(await p.$$('#tabs .bdg')).length===0);
-for(const [t,h] of [['bk','รายการ'],['fv','รายการโปรด'],['nt','แจ้งเตือน'],['ac','บัญชี']]){
+for(const [t,h] of [['bk','การจองของฉัน'],['fv','รายการโปรด'],['nt','แจ้งเตือน'],['ac','บัญชี']]){
  await p.click('#tabs [data-tab='+t+']');await p.waitForSelector('[data-gb=login]',{timeout:3000});
  const tx=await p.textContent('#app');
  ok('installed guest tab '+h+': heading + login prompt',tx.includes(h)&&tx.includes('เข้าสู่ระบบเพื่อ')&&!!(await p.$('[data-gb=reg]')));

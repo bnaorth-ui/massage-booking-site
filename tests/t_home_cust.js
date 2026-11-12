@@ -76,7 +76,7 @@ const st3=!!(await p.$('#selT'))===false;
 await p.click('[data-tab=""]');await w(200);ok('home tab at later step ('+(st3?'step3+':'step2')+') -> shop list',await listShown());
 // other tab round trip keeps the booking
 await startFlow();await p.click('#next');await p.waitForSelector('#selT');
-await p.click('#tabs [data-tab=bk]');await w(300);ok('went to list tab',(await p.textContent('h1'))==='รายการ');
+await p.click('#tabs [data-tab=bk]');await w(300);ok('went to list tab',(await p.textContent('h1'))==='การจองของฉัน');
 await p.click('[data-tab=""]');await w(300);ok('home from other tab returns to the same booking step',!!(await p.$('#selT'))&&!(await p.$('[data-pl]')));
 await p.click('[data-tab=""]');await w(300);ok('home again (already on booking) -> shop list',await listShown());
 await p.click('[data-tab=""]');await w(200);ok('home on list again: stays',await listShown());

@@ -61,7 +61,7 @@ await p.fill('#lph','0811111111');await p.fill('#lpw','abc123');await p.click('b
 
 const vis=async()=>await p.$eval('#tabs',e=>getComputedStyle(e).display!=='none'&&e.getBoundingClientRect().bottom>=innerHeight-1);
 const lab=async()=>await p.$$eval('#tabs button b',b=>b.map(x=>x.textContent));
-ok('tabs visible on home at bottom',await vis());ok('5 tabs '+(await lab()).join('|'),(await lab()).join('|')==='หน้าหลัก|รายการ|รายการโปรด|แจ้งเตือน|บัญชี');
+ok('tabs visible on home at bottom',await vis());ok('5 tabs '+(await lab()).join('|'),(await lab()).join('|')==='หน้าหลัก|การจอง|รายการโปรด|แจ้งเตือน|บัญชี');
 ok('old top menu gone',!(await p.$('.mn')));
 ok('no aria-current / no nav landmark / no aria-label on tabs',(await p.$$('#tabs [aria-current]')).length===0&&(await p.$$('nav')).length===0&&!(await p.getAttribute('#tabs','aria-label')));
 const cur=async()=>await p.$$eval('#tabs button.on b',b=>b.map(x=>x.textContent).join());
@@ -76,7 +76,7 @@ ok('account: contact section',(await p.textContent('h2')).includes('ติดต
 const ord=await p.evaluate(()=>{const y=e=>document.querySelector(e).getBoundingClientRect().top;return[y('.prof'),y('h2.stl'),y('[data-auth=out]')]});ok('order profile<contact<logout '+ord,ord[0]<ord[1]&&ord[1]<ord[2]);
 ok('logout button exists once',(await p.$$('[data-auth=out]')).length===1);}
 ok('no old home button in view',!(await p.$('#home')));
-await p.click('[data-tab=bk]');await p.waitForSelector('[data-bt]');ok('bk view',(await p.textContent('h1'))==='รายการ'&&(await cur())==='รายการ');
+await p.click('[data-tab=bk]');await p.waitForSelector('[data-bt]');ok('bk view',(await p.textContent('h1'))==='การจองของฉัน'&&(await cur())==='การจอง');
 await p.click('[data-tab=nt]');ok('nt view',(await p.textContent('h1'))==='แจ้งเตือน'&&(await cur())==='แจ้งเตือน');
 {const sb=await p.$$eval('[data-nt]',b=>b.map(x=>x.textContent.trim()));console.log(sb.join('|'));ok('nt has 2 sub-tabs',sb.length===2&&/^แจ้งเตือน \(\d+\)$/.test(sb[0])&&/^จากระบบ \(\d+\)$/.test(sb[1]));
 ok('default: notifications, no announcements',(await p.$$('.ann')).length===0&&(await p.$eval('[data-nt].on',e=>e.dataset.nt))==='n');

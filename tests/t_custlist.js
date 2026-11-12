@@ -60,9 +60,9 @@ BKS.push(mk('MS1',72,'confirmed'),mk('MS2',-48,'confirmed','done'),mk('MS3',96,'
 await p.fill('#lph','0811111111');await p.fill('#lpw','abc123');await p.click('button[type=submit]');await p.waitForSelector('[data-pl]',{timeout:4000});
 const kinds=await p.$$eval('.tg button',b=>b.map(x=>x.textContent.trim().replace(/ \(\d+\)/,'')));
 ok('category buttons renamed ('+kinds.join(',')+')',kinds.join()==='เลือกร้านนวด,เลือกหน่วยงาน');
-const mn=await p.$$eval('#tabs button',b=>b.map(x=>x.textContent.replace(/[^ก-๙]/g,'')));console.log('MN',mn.join('|'));ok('menu label "รายการ"',mn.includes('รายการ')&&!mn.includes('รายการจอง'));
+const mn=await p.$$eval('#tabs button',b=>b.map(x=>x.textContent.replace(/[^ก-๙]/g,'')));console.log('MN',mn.join('|'));ok('menu label "การจอง"',mn.includes('การจอง')&&!mn.includes('รายการ'));
 await p.click('#tabs [data-tab=bk]');
-ok('title รายการ',(await p.textContent('h1'))==='รายการ');
+ok('title การจองของฉัน',(await p.textContent('h1'))==='การจองของฉัน');
 await p.waitForFunction(()=>[...document.querySelectorAll('[data-bt]')].some(x=>/\(1\)/.test(x.textContent)),null,{timeout:4000}).catch(()=>{});const tabs=async()=>await p.$$eval('[data-bt]',b=>b.map(x=>x.textContent.trim()));
 ok('3 sub tabs ('+(await tabs()).join('|')+')',(await tabs()).join('|')==='รายการจอง (1)|ประวัติ (2)|งานถูกยกเลิก (2)');
 let t=await A();ok('up: MS1 only',t.includes('MS1')&&!t.includes('MS2')&&!t.includes('MS3'));

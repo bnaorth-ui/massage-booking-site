@@ -113,7 +113,7 @@ ok('tag โปรด on fav',(await p.textContent('[data-pl="sh1"]')).includes('
 ok('home: favourites filter chip is gone',(await p.$('[data-favonly]'))===null);
 FP.length=0;await p.evaluate(()=>{CAT.at=0;document.dispatchEvent(new Event('visibilitychange'))});await p.waitForTimeout(500);
 // ===== แท็บ ร้านโปรด =====
-ok('tab bar has 5 tabs in order',JSON.stringify(await p.$$eval('#tabs [data-tab]',b=>b.map(x=>x.textContent.replace(/[^฀-๿]/g,''))))===JSON.stringify(['หน้าหลัก','รายการ','รายการโปรด','แจ้งเตือน','บัญชี']));
+ok('tab bar has 5 tabs in order',JSON.stringify(await p.$$eval('#tabs [data-tab]',b=>b.map(x=>x.textContent.replace(/[^฀-๿]/g,''))))===JSON.stringify(['หน้าหลัก','การจอง','รายการโปรด','แจ้งเตือน','บัญชี']));
 await p.setViewportSize({width:320,height:640});await p.waitForTimeout(150);
 ok('320px wide: all 5 tabs on one row, labels not clipped or wrapped',await p.evaluate(()=>{const bs=[...document.querySelectorAll('#tabs [data-tab]')];const t=bs.map(b=>b.getBoundingClientRect().top);return bs.length===5&&Math.max(...t)-Math.min(...t)<2&&bs.every(b=>{const l=b.querySelector('b');return l.scrollWidth<=b.clientWidth+1&&l.getBoundingClientRect().height<26})}));
 await p.setViewportSize({width:420,height:900});
