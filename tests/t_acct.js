@@ -61,7 +61,7 @@ await p.fill('#lph','0811111111');await p.fill('#lpw','abc123');await p.click('b
 
 const vis=async()=>await p.$eval('#tabs',e=>getComputedStyle(e).display!=='none'&&e.getBoundingClientRect().bottom>=innerHeight-1);
 const lab=async()=>await p.$$eval('#tabs button b',b=>b.map(x=>x.textContent));
-ok('tabs visible on home at bottom',await vis());ok('5 tabs '+(await lab()).join('|'),(await lab()).join('|')==='หน้าหลัก|รายการ|ร้านโปรด|แจ้งเตือน|บัญชี');
+ok('tabs visible on home at bottom',await vis());ok('5 tabs '+(await lab()).join('|'),(await lab()).join('|')==='หน้าหลัก|รายการ|รายการโปรด|แจ้งเตือน|บัญชี');
 ok('old top menu gone',!(await p.$('.mn')));
 ok('no aria-current / no nav landmark / no aria-label on tabs',(await p.$$('#tabs [aria-current]')).length===0&&(await p.$$('nav')).length===0&&!(await p.getAttribute('#tabs','aria-label')));
 const cur=async()=>await p.$$eval('#tabs button.on b',b=>b.map(x=>x.textContent).join());

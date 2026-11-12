@@ -87,7 +87,7 @@ await hist();
 ok('hearts in history cards (place+staff)',(await p.$$('[data-fv^="p:"]')).length>=1&&(await p.$$('[data-fv^="s:"]')).length>=1);
 ok('no hearts in upcoming tab',await (async()=>{await p.click('[data-bt=up]');await p.waitForTimeout(200);const n=(await p.$$('[data-fv]')).length;await p.click('[data-bt=hist]');await p.waitForTimeout(200);return n===0})());
 ok('aria-label place',(await p.getAttribute('[data-fv="p:sh1"]','aria-label'))==='เพิ่มร้านร้านสบายดี สปา เป็นร้านโปรด');
-ok('aria-label staff',(await p.getAttribute('[data-fv="s:st1"]','aria-label'))==='เพิ่มคุณวิภา เป็นพนักงานโปรด');
+ok('aria-label staff',(await p.getAttribute('[data-fv="s:st1"]','aria-label'))==='เพิ่มคุณวิภา เป็นหมอโปรด');
 await p.click('[data-fv="p:sh1"]');await p.waitForTimeout(400);
 ok('SR announces added to favorites',(await p.evaluate(()=>document.getElementById('sr').textContent)).includes('เพิ่มเป็นรายการโปรดแล้ว'));
 ok('POST place sent',favcalls.length===1&&favcalls[0].body.place_id==='sh1'&&favcalls[0].body.user_id===UID&&FP.includes('sh1'));
@@ -113,18 +113,20 @@ ok('tag โปรด on fav',(await p.textContent('[data-pl="sh1"]')).includes('
 ok('home: favourites filter chip is gone',(await p.$('[data-favonly]'))===null);
 FP.length=0;await p.evaluate(()=>{CAT.at=0;document.dispatchEvent(new Event('visibilitychange'))});await p.waitForTimeout(500);
 // ===== แท็บ ร้านโปรด =====
-ok('tab bar has 5 tabs in order',JSON.stringify(await p.$$eval('#tabs [data-tab]',b=>b.map(x=>x.textContent.replace(/[^฀-๿]/g,''))))===JSON.stringify(['หน้าหลัก','รายการ','ร้านโปรด','แจ้งเตือน','บัญชี']));
+ok('tab bar has 5 tabs in order',JSON.stringify(await p.$$eval('#tabs [data-tab]',b=>b.map(x=>x.textContent.replace(/[^฀-๿]/g,''))))===JSON.stringify(['หน้าหลัก','รายการ','รายการโปรด','แจ้งเตือน','บัญชี']));
 await p.setViewportSize({width:320,height:640});await p.waitForTimeout(150);
 ok('320px wide: all 5 tabs on one row, labels not clipped or wrapped',await p.evaluate(()=>{const bs=[...document.querySelectorAll('#tabs [data-tab]')];const t=bs.map(b=>b.getBoundingClientRect().top);return bs.length===5&&Math.max(...t)-Math.min(...t)<2&&bs.every(b=>{const l=b.querySelector('b');return l.scrollWidth<=b.clientWidth+1&&l.getBoundingClientRect().height<26})}));
 await p.setViewportSize({width:420,height:900});
 ok('ร้านโปรด tab has no badge',(await p.$$('#tabs [data-tab="fv"] .bdg')).length===0);
 await p.click('#tabs [data-tab="fv"]');await p.waitForTimeout(400);
 ok('fav tab: focus on heading, tab marked current',await p.evaluate(()=>document.activeElement&&document.activeElement.id==='fvt')||(await p.$eval('#tabs button.on',e=>e.dataset.tab))==='fv');
-ok('fav tab (empty): explains how to add, no back button',(await p.textContent('#app')).includes('ยังไม่มีร้านโปรด')&&(await p.textContent('#app')).includes('กดรูปหัวใจในรายการจอง')&&!(await p.textContent('#app')).includes('← กลับ')&&(await p.$('[data-fvp]'))===null);
+ok('fav tab: opens on favourite staff with free time and book button',(await p.getAttribute('[data-fvk=s]','aria-pressed'))==='true'&&(await p.textContent('#app')).includes('หมอโปรด (1)')&&(await p.textContent('#app')).includes('คุณวิภา')&&!!(await p.$('[data-fvb="st1"]')));
+await p.click('[data-fvk=p]');await p.waitForTimeout(300);
+ok('shop tab (empty): explains how to add, no back button, focus stays on the tab',(await p.textContent('#app')).includes('ยังไม่มีร้านโปรด')&&(await p.textContent('#app')).includes('กดรูปหัวใจในรายการจอง')&&!(await p.textContent('#app')).includes('← กลับ')&&(await p.$('[data-fvp]'))===null&&await p.evaluate(()=>document.activeElement&&document.activeElement.dataset.fvk==='p'));
 ok('account page: old โปรดของฉัน button is gone',await (async()=>{await p.click('#tabs [data-tab="ac"]');await p.waitForTimeout(300);return !(await p.textContent('#app')).includes('โปรดของฉัน')&&(await p.$('[data-fvp]'))===null})());
 // มีร้านโปรด
 FP.push('sh1');if(!FS.includes('st1'))FS.push('st1');
-await p.evaluate(()=>{CAT.at=0});await p.click('#tabs [data-tab="fv"]');await p.waitForTimeout(900);
+await p.evaluate(()=>{CAT.at=0});await p.click('#tabs [data-tab="fv"]');await p.waitForTimeout(900);await p.click('[data-fvk=p]');await p.waitForTimeout(300);
 let tx=await p.textContent('#app');
 ok('fav tab lists the favourite shop as a bookable card',!!(await p.$('[data-pl="sh1"]'))&&tx.includes('ร้านสบายดี สปา'));
 ok('fav tab: favourite staff are not listed',!tx.includes('คุณวิภา'));
@@ -132,7 +134,7 @@ ok('fav tab: each card has a labelled remove button',(await p.getAttribute('[dat
 // กดการ์ด -> เริ่มจองที่ร้านนั้น
 await p.click('[data-pl="sh1"]');await p.waitForTimeout(400);
 ok('tapping the card starts booking at that shop',(await p.$('#fvt'))===null&&(await p.textContent('#app')).includes('ร้านสบายดี'));
-await p.click('#tabs [data-tab="fv"]');await p.waitForTimeout(500);
+await p.click('#tabs [data-tab="fv"]');await p.waitForTimeout(500);await p.click('[data-fvk=p]');await p.waitForTimeout(300);
 // เอาออก
 await p.click('[data-fv="p:sh1"]');await p.waitForTimeout(500);
 ok('remove: list empty again, focus on heading',!FP.length&&(await p.textContent('#app')).includes('ยังไม่มีร้านโปรด')&&await p.evaluate(()=>document.activeElement.id==='fvt'));

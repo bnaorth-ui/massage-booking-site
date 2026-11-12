@@ -87,7 +87,7 @@ await hist();
 ok('hearts in history cards (place+staff)',(await p.$$('[data-fv^="p:"]')).length>=1&&(await p.$$('[data-fv^="s:"]')).length>=1);
 ok('no hearts in upcoming tab',await (async()=>{await p.click('[data-bt=up]');await p.waitForTimeout(200);const n=(await p.$$('[data-fv]')).length;await p.click('[data-bt=hist]');await p.waitForTimeout(200);return n===0})());
 ok('aria-label place',(await p.getAttribute('[data-fv="p:sh1"]','aria-label'))==='เพิ่มร้านร้านสบายดี สปา เป็นร้านโปรด');
-ok('aria-label staff',(await p.getAttribute('[data-fv="s:st1"]','aria-label'))==='เพิ่มคุณวิภา เป็นพนักงานโปรด');
+ok('aria-label staff',(await p.getAttribute('[data-fv="s:st1"]','aria-label'))==='เพิ่มคุณวิภา เป็นหมอโปรด');
 await p.click('[data-fv="p:sh1"]');await p.waitForTimeout(400);
 ok('SR announces added to favorites',(await p.evaluate(()=>document.getElementById('sr').textContent)).includes('เพิ่มเป็นรายการโปรดแล้ว'));
 ok('POST place sent',favcalls.length===1&&favcalls[0].body.place_id==='sh1'&&favcalls[0].body.user_id===UID&&FP.includes('sh1'));
