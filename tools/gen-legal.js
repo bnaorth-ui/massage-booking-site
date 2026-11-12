@@ -98,7 +98,7 @@ footer{margin-top:28px;padding-top:14px;border-top:2px solid var(--line);color:v
 <h1>${o.title}</h1>
 ${o.body}
 <a class="home" href="/">เปิดแอปจองคิวนวด</a>
-<footer><a href="/privacy/">นโยบายความเป็นส่วนตัว</a> · <a href="/delete-account/">วิธีลบบัญชี</a></footer>
+<footer><a href="/privacy/">นโยบายความเป็นส่วนตัว</a>, <a href="/delete-account/">วิธีลบบัญชี</a></footer>
 </main>
 <script>
 (function(){

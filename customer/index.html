@@ -10,7 +10,7 @@
 <meta property="og:title" content="จองนวดออนไลน์ ร้านนวดใกล้ฉัน"><meta property="og:description" content="นวดโดยคนพิการทางการเห็น ผู้ให้บริการขึ้นทะเบียนถูกต้อง จองคิวได้ทันที"><meta property="og:url" content="https://massage-customer-bna.pages.dev/"><meta property="og:image" content="https://massage-customer-bna.pages.dev/icon-512.png">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"สมาคมวิทยากรฝึกอาชีพคนตาบอด","url":"https://bna.or.th","logo":"https://massage-customer-bna.pages.dev/icon-512.png"}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"จองนวดออนไลน์ต้องทำอย่างไร?","acceptedAnswer":{"@type":"Answer","text":"เลือกร้านและบริการ เลือกวันเวลาและพนักงาน แล้วสมัครสมาชิกหรือเข้าสู่ระบบด้วยเบอร์โทรเพื่อยืนยันการจอง"}},{"@type":"Question","name":"ใครเป็นผู้ให้บริการนวด?","acceptedAnswer":{"@type":"Answer","text":"ผู้ให้บริการเป็นคนพิการทางการเห็นที่ขึ้นทะเบียนกับกรมสนับสนุนบริการสุขภาพ กระทรวงสาธารณสุข และร้านนวดจดทะเบียนตามกฎหมายสถานประกอบการเพื่อสุขภาพ"}},{"@type":"Question","name":"เลื่อนนัดหรือยกเลิกการจองได้ไหม?","acceptedAnswer":{"@type":"Answer","text":"ทำได้เองในแอป ตามเงื่อนไขของแต่ละร้าน"}},{"@type":"Question","name":"ติดต่อร้านหรือพนักงานได้อย่างไร?","acceptedAnswer":{"@type":"Answer","text":"แชตกับร้านหรือพนักงานได้ในแอป"}},{"@type":"Question","name":"มีแต้มสะสมหรือรีวิวไหม?","acceptedAnswer":{"@type":"Answer","text":"มี สะสมแต้มจากการใช้บริการ และรีวิวร้านที่ใช้บริการได้"}},{"@type":"Question","name":"หน่วยงานขอให้หมอนวดไปให้บริการนอกสถานที่ได้ไหม และคิดค่าบริการเท่าไร?","acceptedAnswer":{"@type":"Answer","text":"ได้ เฉพาะหน่วยงานในกรุงเทพมหานคร ค่าบริการ 400 บาทต่อหมอนวด 1 คน ต่อชั่วโมง ไม่รวมช่วงพักเที่ยง ชำระเงินหลังเจ้าหน้าที่อนุมัติและหมอนวดตอบรับแล้ว โดยต้องชำระภายใน 3 วันก่อนวันให้บริการ และขอบริการล่วงหน้าอย่างน้อย 10 วัน"}},{"@type":"Question","name":"ใครจัดทำระบบนี้?","acceptedAnswer":{"@type":"Answer","text":"สมาคมวิทยากรฝึกอาชีพคนตาบอด เพื่อให้คนพิการทางการเห็นมีช่องทางประกอบอาชีพและเข้าถึงลูกค้าได้ง่ายขึ้น"}}]}</script>
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.21"><meta name="app-name" content="ระบบจองนวด สำหรับผู้ใช้งาน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.22"><meta name="app-name" content="ระบบจองนวด สำหรับผู้ใช้งาน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -111,6 +111,7 @@ h1{font-size:1.4rem;margin:8px 0 4px}
 .regbar{display:flex;flex-direction:column;gap:6px;margin:16px 0 4px;padding:12px 14px;border:1px solid var(--line);background:var(--card);border-radius:12px}.regbar .btn{width:auto;align-self:flex-start;padding:8px 14px;text-decoration:none}.gbar{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}.gbar .btn{width:auto;flex:1 1 auto;padding:8px 14px}
 
 .sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}.atoast{position:fixed;left:50%;transform:translateX(-50%);top:12px;max-width:calc(100% - 32px);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:99px;font-weight:700;z-index:60;box-shadow:0 4px 16px rgba(0,0,0,.25);text-align:center}.atoast.bad{background:var(--bad);color:#fff}.atoast[hidden]{display:none}
+.nf{border:2px solid var(--line);border-radius:14px;padding:12px 14px;margin:10px 0 14px;background:var(--card)}.nfb{display:flex;flex-wrap:wrap;gap:8px}.nfb .btn{flex:1 1 30%;min-width:96px;margin:0;padding-left:8px;padding-right:8px}.nfb .btn{display:flex;flex-direction:column;align-items:center;line-height:1.25;padding-top:8px;padding-bottom:8px}.nfd{font-size:.85rem;font-weight:500}.nfb b{font-size:1.15rem}.nfb .btn.sel{background:var(--soft);border-color:var(--main)}.cq{color:var(--main);font-weight:600}.cq.later,.cq.off{color:var(--mute);font-weight:500}
 </style>
 </head>
 <body>
@@ -258,7 +259,7 @@ function shopClosed(p){if(p.type!=="shop"||!p.days||!p.days.length||p.open==null
  return"ปิดอยู่"}
 var CLSIG="";
 setInterval(function(){if(!ME||CAT.state!=="ok"||S.view||V.chat||V.rv||S.step!==0)return;var sg=PLACES.map(function(p){return shopClosed(p)?1:0}).join("");if(CLSIG&&sg!==CLSIG)render(true)},60000);
-function placeBtn(p){var st=placeState(p);return '<button class="opt" data-pl="'+p.id+'"'+(st?" disabled":"")+'><span class="ico">'+(p.img?'<img loading="lazy" decoding="async" src="'+p.img+'" alt="">':p.icon)+'</span><span><b>'+p.name+'</b>'+(p.type==="shop"&&isFavP(p)?' <span class="tag fv">♥ โปรด</span>':'')+'<small>'+[p.type==="shop"?p.area:"",dist(p)===Infinity?(V.loc&&!hasPin(p)?"ยังไม่ปักหมุดตำแหน่ง":""):"ห่าง "+dist(p).toFixed(1)+" กม."].filter(Boolean).join("<br>")+(st?'<br>'+st:(shopClosed(p)?'<br>'+shopClosed(p):'')+(p.comp?'<br>ให้บริการวัน '+p.days.map(function(d){return DN[d]}).join(" ")+' (ตามพนักงาน)':p.type==="org"?'<br>ให้บริการวันที่ '+thDate(p.sdate):(promosOf(p).length?'<br>🎁 มีโปรโมชั่น':'')))+'</small></span></button>'}
+function placeBtn(p){var st=placeState(p);return '<button class="opt" data-pl="'+p.id+'"'+(st?" disabled":"")+'><span class="ico">'+(p.img?'<img loading="lazy" decoding="async" src="'+p.img+'" alt="">':p.icon)+'</span><span><b>'+p.name+'</b>'+(p.type==="shop"&&isFavP(p)?' <span class="tag fv">♥ โปรด</span>':'')+'<small>'+[p.type==="shop"?p.area:"",dist(p)===Infinity?(V.loc&&!hasPin(p)?"ยังไม่ปักหมุดตำแหน่ง":""):"ห่าง "+dist(p).toFixed(1)+" กม."].filter(Boolean).join("<br>")+(st?'<br>'+st:(shopClosed(p)?'<br>'+shopClosed(p):'')+(p.comp?'<br>ให้บริการวัน '+p.days.map(function(d){return DN[d]}).join(" ")+' (ตามพนักงาน)':p.type==="org"?'<br>ให้บริการวันที่ '+thDate(p.sdate):(promosOf(p).length?'<br>🎁 มีโปรโมชั่น':'')))+(st?'':cqLine(p))+'</small></span></button>'}
 /* ---------- รายการจอง / แจ้งเตือน / ยกเลิก / เลื่อนคิว ---------- */
 function allBk(){return BK.map(function(b){b.min=b.min||60;b.staff=b.staff||[];return b})}
 function findBk(ref){return allBk().filter(function(b){return b.ref===ref})[0]}
@@ -481,13 +482,14 @@ function render(keep){
  } else {
   if(S.step===2&&!S.date&&S.svc&&S.place.type==="shop"){var pd=preDate();if(pd){S.date=pd;S.autoTime=true}}
   if(S.step===2&&S.date)ensureBusy();
+  if(S.step===2)nfEnsure();
   h=(GUEST&&!ME&&!isApp()&&S.step===0?guestBar():"")+mvBanner(S.step===0);
   if(S.step===0){
-   syncAdmin();nearbyCheck();CLSIG=PLACES.map(function(p){return shopClosed(p)?1:0}).join("");var kd=V.kind,KT=kd==="shop"?"ร้านนวด":"หน่วยงาน",R=RADIUS[kd],near=visible(kd).filter(function(p){return dist(p)===Infinity||dist(p)<=R}),shown=near.slice().sort(function(a,b){var ga=isFavP(a)?0:1,gb=isFavP(b)?0:1;if(ga!==gb)return ga-gb;var fa=isFresh(a)?0:1,fb=isFresh(b)?0:1;if(fa!==fb)return fa-fb;return(dist(a)===Infinity?1e9:dist(a))-(dist(b)===Infinity?1e9:dist(b))});
+   syncAdmin();nearbyCheck();if(V.kind==="shop")cqEnsure();CLSIG=PLACES.map(function(p){return shopClosed(p)?1:0}).join("");var kd=V.kind,KT=kd==="shop"?"ร้านนวด":"หน่วยงาน",R=RADIUS[kd],near=visible(kd).filter(function(p){return dist(p)===Infinity||dist(p)<=R}),shown=near.slice().sort(function(a,b){var ga=isFavP(a)?0:1,gb=isFavP(b)?0:1;if(ga!==gb)return ga-gb;var fa=isFresh(a)?0:1,fb=isFresh(b)?0:1;if(fa!==fb)return fa-fb;return(dist(a)===Infinity?1e9:dist(a))-(dist(b)===Infinity?1e9:dist(b))});
    h+='<h1>เลือกสถานที่</h1>'+
    '<div class="loc">📍 '+(V.loc?(V.manual?"จุดที่คุณเลือก":"ตำแหน่งของคุณ"):"ยังไม่ได้ระบุตำแหน่ง")+'<button class="lb" data-loc="gps">'+(V.manual?"กลับไปใช้ตำแหน่งของฉัน":V.loc?"อัปเดตตำแหน่ง":"ใช้ตำแหน่งของฉัน")+'</button><button class="lb" data-loc="find">ค้นหาสถานที่</button><button class="lb" data-loc="map">'+(V.manual?"เปลี่ยนจุดบนแผนที่":"เลือกจุดบนแผนที่")+'</button>'+(V.loc&&V.locName?'<small id="locnm" style="flex-basis:100%;color:var(--mute)">'+esc(V.locName)+'</small>':"")+(V.loc?'<button class="lb" data-loc="reset">ไม่ใช้ตำแหน่ง</button>':'')+'</div>'+(V.msg?'<p class="hint">'+V.msg+'</p>':'')+
    '<div class="tg" role="group" aria-label="ประเภท">'+[["shop","เลือกร้านนวด"],["org","เลือกหน่วยงาน"]].map(function(k){var n=visible(k[0]).filter(function(p){return dist(p)===Infinity||dist(p)<=RADIUS[k[0]]}).length;return '<button data-kind="'+k[0]+'" class="'+(k[0]===kd?"on":"")+'" aria-pressed="'+(k[0]===kd)+'">'+k[1]+' ('+n+')</button>'}).join("")+'</div>'+
-   '<p class="sub">'+(V.loc?'แสดง'+KT+'ในรัศมี '+R+' กม. จาก'+(V.manual?'จุดที่คุณเลือก':'ตำแหน่งของคุณ')+', พบ '+shown.length+' แห่ง เรียงจากใกล้ไปไกล (ร้านใหม่ขึ้นก่อน)':'แสดง'+KT+'ทั้งหมด '+shown.length+' แห่ง, กด "ใช้ตำแหน่งของฉัน" เพื่อดูเฉพาะที่อยู่ใกล้และเรียงตามระยะทาง')+'</p>'+
+   '<p class="sub">'+(V.loc?'แสดง'+KT+'ในรัศมี '+R+' กม. จาก'+(V.manual?'จุดที่คุณเลือก':'ตำแหน่งของคุณ')+', พบ '+shown.length+' แห่ง เรียงจากใกล้ไปไกล (ร้านใหม่ขึ้นก่อน)':'แสดง'+KT+'ทั้งหมด '+shown.length+' แห่ง, กด "ใช้ตำแหน่งของฉัน" เพื่อดูเฉพาะที่อยู่ใกล้และเรียงตามระยะทาง')+'</p>'+(kd==="shop"&&CQ.busy&&shown.some(function(p){return cqInfo(p)})?'<p class="sub" style="margin-top:-4px">เวลาว่างบนการ์ดคิดจากบริการที่สั้นที่สุดของร้าน ดูเวลาจริงได้หลังเลือกบริการ</p>':'')+
    (shown.length?'<div class="list">'+shown.filter(function(p){return !shopClosed(p)}).map(placeItem).join("")+'</div>'+(shown.some(shopClosed)?'<div class="list" style="margin-top:10px">'+shown.filter(shopClosed).map(placeItem).join("")+'</div>':''):!PLACES.length?'<div class="empty">ยังไม่มีร้านค้าหรือหน่วยงานในระบบ<br><small>ผู้ดูแลต้องเพิ่มข้อมูลใน Supabase หรือรันไฟล์ข้อมูลตัวอย่าง</small></div>':'<div class="empty">ไม่มี'+KT+""+'ในรัศมี '+R+' กม.</div>');
    if(GUEST&&!ME&&!isApp())h+=regShopBar()+orqBar()+capBar();
   }
@@ -502,7 +504,7 @@ function render(keep){
    if(fixedDate(S.place)){
     h+='<h1>เลือกเวลา</h1><p class="sub">'+S.place.name+', '+S.svc.name+'</p><p class="note">วันที่ให้บริการ: '+thDate(S.date)+'<br>เวลาให้บริการ '+hm(S.place.open*60)+'-'+hm(S.place.close*60)+' น.'+lunchTxt(S.place)+'</p>'+tsel;
    } else {
-    h+='<h1>เลือกวันที่และเวลา</h1><p class="sub">'+S.place.name+', '+S.svc.name+'</p><p class="note">'+label(S.place)+', จองล่วงหน้าได้ '+cv(S.place,"adv")+' วัน</p>'+
+    h+='<h1>เลือกวันที่และเวลา</h1><p class="sub">'+S.place.name+', '+S.svc.name+'</p><p class="note">'+label(S.place)+', จองล่วงหน้าได้ '+cv(S.place,"adv")+' วัน</p>'+nfHtml()+
     '<label class="fl" for="selD">วันที่ (แสดงเฉพาะวันที่ให้บริการ)</label><select id="selD" class="sel"><option value="">เลือกวันที่</option>'+openDays().map(function(d){var x=iso(d);return '<option value="'+x+'"'+(S.date===x?" selected":"")+'>'+d.toLocaleDateString("th-TH",{weekday:"long",day:"numeric",month:"long",year:"numeric"})+(x===iso(new Date())?" (วันนี้)":"")+'</option>'}).join("")+'</select>'+tsel;
    }
    h+='<p class="sub" style="margin-top:12px">เลือกเวลาแล้วไปเลือกพนักงานที่ว่างต่อทันที</p>';
@@ -555,6 +557,49 @@ function confirmBooking(){
   if(e&&e.code==="P0001"&&/เต็ม|หยุด|ไม่ได้ประจำ|ปิดให้บริการ|นอกเวลา|ผ่านไปแล้ว|ไม่ให้บริการ|ไม่เปิดให้จอง/.test(m)){SS.note=m;SS.step=2;SS.time=null;SS.sts=[];SS.asg={};SS.busyKey=null;SS.busyErr="";render()}
   else{SS.err=m;render(true)}})
 }
+/* ===== คิวว่างเร็วที่สุด (หน้าเลือกวันและเวลา) และเวลาว่างบนการ์ดร้าน (หน้ารายการร้าน) =====
+   ใช้การคำนวณชุดเดียวกับช่องเลือกเวลา (openDays / slots / slotOk / freeFor) เวลาที่เสนอจึงตรงกับที่จองได้จริง
+   ต่างกันแค่ใช้ตารางคิวหลายวันที่โหลดครั้งเดียว (busy_slots ช่วงหลายวัน) ถ้าโหลดไม่ได้ ไม่แสดง ช่องเลือกแบบเดิมใช้ได้ตามปกติ
+   ตอนกดจองจริง ระบบยังตรวจซ้ำเหมือนเดิม จึงไม่มีการจองซ้อน */
+var NF={},CQ={},CQC={};
+function busyRange(ids,d0,days){var f=bkTs(d0,0);return sbApi("/rest/v1/rpc/busy_slots",{method:"POST",json:1,body:JSON.stringify({p_staff:ids,p_from:new Date(f).toISOString(),p_to:new Date(f+days*86400000).toISOString()})}).then(function(rows){var B={};(rows||[]).forEach(function(r){(B[r.staff_id]=B[r.staff_id]||[]).push({s:Date.parse(r.starts_at),e:Date.parse(r.ends_at)})});return B})}
+function withBusy(B,fn){var o=BUSY;BUSY=B;try{return fn()}finally{BUSY=o}}
+/* เวลาที่จองได้ n ช่วงแรก ภายใน maxD วันนับจากวันนี้ (ข้ามเวลาที่เหลือไม่ถึง 30 นาทีจากตอนนี้ เหมือนตอนเลือกเวลาเอง) */
+function nfFind(n,maxD){var r=[],nw=new Date(),td=iso(nw),nm=nw.getHours()*60+nw.getMinutes(),lim=maxD?iso(new Date(nw.getFullYear(),nw.getMonth(),nw.getDate()+maxD)):null,od=openDays();
+ for(var i=0;i<od.length&&r.length<n;i++){var d=iso(od[i]);if(lim&&d>=lim)break;var a=slots();for(var j=0;j<a.length&&r.length<n;j++){var m=a[j];if(d===td&&m-nm<30)continue;if(slotOk(d,m))r.push({d:d,m:m})}}return r}
+function nfDay(d,long){var nw=new Date(),t=iso(nw),tm=iso(new Date(nw.getFullYear(),nw.getMonth(),nw.getDate()+1));if(d===t)return"วันนี้";if(d===tm)return"พรุ่งนี้";var q=d.split("-");return new Date(+q[0],+q[1]-1,+q[2]).toLocaleDateString("th-TH",long?{weekday:"long",day:"numeric",month:"long"}:{weekday:"short",day:"numeric",month:"short"})}
+function nfEnsure(){if(!S.place||S.place.type!=="shop"||!S.svc)return;var pid=S.place.id,nw=new Date(),k=iso(nw),c=NF[pid];if(c&&c.k===k&&(c.loading||Date.now()-c.at<60000))return;
+ var ids=placeStaffIds(S.place),od=openDays();if(!ids.length||!od.length){NF[pid]={k:k,at:Date.now(),busy:{}};return}
+ var days=Math.round((od[od.length-1]-new Date(nw.getFullYear(),nw.getMonth(),nw.getDate()))/86400000)+1;
+ NF[pid]={k:k,loading:true};var re=function(){if(S.place&&S.place.id===pid&&S.step===2&&!S.view)render(true)};
+ busyRange(ids,k,days).then(function(B){NF[pid]={k:k,at:Date.now(),busy:B};re()},function(){NF[pid]={k:k,at:Date.now(),err:1};re()})}
+function nfHtml(){if(!S.place||S.place.type!=="shop"||!S.svc)return"";var c=NF[S.place.id];
+ if(!c||c.loading)return'<div class="nf"><h2 class="fl" style="margin:0">คิวว่างเร็วที่สุด</h2><p class="sub" role="status" style="margin:4px 0 0">กำลังหาคิวว่าง…</p></div>';if(c.err)return"";
+ var r=withBusy(c.busy,function(){return nfFind(3)});
+ if(!r.length)return'<div class="nf"><p class="err" role="status" style="margin:0">ช่วงที่จองล่วงหน้าได้ คิวเต็มทั้งหมด ลองเลือกร้านอื่น</p></div>';
+ var full=S.date&&busyReady()&&!slots().some(function(m){return slotOk(S.date,m)});
+ return'<div class="nf" role="group" aria-labelledby="nfh"><h2 id="nfh" class="fl" style="margin:0 0 6px">คิวว่างเร็วที่สุด</h2>'+(full?'<p class="note" id="nffull" style="margin:0 0 8px">'+(S.date===iso(new Date())?"วันนี้":nfDay(S.date,true))+'เต็มแล้ว เลือกคิวว่างด้านล่างได้</p>':'')+
+  '<div class="nfb">'+r.map(function(x){var on=S.date===x.d&&S.time===x.m;return'<button type="button" class="btn ghost'+(on?' sel':'')+'" data-nf="'+x.d+'|'+x.m+'" aria-pressed="'+on+'" aria-label="'+nfDay(x.d,true)+' เวลา '+hh(x.m)+'"><span class="nfd">'+nfDay(x.d)+'</span><b>'+hm(x.m)+'</b></button>'}).join("")+'</div><p class="sub" style="margin:8px 0 0">หรือเลือกวันและเวลาเองด้านล่าง</p></div>'}
+/* การ์ดร้าน: เวลาว่างถัดไปและจำนวนหมอที่ว่างตอนนั้น คิดจากบริการที่สั้นที่สุดของร้าน ค้นไม่เกิน 7 วัน
+   จำนวนหมอแสดงไม่เกิน "5 คนขึ้นไป" (ไม่เปิดเผยขนาดร้าน) เหลือคนเดียวขึ้น "เหลือหมอว่าง 1 คน" */
+function cqEnsure(){var ids=[],nw=new Date(),t=iso(nw);PLACES.forEach(function(p){if(p.type==="shop"&&!placeState(p))p.staff.forEach(function(c){if(ids.indexOf(c.id)<0)ids.push(c.id)})});if(!ids.length)return;
+ var k=t+"|"+ids.join(",");if(CQ.k===k&&(CQ.loading||Date.now()-CQ.at<120000))return;CQ={k:k,loading:true};
+ var re=function(){if(S.step===0&&!S.view&&!V.chat&&!V.rv)render(true)};
+ busyRange(ids,t,8).then(function(B){CQ={k:k,at:Date.now(),busy:B};CQC={};re()},function(){CQ={k:k,at:Date.now(),err:1}})}
+function cqInfo(p){if(p.type!=="shop"||!CQ.busy||placeState(p))return null;if(CQC.hasOwnProperty(p.id))return CQC[p.id];
+ var sv=actSvcs(p).slice().sort(function(a,b){return a.min-b.min})[0];if(!sv)return CQC[p.id]=null;
+ var o=S,res=null;try{S=fresh();S.place=p;S.sim=false;S.svcs=[unit(sv,1,1)];comb();
+  res=withBusy(CQ.busy,function(){var r=nfFind(1,7)[0];return r?{d:r.d,m:r.m,n:freeFor(S.svcs[0],0,r.d,r.m).length}:{none:1}})}catch(e){res=null}finally{S=o}
+ return CQC[p.id]=res}
+function cqLine(p){var x=cqInfo(p);if(!x)return"";if(x.none)return'<br><span class="cq off">ช่วง 7 วันนี้คิวเต็ม</span>';
+ var nw=new Date(),t=iso(nw),nm=nw.getHours()*60+nw.getMinutes(),openToday=p.days.indexOf(nw.getDay())>-1&&!(CLOSED[p.id]||{})[t]&&nm<p.close*60-30,
+  when=(x.d===t?"ว่างวันนี้ ":(openToday?"วันนี้เต็ม, ":"")+"ว่าง"+nfDay(x.d)+" ")+hh(x.m),
+  cnt=x.n>5?"หมอว่าง 5 คนขึ้นไป":x.n===1?"เหลือหมอว่าง 1 คน":x.n>1?"หมอว่าง "+x.n+" คน":"";
+ return'<br><span class="cq'+(x.d===t?'':' later')+'"><span aria-hidden="true">'+(x.d===t?'🟢':'⚪')+' </span>'+when+(cnt?', '+cnt:'')+'</span>'}
+/* หลังกดปุ่มคิวว่าง: รอโหลดคิวของวันนั้น แล้วตรวจซ้ำ ถ้ายังว่าง ย้ายโฟกัสไปปุ่มถัดไป ถ้าเพิ่งเต็ม แจ้งให้เลือกใหม่ */
+function nfAfter(){if(!S.nfPick||S.step!==2||!busyReady()||S.date+"|"+S.time!==S.nfPick)return;S.nfPick=null;
+ if(!slotOk(S.date,S.time)){S.time=null;S.note="เวลานี้เพิ่งมีคนจอง กรุณาเลือกเวลาอื่น";render(true);return}
+ var b=document.getElementById("go3");if(b)setTimeout(function(){try{b.focus()}catch(e){}},0)}
 function bind(){
  var q=function(s){return document.querySelectorAll(s)},g=function(i){return document.getElementById(i)};
  orqBind();
@@ -603,6 +648,7 @@ function bind(){
  if(g("sim"))g("sim").onchange=function(){S.sim=this.checked;comb();S.date=null;S.time=null;S.sts=[];S.asg={};render(true)};
  q("[data-svc]").forEach(function(e){e.onclick=function(){var v=svcOf(S.place,e.dataset.svc);S.svcs=[unit(v,1,1)];comb();S.date=fixedDate(S.place)?S.place.sdate:null;S.time=null;S.sts=[];S.asg={};render(true)}});
  q("[data-st]").forEach(function(e){e.onclick=function(){var v=S.svcs.filter(function(x){return x.uid===(e.dataset.sv||S.svcs[0].uid)})[0],c=find(candsFor(v,S.date),e.dataset.st);S.asg[v.uid]=c;syncSts();render(true)}});
+ q("[data-nf]").forEach(function(e){e.onclick=function(){var x=e.dataset.nf.split("|");S.autoTime=false;S.date=x[0];S.time=+x[1];S.note="";S.sts=[];S.asg={};S.nfPick=e.dataset.nf;var lb=e.getAttribute("aria-label");render(true);ann("เลือก "+lb+" แล้ว"+(busyReady()?" กดถัดไปเพื่อเลือกหมอนวด":""));nfAfter()}});
  if(g("selD"))g("selD").onchange=function(){S.autoTime=false;S.date=this.value||null;S.note="";S.time=null;S.sts=[];S.asg={};render(true)};
  if(g("selT"))g("selT").onchange=function(){if(!this.value)return;S.note="";S.time=+this.value;S.sts=[];S.asg={};S.step=3;render()};
  if(g("go3"))g("go3").onclick=function(){if(!S.date||!S.time)return;S.note="";S.sts=[];S.asg={};S.step=3;render()};
@@ -674,7 +720,7 @@ function loadBusy(p,date){var ids=placeStaffIds(p);BUSY={};if(!ids.length||!date
  return sbApi("/rest/v1/rpc/busy_slots",{method:"POST",json:1,body:JSON.stringify({p_staff:ids,p_from:new Date(f).toISOString(),p_to:new Date(f+86400000).toISOString()})}).then(function(rows){(rows||[]).forEach(function(r){(BUSY[r.staff_id]=BUSY[r.staff_id]||[]).push({s:Date.parse(r.starts_at),e:Date.parse(r.ends_at)})})})}
 function busyReady(){return !!S.date&&S.busyKey===S.place.id+"|"+S.date}
 function ensureBusy(){var key=S.place.id+"|"+S.date,SS=S;if(SS.busyKey===key||SS.busyLoad===key||SS.busyErr)return;SS.busyLoad=key;
- loadBusy(SS.place,SS.date).then(function(){SS.busyLoad=null;if(S!==SS)return;SS.busyKey=key;render(true)},function(e){SS.busyLoad=null;if(S!==SS)return;SS.busyErr=errTh(e,"โหลดเวลาว่างไม่สำเร็จ");render(true)})}
+ loadBusy(SS.place,SS.date).then(function(){SS.busyLoad=null;if(S!==SS)return;SS.busyKey=key;render(true);nfAfter()},function(e){SS.busyLoad=null;if(S!==SS)return;SS.busyErr=errTh(e,"โหลดเวลาว่างไม่สำเร็จ");render(true)})}
 function catRender(){var a=document.getElementById("app"),b=document.getElementById("bar");seoSet(false);var tb=document.getElementById("tabs");if(tb)tb.style.display="none";b.innerHTML="";b.style.display="none";
  if(CAT.state==="err"){a.innerHTML='<h1>โหลดข้อมูลไม่สำเร็จ</h1><div class="err" role="alert">'+esc(CAT.msg)+'</div><button class="btn wide" id="cretry">ลองใหม่</button>'+(ME?'<div class="alinks"><button class="lb" data-auth="out">ออกจากระบบ</button></div>':'<div class="alinks"><button class="lb" data-gb="login">เข้าสู่ระบบ / สมัครสมาชิก</button></div>');
   document.getElementById("cretry").onclick=startApp;document.querySelectorAll("[data-gb=login]").forEach(function(e){e.onclick=function(){needLogin("")}});document.querySelectorAll("[data-auth=out]").forEach(function(e){e.onclick=logout});return}
