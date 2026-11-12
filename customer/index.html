@@ -10,7 +10,7 @@
 <meta property="og:title" content="จองนวดออนไลน์ ร้านนวดใกล้ฉัน"><meta property="og:description" content="นวดโดยคนพิการทางการเห็น ผู้ให้บริการขึ้นทะเบียนถูกต้อง จองคิวได้ทันที"><meta property="og:url" content="https://massage-customer-bna.pages.dev/"><meta property="og:image" content="https://massage-customer-bna.pages.dev/icon-512.png">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"สมาคมวิทยากรฝึกอาชีพคนตาบอด","url":"https://bna.or.th","logo":"https://massage-customer-bna.pages.dev/icon-512.png"}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"จองนวดออนไลน์ต้องทำอย่างไร?","acceptedAnswer":{"@type":"Answer","text":"เลือกร้านและบริการ เลือกวันเวลาและพนักงาน แล้วสมัครสมาชิกหรือเข้าสู่ระบบด้วยเบอร์โทรเพื่อยืนยันการจอง"}},{"@type":"Question","name":"ใครเป็นผู้ให้บริการนวด?","acceptedAnswer":{"@type":"Answer","text":"ผู้ให้บริการเป็นคนพิการทางการเห็นที่ขึ้นทะเบียนกับกรมสนับสนุนบริการสุขภาพ กระทรวงสาธารณสุข และร้านนวดจดทะเบียนตามกฎหมายสถานประกอบการเพื่อสุขภาพ"}},{"@type":"Question","name":"เลื่อนนัดหรือยกเลิกการจองได้ไหม?","acceptedAnswer":{"@type":"Answer","text":"ทำได้เองในแอป ตามเงื่อนไขของแต่ละร้าน"}},{"@type":"Question","name":"ติดต่อร้านหรือพนักงานได้อย่างไร?","acceptedAnswer":{"@type":"Answer","text":"แชตกับร้านหรือพนักงานได้ในแอป"}},{"@type":"Question","name":"มีแต้มสะสมหรือรีวิวไหม?","acceptedAnswer":{"@type":"Answer","text":"มี สะสมแต้มจากการใช้บริการ และรีวิวร้านที่ใช้บริการได้"}},{"@type":"Question","name":"หน่วยงานขอให้หมอนวดไปให้บริการนอกสถานที่ได้ไหม และคิดค่าบริการเท่าไร?","acceptedAnswer":{"@type":"Answer","text":"ได้ เฉพาะหน่วยงานในกรุงเทพมหานคร ค่าบริการ 400 บาทต่อหมอนวด 1 คน ต่อชั่วโมง ไม่รวมช่วงพักเที่ยง ชำระเงินหลังเจ้าหน้าที่อนุมัติและหมอนวดตอบรับแล้ว โดยต้องชำระภายใน 3 วันก่อนวันให้บริการ และขอบริการล่วงหน้าอย่างน้อย 10 วัน"}},{"@type":"Question","name":"ใครจัดทำระบบนี้?","acceptedAnswer":{"@type":"Answer","text":"สมาคมวิทยากรฝึกอาชีพคนตาบอด เพื่อให้คนพิการทางการเห็นมีช่องทางประกอบอาชีพและเข้าถึงลูกค้าได้ง่ายขึ้น"}}]}</script>
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.23"><meta name="app-name" content="ระบบจองนวด สำหรับผู้ใช้งาน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.24"><meta name="app-name" content="ระบบจองนวด สำหรับผู้ใช้งาน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -112,6 +112,7 @@ h1{font-size:1.4rem;margin:8px 0 4px}
 
 .sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}.atoast{position:fixed;left:50%;transform:translateX(-50%);top:12px;max-width:calc(100% - 32px);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:99px;font-weight:700;z-index:60;box-shadow:0 4px 16px rgba(0,0,0,.25);text-align:center}.atoast.bad{background:var(--bad);color:#fff}.atoast[hidden]{display:none}
 .nf{border:2px solid var(--line);border-radius:14px;padding:12px 14px;margin:10px 0 14px;background:var(--card)}.nfb{display:flex;flex-wrap:wrap;gap:8px}.nfb .btn{flex:1 1 30%;min-width:96px;margin:0;padding-left:8px;padding-right:8px}.nfb .btn{display:flex;flex-direction:column;align-items:center;line-height:1.25;padding-top:8px;padding-bottom:8px}.nfd{font-size:.85rem;font-weight:500}.nfb b{font-size:1.15rem}.nfb .btn.sel{background:var(--soft);border-color:var(--main)}.cq{color:var(--main);font-weight:600}.cq.later,.cq.off{color:var(--mute);font-weight:500}
+.sfb{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:10px 0 4px}.sfs{width:auto;min-height:40px;padding:6px 4px 6px 10px;font-size:.85rem;border:2px solid var(--main);border-radius:999px;background:var(--card);color:var(--main);font:inherit;font-weight:600}.sfb .lb.on{background:var(--main);color:#fff;border-color:var(--main)}
 </style>
 </head>
 <body>
@@ -485,12 +486,12 @@ function render(keep){
   if(S.step===2)nfEnsure();
   h=(GUEST&&!ME&&!isApp()&&S.step===0?guestBar():"")+mvBanner(S.step===0);
   if(S.step===0){
-   syncAdmin();nearbyCheck();if(V.kind==="shop")cqEnsure();CLSIG=PLACES.map(function(p){return shopClosed(p)?1:0}).join("");var kd=V.kind,KT=kd==="shop"?"ร้านนวด":"หน่วยงาน",R=RADIUS[kd],near=visible(kd).filter(function(p){return dist(p)===Infinity||dist(p)<=R}),shown=near.slice().sort(function(a,b){var ga=isFavP(a)?0:1,gb=isFavP(b)?0:1;if(ga!==gb)return ga-gb;var fa=isFresh(a)?0:1,fb=isFresh(b)?0:1;if(fa!==fb)return fa-fb;return(dist(a)===Infinity?1e9:dist(a))-(dist(b)===Infinity?1e9:dist(b))});
+   syncAdmin();nearbyCheck();if(V.kind==="shop")cqEnsure();CLSIG=PLACES.map(function(p){return shopClosed(p)?1:0}).join("");var kd=V.kind,KT=kd==="shop"?"ร้านนวด":"หน่วยงาน",R=RADIUS[kd],near=visible(kd).filter(function(p){return dist(p)===Infinity||dist(p)<=R}),shown=near.slice().sort(function(a,b){var ga=isFavP(a)?0:1,gb=isFavP(b)?0:1;if(ga!==gb)return ga-gb;var fa=isFresh(a)?0:1,fb=isFresh(b)?0:1;if(fa!==fb)return fa-fb;return(dist(a)===Infinity?1e9:dist(a))-(dist(b)===Infinity?1e9:dist(b))});var sfx=sfOn(near.length);if(sfx&&(SF.s!=="rec"||SF.a||SF.p))shown=sfApply(shown);
    h+='<h1>เลือกสถานที่</h1>'+
    '<div class="loc">📍 '+(V.loc?(V.manual?"จุดที่คุณเลือก":"ตำแหน่งของคุณ"):"ยังไม่ได้ระบุตำแหน่ง")+'<button class="lb" data-loc="gps">'+(V.manual?"กลับไปใช้ตำแหน่งของฉัน":V.loc?"อัปเดตตำแหน่ง":"ใช้ตำแหน่งของฉัน")+'</button><button class="lb" data-loc="find">ค้นหาสถานที่</button><button class="lb" data-loc="map">'+(V.manual?"เปลี่ยนจุดบนแผนที่":"เลือกจุดบนแผนที่")+'</button>'+(V.loc&&V.locName?'<small id="locnm" style="flex-basis:100%;color:var(--mute)">'+esc(V.locName)+'</small>':"")+(V.loc?'<button class="lb" data-loc="reset">ไม่ใช้ตำแหน่ง</button>':'')+'</div>'+(V.msg?'<p class="hint">'+V.msg+'</p>':'')+
-   '<div class="tg" role="group" aria-label="ประเภท">'+[["shop","เลือกร้านนวด"],["org","เลือกหน่วยงาน"]].map(function(k){var n=visible(k[0]).filter(function(p){return dist(p)===Infinity||dist(p)<=RADIUS[k[0]]}).length;return '<button data-kind="'+k[0]+'" class="'+(k[0]===kd?"on":"")+'" aria-pressed="'+(k[0]===kd)+'">'+k[1]+' ('+n+')</button>'}).join("")+'</div>'+
-   '<p class="sub">'+(V.loc?'แสดง'+KT+'ในรัศมี '+R+' กม. จาก'+(V.manual?'จุดที่คุณเลือก':'ตำแหน่งของคุณ')+', พบ '+shown.length+' แห่ง เรียงจากใกล้ไปไกล (ร้านใหม่ขึ้นก่อน)':'แสดง'+KT+'ทั้งหมด '+shown.length+' แห่ง, กด "ใช้ตำแหน่งของฉัน" เพื่อดูเฉพาะที่อยู่ใกล้และเรียงตามระยะทาง')+'</p>'+
-   (shown.length?'<div class="list">'+shown.filter(function(p){return !shopClosed(p)}).map(placeItem).join("")+'</div>'+(shown.some(shopClosed)?'<div class="list" style="margin-top:10px">'+shown.filter(shopClosed).map(placeItem).join("")+'</div>':''):!PLACES.length?'<div class="empty">ยังไม่มีร้านค้าหรือหน่วยงานในระบบ<br><small>ผู้ดูแลต้องเพิ่มข้อมูลใน Supabase หรือรันไฟล์ข้อมูลตัวอย่าง</small></div>':'<div class="empty">ไม่มี'+KT+""+'ในรัศมี '+R+' กม.</div>');
+   '<div class="tg" role="group" aria-label="ประเภท">'+[["shop","เลือกร้านนวด"],["org","เลือกหน่วยงาน"]].map(function(k){var n=visible(k[0]).filter(function(p){return dist(p)===Infinity||dist(p)<=RADIUS[k[0]]}).length;return '<button data-kind="'+k[0]+'" class="'+(k[0]===kd?"on":"")+'" aria-pressed="'+(k[0]===kd)+'">'+k[1]+' ('+n+')</button>'}).join("")+'</div>'+(sfx?sfBar():'')+
+   '<p class="sub">'+(sfx&&(SF.s!=="rec"||SF.a||SF.p)?esc(sfDesc(shown.length))+(SF.s==="near"&&!V.loc?', กด "ใช้ตำแหน่งของฉัน" เพื่อเรียงตามระยะทาง':'')+(SF.a&&!CQ.busy?', กำลังตรวจคิวว่าง…':''):V.loc?'แสดง'+KT+'ในรัศมี '+R+' กม. จาก'+(V.manual?'จุดที่คุณเลือก':'ตำแหน่งของคุณ')+', พบ '+shown.length+' แห่ง เรียงจากใกล้ไปไกล (ร้านใหม่ขึ้นก่อน)':'แสดง'+KT+'ทั้งหมด '+shown.length+' แห่ง, กด "ใช้ตำแหน่งของฉัน" เพื่อดูเฉพาะที่อยู่ใกล้และเรียงตามระยะทาง')+'</p>'+
+   (shown.length?(sfx&&SF.s!=="rec"?'<div class="list">'+shown.map(placeItem).join("")+'</div>':'<div class="list">'+shown.filter(function(p){return !shopClosed(p)}).map(placeItem).join("")+'</div>'+(shown.some(shopClosed)?'<div class="list" style="margin-top:10px">'+shown.filter(shopClosed).map(placeItem).join("")+'</div>':'')):sfx&&near.length?'<div class="empty" id="sfempty">ไม่มีร้านที่ตรงเงื่อนไข<br><button type="button" class="lb" data-sf="clear">ล้างตัวกรอง</button></div>':!PLACES.length?'<div class="empty">ยังไม่มีร้านค้าหรือหน่วยงานในระบบ<br><small>ผู้ดูแลต้องเพิ่มข้อมูลใน Supabase หรือรันไฟล์ข้อมูลตัวอย่าง</small></div>':'<div class="empty">ไม่มี'+KT+""+'ในรัศมี '+R+' กม.</div>');
    if(GUEST&&!ME&&!isApp())h+=regShopBar()+orqBar()+capBar();
   }
   if(S.step===1){var shop=S.place.type==="shop",pm=shop?promosOf(S.place):[];
@@ -596,6 +597,23 @@ function cqLine(p){var x=cqInfo(p);if(!x)return"";if(x.none)return'<br><span cla
   when=(x.d===t?"ว่างวันนี้ ":(openToday?"วันนี้เต็ม, ":"")+"ว่าง"+nfDay(x.d)+" ")+hh(x.m),
   cnt=x.n>5?"หมอว่าง 5 คนขึ้นไป":x.n===1?"เหลือหมอว่าง 1 คน":x.n>1?"หมอว่าง "+x.n+" คน":"";
  return'<br><span class="cq'+(x.d===t?'':' later')+'"><span aria-hidden="true">'+(x.d===t?'🟢':'⚪')+' </span>'+when+(cnt?', '+cnt:'')+'</span>'}
+/* ===== เรียงและกรองร้านนวด (หน้ารายการร้าน) แสดงเมื่อมีร้านในรายการตั้งแต่ 4 ร้าน
+   เรียง: แนะนำ (แบบเดิม) / ใกล้สุด / คะแนนสูงสุด / ว่างเร็วสุด (ใช้เวลาว่างชุดเดียวกับการ์ดร้าน)
+   กรอง: ว่างวันนี้ / มีโปรโมชัน จำค่าไว้ในเครื่อง ถ้าร้านไม่ถึง 4 ร้าน ใช้แบบแนะนำและไม่กรอง (ไม่ลบค่าที่จำไว้) ===== */
+var SF=(function(){var o=rd("custShopSort",{});return{s:["rec","near","rate","soon"].indexOf(o.s)>-1?o.s:"rec",a:!!o.a,p:!!o.p}})();
+var SFN={rec:"แนะนำ",near:"ใกล้สุด",rate:"คะแนนสูงสุด",soon:"ว่างเร็วสุด"};
+function sfOn(n){return V.kind==="shop"&&n>=4}
+function sfRate(p){var r=RVOK&&RT[p.id];return r&&!r.fresh&&r.avg!=null?r.avg:-1}
+function sfSoon(p){var x=cqInfo(p);return x&&!x.none?x.d+" "+String(x.m).padStart(4,"0"):"9"}
+function sfToday(p){var x=cqInfo(p);return !!(x&&!x.none&&x.d===iso(new Date()))}
+function sfApply(list){var t=list;if(SF.p)t=t.filter(function(p){return promosOf(p).length>0});if(SF.a&&CQ.busy)t=t.filter(sfToday);
+ var dd=function(p){return dist(p)===Infinity?1e9:dist(p)},by=SF.s==="near"?function(a,b){return dd(a)-dd(b)}:SF.s==="rate"?function(a,b){return(sfRate(b)-sfRate(a))||(dd(a)-dd(b))}:SF.s==="soon"?function(a,b){var x=sfSoon(a),y=sfSoon(b);return x<y?-1:x>y?1:dd(a)-dd(b)}:null;
+ return by?t.slice().sort(by):t}
+function sfDesc(n){var f=[];if(SF.a)f.push("ว่างวันนี้");if(SF.p)f.push("มีโปรโมชัน");return "พบ "+n+" ร้าน เรียงตาม"+SFN[SF.s]+(f.length?" เฉพาะที่"+f.join(" และ"):"")}
+function sfBar(){return'<div class="sfb" role="group" aria-label="เรียงและกรองร้าน"><label class="vh" for="sfs">เรียงร้าน</label><select id="sfs" class="sfs">'+["rec","near","rate","soon"].map(function(k){return'<option value="'+k+'"'+(SF.s===k?" selected":"")+'>เรียง: '+SFN[k]+'</option>'}).join("")+'</select>'+
+ (CQ.err?'':'<button type="button" class="lb'+(SF.a?' on':'')+'" data-sf="a" aria-pressed="'+SF.a+'">ว่างวันนี้</button>')+'<button type="button" class="lb'+(SF.p?' on':'')+'" data-sf="p" aria-pressed="'+SF.p+'">มีโปรโมชัน</button></div>'}
+function sfSave(){wr("custShopSort",SF)}
+function sfSay(){setTimeout(function(){var n=document.querySelectorAll("#app [data-pl]").length;ann(n?"แสดง "+sfDesc(n).replace(/^พบ /,""):"ไม่มีร้านที่ตรงเงื่อนไข")},50)}
 /* หลังกดปุ่มคิวว่าง: รอโหลดคิวของวันนั้น แล้วตรวจซ้ำ ถ้ายังว่าง ย้ายโฟกัสไปปุ่มถัดไป ถ้าเพิ่งเต็ม แจ้งให้เลือกใหม่ */
 function nfAfter(){if(!S.nfPick||S.step!==2||!busyReady()||S.date+"|"+S.time!==S.nfPick)return;S.nfPick=null;
  if(!slotOk(S.date,S.time)){S.time=null;S.note="เวลานี้เพิ่งมีคนจอง กรุณาเลือกเวลาอื่น";render(true);return}
@@ -634,6 +652,8 @@ function bind(){
  q("[data-auth=out]").forEach(function(e){e.onclick=logout});
  q("#myimg").forEach(function(e){e.onchange=function(){var f=this.files&&this.files[0];this.value="";changeAvatar(f)}});
  if(g("home"))g("home").onclick=function(){S.view=null;V.cfm=null;V.flash="";V.prevSeen=null;render()};
+ if(g("sfs"))g("sfs").onchange=function(){SF.s=this.value;sfSave();render(true);var e=g("sfs");if(e)e.focus();sfSay()};
+ q("[data-sf]").forEach(function(e){e.onclick=function(){var k=e.dataset.sf;if(k==="clear"){SF.a=false;SF.p=false}else SF[k]=!SF[k];sfSave();render(true);var f=k==="clear"?g("sfs"):document.querySelector('[data-sf="'+k+'"]');if(f)f.focus();sfSay()}});
  q("[data-kind]").forEach(function(e){e.onclick=function(){V.kind=e.dataset.kind;render(true)}});
  q("[data-loc]").forEach(function(e){e.onclick=function(){
   if(e.dataset.loc==="map"){openPicker();return}
