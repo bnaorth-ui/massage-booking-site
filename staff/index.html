@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>สำหรับพนักงานนวด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="apple-mobile-web-app-title" content="หมอนวด"><meta name="app-version" content="1.14"><meta name="app-name" content="ระบบจองนวด สำหรับพนักงาน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="apple-mobile-web-app-title" content="หมอนวด"><meta name="app-version" content="1.15"><meta name="app-name" content="ระบบจองนวด สำหรับพนักงาน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -170,7 +170,6 @@ function hvTabs(co,og){var cur=S.hv==="co"&&co?"co":S.hv==="og"&&og?"og":"cu",nj
  return{cur:cur,html:T.length<2?"":'<div class="nf" role="tablist" aria-label="หมวดงาน">'+T.map(function(x){return'<button type="button" role="tab" data-a="hv" data-id="'+x[0]+'" class="'+(x[0]===cur?"on":"")+'" aria-selected="'+(x[0]===cur)+'"'+(x[2]?' aria-label="'+x[1]+' '+x[3]+'"':'')+'>'+x[1]+(x[2]?' ('+x[2]+')':'')+'</button>'}).join("")+'</div>'}}
 function okUrl(u){return /^https?:\/\//i.test(u||"")}
 function ctView(){var c=CT,tel=String(c.phone||"").replace(/[^0-9+]/g,""),h='<h2 class="stl">ติดต่อเรา</h2>';
- h+='<div class="ctc"><b>'+esc(c.name||"สมาคมวิทยากรฝึกอาชีพคนตาบอด")+'</b>'+(c.addr?'<p>'+esc(c.addr)+'</p>':"")+'</div>';
  if(tel)h+='<a class="cta" href="tel:'+tel+'" aria-label="โทรหาเจ้าหน้าที่ '+esc(c.phone)+'"><span aria-hidden="true">📞</span><div>โทรหาเจ้าหน้าที่<small>'+esc(c.phone)+'</small></div></a>';
  if(okUrl(c.line))h+='<a class="cta line" href="'+esc(c.line)+'" target="_blank" rel="noopener" aria-label="แชตกับเจ้าหน้าที่ทาง LINE"><span aria-hidden="true">💬</span><div>แชตทาง LINE<small>เปิดแชตกับเจ้าหน้าที่</small></div></a>';
  if(c.hours)h+='<div class="ctc"><b>เวลาทำการ</b><span class="hr">'+esc(c.hours)+'</span></div>';

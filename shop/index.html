@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>สำหรับร้านนวด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.14"><meta name="app-name" content="ระบบจองนวด สำหรับร้านค้า"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.15"><meta name="app-name" content="ระบบจองนวด สำหรับร้านค้า"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -301,7 +301,6 @@ function mgBar(){return '<div class="nf" role="tablist" aria-label="หมวด
 function clsTag(){try{if(D&&D.shop&&D.shop.closedAt)return" (ปิดแล้ว)";if(D&&D.cls&&D.cls.status==="pending")return" (รอตรวจ)"}catch(e){}return""}
 function okUrl(u){return /^https?:\/\//i.test(u||"")}
 function ctView(){if(S.blk)return blkView();if(S.tm)return'<div style="margin-bottom:10px"><button type="button" class="btn g" data-a="tmno">← กลับ</button></div><div class="card"><h1 id="tmt" tabindex="-1" style="font-size:1.3rem;margin:0 0 8px">เงื่อนไขการใช้งาน (ร้านนวด)</h1>'+tmBody(CT.name)+'</div>';if(S.pv)return '<div style="margin-bottom:10px"><button type="button" class="btn g" data-a="pvno">← กลับ</button></div><div class="card"><h1 id="pvt" tabindex="-1" style="font-size:1.3rem;margin:0 0 8px">นโยบายความเป็นส่วนตัว (ร้านค้า)</h1>'+pvBody(CT.name||"สมาคมวิทยากรฝึกอาชีพคนตาบอด",CT.phone)+'</div>';var c=CT,tel=String(c.phone||"").replace(/[^0-9+]/g,""),h='<div class="head"><h1>ติดต่อเรา</h1></div>';
- h+='<div class="ctc"><b>'+esc(c.name||"สมาคมวิทยากรฝึกอาชีพคนตาบอด")+'</b>'+(c.addr?'<p>'+esc(c.addr)+'</p>':"")+'</div>';
  if(tel)h+='<a class="cta" href="tel:'+tel+'" aria-label="โทรหาเจ้าหน้าที่ '+esc(c.phone)+'"><span aria-hidden="true">📞</span><div>โทรหาเจ้าหน้าที่<small>'+esc(c.phone)+'</small></div></a>';
  if(okUrl(c.line))h+='<a class="cta line" href="'+esc(c.line)+'" target="_blank" rel="noopener" aria-label="แชตกับเจ้าหน้าที่ทาง LINE"><span aria-hidden="true">💬</span><div>แชตทาง LINE<small>เปิดแชตกับเจ้าหน้าที่</small></div></a>';
  if(c.hours)h+='<div class="ctc"><b>เวลาทำการ</b><span class="hr">'+esc(c.hours)+'</span></div>';

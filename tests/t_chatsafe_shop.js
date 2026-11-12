@@ -135,7 +135,7 @@ ST.other=false;await p.click('#chback');await sleep(500);
 // ---- รายชื่อที่บล็อก ----
 BL=[{id:'blk9',name:'สมปอง',kind:'customer',at:'2026-11-10T03:00:00Z'}];
 await p.click('[data-a=tab][data-id=mg]');await sleep(200);await p.click('[data-a=tab][data-id=ct]');await sleep(200);
-ok('contact page has terms and blocked list buttons',!!(await p.$('[data-a=tmopen]'))&&!!(await p.$('[data-a=blkopen]')));
+ok('contact box: no association name or address, phone still there',!(await txt('#main')).includes('สมาคมทดสอบ')&&!(await txt('#main')).includes('ถนนทดสอบ')&&!!(await p.$('#main a.cta[href^="tel:"]')));ok('contact page has terms and blocked list buttons',!!(await p.$('[data-a=tmopen]'))&&!!(await p.$('[data-a=blkopen]')));
 await p.click('[data-a=blkopen]');ok('blocked list shows first name',await until(()=>document.getElementById('main').textContent.includes('สมปอง')));
 ok('blocked list asks app shop',CS.some(c=>c.f==='my_blocks'&&c.p_app==='shop'));
 await p.click('[data-a=ublk][data-id=blk9]');ok('unblock from list',await W(()=>CS.some(c=>c.f==='chat_unblock'&&c.p_id==='blk9')));

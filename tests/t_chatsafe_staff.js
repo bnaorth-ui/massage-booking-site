@@ -104,7 +104,7 @@ await p.click('#chback');await sleep(500);
 // ---- บัญชี ----
 BL=[{id:'blk9',name:'สมศรี',kind:'customer',at:'2026-11-10T03:00:00Z'}];
 await p.click('[data-a=tab][data-id=ac]');await sleep(300);
-ok('account page: blocked list and terms buttons',!!(await p.$('[data-a=blkopen]'))&&!!(await p.$('[data-a=tmopen]')));
+ok('contact box: no association name or address, phone still there',!(await txt('#app')).includes('สมาคมทดสอบ')&&!(await txt('#app')).includes('ถนนทดสอบ')&&!!(await p.$('#app a.cta[href^="tel:"]')));ok('account page: blocked list and terms buttons',!!(await p.$('[data-a=blkopen]'))&&!!(await p.$('[data-a=tmopen]')));
 await p.click('[data-a=blkopen]');ok('blocked list',await until(()=>document.getElementById('app').textContent.includes('สมศรี')&&!!document.querySelector('[data-a=ublk]'))&&CS.some(c=>c.f==='my_blocks'&&c.p_app==='staff'));
 await p.click('[data-a=ublk][data-id=blk9]');ok('unblock from list',await W(()=>CS.some(c=>c.f==='chat_unblock'&&c.p_id==='blk9')));
 await sleep(200);ok('list empty',(await txt('#app')).includes('ยังไม่ได้บล็อกลูกค้าคนไหน'));

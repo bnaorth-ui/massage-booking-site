@@ -104,7 +104,7 @@ ok('manage button active',(await p.$eval('#tabs button.on',e=>e.textContent)).in
 for(const [id,key] of [['staff','เพิ่มพนักงาน'],['promo','โปรโมชั่น'],['set','บันทึกการตั้งค่า']]){await p.click('#main [data-id='+id+']');ok('sub '+id,(await p.textContent('#main')).includes(key)&&(await p.$eval('#tabs button.on',e=>e.textContent)).includes('จัดการร้าน')&&(await p.$eval('#main .nf button.on',e=>e.dataset.id))===id)}
 ok('logout button inside settings',!!(await p.$('[data-a=logout]')));
 await p.click('#main [data-id=ct]');let t=await p.textContent('#main');
-ok('contact: name+address',t.includes('สมาคมทดสอบ')&&t.includes('1 ถนนทดสอบ'));
+ok('contact: no association name or address (choice ก, 12 Nov)',!t.includes('สมาคมทดสอบ')&&!t.includes('1 ถนนทดสอบ'));
 ok('contact: tel + line + hours',!!(await p.$('a.cta[href="tel:021234567"]'))&&!!(await p.$('a.cta.line[href^="https://line.me"]'))&&t.includes('จ-ศ 9-17'));
 ok('contact: no register link',!t.includes('ลงทะเบียน'));
 await p.click('#tabs [data-id=q]');await p.click('#tabs [data-id=mg]');
