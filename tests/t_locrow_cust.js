@@ -15,12 +15,15 @@ ok('gps, no name yet',r.l==='📍 แสดงร้านใกล้ตำแ�
 r=await st(()=>{V.manual=true;V.locName=""});
 ok('chosen point, no name yet',r.l==='📍 แสดงร้านใกล้จุดที่คุณเลือก'&&r.b.join('|')==='gps:กลับไปใช้ตำแหน่งของฉัน|find:เปลี่ยนสถานที่|reset:ร้านทั้งหมด');
 r=await st(()=>{V.locName="ซอยสุขุมวิท 21 เขตวัฒนา"});
-ok('with place name',r.l==='📍 แสดงร้านใกล้: ซอยสุขุมวิท 21 เขตวัฒนา'&&(await p.textContent('#locnm'))==='ซอยสุขุมวิท 21 เขตวัฒนา');
+ok('with place name (no comma: one line, no address line)',r.l==='📍 แสดงร้านใกล้: ซอยสุขุมวิท 21 เขตวัฒนา'&&(await p.textContent('#locnm'))==='ซอยสุขุมวิท 21 เขตวัฒนา'&&!(await p.$('#locad')));
 ok('label is plain text (not a button), pin emoji hidden from screen readers',await p.evaluate(()=>{const l=document.getElementById('locl');return l.tagName==='P'&&!l.querySelector('button')&&l.querySelector('[aria-hidden=true]').textContent.includes('📍')}));
 ok('buttons on their own line below the label',await p.evaluate(()=>{const l=document.getElementById('locl').getBoundingClientRect(),b=document.querySelector('.loc button').getBoundingClientRect();return b.top>=l.bottom-1}));
 ok('no separate map button any more',!(await p.$('[data-loc=map]')));
+r=await st(()=>{V.locName="โรงแรมเซ็นทารา แกรนด์, ถนนพระราม 1, เขตปทุมวัน"});
+ok('hotel name bold on the first line, address smaller below',(await p.textContent('#locnm'))==='โรงแรมเซ็นทารา แกรนด์'&&(await p.textContent('#locad'))==='ถนนพระราม 1, เขตปทุมวัน'&&await p.evaluate(()=>{const n=document.getElementById('locnm').getBoundingClientRect(),a=document.getElementById('locad').getBoundingClientRect();return a.top>=n.bottom-1&&parseFloat(getComputedStyle(document.getElementById('locad')).fontSize)<parseFloat(getComputedStyle(document.getElementById('locnm')).fontSize)}));
+ok('screen reader text reads name then address',r.l.includes('แสดงร้านใกล้: โรงแรมเซ็นทารา แกรนด์ถนนพระราม 1, เขตปทุมวัน')||r.l.replace(/\s+/g,' ').includes('แสดงร้านใกล้: โรงแรมเซ็นทารา แกรนด์'));
 r=await st(()=>{V.kind="org"});
-ok('organization tab: wording uses หน่วยงาน',r.l==='📍 แสดงหน่วยงานใกล้: ซอยสุขุมวิท 21 เขตวัฒนา'&&r.b.includes('reset:หน่วยงานทั้งหมด'));
+ok('organization tab: wording uses หน่วยงาน',r.l.startsWith('📍 แสดงหน่วยงานใกล้: โรงแรมเซ็นทารา แกรนด์')&&r.b.includes('reset:หน่วยงานทั้งหมด'));
 await st(()=>{V.kind="shop"});await p.click('[data-loc=reset]');await sleep(300);
 ok('all shops button: location cleared, label updated, focus on first button',(await p.textContent('#locl')).includes('แสดงร้านทั้งหมด')&&!(await p.$('[data-loc=reset]'))&&(await p.evaluate(()=>document.activeElement&&document.activeElement.dataset.loc))==='gps');
 ok('announced for screen readers',(await p.evaluate(()=>new Promise(r=>setTimeout(()=>r((document.querySelector('#sr')||{}).textContent||''),200)))).includes('แสดงร้านทั้งหมดแล้ว'));
