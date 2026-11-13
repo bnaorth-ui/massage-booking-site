@@ -69,6 +69,10 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
   if(f==='chat_unblock'){CS.push({f,...body});ST.bid=null;BL=BL.filter(x=>x.id!==body.p_id);return J(204,null)}
   if(f==='chat_report'){CS.push({f,...body});ST.rep=true;return J(200,'rp1')}
   if(f==='my_blocks'){CS.push({f,...body});return J(200,BL)}
+  if(f==='support_unread'){SPQ.push([f,body]);return J(200,SPM.filter(x=>x.sender_role!=='user'&&!x.read).length)}
+  if(f==='support_mark_read'){SPQ.push([f,body]);SPM.forEach(x=>x.read=1);return J(204,null)}
+  if(f==='support_room'){SPQ.push([f,body]);return J(200,{messages:body.p_after?SPM.filter(x=>x.created_at>body.p_after):SPM,hours:'9-17'})}
+  if(f==='support_send'){SPQ.push([f,body]);SPM.push({id:'sp'+SPM.length,sender_id:SPUID,sender_role:'user',sender_name:'x',body:body.p_body,created_at:new Date().toISOString(),read:1});return J(200,'mid')}
   return J(404,{message:'no rpc '+f})}
  if(path==='/rest/v1/chat_messages'){const bb=sp.get('booking_id').replace('eq.',''),rr=sp.get('room_key').replace('eq.','');return J(200,MSGS.filter(m=>m.booking_id===bb&&m.room_key===rr))}
  const tb=path.replace('/rest/v1/','');if(T[tb]===undefined)return J(404,{message:'nf '+path});
@@ -91,7 +95,7 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
  if(m==='DELETE'){if(tb==='services'&&mode.fkErr&&sp.get('id')==='eq.vUsed')return J(409,{code:'23503',message:'violates foreign key constraint'});const keep=rows.filter(x=>!filt([x]).length);T[tb]=keep;if(tb==='services')T.staff_services=T.staff_services.filter(x=>keep.some(s=>s.id===x.service_id));return J(204,null)}
  return J(404,{message:'nf'})});
 const p=await ctx.newPage();p.on('pageerror',e=>errs.push(e.message));p.on('dialog',d=>{errs.push('DIALOG '+d.message());d.dismiss()});
-const ok=(nm,c)=>console.log((c?'PASS ':'FAIL ')+nm);
+const SPQ=[],SPM=[{id:'sp0',sender_id:'ad',sender_role:'admin',sender_name:'เจ้าหน้าที่ สมหญิง',body:'สวัสดีจากเจ้าหน้าที่',created_at:new Date(Date.now()-60000).toISOString()}],SPUID='me';const ok=(nm,c)=>console.log((c?'PASS ':'FAIL ')+nm);
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const until=async(f,a)=>{try{await p.waitForFunction(f,a,{timeout:4000});return true}catch(e){return false}};
 const W=require('./config').waitFor;const txt=async s=>await p.textContent(s);
@@ -136,6 +140,17 @@ ST.other=false;await p.click('#chback');await sleep(500);
 BL=[{id:'blk9',name:'สมปอง',kind:'customer',at:'2026-11-10T03:00:00Z'}];
 await p.click('[data-a=tab][data-id=mg]');await sleep(200);await p.click('[data-a=tab][data-id=ct]');await sleep(200);
 ok('contact box: no association name or address, phone still there',!(await txt('#main')).includes('สมาคมทดสอบ')&&!(await txt('#main')).includes('ถนนทดสอบ')&&!!(await p.$('#main a.cta[href^="tel:"]')));ok('contact page has terms and blocked list buttons',!!(await p.$('[data-a=tmopen]'))&&!!(await p.$('[data-a=blkopen]')));
+
+ok('contact: chat-with-staff button first, no LINE',!!(await p.$('#main button.cta[data-supgo]'))&&!(await txt('#main')).includes('LINE')&&!(await p.$('a[href*="line.me"]')));
+ok('contact: unread badge from support_unread (shop)',SPQ.some(x=>x[0]==='support_unread'&&x[1].p_app==='shop')&&((await p.getAttribute('#main button.cta[data-supgo]','aria-label'))||'').includes('ข้อความใหม่ 1 ข้อความ'));
+await p.click('#main button.cta[data-supgo]');
+ok('staff chat room opens with focus on heading',await W(async()=>(await p.evaluate(()=>document.activeElement&&document.activeElement.id))==='chtitle'));
+ok('room: title, 6-month note, no report/block, earlier reply shown',(await txt('#chtitle')).includes('แชตกับเจ้าหน้าที่')&&(await txt('#main')).includes('6 เดือน')&&!(await p.$('#chsx button'))&&(await txt('#chl')).includes('สวัสดีจากเจ้าหน้าที่'));
+ok('marked read',await W(()=>SPQ.some(x=>x[0]==='support_mark_read'&&x[1].p_app==='shop')));
+await p.fill('#chi','ขอเปลี่ยนเบอร์โทร');await p.click('#chsend');
+ok('message sent with app shop',await W(()=>SPQ.some(x=>x[0]==='support_send'&&x[1].p_app==='shop'&&x[1].p_body==='ขอเปลี่ยนเบอร์โทร'))&&await W(async()=>(await txt('#chl')).includes('ขอเปลี่ยนเบอร์โทร')));
+ok('1000-char limit',(await p.getAttribute('#chi','maxlength'))==='1000');
+await p.click('#chback');await sleep(300);
 await p.click('[data-a=blkopen]');ok('blocked list shows first name',await until(()=>document.getElementById('main').textContent.includes('สมปอง')));
 ok('blocked list asks app shop',CS.some(c=>c.f==='my_blocks'&&c.p_app==='shop'));
 await p.click('[data-a=ublk][data-id=blk9]');ok('unblock from list',await W(()=>CS.some(c=>c.f==='chat_unblock'&&c.p_id==='blk9')));

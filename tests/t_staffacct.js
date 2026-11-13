@@ -84,7 +84,7 @@ await p.click('[data-a=tab][data-id=ac]');await sleep(300);
 const t=await txt('#app');const hr=await p.$$eval('#app a',a=>a.map(x=>x.getAttribute('href')));
 if(!process.env.EMPTY){
 ok('ct: title, no association name or address (choice ก, 12 Nov)',(await p.textContent('h1'))==='บัญชี'&&(await p.$$eval('h2',e=>e.map(x=>x.textContent).join('|'))).includes('ติดต่อเรา')&&!t.includes('สมาคมทดสอบ')&&!t.includes('เลขที่ 1 ถนนทดสอบ'));
-ok('ct: tel + line links',hr.includes('tel:021234567')&&hr.includes('https://line.me/R/ti/p/@test'));
+ok('ct: tel link and in-app chat, no LINE',hr.includes('tel:021234567')&&!hr.includes('line.me')&&!!(await p.$('button.cta[data-supgo]')));
 ok('ct: hours shown, no register/map/faq',t.includes('08:30 – 16:30')&&!t.includes('ลงทะเบียน')&&!t.includes('แผนที่'));
 }else ok('ct empty message',t.includes('ยังไม่ได้ตั้งค่า')&&hr.length===0);
 const bd2=await p.$$eval('#navb .bdg',b=>b.map(x=>x.getAttribute('aria-label')));

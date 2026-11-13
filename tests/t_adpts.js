@@ -92,7 +92,7 @@ const sub=async()=>await p.$$eval('#main .subtabs[aria-label] button',b=>b.map(x
 const onNav=async()=>await p.$eval('#tabs button.on',e=>e.textContent.replace(/^[^ก-๙]+/,'').replace(/\d+$/,'').trim());
 const onSub=async()=>await p.$eval('#main .subtabs[aria-label] button.on',e=>e.textContent.replace(/\s*\(\d+\)/,'').trim());
 const nv=await nav();console.log(nv.join('|'));
-ok('5 nav buttons',nv.join()==='🏠หน้าหลัก,🏪สถานที่และคน,💰การเงิน,🔔การแจ้งเตือน,⚙️จัดการระบบ');
+ok('6 nav buttons (chat added 13 Nov)',nv.join()==='🏠หน้าหลัก,🏪สถานที่และคน,💰การเงิน,🔔การแจ้งเตือน,💬แชต,⚙️จัดการระบบ');
 ok('nav fixed at bottom',await p.$eval('#navb',e=>getComputedStyle(e).position==='fixed'&&e.getBoundingClientRect().bottom>=innerHeight-1));
 ok('logout at top (header)',await p.$eval('#hacts',e=>e.textContent.includes('ออกจากระบบ'))&&await p.$eval('header.top',h=>h.contains(document.querySelector('[data-a=logout]'))));
 ok('no nav landmark',(await p.$$('nav,[aria-current]')).length===0);

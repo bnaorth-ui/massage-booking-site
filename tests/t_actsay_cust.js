@@ -82,7 +82,7 @@ await p.click('[data-ag=fp]');await p.waitForTimeout(500);
 let t=await A();
 ok('fp: name+hours',t.includes('สมาคมทดสอบ')&&t.includes('จ-ศ 9-17'));
 ok('fp: tel link',await p.evaluate(()=>{const a=document.querySelector('a[href^="tel:"]');return !!a&&a.getAttribute('href')==='tel:021234567'}));
-ok('fp: line link',await p.evaluate(()=>!!document.querySelector('a[href="https://line.me/x"]')));
+ok('fp: no LINE link (replaced by in-app chat, 13 Nov)',await p.evaluate(()=>!document.querySelector('a[href*="line.me"]')));
 ok('fp: verify + change text',t.includes('ยืนยันตัวตน')&&t.includes('เปลี่ยนรหัสผ่าน'));
 await p.click('[data-ag=login]');
 await p.fill('#lph','0811111111');await p.fill('#lpw','abc123');await p.click('button[type=submit]');await p.waitForSelector('[data-pl]',{timeout:4000});

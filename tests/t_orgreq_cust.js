@@ -223,7 +223,7 @@ await p.click('#orqtab_done');ok('done tab shows confirmed only',(await p.getAtt
 ok('SR announces tab change',await p.waitForFunction(t=>document.getElementById('sr').textContent.includes(t),'ยืนยันแล้ว 1 รายการ',{timeout:4000}).then(()=>true,()=>false));
 await p.click('#orqtab_closed');ok('empty tab message',(await p.textContent('#app')).includes('ไม่มีคำขอในหมวดนี้'));
 await p.click('#orqtab_done');
-ok('contact buttons (tel + LINE) on card',await p.$eval('.orqc',e=>!!e.querySelector('a[href^="tel:"]')&&!!e.querySelector('a[href^="https://line.me"]')));
+ok('contact buttons (tel + in-app chat, no LINE) on card',await p.$eval('.orqc',e=>!!e.querySelector('a[href^="tel:"]')&&!!e.querySelector('[data-supgo]')&&!e.querySelector('a[href*="line.me"]')));
 {const dl=p.waitForEvent('download',{timeout:15000});await p.click('[data-orq=sumpdf]');const d=await dl;const fp=await d.path();const buf=require('fs').readFileSync(fp);
  if(process.env.PDFOUT)require('fs').copyFileSync(fp,process.env.PDFOUT);
  ok('summary PDF downloads (ASCII name, valid PDF)',d.suggestedFilename()==='summary-ORG-TEST-0001.pdf'&&buf.slice(0,5).toString()==='%PDF-'&&buf.length>5000);}

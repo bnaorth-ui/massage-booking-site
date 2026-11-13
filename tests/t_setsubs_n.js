@@ -108,11 +108,11 @@ ok('typed values survive switching',(await p.$eval('#c1',e=>e.value))==='ชื�
 await p.$eval('#ato',e=>e.value='9999');await p.click('[data-a=setsave]');await p.waitForTimeout(200);
 ok('error on hidden field switches to its tab ('+await shown()+')',(await shown())==='b'&&(await p.textContent('#err')).includes('0-1440'));
 await p.click('[data-a=sub][data-id=b]');await p.fill('#ato','5');
-await p.click('[data-a=sub][data-id=g]');await p.fill('#c5','line.me/bad');await p.click('[data-a=setsave]');await p.waitForTimeout(200);ok('bad LINE url rejected',(await p.textContent('#err')).includes('ขึ้นต้นด้วย https://'));
-await p.fill('#c5','https://line.me/R/ti/p/@test');await p.fill('#c6','จันทร์ – ศุกร์ 08:30 – 16:30 น.');await p.fill('#c7','https://shop.example.com/');await p.fill('#c4','ที่อยู่ใหม่ 1/2');
+await p.click('[data-a=sub][data-id=g]');await p.fill('#c7','shop.example.com/bad');await p.click('[data-a=setsave]');await p.waitForTimeout(200);ok('bad register url rejected',(await p.textContent('#err')).includes('ขึ้นต้นด้วย https://'));ok('no LINE field any more',!(await p.$('#c5')));
+await p.fill('#c6','จันทร์ – ศุกร์ 08:30 – 16:30 น.');await p.fill('#c7','https://shop.example.com/');await p.fill('#c4','ที่อยู่ใหม่ 1/2');
 await p.click('[data-a=setsave]');await p.waitForTimeout(500);
 const pc3=calls.filter(c=>c.m==='PATCH'&&c.path.endsWith('app_settings')).pop();
-ok('one save contains fields from all subs',!!pc3&&pc3.body.association_name==='ชื่อทดสอบ'&&pc3.body.shop_radius_km===15&&pc3.body.wallet_warn1===200&&pc3.body.accept_timeout_min===5&&pc3.body.address==='ที่อยู่ใหม่ 1/2'&&pc3.body.line_url==='https://line.me/R/ti/p/@test'&&pc3.body.register_url==='https://shop.example.com/');
+ok('one save contains fields from all subs',!!pc3&&pc3.body.association_name==='ชื่อทดสอบ'&&pc3.body.shop_radius_km===15&&pc3.body.wallet_warn1===200&&pc3.body.accept_timeout_min===5&&pc3.body.address==='ที่อยู่ใหม่ 1/2'&&!('line_url' in pc3.body)&&pc3.body.register_url==='https://shop.example.com/');
 ok('saved message',(await p.textContent('#main')).includes('บันทึกการตั้งค่าแล้ว'));
 await p.setViewportSize({width:390,height:844});await p.click('[data-a=sub][data-id=n]');await p.screenshot({path:'set_n.png'});
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)

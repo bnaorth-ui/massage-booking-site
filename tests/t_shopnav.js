@@ -105,7 +105,7 @@ for(const [id,key] of [['staff','เพิ่มพนักงาน'],['promo'
 ok('logout button inside settings',!!(await p.$('[data-a=logout]')));
 await p.click('#main [data-id=ct]');let t=await p.textContent('#main');
 ok('contact: no association name or address (choice ก, 12 Nov)',!t.includes('สมาคมทดสอบ')&&!t.includes('1 ถนนทดสอบ'));
-ok('contact: tel + line + hours',!!(await p.$('a.cta[href="tel:021234567"]'))&&!!(await p.$('a.cta.line[href^="https://line.me"]'))&&t.includes('จ-ศ 9-17'));
+ok('contact: chat + tel + hours, no LINE',!!(await p.$('button.cta[data-supgo]'))&&!!(await p.$('a.cta[href="tel:021234567"]'))&&!(await p.$('a[href*="line.me"]'))&&t.includes('จ-ศ 9-17'));
 ok('contact: no register link',!t.includes('ลงทะเบียน'));
 await p.click('#tabs [data-id=q]');await p.click('#tabs [data-id=mg]');
 ok('manage remembers last sub-tab (contact)',(await p.$eval('#main .nf button.on',e=>e.dataset.id))==='ct');

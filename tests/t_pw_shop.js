@@ -98,7 +98,7 @@ await until(()=>document.querySelector('#gph'));
 await p.click('[data-g=forgot]');await sleep(500);let t=await p.textContent('#box').catch(()=>null);if(t===null)t=await p.textContent('body');
 ok('forgot: name+hours',t.includes('สมาคมทดสอบ')&&t.includes('จ-ศ 9-17'));
 ok('forgot: tel',await p.evaluate(()=>{const a=document.querySelector('a[href^="tel:"]');return !!a&&a.getAttribute('href')==='tel:021234567'}));
-ok('forgot: line',await p.evaluate(()=>!!document.querySelector('a[href="https://line.me/x"]')));
+ok('forgot: no LINE link',await p.evaluate(()=>!document.querySelector('a[href*="line.me"]')));
 ok('forgot: verify+change text',t.includes('ยืนยันตัวตน')&&t.includes('เปลี่ยนรหัสผ่าน'));
 await p.click('[data-g=back]');await until(()=>document.querySelector('#gph'));
 await p.fill('#gph','0811111111');await p.fill('#gpw','abc123');await p.click('[data-g=login]');
