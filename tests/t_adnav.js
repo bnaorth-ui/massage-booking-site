@@ -85,21 +85,21 @@ const until=async(f,a)=>{try{await p.waitForFunction(f,a,{timeout:4000});return 
 await p.goto(require('./config').page('admin-panel.html'));
 await until(()=>document.querySelector('#spw'));
 await p.fill('#sn','แอดมิน หนึ่ง');await p.fill('#sph','0811111111');await p.fill('#spw','adminpass1');await p.fill('#spw2','adminpass1');await p.click('button[type=submit]');
-await until(()=>document.getElementById('hacts').textContent.includes('ออกจากระบบ')&&document.getElementById('tabs').children.length>0);
+await until(()=>!!document.querySelector('#hacts .srb')&&document.getElementById('tabs').children.length>0);
 
 const nav=async()=>await p.$$eval('#tabs button',b=>b.map(x=>x.textContent.replace(/\d+$/,'').trim()));
 const sub=async()=>await p.$$eval('#main .subtabs[aria-label] button',b=>b.map(x=>x.textContent.replace(/\s*\(\d+\)/,'').trim()));
 const onNav=async()=>await p.$eval('#tabs button.on',e=>e.textContent.replace(/^[^ก-๙]+/,'').replace(/\d+$/,'').trim());
 const onSub=async()=>await p.$eval('#main .subtabs[aria-label] button.on',e=>e.textContent.replace(/\s*\(\d+\)/,'').trim());
 const nv=await nav();console.log(nv.join('|'));
-ok('6 nav buttons (chat added 13 Nov)',nv.join()==='🏠หน้าหลัก,🏪สถานที่และคน,💰การเงิน,🔔การแจ้งเตือน,💬แชต,⚙️จัดการระบบ');
+ok('6 nav buttons (chat added 13 Nov)',nv.join()==='🏠หน้าหลัก,🏪ทะเบียน,💰การเงิน,🔔แจ้งเตือน,💬แชต,⚙️ระบบ');
 ok('nav fixed at bottom',await p.$eval('#navb',e=>getComputedStyle(e).position==='fixed'&&e.getBoundingClientRect().bottom>=innerHeight-1));
-ok('logout at top (header)',await p.$eval('#hacts',e=>e.textContent.includes('ออกจากระบบ'))&&await p.$eval('header.top',h=>h.contains(document.querySelector('[data-a=logout]'))));
+ok('header: search button only, logout moved to ระบบ > บัญชีของฉัน',await p.$eval('header.top',h=>!!h.querySelector('.srb')&&!h.querySelector('[data-a=logout]')));
 ok('no nav landmark',(await p.$$('nav,[aria-current]')).length===0);
 ok('home active; queue shown',(await onNav())==='หน้าหลัก'&&!!(await p.$('#main')));
-await p.click('#tabs [data-id=nt]');ok('nt active',(await onNav())==='การแจ้งเตือน');
-await p.click('#tabs [data-id=pl]');await p.waitForTimeout(300);ok('pl: subs '+(await sub()).join('|'),(await sub()).join()==='ร้านนวด,หน่วยงาน,คำขอหน่วยงาน,บริษัท,พนักงาน'&&(await onSub())==='ร้านนวด'&&(await onNav())==='สถานที่และคน');
-for(const [id,nm] of [['org','หน่วยงาน'],['comp','บริษัท'],['staff','พนักงาน']]){await p.click('#main .subtabs[aria-label] [data-id='+id+']');await p.waitForTimeout(200);ok('pl sub '+id,(await onSub())===nm&&(await onNav())==='สถานที่และคน')}
+await p.click('#tabs [data-id=nt]');ok('nt active',(await onNav())==='แจ้งเตือน');
+await p.click('#tabs [data-id=pl]');await p.waitForTimeout(300);ok('pl: subs '+(await sub()).join('|'),(await sub()).join()==='ร้านนวด,หน่วยงาน,คำขอหน่วยงาน,บริษัท,พนักงาน'&&(await onSub())==='ร้านนวด'&&(await onNav())==='ทะเบียน');
+for(const [id,nm] of [['org','หน่วยงาน'],['comp','บริษัท'],['staff','พนักงาน']]){await p.click('#main .subtabs[aria-label] [data-id='+id+']');await p.waitForTimeout(200);ok('pl sub '+id,(await onSub())===nm&&(await onNav())==='ทะเบียน')}
 await p.click('#tabs [data-id=fin]');await p.waitForTimeout(300);ok('fin: subs '+(await sub()).join('|'),(await sub()).join()==='คำขอเติมเงิน,บัญชีรับเงิน,รายงาน,สรุปการเงิน'&&(await onSub())==='คำขอเติมเงิน'&&(await onNav())==='การเงิน');
 const shown=async()=>await p.$$eval('[data-pg]',x=>x.filter(e=>!e.hidden).map(e=>e.dataset.pg).join());
 ok('fin default shows requests',(await shown())==='rq'&&await p.isVisible('[data-a=tpok]'));
@@ -109,7 +109,7 @@ await p.click('#main .subtabs[aria-label] [data-id=ppac]');await p.waitForTimeou
 await p.fill('#ppi','0812345678');await p.fill('#ppn','สมาคมฯ');await p.click('[data-a=ppsave]');await p.waitForTimeout(1500);ok('promptpay saved msg',!!(await p.$('.saved'))&&(await shown())==='ac');
 await p.click('#main .subtabs[aria-label] [data-id=rp]');await p.waitForTimeout(300);ok('รายงาน',(await onSub())==='รายงาน'&&(await onNav())==='การเงิน'&&!(await p.$('.saved')));
 await p.click('#tabs [data-id=q]');await p.click('#tabs [data-id=fin]');await p.waitForTimeout(200);ok('fin remembers last sub (รายงาน)',(await onSub())==='รายงาน');
-await p.waitForTimeout(1000);await p.click('#tabs [data-id=sys]');await p.waitForTimeout(500);ok('sys: subs '+(await sub()).join('|'),(await sub()).join()==='บริการกลาง,หมวดหมู่,รีวิว,ผู้ใช้งาน,ประกาศ,การตั้งค่า,สถานะระบบ,ข้อผิดพลาดหน้าเว็บ,ประวัติการทำงาน'&&(await onNav())==='จัดการระบบ');
+await p.waitForTimeout(1000);await p.click('#tabs [data-id=sys]');await p.waitForTimeout(500);ok('sys: subs '+(await sub()).join('|'),(await sub()).join()==='บริการกลาง,หมวดหมู่,รีวิว,ผู้ใช้งาน,ประกาศ,การตั้งค่า,สถานะระบบ,ข้อผิดพลาดหน้าเว็บ,ประวัติการทำงาน,บัญชีของฉัน'&&(await onNav())==='ระบบ');
 for(const [id,nm] of [['cat','หมวดหมู่'],['ann','ประกาศ'],['set','การตั้งค่า']]){await p.click('#main .subtabs[aria-label] [data-id='+id+']');await p.waitForTimeout(250);ok('sys sub '+id,(await onSub())===nm)}
 ok('settings keeps its own sub-tabs',(await p.$$('[data-a=sub]')).length>=4);
 await p.setViewportSize({width:390,height:844});await p.screenshot({path:'adnav_set.png'});

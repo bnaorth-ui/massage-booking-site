@@ -80,10 +80,10 @@ await p.fill('#spw2','adminpass1');await p.click('button[type=submit]');
 ok('first admin created and app opens',await until(()=>document.getElementById('tabs').textContent.includes('หน้าหลัก')));
 ok('claim_first_admin called with bearer',calls.some(c=>c.path.endsWith('claim_first_admin')&&c.auth==='at-u1'));
 ok('admin id stored in admins',T.admins[0]==='u1');
-ok('place tab shows 2 new shops',(await p.textContent('#tabs')).includes('สถานที่และคน')&&(await p.textContent('#tabs')).includes('2'));
+ok('place tab shows 2 new shops',(await p.textContent('#tabs')).includes('ทะเบียน')&&(await p.textContent('#tabs')).includes('2'));
 // ---- รีโหลดคงอยู่ + ออกจากระบบ
 await p.reload();ok('session persists',await until(()=>document.getElementById('tabs').textContent.includes('หน้าหลัก')));
-await p.click('[data-a=logout]');await until(()=>document.querySelector('#aph'));
+await p.click('#tabs [data-id=sys]');await p.click('#main .subtabs [data-id=me]');await p.click('[data-a=logout]');await until(()=>document.querySelector('#aph'));
 ok('admin exists -> login screen (not setup)',!!(await p.$('#aph'))&&!(await p.$('#spw')));
 await p.fill('#aph','0833333333');await p.fill('#apw','custpass1');await p.click('button[type=submit]');
 ok('customer account denied',await has('ไม่มีสิทธิ์แอดมิน'));

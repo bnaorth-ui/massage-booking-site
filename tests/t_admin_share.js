@@ -76,7 +76,7 @@ ok('no admin -> setup screen',await has('สร้างบัญชีแอด
 await p.fill('#sn','แอดมิน หนึ่ง');await p.fill('#sph','0811111111');await p.fill('#spw','adminpass1');await p.fill('#spw2','adminpass1');await p.click('button[type=submit]');
 ok('first admin created',await until(()=>document.getElementById('tabs').textContent.includes('หน้าหลัก')));
 // หน้า login แสดงคำแนะนำติดตั้ง
-await p.click('[data-a=logout]');await until(()=>document.querySelector('#aph'));
+await p.click('#tabs [data-id=sys]');await p.click('#main .subtabs [data-id=me]');await p.click('[data-a=logout]');await until(()=>document.querySelector('#aph'));
 ok('login screen shows install hint',await has('เพิ่มไปยังหน้าจอโฮม')&&await has('ติดตั้งแอป'));
 await p.fill('#aph','0811111111');await p.fill('#apw','adminpass1');await p.click('button[type=submit]');await until(()=>document.getElementById('tabs').textContent.includes('หน้าหลัก'));
 await p.click('#tabs [data-id=sys]');await p.click('[data-a=tab][data-id=set]');await p.click('[data-a=sub][data-id=a]');

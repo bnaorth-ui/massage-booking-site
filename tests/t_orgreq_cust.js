@@ -276,8 +276,10 @@ await p.click('[data-orq=back]');
 await p.goto(require('./config').page('customer-booking.html')+'?org=og1');await p.waitForTimeout(1500);
 ok('deep link opens the org place booking',await p.$eval('#app',e=>e.textContent.includes('สำนักงานพัฒนาสังคม')&&!e.querySelector('[data-pl]')));
 ok('link consumed (stored id cleared)',!(await p.evaluate(()=>sessionStorage.getItem('orgLink'))));
-await p.goto(require('./config').page('customer-booking.html')+'?org=00000000-0000-0000-0000-000000000000');await p.waitForTimeout(1500);
-ok('bad link announces unavailable + shows home',(await p.textContent('#sr')).includes('ลิงก์จองนี้ไม่พร้อมใช้งาน')&&!!(await p.$('[data-pl]')));
+await p.goto(require('./config').page('customer-booking.html')+'?org=00000000-0000-0000-0000-000000000000');
+// รอแบบวนตรวจ (เดิมรอตายตัว 1.5 วินาที เคยไม่ทันตอนรันหลายไฟล์พร้อมกัน 13 พ.ย.)
+let badOk=false;for(let i=0;i<60&&!badOk;i++){badOk=(await p.textContent('#sr').catch(()=>'')).includes('ลิงก์จองนี้ไม่พร้อมใช้งาน')&&!!(await p.$('[data-pl]'));if(!badOk)await p.waitForTimeout(100)}
+ok('bad link announces unavailable + shows home',badOk);
 await p.goto(require('./config').page('customer-booking.html')+'?orq=rq9');await p.waitForSelector('#orqlm',{timeout:6000});
 ok('pre-payment link shows waiting message, not booking',(await p.textContent('#orqlm')).includes('ยังไม่เปิดรับจอง')&&!!(await p.$('[data-pl]')));
 await p.goto(require('./config').page('customer-booking.html')+'?orq=rq1');await p.waitForTimeout(2000);

@@ -72,10 +72,10 @@ await p.reload();
 await p.waitForSelector('[data-pl]',{timeout:2500});
 ok('2 list shown from cache before slow server ('+(Date.now()-t0)+'ms < 3000)',Date.now()-t0<2900&&(await A()).includes('ร้านสบายดี สปา'));
 // server data replaces cache
-mode.delay=800;mode.rename='ร้านชื่อใหม่';
+mode.delay=2500;mode.rename='ร้านชื่อใหม่'; // 2500 (เดิม 800): ตอนรันหลายไฟล์พร้อมกันเครื่องช้า ข้อมูลใหม่เคยมาถึงก่อนตรวจภาพแรก (13 พ.ย.)
 await p.reload();await p.waitForSelector('[data-pl]');
 ok('3a first paint still old name',(await A()).includes('ร้านสบายดี สปา'));
-await p.waitForFunction(()=>document.body.innerText.includes('ร้านชื่อใหม่'),{timeout:4000}).catch(()=>{});
+await p.waitForFunction(()=>document.body.innerText.includes('ร้านชื่อใหม่'),{timeout:7000}).catch(()=>{});
 ok('3b server data replaces old',(await A()).includes('ร้านชื่อใหม่'));
 ok('3c cache updated',(await p.evaluate(()=>localStorage.getItem('catCache_v1'))).includes('ร้านชื่อใหม่'));
 // network failure with cache: no error screen

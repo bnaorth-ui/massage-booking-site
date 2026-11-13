@@ -107,14 +107,15 @@ await p.goto(require('./config').page('admin-panel.html'));
 await until(()=>document.querySelector('#spw'));
 await p.fill('#sn','แอดมิน หนึ่ง');await p.fill('#sph','0811111111');await p.fill('#spw','adminpass1');await p.fill('#spw2','adminpass1');await p.click('button[type=submit]');
 await p.waitForTimeout(800);
+const HW=hlCalls.length;ok('home to-do list checks system status once at start',HW===1);
 await p.click('#tabs [data-id=sys]');await p.waitForTimeout(400);
 let t=await p.evaluate(()=>document.body.innerText);
 const subs=await p.$$eval('#main .subtabs [data-id]',e=>e.map(x=>x.textContent.trim()));
-ok('sys has tab สถานะระบบ, then ข้อผิดพลาดหน้าเว็บ, then ประวัติการทำงาน',subs[subs.length-1]==='ประวัติการทำงาน'&&subs[subs.length-2].startsWith('ข้อผิดพลาดหน้าเว็บ')&&subs[subs.length-3].startsWith('สถานะระบบ'));
+ok('sys has tab สถานะระบบ, ข้อผิดพลาดหน้าเว็บ, ประวัติการทำงาน, then บัญชีของฉัน last',subs[subs.length-1]==='บัญชีของฉัน'&&subs[subs.length-2]==='ประวัติการทำงาน'&&subs[subs.length-3].startsWith('ข้อผิดพลาดหน้าเว็บ')&&subs[subs.length-4].startsWith('สถานะระบบ'));
 await p.click('#main .subtabs [data-id=hl]');await p.waitForTimeout(600);
 ok('admin status: version line is last, matches meta app-version',await p.evaluate(()=>{const v=document.getElementById('appver'),m=document.querySelector('meta[name="app-version"]').content;return !!v&&v.textContent==='เวอร์ชันแอป '+m&&!v.nextElementSibling&&v.parentElement.id==='main'}));
 t=await p.evaluate(()=>document.body.innerText);
-ok('loads via rpc once',hlCalls.length===1);
+ok('loads via rpc once',hlCalls.length===HW+1);
 ok('healthy banner',t.includes('ปกติ')&&t.includes('ไม่พบเรื่องค้าง')&&t.includes('ไม่มี'));
 ok('job Thai names + schedules',t.includes('ส่งเตือนก่อนถึงคิว')&&t.includes('รันทุกนาที')&&t.includes('รันทุก 10 นาที')&&t.includes('ทุกวัน 04:00 น.')&&t.includes('วันที่ 1 ของเดือน 09:00 น.'));
 ok('no warning chips when healthy',!/ล้มเหลว \d+ ครั้ง|ไม่รันตามกำหนด/.test(t));
@@ -128,7 +129,7 @@ ok('job card detail on its own line',await p.$$eval('#main .hlc small',e=>e.leng
 hlMode.d={now:new Date().toISOString(),last_check:MIN(10),last_alert:MIN(5),issues:[{code:'org_slip',n:2,line:'• สลิปคำขอหน่วยงานรอตรวจนานเกิน 24 ชั่วโมง 2 รายการ: ORG000005, ORG000006'}],jobs:[JB('send-reminders','* * * * *',45),JB('chat-purge','20 20 * * *',60,2,'connection refused'),JB('points-expire','0 20 * * *',60)]};
 await p.focus('#hlbtn');await p.click('[data-a=hlre]');await p.waitForTimeout(700);
 t=await p.evaluate(()=>document.body.innerText);
-ok('refresh calls rpc again',hlCalls.length===2);
+ok('refresh calls rpc again',hlCalls.length===HW+2);
 ok('screen reader gets completion message',(await p.textContent('#sr'))==='ตรวจเสร็จแล้ว พบเรื่องที่ควรดู 3 รายการ');
 ok('visible toast shows same text, hidden from SR (no double reading)',await p.$eval('#toast',e=>!e.hidden&&e.textContent==='ตรวจเสร็จแล้ว พบเรื่องที่ควรดู 3 รายการ'&&e.getAttribute('aria-hidden')==='true'));
 ok('focus stays on the same button element',await p.evaluate(()=>document.activeElement&&document.activeElement.id==='hlbtn'));
@@ -153,6 +154,6 @@ ok('error shown with SQL hint',t.includes('ฐานข้อมูลยัง�
 ok('error announced once via alert region + red toast',(await p.textContent('#sra')).includes('admin_system_status')&&await p.$eval('#toast',e=>!e.hidden&&e.classList.contains('bad')));
 // leaving and returning reloads
 hlMode.err=false;await p.click('#main .subtabs [data-id=svc]');await p.waitForTimeout(300);await p.click('#main .subtabs [data-id=hl]');await p.waitForTimeout(600);
-ok('returning reloads (calls 4)',hlCalls.length===4);
+ok('returning reloads (calls 4)',hlCalls.length===HW+4);
 await p.screenshot({path:'hl_admin.png',fullPage:true});
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)})();

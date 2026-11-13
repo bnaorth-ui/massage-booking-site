@@ -96,7 +96,7 @@ await p.fill('#invph','0855555555');await p.click('[data-a=invcreate]');await un
 await p.click('[data-a=invcancel][data-id='+INV.find(x=>x.phone==='0855555555').id+']');await until(()=>document.querySelectorAll('[data-a=invcancel]').length===1);
 ok('cancel removes invite',INV.find(x=>x.phone==='0855555555').cancelled===true&&(await p.$$eval('[data-a=invcancel]',e=>e.length))===1);
 // ผู้รับคำเชิญ
-await p.click('[data-a=logout]');await until(()=>document.querySelector('#aph'));
+await p.click('#tabs [data-id=sys]');await p.click('#main .subtabs [data-id=me]');await p.click('[data-a=logout]');await until(()=>document.querySelector('#aph'));
 ok('login screen has invite link',await has('ได้รับคำเชิญ? สร้างบัญชีแอดมิน'));
 await p.goto(require('./config').page('admin-panel.html')+'?join=0844444444');
 ok('?join= opens join screen with phone prefilled',await until(()=>document.querySelector('#jph'))&&(await p.inputValue('#jph'))==='0844444444');
@@ -110,7 +110,7 @@ ok('correct code -> admin app opens',await until(()=>document.getElementById('ta
 ok('new account is admin and invite used',T.admins.includes(users['0844444444'].id)&&INV.find(x=>x.phone==='0844444444').used===true);
 ok('claim rpc used new user bearer',calls.some(c=>c.path.endsWith('admin_invite_claim')&&c.auth==='at-'+users['0844444444'].id&&c.body.p_code==='123456'));
 // คนทั่วไปไม่มีคำเชิญ
-await p.click('[data-a=logout]');await until(()=>document.querySelector('#aph'));
+await p.click('#tabs [data-id=sys]');await p.click('#main .subtabs [data-id=me]');await p.click('[data-a=logout]');await until(()=>document.querySelector('#aph'));
 await p.goto(require('./config').page('admin-panel.html')+'?join=0866666666');await until(()=>document.querySelector('#jph'));
 await p.fill('#jn','คนแปลกหน้า');await p.fill('#jpw','strangerpw1');await p.fill('#jpw2','strangerpw1');await p.fill('#jcode','123456');await p.click('button[type=submit]');
 ok('no invite -> same generic error, no admin',await has('รหัสเชิญไม่ถูกต้อง หรือคำเชิญหมดอายุ')&&!T.admins.includes(users['0866666666'].id));

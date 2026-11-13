@@ -94,11 +94,11 @@ const until=async(f,a)=>{try{await p.waitForFunction(f,a,{timeout:4000});return 
 await p.goto(require('./config').page('admin-panel.html'));
 await until(()=>document.querySelector('#spw'));
 await p.fill('#sn','แอดมิน หนึ่ง');await p.fill('#sph','0811111111');await p.fill('#spw','adminpass1');await p.fill('#spw2','adminpass1');await p.click('button[type=submit]');
-await until(()=>document.getElementById('hacts').textContent.includes('ออกจากระบบ')&&document.getElementById('tabs').children.length>0);
+await until(()=>!!document.querySelector('#hacts .srb')&&document.getElementById('tabs').children.length>0);
 
 await p.click('#tabs [data-id=sys]');await p.waitForTimeout(400);
 const subs=await p.$$eval('#main .subtabs[aria-label] button',b=>b.map(x=>x.textContent.replace(/\s*\(\d+\)/,'').trim()));
-ok('sys subs include รีวิว',subs.join()==='บริการกลาง,หมวดหมู่,รีวิว,ผู้ใช้งาน,ประกาศ,การตั้งค่า,สถานะระบบ,ข้อผิดพลาดหน้าเว็บ,ประวัติการทำงาน');
+ok('sys subs include รีวิว',subs.join()==='บริการกลาง,หมวดหมู่,รีวิว,ผู้ใช้งาน,ประกาศ,การตั้งค่า,สถานะระบบ,ข้อผิดพลาดหน้าเว็บ,ประวัติการทำงาน,บัญชีของฉัน');
 const lab=await p.$eval('#main .subtabs[aria-label] [data-id=rvw]',e=>e.textContent);
 await p.click('#main .subtabs[aria-label] [data-id=rvw]');await p.waitForTimeout(600);
 let t=await p.textContent('#main');

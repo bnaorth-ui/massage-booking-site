@@ -113,7 +113,7 @@ await p.waitForTimeout(800);
 ok('admin loads today count on start (badge)',ceCalls.length===1);
 await p.click('#tabs [data-id=sys]');await p.waitForTimeout(400);
 const subs=await p.$$eval('#main .subtabs [data-id]',e=>e.map(x=>x.textContent.trim()));
-ok('sub tab order: สถานะระบบ, ข้อผิดพลาดหน้าเว็บ (2), ประวัติการทำงาน',subs[subs.length-1]==='ประวัติการทำงาน'&&subs[subs.length-2]==='ข้อผิดพลาดหน้าเว็บ (2)'&&subs[subs.length-3].startsWith('สถานะระบบ'));
+ok('sub tab order: สถานะระบบ, ข้อผิดพลาดหน้าเว็บ (2), ประวัติการทำงาน',subs[subs.length-1]==='บัญชีของฉัน'&&subs[subs.length-2]==='ประวัติการทำงาน'&&subs[subs.length-3]==='ข้อผิดพลาดหน้าเว็บ (2)'&&subs[subs.length-4].startsWith('สถานะระบบ'));
 await p.click('#main .subtabs [data-id=ce]');await p.waitForTimeout(600);
 let t=await p.evaluate(()=>document.getElementById('main').innerText);
 ok('opening the tab reloads via rpc with 30 days',ceCalls.length===2&&ceCalls[1].p_days===30);

@@ -83,10 +83,10 @@ await p.fill('#spw2','adminpass1');await p.click('button[type=submit]');
 ok('first admin created and app opens',await until(()=>document.getElementById('tabs').textContent.includes('หน้าหลัก')));
 ok('claim_first_admin called with bearer',await W(()=>calls.some(c=>c.path.endsWith('claim_first_admin')&&c.auth==='at-u1')));
 ok('admin id stored in admins',await W(()=>T.admins[0]==='u1'));
-ok('place tab shows 2 new shops',(await p.textContent('#tabs')).includes('สถานที่และคน')&&(await p.textContent('#tabs')).includes('2'));
+ok('place tab shows 2 new shops',(await p.textContent('#tabs')).includes('ทะเบียน')&&(await p.textContent('#tabs')).includes('2'));
 // ---- รีโหลดคงอยู่ + ออกจากระบบ
 await p.reload();ok('session persists',await until(()=>document.getElementById('tabs').textContent.includes('หน้าหลัก')));
-await p.click('[data-a=logout]');await until(()=>document.querySelector('#aph'));
+await p.click('#tabs [data-id=sys]');await p.click('#main .subtabs [data-id=me]');await p.click('[data-a=logout]');await until(()=>document.querySelector('#aph'));
 ok('admin exists -> login screen (not setup)',!!(await p.$('#aph'))&&!(await p.$('#spw')));
 await p.fill('#aph','0833333333');await p.fill('#apw','custpass1');await p.click('button[type=submit]');
 ok('customer account denied',await has('ไม่มีสิทธิ์แอดมิน'));
@@ -211,7 +211,7 @@ await p.click('[data-a=ntc][data-id=fin]');ok('fin shows topup',(await txt('#mai
 await p.click('[data-a=ntread][data-id=n1]');await wait(250);ok('mark one read posts',(c=>c&&c.body.length===1&&c.body[0].notification_id==='n1'&&c.body[0].user_id==='u1'&&c.q.includes('on_conflict')&&c.pref.includes('ignore-duplicates'))(calls.filter(c=>c.path.endsWith('notification_reads')&&c.m==='POST').pop()));
 await p.click('[data-a=ntc][data-id=sys]');ok('sys shows n3',(await txt('#main')).includes('มีคำขอลงทะเบียน'));
 await p.click('[data-a=ntall]');await wait(250);ok('mark all read only this cat',(c=>c&&c.body.length===1&&c.body[0].notification_id==='n3')(calls.filter(c=>c.path.endsWith('notification_reads')&&c.m==='POST').pop())&&(await txt('#main')).includes('1 ใหม่'));
-await p.click('[data-a=ntc][data-id=shop]');await p.click('[data-a=ntall]');await wait(250);ok('all read now',!(await p.textContent('#tabs')).match(/การแจ้งเตือน \d/));
+await p.click('[data-a=ntc][data-id=shop]');await p.click('[data-a=ntall]');await wait(250);ok('all read now',!(await p.textContent('#tabs')).match(/แจ้งเตือน \d/));
 await p.click('[data-a=ntf][data-id=unread]');ok('unread filter empty',await has('ไม่มีการแจ้งเตือนที่ยังไม่อ่านในหมวดนี้'));
 await p.click('[data-a=ntc][data-id=rv]');ok('empty cat msg',await has('ไม่มีการแจ้งเตือนที่ยังไม่อ่านในหมวดนี้'));
 // ---- ตั้งค่า

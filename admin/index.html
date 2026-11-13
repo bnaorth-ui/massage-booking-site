@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>แอดมิน - สมาคมวิทยากรฝึกอาชีพคนตาบอด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.18"><meta name="app-name" content="ระบบจองนวด สำหรับแอดมิน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.19"><meta name="app-name" content="ระบบจองนวด สำหรับแอดมิน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,14 +31,14 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans Thai"
 .top{background:var(--card);border-bottom:1px solid var(--line)}
 .top>div{max-width:960px;margin:0 auto;padding:12px 16px 12px}
 .brand{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.logo{width:40px;height:40px;flex:none;border-radius:22%}.supr{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}.supb{display:flex;flex-direction:column;gap:2px;width:100%;text-align:left;font:inherit;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;cursor:pointer}.supb small{color:var(--mute,inherit)}.supl{display:flex;flex-direction:column;gap:8px;max-height:60vh;overflow:auto;margin:10px 0}.smsg{max-width:85%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 12px}.smsg.mine{align-self:flex-end;background:var(--soft)}.smsg.auto{align-self:center;opacity:.85}.smsg p{margin:4px 0 0;white-space:normal}
+.logo{width:40px;height:40px;flex:none;border-radius:22%}.srg{font-size:1.05rem;margin:16px 0 8px}.supb.late{border-color:var(--bad);border-width:2px}.tdok{margin:4px 0 12px;font-weight:600;color:var(--ok,inherit)}.srl{margin:0 0 12px;padding-left:1.2em}.supr{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}.supb{display:flex;flex-direction:column;gap:2px;width:100%;text-align:left;font:inherit;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;cursor:pointer}.supb small{color:var(--mute,inherit)}.supl{display:flex;flex-direction:column;gap:8px;max-height:60vh;overflow:auto;margin:10px 0}.smsg{max-width:85%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 12px}.smsg.mine{align-self:flex-end;background:var(--soft)}.smsg.auto{align-self:center;opacity:.85}.smsg p{margin:4px 0 0;white-space:normal}
 .brand b{display:block;line-height:1.25}.brand small{color:var(--mute)}
 .navb{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
 .navb>div{max-width:560px;margin:0 auto;display:flex}
 .navb button{position:relative;flex:1;font:inherit;font-size:.72rem;line-height:1.2;border:0;background:transparent;color:var(--mute);padding:8px 2px 7px;cursor:pointer}
 .navb button span{display:block;font-size:1.2rem;line-height:1.3}.navb button.on{color:var(--main);font-weight:700}
 .navb .bdg{position:absolute;top:2px;right:calc(50% - 26px);min-width:18px;height:18px;border-radius:99px;background:#d64545;color:#fff;font-size:.72rem;display:grid;place-items:center;padding:0 5px;font-style:normal}
-.subtabs.mgb{flex-wrap:wrap;overflow-x:visible}.lgo{margin-left:auto;font:inherit;font-size:.9rem;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:6px 12px;cursor:pointer}
+.subtabs.mgb{flex-wrap:wrap;overflow-x:visible}.srb{margin-left:auto;font-size:1.15rem;min-width:44px;min-height:44px;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;cursor:pointer}.srb+.lgo{margin-left:8px}.lgo{margin-left:auto;font:inherit;font-size:.9rem;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:6px 12px;cursor:pointer}
 main{max-width:960px;margin:0 auto;padding:16px 16px 96px}
 h1{font-size:1.3rem;margin:0}
 .head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}.card{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:4px 14px;margin-bottom:14px}
@@ -201,7 +201,7 @@ function loadAdmins(){return Promise.all([rpc("admin_list"),rpc("admin_invite_li
 function loadBk(){var ids=D.orgs.concat(D.comp).map(function(x){return x.id});if(!ids.length){D.bk=[];return Promise.resolve()}
  var from=new Date(Date.now()-30*864e5).toISOString();
  return g1("bookings?select=id,ref,customer_name,phone,status,starts_at,ends_at,total_price,moved_to,places(name,type),booking_items(id,service_name,minutes,active,job,starts_at,staff(name))&place_id=in.("+ids.join(",")+")&ends_at=gte."+from+"&order=starts_at.asc&limit=500").then(function(r){D.bk=r||[]},function(){D.bk=D.bk||[]})}
-function loadAll(){D={};return loadCore().then(function(){return Promise.all([loadLive(),loadBk(),supLoad()])})}
+function loadAll(){D={};return loadCore().then(function(){return Promise.all([loadLive(),loadBk(),supLoad()])}).then(function(){todoWarm()})}
 function catName(id){var c=id&&byId(D.cats,id);return c?c.name:""}
 function ntUnread(){return D.nt.filter(function(x){return D.reads.indexOf(x.id)<0}).length}
 function tpPending(){return D.tp.filter(function(x){return x.st==="pending"}).length}
@@ -260,9 +260,9 @@ function enter(){AG.step="load";S.busy=false;gateDraw();whoAmI();
   return loadAll().then(function(){startMain();ceLoad()})}).catch(function(e){if(e&&e.status===401){doLogout();return}AG.err=errTh(e,"โหลดข้อมูลไม่สำเร็จ");AG.step="loaderr";gateDraw()})}
 
 /* ===================== หน้าจอ ===================== */
-var NAV=[["q","หน้าหลัก","🏠","คิวงานใหม่"],["pl","สถานที่และคน","🏪","ร้านและคำขอที่รอดำเนินการ"],["fin","การเงิน","💰","คำขอเติมเงินรอยืนยัน"],["nt","การแจ้งเตือน","🔔","ยังไม่ได้อ่าน"],["sup","แชต","💬","แชตที่ยังไม่ได้ตอบ"],["sys","จัดการระบบ","⚙️",""]],
-SUBM={pl:[["shop","ร้านนวด"],["org","หน่วยงาน"],["oreq","คำขอหน่วยงาน"],["comp","บริษัท"],["staff","พนักงาน"]],fin:[["pprq","คำขอเติมเงิน"],["ppac","บัญชีรับเงิน"],["rp","รายงาน"],["fm","สรุปการเงิน"]],sys:[["svc","บริการกลาง"],["cat","หมวดหมู่"],["rvw","รีวิว"],["usr","ผู้ใช้งาน"],["ann","ประกาศ"],["set","การตั้งค่า"],["hl","สถานะระบบ"],["ce","ข้อผิดพลาดหน้าเว็บ"],["au","ประวัติการทำงาน"]]},
-NAVN={pl:"สถานที่และคน",fin:"การเงิน",sys:"จัดการระบบ"};
+var NAV=[["q","หน้าหลัก","🏠","คิวงานใหม่"],["pl","ทะเบียน","🏪","ร้านและคำขอที่รอดำเนินการ"],["fin","การเงิน","💰","คำขอเติมเงินรอยืนยัน"],["nt","แจ้งเตือน","🔔","ยังไม่ได้อ่าน"],["sup","แชต","💬","แชตที่ยังไม่ได้ตอบ"],["sys","ระบบ","⚙️",""]],
+SUBM={pl:[["shop","ร้านนวด"],["org","หน่วยงาน"],["oreq","คำขอหน่วยงาน"],["comp","บริษัท"],["staff","พนักงาน"]],fin:[["pprq","คำขอเติมเงิน"],["ppac","บัญชีรับเงิน"],["rp","รายงาน"],["fm","สรุปการเงิน"]],sys:[["svc","บริการกลาง"],["cat","หมวดหมู่"],["rvw","รีวิว"],["usr","ผู้ใช้งาน"],["ann","ประกาศ"],["set","การตั้งค่า"],["hl","สถานะระบบ"],["ce","ข้อผิดพลาดหน้าเว็บ"],["au","ประวัติการทำงาน"],["me","บัญชีของฉัน"]]},
+NAVN={pl:"ทะเบียน",fin:"การเงิน",sys:"ระบบ"};
 function groupOf(t){return t==="q"||t==="nt"||t==="sup"?t:/^(shop|org|oreq|comp|staff)$/.test(t)?"pl":/^(pp|rp|pprq|ppac|fm)$/.test(t)?"fin":"sys"}
 function curSub(){return S.tab==="pp"?"pp"+(S.pps==="ac"?"ac":"rq"):S.tab}
 var AUDS=["ผู้ใช้งาน","ร้านค้า","พนักงาน"],PPT=[["mobile","เบอร์มือถือ"],["national","เลขบัตรประชาชน"],["tax","เลขประจำตัวผู้เสียภาษี (นิติบุคคล)"],["ewallet","e-Wallet ID"]];
@@ -378,11 +378,28 @@ function qCard(b){var c=qCat(b),its=(b.booking_items||[]).slice().sort(function(
  tg=b.status==="no_show"?'<span class="tag b">ลูกค้าไม่มา</span>':b.status==="cancelled"?'<span class="tag b">ยกเลิก</span>':b.status==="rescheduled"?'<span class="tag o">เลื่อนคิว'+(b.moved_to?' → '+esc(b.moved_to):'')+'</span>':c==="done"?'<span class="tag">เสร็จสิ้น</span>':c==="new"?'<span class="tag w">งานใหม่</span>':'<span class="tag w">รอให้บริการ</span>';
  return '<div class="row"><div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><b>'+qHM(b.starts_at)+'-'+qHM(b.ends_at)+' น.</b>'+tg+'</div><b>'+esc(b.customer_name)+'</b>'+(b.phone?'<small>โทร <a href="tel:'+esc(b.phone)+'">'+esc(b.phone)+'</a></small>':'')+'<small>'+esc((b.places&&b.places.name)||"-")+(b.places&&b.places.type==="company"?" (บริษัท)":" (หน่วยงาน)")+'</small>'+
  its.map(function(i){return '<small>'+esc(i.service_name)+', '+i.minutes+' นาที, พนักงาน '+esc((i.staff&&i.staff.name)||"-")+(i.active&&(c==="new"||c==="wait")?', '+QJOB[i.job]:'')+'</small>'}).join("")+'<small>เลขที่ '+esc(b.ref)+', '+baht(+b.total_price||0)+'</small></div></div>'}
+/* ===== งานที่ต้องทำ (บนสุดของหน้าหลัก) รวมเรื่องค้างจากทุกเมนู เรียงตามความเร่งด่วน ใช้ข้อมูลที่โหลดอยู่แล้ว ===== */
+function tdAgo(iso){var m=Math.max(0,Math.round((Date.now()-new Date(iso).getTime())/60000));return m<60?m+" นาที":m<2880?Math.round(m/60)+" ชั่วโมง":Math.round(m/1440)+" วัน"}
+function tdOld(a,k){var t=null;a.forEach(function(x){var v=x[k];if(v&&(!t||v<t))t=v});return t}
+function todoItems(){var L=[];function add(k,ic,txt,n,unit,old,tab,urgH){if(!n)return;var late=old&&urgH&&(Date.now()-new Date(old).getTime())>urgH*3600000;L.push({k:k,ic:ic,txt:txt+" "+n+" "+unit,sub:old?"รอนานสุด "+tdAgo(old):"",late:late,tab:tab})}
+ var tp=(D.tp||[]).filter(function(x){return x.st==="pending"});add("tp","💰","เติมเงินรอยืนยัน",tp.length,"รายการ",tdOld(tp,"at"),"pprq",2);
+ var sr=(SUP.rooms||[]).filter(function(r){return r.last_from==="user"});add("sup","💬","แชตยังไม่ได้ตอบ",sr.length,"ห้อง",tdOld(sr,"last_at"),"sup",2);
+ var qn=(D.bk||[]).filter(function(b){return qCat(b)==="new"});if(qn.length){var f=tdOld(qn,"starts_at");L.push({k:"q",ic:"🗓️",txt:"คิวงานใหม่ ยังไม่มีพนักงานกดรับ "+qn.length+" งาน",sub:f?"งานแรกเริ่ม "+new Date(f).toLocaleString("th-TH",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit",timeZone:"Asia/Bangkok"})+" น.":"",late:false,tab:"q"})}
+ var rg=(D.regs||[]).filter(function(x){return x.status==="pending"});add("reg","🏪","ร้านสมัครใหม่ รออนุมัติ",rg.length,"ร้าน",tdOld(rg,"created_at"),"shop",0);
+ var oq=(D.oreq||[]).filter(function(r){return r.status==="pending"||r.status==="paid_review"});add("oreq","🏢","คำขอบริการของหน่วยงาน",oq.length,"รายการ",tdOld(oq,"created_at"),"oreq",0);
+ var sc=D.scrOff?[]:(D.scr||[]);add("scr","📝","คำขอปิดบัญชีร้าน",sc.length,"รายการ",tdOld(sc,"requested_at"),"shop",0);
+ var sd=D.sdrOff?[]:(D.sdr||[]);add("sdr","📝","คำขอลบบัญชีพนักงาน",sd.length,"รายการ",tdOld(sd,"requested_at"),"staff",0);
+ add("rvw","⭐","รีวิวที่ถูกรายงาน",RW.loaded?rvwPending():0,"รายการ",null,"rvw",0);
+ add("hl","⚠️","ระบบตรวจพบเรื่องที่ควรดู",hlN(),"เรื่อง",null,"hl",0);
+ add("ce","⚠️","ข้อผิดพลาดหน้าเว็บวันนี้",ceN(),"ครั้ง",null,"ce",0);
+ return L}
+function todoHtml(){var L=todoItems();return '<div class="head"><h1>งานที่ต้องทำ</h1></div>'+(L.length?'<ul class="supr tdl">'+L.map(function(x){return '<li><button type="button" class="supb'+(x.late?' late':'')+'" '+(x.k==="q"?'data-a="todoq"':'data-a="tab" data-id="'+x.tab+'"')+' data-td="'+x.k+'"><span class="qh"><span aria-hidden="true">'+x.ic+'</span> <b>'+esc(x.txt)+'</b>'+(x.late?'<span class="tag w">รอนาน</span>':'')+'</span>'+(x.sub?'<small>'+esc(x.sub)+'</small>':'')+'</button></li>'}).join("")+'</ul>':'<p class="tdok" role="status"><span aria-hidden="true">✓ </span>ไม่มีงานค้าง</p>')}
+function todoWarm(){var a=[];if(!RW.loaded)a.push(rvwLoad());if(!HL.d)a.push(hlLoad());if(!CE.d)a.push(ceLoad());return Promise.all(a.map(function(x){return Promise.resolve(x).catch(function(){})})).then(function(){if(S.tab==="q"&&!SR.open)softDraw()})}
 function qView(){var L={new:[],wait:[],done:[],cx:[]};(D.bk||[]).forEach(function(b){L[qCat(b)].push(b)});
  var TB=[["new","งานใหม่"],["wait","งานที่รออยู่"],["done","งานที่เสร็จสิ้น"],["cx","ถูกยกเลิก"]],qt=L[S.qt]?S.qt:"new",
  list=L[qt].slice().sort(function(a,z){return qt==="new"||qt==="wait"?(a.starts_at<z.starts_at?-1:1):(a.starts_at<z.starts_at?1:-1)}),body="",last="";
  list.forEach(function(b){var d=qDay(b.starts_at);if(d!==last){body+='<h3 style="margin:14px 0 6px;font-size:1rem">'+qThD(d)+'</h3>';last=d}body+=qCard(b)});
- return '<div class="head"><h1>คิวงาน</h1></div><p class="hint2">คิวงานของหน่วยงานและบริษัท</p><div class="nf" role="tablist" aria-label="หมวดคิวงาน">'+TB.map(function(x){return '<button type="button" role="tab" data-a="qt" data-id="'+x[0]+'" class="'+(x[0]===qt?"on":"")+'" aria-selected="'+(x[0]===qt)+'">'+x[1]+' ('+L[x[0]].length+')</button>'}).join("")+'</div>'+
+ return todoHtml()+'<h2 id="qh2" class="srg" tabindex="-1">คิวงาน</h2><p class="hint2">คิวงานของหน่วยงานและบริษัท</p><div class="nf" role="tablist" aria-label="หมวดคิวงาน">'+TB.map(function(x){return '<button type="button" role="tab" data-a="qt" data-id="'+x[0]+'" class="'+(x[0]===qt?"on":"")+'" aria-selected="'+(x[0]===qt)+'">'+x[1]+' ('+L[x[0]].length+')</button>'}).join("")+'</div>'+
  '<div class="card">'+(list.length?body:'<div class="empty">'+({new:"ยังไม่มีงานใหม่ที่รอพนักงานกดรับ",wait:"ไม่มีงานที่รออยู่",done:"ยังไม่มีงานที่เสร็จสิ้น",cx:"ไม่มีงานที่ถูกยกเลิก"})[qt]+'</div>')+'</div>'+(qt==="done"||qt==="cx"?'<p class="hint2">แสดงย้อนหลัง 30 วัน</p>':'')}
 /* ---- หน่วยงาน / บริษัท ---- */
 function pOf(t){return t==="comp"?D.comp:D.orgs}
@@ -431,11 +448,11 @@ function invText(a,ph,gp,link){return (a||"สมาคมวิทยากร�
 function shInvLink(){var b=String((D.set&&D.set.reg)||"").trim().split("#")[0].split("?")[0];if(!b)return"";return b.replace(/\/+$/,"")+"/reg"}
 function shInvMsg(){var st=D.set||{};return invText(st.assoc,st.phone,10,shInvLink())}
 function shInvCard(){var m=S.shmsg?'<div class="'+(S.shok?"saved":"closed")+'" role="status">'+esc(S.shmsg)+'</div>':'';
- if(!shInvLink())return m+'<div class="card"><b>ชวนร้านนวดมาสมัคร</b><p class="hint2" style="margin:4px 0 0">ยังไม่ได้ตั้งลิงก์ลงทะเบียนร้านนวด ตั้งได้ที่เมนู จัดการระบบ > การตั้งค่า > ลิงก์ลงทะเบียนร้านนวด</p></div>';
+ if(!shInvLink())return m+'<div class="card"><b>ชวนร้านนวดมาสมัคร</b><p class="hint2" style="margin:4px 0 0">ยังไม่ได้ตั้งลิงก์ลงทะเบียนร้านนวด ตั้งได้ที่เมนู ระบบ > การตั้งค่า > ลิงก์ลงทะเบียนร้านนวด</p></div>';
  return m+'<div class="card"><b>ชวนร้านนวดมาสมัคร</b><p class="hint2" style="margin:4px 0 8px">ส่งข้อความนี้ทาง LINE, Facebook หรือ SMS ร้านที่กดลิงก์จะเข้าฟอร์มลงทะเบียนทันที (ถ้าเปิดจาก LINE จะเด้งไปเบราว์เซอร์ของเครื่อง) แล้วคำขอจะมารอที่แถบนี้ ลิงก์แสดงเป็นการ์ดตัวอย่างใน LINE และ Facebook ได้ แม้แชร์ต่อไปแค่ลิงก์</p>'
  +'<div class="hint2" id="shinvtxt" style="white-space:pre-line;margin:0 0 10px;padding:10px;border:1px solid var(--line);border-radius:10px">'+esc(shInvMsg())+'</div>'
  +'<div class="acts">'+(navigator.share?'<button type="button" class="btn" data-a="shinv" data-id="share">แชร์ผ่านมือถือ</button>':'')+'<button type="button" class="btn g" data-a="shinv" data-id="copy">คัดลอกข้อความ</button></div></div>'}
-function shInvShare(copyOnly){if(!shInvLink()){S.shmsg="ยังไม่ได้ตั้งลิงก์ลงทะเบียนร้านนวด ตั้งได้ที่เมนู จัดการระบบ > การตั้งค่า";S.shok=false;draw();return}
+function shInvShare(copyOnly){if(!shInvLink()){S.shmsg="ยังไม่ได้ตั้งลิงก์ลงทะเบียนร้านนวด ตั้งได้ที่เมนู ระบบ > การตั้งค่า";S.shok=false;draw();return}
  var t=shInvMsg(),done=function(m){S.shmsg=m;S.shok=true;draw()},copy=function(){
   if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){done("คัดลอกข้อความชวนร้านนวดแล้ว นำไปวางใน LINE, Facebook หรือ SMS ได้เลย")},function(){S.shmsg="คัดลอกไม่สำเร็จ ลองกดอีกครั้ง";S.shok=false;draw()})}
   else{S.shmsg="เครื่องนี้คัดลอกอัตโนมัติไม่ได้ ลิงก์คือ "+shInvLink();S.shok=false;draw()}};
@@ -445,7 +462,7 @@ function stMsg(p){return"สวัสดีค่ะ/ครับ คุณ"+p.n
 function stNewCard(){var nw=S.stnew?D.staff.filter(function(x){return x.phone===S.stnew})[0]:null;if(!nw||nw.linked)return"";
  return '<div class="card"><b>เพิ่ม'+esc(nw.name)+'แล้ว</b><p class="hint2" style="margin:4px 0 8px">ส่งลิงก์ให้พนักงานสร้างบัญชีและติดตั้งแอปรับงานบนโทรศัพท์ได้เลย</p><div class="acts"><button type="button" class="btn" data-a="stshare" data-id="'+nw.id+'">ส่งลิงก์ให้'+esc(nw.name)+'</button><button type="button" class="btn g" data-a="stnewno">ไว้ทีหลัง</button></div></div>'}
 function stShare(id){var p=byId(D.staff,id);if(!p)return;
- if(!(D.set&&D.set.staff)){S.stmsg="ยังไม่ได้ตั้งลิงก์แอปพนักงาน ตั้งได้ที่เมนู จัดการระบบ > การตั้งค่า > ลิงก์แอปพนักงาน";S.stok=false;draw();return}
+ if(!(D.set&&D.set.staff)){S.stmsg="ยังไม่ได้ตั้งลิงก์แอปพนักงาน ตั้งได้ที่เมนู ระบบ > การตั้งค่า > ลิงก์แอปพนักงาน";S.stok=false;draw();return}
  if(!p.phone){S.stmsg="ยังไม่ได้บันทึกเบอร์มือถือของพนักงานคนนี้";S.stok=false;draw();return}
  var t=stMsg(p),done=function(m){S.stmsg=m;S.stok=true;draw()},copy=function(){
   if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){done("คัดลอกข้อความและลิงก์ของ "+p.name+" แล้ว นำไปวางส่งใน LINE หรือ SMS ได้เลย")},function(){S.stmsg="คัดลอกไม่สำเร็จ ลองกดอีกครั้ง";S.stok=false;draw()})}
@@ -762,11 +779,12 @@ function fmCsv(){var d=FM.d;if(!d)return;var q=function(x){x=String(x==null?"":x
  (d.shops||[]).forEach(function(r){rows.push([r.name,r.opening,r.topup,r.credit,r.gp,r.gp_n,r.closing])});rows.push(["รวมทุกร้าน",t.opening,t.topup,t.credit,t.gp,t.gp_n,t.closing]);
  var is=fmIssues(d);rows.push([]);rows.push(["ผลตรวจกระทบยอด",is.length?"พบ "+is.length+" เรื่อง":"ตรงกันทุกข้อ"]);is.forEach(function(x){rows.push(["",x])});
  var csv="﻿"+rows.map(function(r){return r.map(q).join(",")}).join("\r\n"),a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));a.download="finance-"+FM.m+".csv";document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500)}
-function view(){return subBar(groupOf(S.tab))+viewIn()}
+function view(){if(SR.open)return srView();return view0()}
+function view0(){return subBar(groupOf(S.tab))+viewIn()}
 function viewIn(){var t=S.tab;
  if(t==="q")return qView();if(t==="rp")return rpView();if(t==="shop")return shopView();if(t==="org"||t==="comp")return orgView(t);if(t==="oreq")return oreqView();
  if(t==="staff")return (S.info?'<div class="saved" role="status">'+esc(S.info)+'</div>':'')+(S.stmsg?'<div class="'+(S.stok?"saved":"closed")+'" role="status">'+esc(S.stmsg)+'</div>':'')+stNewCard()+sdrCard()+'<div class="head"><h1>เพิ่มพนักงาน</h1>'+addBtn("staff")+'</div>'+(S.form&&S.form.t==="staff"?staffForm():searchBox("staff","ค้นหาชื่อหรือเบอร์พนักงาน")+'<div id="lst">'+staffList()+'</div>');
- if(t==="svc")return svcView();if(t==="cat")return catView();if(t==="ann")return annView();if(t==="rvw")return rvwView();if(t==="usr")return usrView();if(t==="hl")return hlView();if(t==="ce")return ceView();if(t==="au")return auView();if(t==="fm")return fmView();if(t==="nt")return ntView();if(t==="sup")return supView();if(t==="pp")return ppView();return setView()}
+ if(t==="svc")return svcView();if(t==="cat")return catView();if(t==="ann")return annView();if(t==="rvw")return rvwView();if(t==="usr")return usrView();if(t==="hl")return hlView();if(t==="ce")return ceView();if(t==="au")return auView();if(t==="me")return meView();if(t==="fm")return fmView();if(t==="nt")return ntView();if(t==="sup")return supView();if(t==="pp")return ppView();return setView()}
 var OQ_ST={pending:["รออนุมัติ","closed"],invited:["รอหมอนวดตอบรับ","saved"],awaiting_payment:["รอชำระเงิน","saved"],paid_review:["รอตรวจสลิป","closed"],confirmed:["ยืนยันแล้ว","saved"],rejected:["ไม่อนุมัติ",""],cancelled:["ยกเลิก",""],expired:["หมดเวลา",""],no_staff:["ไม่มีหมอนวดรับงาน",""]},OQ_IS={pending:"รอตอบ",accepted:"รับงาน",declined:"ปฏิเสธ",expired:"หมดเวลา",cancelled:"ยกเลิก",replaced:"เปลี่ยนตัวแล้ว"};
 function oqDate(d){var x=new Date(d+"T00:00:00");return x.toLocaleDateString("th-TH",{day:"numeric",month:"short",year:"numeric"})}
 function oqT(t){return t?String(t).slice(0,5):""}
@@ -877,7 +895,7 @@ function oqSubBody(act_,done){var c=oqCur(),h="";
 function listHtml(tab){return tab==="org"||tab==="comp"?orgList(tab):tab==="shop"?shopList():staffList()}
 function navDraw(){var g=groupOf(S.tab);document.getElementById("navb").hidden=false;
  document.getElementById("tabs").innerHTML=NAV.map(function(x){var u=x[0]==="sup"?supPending():x[0]==="nt"?ntUnread():x[0]==="pl"?plPending():x[0]==="fin"?tpPending():x[0]==="q"?qNew():0;return '<button type="button" data-a="tab" data-id="'+x[0]+'" class="'+(x[0]===g?"on":"")+'"><span aria-hidden="true">'+x[2]+'</span>'+x[1]+(u?'<i class="bdg" aria-label="'+x[3]+' '+u+' รายการ">'+u+'</i>':'')+'</button>'}).join("");
- document.getElementById("hacts").innerHTML='<button type="button" class="lgo" data-a="logout">ออกจากระบบ, '+esc(WHO.name)+'</button>'}
+ document.getElementById("hacts").innerHTML='<button type="button" class="srb" data-a="sropen" aria-label="ค้นหา" title="ค้นหา (กด /)"><span aria-hidden="true">🔍</span></button>'}
 function subBar(g){var L=SUBM[g];if(!L)return"";var cur=curSub();return '<div class="subtabs mgb" role="tablist" aria-label="'+NAVN[g]+'">'+L.map(function(x){var u=x[0]==="shop"?regPending():x[0]==="pprq"?tpPending():x[0]==="rvw"?rvwPending():x[0]==="oreq"?oreqPending():x[0]==="hl"?hlN():x[0]==="ce"?ceN():0;return '<button type="button" role="tab" data-a="tab" data-id="'+x[0]+'" class="'+(x[0]===cur?"on":"")+'" aria-selected="'+(x[0]===cur)+'">'+x[1]+(u?' ('+u+')':'')+'</button>'}).join("")+'</div>'}
 function post(){
  if(S.tab==="pp"){if(D.pp.id&&ppValid(D.pp.type,D.pp.id))drawQr("ppqr",ppPayload(D.pp.type,D.pp.id,0));
@@ -914,8 +932,43 @@ function supSend(){var c=SUP.cur,ta=document.getElementById("supi"),tx=ta?ta.val
  rpc("admin_support_reply",{p_user:c.u,p_app:c.a,p_body:tx}).then(function(){SUP.sending=false;if(bt)bt.disabled=false;if(SUP.cur!==c)return;ta.value="";var r=supRoom();if(r){r.last_from="admin";r.last_body=tx;r.last_at=new Date().toISOString()}navDraw();SUP.busy=false;return supFetch().then(function(){var t=document.getElementById("supi");if(t)t.focus();ann("ส่งคำตอบแล้ว")})},
   function(e){SUP.sending=false;if(bt)bt.disabled=false;SUP.serr=errTh(e,"ส่งคำตอบไม่สำเร็จ");if(er)er.textContent=SUP.serr})}
 document.addEventListener("submit",function(e){if(e.target&&e.target.id==="supf"){e.preventDefault();supSend()}});
+/* ===== ค้นหารวม (ฐานข้อมูล: admin_search) ปุ่ม 🔍 บนแถบหัว หรือกด / บนคอมพิวเตอร์ ===== */
+var SR={open:false,q:"",res:null,busy:false,err:"",sel:null,t:null,seq:0},BKST={confirmed:"ยืนยันแล้ว",cancelled:"ยกเลิก",rescheduled:"เลื่อนแล้ว",completed:"เสร็จสิ้น",no_show:"ไม่มาตามนัด"},PLT={shop:"ร้านนวด",org:"หน่วยงาน",company:"บริษัท"};
+function srWhen(iso){var d=new Date(iso);return isNaN(d)?"":d.toLocaleDateString("th-TH",{day:"numeric",month:"short",year:"2-digit",timeZone:"Asia/Bangkok"})+" "+d.toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit",timeZone:"Asia/Bangkok"})+" น."}
+function srTel(p){var t=String(p||"").replace(/[^0-9+]/g,"");return t?'<a href="tel:'+esc(t)+'">'+esc(p)+'</a>':'-'}
+function srCount(r){return r?["bookings","customers","places","staff","regs"].reduce(function(n,k){return n+(r[k]||[]).length},0):0}
+function srResHtml(){var r=SR.res;if(SR.err)return '<div class="closed" role="alert">'+esc(SR.err)+'</div>';if(SR.busy&&!r)return '<p class="sub">กำลังค้นหา</p>';if(!r)return '<p class="hint2">ค้นได้จากเลขที่การจอง ชื่อหรือเบอร์ลูกค้า ร้าน หน่วยงาน บริษัท และหมอนวด เบอร์พิมพ์แบบมีขีดหรือเว้นวรรคก็ได้</p>';
+ if(!srCount(r))return '<div class="empty">ไม่พบผลลัพธ์สำหรับ "'+esc(SR.q)+'"</div>';
+ function grp(k,title,fn){var a=r[k]||[];return a.length?'<h2 class="srg">'+title+' ('+a.length+')</h2><ul class="supr">'+a.map(function(x,i){return '<li><button type="button" class="supb" data-a="srpick" data-t="'+k+'" data-id="'+i+'">'+fn(x)+'</button></li>'}).join("")+'</ul>':''}
+ return grp("bookings","การจอง",function(b){return '<span class="qh"><b>'+esc(b.ref)+'</b><span class="tag">'+esc(BKST[b.status]||b.status)+'</span></span><small>'+srWhen(b.starts_at)+', '+esc(b.place_name||"")+'</small><small>'+esc(b.customer_name||"")+(b.phone?', '+esc(b.phone):'')+'</small>'})+
+  grp("customers","ลูกค้า",function(c){return '<span class="qh"><b>'+esc(c.name||"ไม่มีชื่อ")+'</b>'+(c.kind!=="user"?'<span class="tag">'+UKIND[c.kind]+'</span>':'')+(c.suspended?'<span class="tag w">ระงับบัญชีอยู่</span>':'')+'</span><small>'+esc(c.phone||"")+'</small>'})+
+  grp("places","ร้าน หน่วยงาน บริษัท",function(p){return '<span class="qh"><b>'+esc(p.name)+'</b><span class="tag">'+PLT[p.type]+'</span>'+(!p.active?'<span class="tag w">ปิดอยู่</span>':'')+'</span><small>'+esc([p.area,p.phone].filter(Boolean).join(", "))+'</small>'})+
+  grp("staff","หมอนวด",function(f){return '<span class="qh"><b>'+esc(f.name)+'</b>'+(!f.active?'<span class="tag w">ปิดใช้งาน</span>':'')+'</span><small>'+esc(f.place_name?"สังกัด "+f.place_name:"สังกัดสมาคม")+(f.phone?', '+esc(f.phone):'')+'</small>'})+
+  grp("regs","ร้านสมัครใหม่ รออนุมัติ",function(g){return '<span class="qh"><b>'+esc(g.name)+'</b><span class="tag w">รออนุมัติ</span></span><small>'+esc(g.phone||"")+'</small>'})}
+function srSelHtml(){var x=SR.sel.x,k=SR.sel.k,h='<div class="acts mgb"><button type="button" class="btn g" data-a="srunsel">← กลับไปผลการค้นหา</button></div>';
+ if(k==="bookings"){h+='<h1 id="srh" tabindex="-1">การจอง '+esc(x.ref)+'</h1><div class="card"><p><b>สถานะ:</b> '+esc(BKST[x.status]||x.status)+'</p><p><b>วันเวลา:</b> '+srWhen(x.starts_at)+'</p><p><b>'+(PLT[x.place_type]||"สถานที่")+':</b> '+esc(x.place_name||"-")+'</p><p><b>ลูกค้า:</b> '+esc(x.customer_name||"-")+', '+srTel(x.phone)+'</p>'+
+   (x.items||[]).map(function(i){return '<p>'+esc(i.service||"")+(i.staff?', หมอนวด '+esc(i.staff):'')+', '+(+i.price||0).toLocaleString("th-TH")+' บาท</p>'}).join("")+'<p><b>ยอดรวม:</b> '+(+x.total||0).toLocaleString("th-TH")+' บาท'+(+x.discount?' (ส่วนลด '+(+x.discount).toLocaleString("th-TH")+' บาท)':'')+'</p></div>'}
+ else if(k==="customers"){h+='<h1 id="srh" tabindex="-1">'+esc(x.name||"ไม่มีชื่อ")+'</h1><div class="card"><p><b>เบอร์:</b> '+srTel(x.phone)+'</p><p><b>ประเภทบัญชี:</b> '+UKIND[x.kind]+(x.is_admin?', แอดมิน':'')+'</p><p><b>สมัครเมื่อ:</b> '+srWhen(x.created_at)+'</p>'+(x.suspended?'<p class="tag w">บัญชีถูกระงับอยู่</p>':'')+'</div>'+
+   '<h2 class="srg">การจองล่าสุด</h2>'+((x.recent||[]).length?'<ul class="srl">'+x.recent.map(function(b){return '<li>'+esc(b.ref)+', '+srWhen(b.starts_at)+', '+esc(b.place_name||"")+', '+esc(BKST[b.status]||b.status)+'</li>'}).join("")+'</ul>':'<p class="sub">ยังไม่มีการจอง</p>')+
+   '<div class="acts">'+(x.phone?'<button type="button" class="btn g" data-a="srusr">จัดการบัญชี (รหัสผ่าน, การระงับ)</button>':'')+(x.room?'<button type="button" class="btn g" data-a="srchat">เปิดแชตกับเจ้าหน้าที่</button>':'')+'</div>'}
+ else if(k==="staff"){h+='<h1 id="srh" tabindex="-1">'+esc(x.name)+'</h1><div class="card"><p><b>เบอร์:</b> '+srTel(x.phone)+'</p><p><b>สังกัด:</b> '+esc(x.place_name?(PLT[x.place_type]||"")+" "+x.place_name:"สมาคม")+'</p><p><b>สถานะ:</b> '+(x.active?"ใช้งาน":"ปิดใช้งาน")+', '+(x.linked?"ผูกบัญชีแล้ว":"ยังไม่ผูกบัญชี")+'</p></div><div class="acts">'+(x.place_id?'<button type="button" class="btn g" data-a="srplace">ไปหน้า'+esc(PLT[x.place_type]||"สถานที่")+'นี้</button>':'<button type="button" class="btn g" data-a="srgo">ไปหน้าแก้ไขพนักงาน</button>')+'</div>'}
+ return h}
+function srView(){if(SR.sel)return srSelHtml();return '<div class="acts mgb"><button type="button" class="btn g" data-a="srclose">← กลับ</button></div><h1 id="srh" tabindex="-1">ค้นหา</h1><div class="card form"><label for="srq">ค้นหาเบอร์โทร ชื่อ หรือเลขที่การจอง</label><input class="in" id="srq" type="search" autocomplete="off" enterkeyhint="search" maxlength="60" value="'+esc(SR.q)+'"></div><div id="srres">'+srResHtml()+'</div>'}
+function srRun(){var q=SR.q.trim(),my=++SR.seq;if(q.length<2){SR.res=null;SR.err="";SR.busy=false;srPaint();return}SR.busy=true;SR.err="";
+ rpc("admin_search",{p_q:q}).then(function(r){if(my!==SR.seq)return;SR.busy=false;SR.res=r||{};srPaint();var n=srCount(SR.res);ann(n?"พบ "+n+" รายการ":"ไม่พบผลลัพธ์")},function(e){if(my!==SR.seq)return;SR.busy=false;SR.res=null;SR.err=errTh(e,"ค้นหาไม่สำเร็จ");srPaint()})}
+function srPaint(){var el=document.getElementById("srres");if(el&&SR.open&&!SR.sel)el.innerHTML=srResHtml()}
+function srOpen(){SR.open=true;SR.sel=null;document.getElementById("main").innerHTML=view();var i=document.getElementById("srq");if(i){i.focus();i.select()}window.scrollTo(0,0)}
+function srClose(){SR.open=false;SR.sel=null;draw();var h=document.querySelector("#main h1");if(h){h.tabIndex=-1;h.focus()}}
+function srLeaveTo(fn){SR.open=false;SR.sel=null;fn();var h=document.querySelector("#main h1");if(h){h.tabIndex=-1;h.focus()}}
+document.addEventListener("input",function(e){if(e.target&&e.target.id==="srq"){SR.q=e.target.value;clearTimeout(SR.t);SR.t=setTimeout(srRun,350)}});
+document.addEventListener("keydown",function(e){var t=e.target,typing=t&&(t.tagName==="INPUT"||t.tagName==="TEXTAREA"||t.tagName==="SELECT"||t.isContentEditable);
+ if(e.key==="/"&&!typing&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&D&&WHO&&document.getElementById("navb")&&!document.getElementById("navb").hidden){e.preventDefault();srOpen()}
+ else if(e.key==="Escape"&&SR.open&&!document.querySelector("dialog[open],.modal:not([hidden])")){e.preventDefault();if(SR.sel){SR.sel=null;document.getElementById("main").innerHTML=view();var i=document.getElementById("srq");if(i)i.focus()}else srClose()}
+ else if(e.key==="Enter"&&t&&t.id==="srq"){e.preventDefault();clearTimeout(SR.t);srRun()}});
+/* บัญชีของฉัน (ระบบ > บัญชีของฉัน): ปุ่มออกจากระบบย้ายจากแถบหัวมาไว้ที่นี่ เหมือนหน้าบัญชีของอีก 3 แอป */
+function meView(){var tel=String(WHO.phone||"");return '<div class="head"><h1>บัญชีของฉัน</h1></div><div class="card"><p><b>ชื่อ:</b> '+esc(WHO.name)+'</p>'+(tel?'<p><b>เบอร์:</b> '+esc(tel)+'</p>':'')+'<p class="hint2" style="margin:0">เข้าสู่ระบบในฐานะแอดมิน</p></div><div class="acts"><button type="button" class="btn d" data-a="logout">ออกจากระบบ</button></div>'}
 function draw(){navDraw();document.getElementById("main").innerHTML=view();post()}
-function softDraw(){navDraw();var a=document.activeElement;if(S.form||S.busy||(a&&/INPUT|SELECT|TEXTAREA/.test(a.tagName)&&a.id!=="")||S.tab==="set"||S.tab==="usr"||S.tab==="hl"||S.tab==="ce"||S.tab==="au"||S.tab==="fm"||(S.tab==="sup"&&SUP.cur))return;document.getElementById("main").innerHTML=view();post()}
+function softDraw(){navDraw();var a=document.activeElement;if(S.form||S.busy||(a&&/INPUT|SELECT|TEXTAREA/.test(a.tagName)&&a.id!=="")||S.tab==="set"||S.tab==="usr"||S.tab==="hl"||S.tab==="ce"||S.tab==="au"||S.tab==="fm"||SR.open||(S.tab==="sup"&&SUP.cur))return;document.getElementById("main").innerHTML=view();post()}
 function refresh(){if(!D||S.busy)return Promise.resolve();if(S.tab==="rvw"||RW.loaded)rvwLoad();return Promise.all([loadLive(),loadBk(),supLoad()]).then(softDraw,function(e){if(e&&e.status===401)doLogout()})}
 
 /* ===================== เหตุการณ์ ===================== */
@@ -1194,6 +1247,19 @@ document.addEventListener("click",function(e){
  if(a==="rvwno"){S.rvwC=null;draw();return}
  if(a==="rvwhide"||a==="rvwshow"){var kk=id.split(":"),hid=a==="rvwhide";S.rvwC=null;act(function(){return rpc("admin_hide_review",{p_kind:kk[0],p_id:kk.slice(1).join(":"),p_hidden:hid}).then(rvwLoad)},function(){S.saved=hid?"ซ่อนรีวิวแล้ว":"แสดงรีวิวแล้ว"});return}
  if(a==="abdef"){S.abTmp="";var fi=g("abimg");if(fi)fi.value="";g("abprev").innerHTML=abPrev();var bd2=g("abdef");if(bd2)bd2.hidden=true;g("abn").focus();ann("กลับไปใช้โลโก้มาตรฐานแล้ว กดบันทึกการตั้งค่าเพื่อใช้งาน");return}
+ if(a==="todoq"){S.qt="new";draw();var qh=g("qh2");if(qh){qh.focus();qh.scrollIntoView({block:"start"})}return}
+ if(a==="sropen"){srOpen();return}
+ if(a==="srclose"){srClose();return}
+ if(a==="srunsel"){SR.sel=null;document.getElementById("main").innerHTML=view();var sq=g("srq");if(sq)sq.focus();return}
+ if(a==="srpick"){var sx=(SR.res&&SR.res[t]||[])[+id];if(!sx)return;
+  if(t==="places"){var lk={shop:"shop",org:"org",company:"comp"}[sx.type];srLeaveTo(function(){S.tab=lk;S.form=null;var o=byId(listOf(lk),sx.id);if(o)S.form={t:lk,id:sx.id,sel:(o.staff?o.staff.slice():[]),sd:JSON.parse(JSON.stringify(o.sd||{})),date:o.date||"",spq:""};draw()});return}
+  if(t==="regs"){srLeaveTo(function(){S.tab="shop";S.form=null;draw()});return}
+  if(t==="staff"&&!sx.place_id&&byId(D.staff,sx.id)){srLeaveTo(function(){S.tab="staff";var o=byId(D.staff,sx.id);S.form={t:"staff",id:sx.id,sel:[],sd:{},date:"",spq:""};draw()});return}
+  SR.sel={k:t,x:sx};document.getElementById("main").innerHTML=view();var sh=g("srh");if(sh)sh.focus();window.scrollTo(0,0);return}
+ if(a==="srusr"){var cx=SR.sel&&SR.sel.x;srLeaveTo(function(){S.tab="usr";US.q=String(cx.phone||"").replace(/\D/g,"");US.res=null;US.sel=null;draw();usrFind()});return}
+ if(a==="srchat"){var cc=SR.sel&&SR.sel.x;srLeaveTo(function(){S.tab="sup";draw();supLoad().then(function(){supOpen(cc.id,"user")})});return}
+ if(a==="srplace"){var fx=SR.sel&&SR.sel.x,lk2={shop:"shop",org:"org",company:"comp"}[fx.place_type];srLeaveTo(function(){S.tab=lk2;S.form=null;var o=byId(listOf(lk2),fx.place_id);if(o)S.form={t:lk2,id:fx.place_id,sel:(o.staff?o.staff.slice():[]),sd:JSON.parse(JSON.stringify(o.sd||{})),date:o.date||"",spq:""};draw()});return}
+ if(a==="srgo"){var gx=SR.sel&&SR.sel.x;srLeaveTo(function(){S.tab="staff";S.form={t:"staff",id:gx.id,sel:[],sd:{},date:"",spq:""};draw()});return}
  if(a==="supopen"){supOpen(id,t);return}
  if(a==="supback"){supClose();draw();supLoad().then(function(){if(S.tab==="sup"&&!SUP.cur)draw()});var h=document.querySelector("#main h1");if(h){h.tabIndex=-1;h.focus()}return}
  if(a==="setsave"){var er4=g("err"),bad=function(m,f){var el=g(f),gp=el&&el.closest("[data-sg]");if(gp&&gp.hidden)subTo(gp.dataset.sg);er4.textContent=m;if(el)el.focus()},c1v=g("c1").value.trim(),sr=+g("d9").value,or=+g("d10").value,w1=+g("d19").value,w2=+g("d20").value;er4.textContent="";
