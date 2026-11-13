@@ -56,7 +56,7 @@ const la0=+(await p.inputValue('#mp_lat')),ln0=+(await p.inputValue('#mp_lng'));
 ok('nudge buttons move the pin a little (up raises latitude, right raises longitude)',la1>la0&&la1-la0<0.01&&ln1>ln0&&ln1-ln0<0.01);
 await p.click('[data-mpr="0"]').catch(()=>{});
 await find(p,'โรงแรมทดสอบ');await p.waitForSelector('[data-mpr]');await p.click('[data-mpr="0"]');await p.click('[data-mp=ok]');await sleep(300);
-ok('confirm: point used for nearby shops, name kept',!(await p.$('#mpov'))&&(await p.textContent('.loc')).includes('จุดที่คุณเลือก')&&(await p.textContent('#locnm')).startsWith('โรงแรมทดสอบ แกรนด์'));
+ok('confirm: point used for nearby shops, name kept',!(await p.$('#mpov'))&&(await p.evaluate(()=>document.getElementById('locl').textContent+' '+document.querySelector('.loc').textContent)).includes('กลับไปใช้ตำแหน่งของฉัน')&&(await p.textContent('#locnm')).startsWith('โรงแรมทดสอบ แกรนด์'));
 await p.click('[data-loc=find]');await p.waitForSelector('#mpm[data-lgstub]');
 ok('reopen: Longdo script not loaded again',H.map3.length===1);
 await find(p,'ไม่มี');await until(async()=>(await p.textContent('#mp_rs')).includes('ไม่พบ'));

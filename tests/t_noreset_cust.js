@@ -81,7 +81,7 @@ await p.fill('#lph','0811111111');await p.fill('#lpw','abc123');await p.click('b
 let t=await p.evaluate(()=>document.body.innerText);
 ok('no shop in radius -> empty message',t.includes('ในรัศมี')&&!(await p.$('[data-pl]')));
 ok('bottom button "ดูทั้งหมดโดยไม่ใช้ตำแหน่ง" is gone',!t.includes('ดูทั้งหมดโดยไม่ใช้ตำแหน่ง')&&!(await p.$('.empty [data-loc]'))&&!(await p.$('.empty button')));
-ok('main button "ไม่ใช้ตำแหน่ง" still in the location bar',(await p.$$eval('[data-loc=reset]',e=>e.map(x=>x.textContent.trim()))).join()==='ไม่ใช้ตำแหน่ง');
+ok('main button "ร้านทั้งหมด" (was ไม่ใช้ตำแหน่ง) in the location bar',(await p.$$eval('[data-loc=reset]',e=>e.map(x=>x.textContent.trim()))).join()==='ร้านทั้งหมด');
 await p.click('[data-loc=reset]');await wait(600);
 ok('main button still shows all shops',!!(await p.$('[data-pl]')));
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)})();

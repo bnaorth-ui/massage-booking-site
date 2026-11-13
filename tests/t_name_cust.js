@@ -79,7 +79,7 @@ await p.goto(require('./config').page('customer-booking.html'));
 const ok=(n,c)=>console.log((c?'PASS ':'FAIL ')+n);const wait=ms=>p.waitForTimeout(ms);
 await p.fill('#lph','0811111111');await p.fill('#lpw','abc123');await p.click('button[type=submit]');await p.waitForSelector('[data-pl]',{timeout:4000});await wait(800);
 ok('no place lookup before any user action (auto GPS)',NM.length===0);
-await p.click('[data-loc=map]');await p.waitForSelector('#mpm[data-stub]');await wait(1200);
+await p.click('[data-loc=find]');await p.waitForSelector('#mpm[data-stub]');await wait(1200);
 ok('picker with known start looks up name (Thai, road only -> "ใกล้")',NM.length===1&&NM[0].lang==='th'&&(await p.textContent('#mp_place')).includes('ใกล้ ถนนพระราม 4'));
 await p.evaluate(()=>{for(let i=0;i<6;i++)window.__lf.drag({lat:7.88+i*0.0001,lng:98.29})});await wait(2200);
 ok('rapid drags -> only one lookup (debounce)',NM.length===2&&NM[1].lat>7.88);
@@ -87,7 +87,7 @@ ok('POI name shown first',(await p.textContent('#mp_place')).includes('โรง
 await p.click('[data-mp=ok]');await wait(300);
 ok('page shows selected place name',(await p.textContent('#locnm')).includes('โรงแรมทดสอบ ป่าตอง'));
 const n2=NM.length;
-await p.click('[data-loc=map]');await p.waitForSelector('#mpm[data-stub]');await wait(1500);
+await p.click('[data-loc=find]');await p.waitForSelector('#mpm[data-stub]');await wait(1500);
 ok('reopen same pin -> cached (no new request)',NM.length===n2&&(await p.textContent('#mp_place')).includes('โรงแรมทดสอบ'));
 await p.evaluate(()=>window.__lf.fire('click',{latlng:{lat:13.7,lng:100.5}}));await wait(1500);
 await p.evaluate(()=>window.__lf.fire('click',{latlng:{lat:7.5,lng:98.1}}));await wait(1800);
@@ -95,7 +95,7 @@ const gaps=NM.slice(1).map((x,i)=>x.t-NM[i].t);ok('requests spaced >= 1s ('+gaps
 nmFail=true;await p.evaluate(()=>window.__lf.fire('click',{latlng:{lat:7.2,lng:98.0}}));await wait(2500);
 ok('lookup failure -> coords message, no crash',(await p.textContent('#mp_place')).includes('ไม่พบชื่อสถานที่ (พิกัด 7.20000'));
 await p.click('[data-mp=ok]');await wait(300);
-ok('confirm still works; no stale name',(await p.textContent('.loc')).includes('จุดที่คุณเลือก')&&!(await p.$('#locnm')));
+ok('confirm still works; no stale name',(await p.evaluate(()=>document.getElementById('locl').textContent+' '+document.querySelector('.loc').textContent)).includes('กลับไปใช้ตำแหน่งของฉัน')&&!(await p.$('#locnm')));
 nmFail=false;
 await p.click('[data-loc=reset]');await wait(200);ok('reset: no name',!(await p.$('#locnm')));
 await p.evaluate(()=>{navigator.geolocation.getCurrentPosition=function(ok){ok({coords:{latitude:13.75,longitude:100.5}})}});await p.click('[data-loc=gps]');await wait(2500);

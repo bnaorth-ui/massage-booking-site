@@ -74,9 +74,9 @@ await p.fill('#lph','0811111111');await p.fill('#lpw','abc123');await p.click('b
 const names=async()=>await p.$$eval('[data-pl]',e=>e.map(x=>x.textContent));
 let L1=(await names()).join('|');
 ok('gps (Bangkok): sh1 shown, Phuket hidden',L1.includes('ร้านสบายดี')&&!L1.includes('ป่าตอง'));
-ok('map button present',!!(await p.$('[data-loc=map]'))&&(await p.textContent('.loc')).includes('เลือกจุดบนแผนที่'));
+ok('search/map button present (merged, 13 Nov)',!!(await p.$('[data-loc=find]'))&&!(await p.$('[data-loc=map]'))&&(await p.evaluate(()=>document.getElementById('locl').textContent+' '+document.querySelector('.loc').textContent)).includes('ค้นหาสถานที่'));
 const before=calls.filter(c=>c.path.endsWith('set_my_location')).length;
-await p.click('[data-loc=map]');await p.waitForSelector('#mpov');await p.waitForSelector('#mpm[data-stub]');
+await p.click('[data-loc=find]');await p.waitForSelector('#mpov');await p.waitForSelector('#mpm[data-stub]');
 ok('SRI + crossorigin set on leaflet js/css',await p.evaluate(()=>{const sc=[...document.scripts].find(x=>x.src.includes('unpkg.com/leaflet@1.9.4/dist/leaflet.js')),ln=[...document.querySelectorAll('link')].find(x=>x.href.includes('unpkg.com/leaflet@1.9.4/dist/leaflet.css'));return !!sc&&sc.getAttribute('crossorigin')===''&&!!ln&&ln.getAttribute('crossorigin')===''&&window.__sri.includes('sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=')&&window.__sri.includes('sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=')}));
 ok('dialog a11y',await p.$eval('#mpov',e=>e.getAttribute('role')==='dialog'&&e.getAttribute('aria-modal')==='true'));
 ok('starts at current location',Math.abs(+(await p.inputValue('#mp_lat'))-13.75)<0.001);
@@ -90,32 +90,32 @@ await p.fill('#mp_lat','abc');await p.click('[data-mp=ok]');ok('invalid coords m
 await p.fill('#mp_lat','7,88');await p.fill('#mp_lng','98.29');await p.click('[data-mp=ok]');await wait(300);
 ok('dialog closed',!(await p.$('#mpov')));
 ok('map instance removed',await p.evaluate(()=>!!window.__lf.removed));
-const loc=await p.textContent('.loc');ok('label จุดที่คุณเลือก',loc.includes('จุดที่คุณเลือก')&&loc.includes('กลับไปใช้ตำแหน่งของฉัน')&&loc.includes('เปลี่ยนจุดบนแผนที่'));
+const loc=await p.evaluate(()=>document.getElementById('locl').textContent+' '+document.querySelector('.loc').textContent);ok('label: showing shops near the chosen point, buttons say back to my location / change place',loc.includes('แสดงร้านใกล้')&&loc.includes('กลับไปใช้ตำแหน่งของฉัน')&&loc.includes('เปลี่ยนสถานที่'));
 let L2=(await names()).join('|');ok('Phuket shop shown, Bangkok hidden',L2.includes('ร้านป่าตอง')&&!L2.includes('ร้านสบายดี'));
 ok('sub text uses selected point',(await A()).includes('จากจุดที่คุณเลือก'));
 ok('distance from pin shown (≈0 km)',(await A()).includes('ห่าง 0.'));
 await ctx.setGeolocation({latitude:13.9,longitude:100.6});await wait(1500);
-ok('gps watcher does not overwrite pin',(await names()).join('|').includes('ร้านป่าตอง')&&(await p.textContent('.loc')).includes('จุดที่คุณเลือก'));
+ok('gps watcher does not overwrite pin',(await names()).join('|').includes('ร้านป่าตอง')&&(await p.evaluate(()=>document.getElementById('locl').textContent+' '+document.querySelector('.loc').textContent)).includes('กลับไปใช้ตำแหน่งของฉัน'));
 ok('pin never sent to server',calls.filter(c=>c.path.endsWith('set_my_location')).length===before||!calls.filter(c=>c.path.endsWith('set_my_location')).slice(before).some(c=>c.body&&Math.abs(c.body.p_lat-7.88)<0.01));
-await p.click('[data-loc=map]');await p.waitForSelector('#mpov');ok('reopen starts at chosen pin',Math.abs(+(await p.inputValue('#mp_lat'))-7.88)<0.001);await p.keyboard.press('Escape');await wait(200);ok('Escape closes',!(await p.$('#mpov')));
-ok('cancel keeps pin',(await p.textContent('.loc')).includes('จุดที่คุณเลือก'));
-await p.click('[data-loc=gps]');await wait(300);ok('gps click drops pin immediately (no stale pin kept)',!(await p.textContent('.loc')).includes('จุดที่คุณเลือก'));await ctx.setGeolocation({latitude:13.751,longitude:100.501});await wait(1800);
-const loc2=await p.textContent('.loc');console.log('LOC2',loc2,'|',await p.evaluate(()=>document.querySelector('.hint')&&document.querySelector('.hint').textContent));ok('back to gps',loc2.includes('ตำแหน่งของคุณ')&&!loc2.includes('จุดที่คุณเลือก'));
+await p.click('[data-loc=find]');await p.waitForSelector('#mpov');ok('reopen starts at chosen pin',Math.abs(+(await p.inputValue('#mp_lat'))-7.88)<0.001);await p.keyboard.press('Escape');await wait(200);ok('Escape closes',!(await p.$('#mpov')));
+ok('cancel keeps pin',(await p.evaluate(()=>document.getElementById('locl').textContent+' '+document.querySelector('.loc').textContent)).includes('กลับไปใช้ตำแหน่งของฉัน'));
+await p.click('[data-loc=gps]');await wait(300);ok('gps click drops pin immediately (no stale pin kept)',!(await p.evaluate(()=>document.getElementById('locl').textContent+' '+document.querySelector('.loc').textContent)).includes('กลับไปใช้ตำแหน่งของฉัน'));await ctx.setGeolocation({latitude:13.751,longitude:100.501});await wait(1800);
+const loc2=await p.evaluate(()=>document.getElementById('locl').textContent+' '+document.querySelector('.loc').textContent);console.log('LOC2',loc2,'|',await p.evaluate(()=>document.querySelector('.hint')&&document.querySelector('.hint').textContent));ok('back to gps',loc2.includes('ตำแหน่งของคุณ')&&!loc2.includes('กลับไปใช้ตำแหน่งของฉัน'));
 let L3=(await names()).join('|');ok('Bangkok shop back',L3.includes('ร้านสบายดี')&&!L3.includes('ป่าตอง'));
 // reset then pick again with map blocked
 await p.click('[data-loc=reset]');await wait(200);stubOn=false;await p.evaluate(()=>{delete window.L});
-await p.click('[data-loc=map]');await p.waitForSelector('#mpov');await p.waitForFunction(()=>document.getElementById('mpm').textContent.includes('โหลดแผนที่ไม่สำเร็จ'),null,{timeout:15000});
+await p.click('[data-loc=find]');await p.waitForSelector('#mpov');await p.waitForFunction(()=>document.getElementById('mpm').textContent.includes('โหลดแผนที่ไม่สำเร็จ'),null,{timeout:15000});
 ok('load failure message',true);
 await p.fill('#mp_lat','7.8804');await p.fill('#mp_lng','98.2923');await p.click('[data-mp=ok]');await wait(300);
-ok('manual coords work without map',(await names()).join('|').includes('ร้านป่าตอง')&&(await p.textContent('.loc')).includes('จุดที่คุณเลือก'));
-await p.click('[data-loc=reset]');await wait(200);ok('reset clears manual',(await p.textContent('.loc')).includes('ยังไม่ได้ระบุตำแหน่ง'));
+ok('manual coords work without map',(await names()).join('|').includes('ร้านป่าตอง')&&(await p.evaluate(()=>document.getElementById('locl').textContent+' '+document.querySelector('.loc').textContent)).includes('กลับไปใช้ตำแหน่งของฉัน'));
+await p.click('[data-loc=reset]');await wait(200);ok('reset clears manual',(await p.evaluate(()=>document.getElementById('locl').textContent+' '+document.querySelector('.loc').textContent)).includes('แสดงร้านทั้งหมด'));
 // ---- ค้นหาสถานที่ ----
 stubOn=true;const NMQ=[];let nmMode='ok';
 const RES={'ป่าตอง':[{lat:'7.8961',lon:'98.2964',name:'หาดป่าตอง',display_name:'หาดป่าตอง, ป่าตอง, กะทู้, ภูเก็ต',address:{suburb:'ป่าตอง',county:'กะทู้',state:'ภูเก็ต'}},{lat:'7.8930',lon:'98.3000',name:'ถนนบางลา',display_name:'ถนนบางลา, ป่าตอง, ภูเก็ต',address:{road:'ถนนบางลา',suburb:'ป่าตอง',state:'ภูเก็ต'}}]};
 await ctx.route('**/nominatim.openstreetmap.org/**',r=>{const u=new URL(r.request().url());if(!u.pathname.startsWith('/search'))return r.fulfill({status:200,contentType:'application/json',body:'{}'});
  NMQ.push({t:Date.now(),q:u.searchParams.get('q'),s:u.search});if(nmMode==='err')return r.fulfill({status:500,body:'x'});r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(RES[u.searchParams.get('q')]||[])})});
 const lbs=await p.$$eval('.loc button',e=>e.map(x=>x.dataset.loc));
-ok('search: button order gps, find, map',lbs.indexOf('find')===lbs.indexOf('gps')+1&&lbs.indexOf('map')===lbs.indexOf('find')+1&&(await p.textContent('[data-loc=find]')).trim()==='ค้นหาสถานที่');
+ok('search: button order gps, find (map button merged into find)',lbs.indexOf('find')===lbs.indexOf('gps')+1&&lbs.indexOf('map')<0&&(await p.textContent('[data-loc=find]')).trim()==='ค้นหาสถานที่');
 await p.click('[data-loc=find]');await p.waitForSelector('#mpov');
 ok('search: dialog title and cursor in the search box',(await p.textContent('#mp_h'))==='ค้นหาหรือเลือกจุดบนแผนที่'&&await p.evaluate(()=>document.activeElement&&document.activeElement.id==='mp_q')&&(await p.getAttribute('#mpov','aria-label'))==='ค้นหาหรือเลือกจุดบนแผนที่');
 await p.fill('#mp_q','ป');await p.click('[data-mp=find]');await wait(200);
@@ -130,7 +130,7 @@ ok('pick: pin and coordinates move to the place',Math.abs(+(await p.inputValue('
 ok('pick: focus on confirm button that names the place, list cleared',await p.evaluate(()=>document.activeElement&&document.activeElement.dataset.mp==='ok'&&document.activeElement.getAttribute('aria-label')==='ยืนยันจุดนี้ หาดป่าตอง')&&(await p.$$('[data-mpr]')).length===0);
 ok('pick: place name shown above the map',(await p.textContent('#mp_place')).startsWith('หาดป่าตอง'));
 await p.click('[data-mp=ok]');await wait(300);
-ok('confirm: shops near the searched place, name kept',(await names()).join('|').includes('ร้านป่าตอง')&&(await p.textContent('.loc')).includes('จุดที่คุณเลือก')&&(await p.textContent('#locnm')).startsWith('หาดป่าตอง'));
+ok('confirm: shops near the searched place, name kept',(await names()).join('|').includes('ร้านป่าตอง')&&(await p.evaluate(()=>document.getElementById('locl').textContent+' '+document.querySelector('.loc').textContent)).includes('กลับไปใช้ตำแหน่งของฉัน')&&(await p.textContent('#locnm')).startsWith('หาดป่าตอง'));
 await p.click('[data-loc=find]');await p.waitForSelector('#mpov');const n0=NMQ.length;await p.fill('#mp_q','ป่าตอง');await p.click('[data-mp=find]');await p.waitForSelector('[data-mpr]',{timeout:6000});
 ok('search: same words again uses saved result (no new request)',NMQ.length===n0);
 await p.fill('#mp_q','ไม่มีที่นี่');await p.click('[data-mp=find]');await p.waitForFunction(()=>document.getElementById('mp_rs').textContent.includes('ไม่พบ'),null,{timeout:6000});
@@ -139,9 +139,9 @@ nmMode='err';await p.fill('#mp_q','ล้มเหลว');await p.click('[data-
 ok('search: failure message',(await p.textContent('#mp_rs')).includes('ค้นหาไม่สำเร็จ'));
 const gaps=NMQ.slice(1).map((x,i)=>x.t-NMQ[i].t);ok('search: at most one request per second',gaps.every(g=>g>=1000));
 await p.keyboard.press('Escape');await wait(200);
-ok('search: Escape closes and keeps earlier point',!(await p.$('#mpov'))&&(await p.textContent('.loc')).includes('จุดที่คุณเลือก'));
-await p.click('[data-loc=map]');await p.waitForSelector('#mpov');
-ok('map button: search box is there, focus stays on the title',!!(await p.$('#mp_q'))&&await p.evaluate(()=>document.activeElement&&document.activeElement.id==='mp_h'));
+ok('search: Escape closes and keeps earlier point',!(await p.$('#mpov'))&&(await p.evaluate(()=>document.getElementById('locl').textContent+' '+document.querySelector('.loc').textContent)).includes('กลับไปใช้ตำแหน่งของฉัน'));
+await p.click('[data-loc=find]');await p.waitForSelector('#mpov');
+ok('find button: search box there with cursor in it, hint to drag the pin',!!(await p.$('#mp_q'))&&await p.evaluate(()=>document.activeElement&&document.activeElement.id==='mp_q')&&(await p.textContent('#mpov')).includes('หรือแตะ ลากหมุดบนแผนที่ด้านล่าง'));
 await p.keyboard.press('Escape');
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)
 })()

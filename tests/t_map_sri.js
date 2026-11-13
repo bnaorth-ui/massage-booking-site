@@ -74,12 +74,12 @@ await p.fill('#lph','0811111111');await p.fill('#lpw','abc123');await p.click('b
 const names=async()=>await p.$$eval('[data-pl]',e=>e.map(x=>x.textContent));
 let L1=(await names()).join('|');
 ok('gps (Bangkok): sh1 shown, Phuket hidden',L1.includes('ร้านสบายดี')&&!L1.includes('ป่าตอง'));
-ok('map button present',!!(await p.$('[data-loc=map]'))&&(await p.textContent('.loc')).includes('เลือกจุดบนแผนที่'));
+ok('search/map button present (merged, 13 Nov)',!!(await p.$('[data-loc=find]'))&&!(await p.$('[data-loc=map]'))&&(await p.evaluate(()=>document.getElementById('locl').textContent+' '+document.querySelector('.loc').textContent)).includes('ค้นหาสถานที่'));
 const before=calls.filter(c=>c.path.endsWith('set_my_location')).length;
-await p.click('[data-loc=map]');await p.waitForSelector('#mpov');
+await p.click('[data-loc=find]');await p.waitForSelector('#mpov');
 await p.waitForFunction(()=>document.getElementById('mpm').textContent.includes('โหลดแผนที่ไม่สำเร็จ'),null,{timeout:15000});
 ok('tampered file (hash mismatch) is refused -> graceful message',true);
 await p.fill('#mp_lat','7.8804');await p.fill('#mp_lng','98.2923');await p.click('[data-mp=ok]');await wait(300);
-ok('coords still usable',(await p.textContent('.loc')).includes('จุดที่คุณเลือก'));
+ok('coords still usable',(await p.evaluate(()=>document.getElementById('locl').textContent+' '+document.querySelector('.loc').textContent)).includes('กลับไปใช้ตำแหน่งของฉัน'));
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)
 })()
