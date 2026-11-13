@@ -37,8 +37,8 @@ const T={bookings:BKX.filter(b=>b.place_id!=='og1').concat(RPT),admins:[],
  notifications:[{id:'n1',audience:'admin',kind:'topup',title:'ร้านขอเติมเงิน 500 บาท',body:'อ้างอิง TP000001\nร้านปิดอัตโนมัติ',created_at:'2026-10-17T04:30:00Z'},{id:'n2',audience:'admin',kind:'status',title:'ร้านปิดรับจองชั่วคราว',body:'x',created_at:'2026-10-17T05:30:00Z'},{id:'n3',audience:'admin',kind:'approval',title:'มีคำขอลงทะเบียน',body:'y',created_at:'2026-10-17T06:30:00Z'}],
  notification_reads:[]};
 const bal={sh1:{balance:960,owner_phone:'0899111111',owner_name:'สมหมาย ใจดี'},sh2:{balance:-600,owner_phone:'0898',owner_name:''},og1:null};
-let mode={netDown:false};const SQ=[];let REPERR=null;const T0=Date.now();const iso=m=>new Date(T0-m*60000).toISOString();
-const ROOMS=[{user_id:'cu1',app:'user',name:'สมชาย ใจดี',phone:'0812345678',last_at:iso(5),last_from:'user',last_body:'สอบถามการจอง MS1',unread:2},{user_id:'sh9',app:'shop',name:'ร้านสบายดี สปา',phone:'0899111111',last_at:iso(60),last_from:'admin',last_body:'เรียบร้อยครับ',unread:0}];
+let mode={netDown:false};const SQ=[],VW=[];let REPERR=null;const T0=Date.now();const iso=m=>new Date(T0-m*60000).toISOString();
+const ROOMS=[{user_id:'cu1',app:'user',name:'สมชาย ใจดี',phone:'0812345678',last_at:iso(5),last_from:'user',last_body:'สอบถามการจอง MS1',unread:2},{user_id:'sh9',app:'shop',name:'ร้านสบายดี สปา',phone:'0899111111',last_at:iso(60),last_from:'admin',last_body:'เรียบร้อยครับ',unread:0,last_admin_name:'เจ้าหน้าที่ สมหญิง',last_admin_at:iso(60),viewing_name:'สมศักดิ์'}];
 const MS={'cu1|user':[{id:'m1',sender_id:'cu1',sender_role:'user',sender_name:'สมชาย ใจดี',body:'สอบถามการจอง MS1',created_at:iso(6)},{id:'m2',sender_id:null,sender_role:'auto',sender_name:'ระบบ',body:'ได้รับข้อความแล้ว',created_at:iso(5.9)},{id:'m3',sender_id:'cu1',sender_role:'user',sender_name:'สมชาย ใจดี',body:'<b>ด่วน</b>',created_at:iso(5)}]};
 await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.protocol==='file:')return r.continue();if(!u.host.endsWith('supabase.co'))return r.abort();
  const m=q.method(),path=u.pathname,sp=u.searchParams;let body=null;try{body=JSON.parse(q.postData()||'null')}catch(e){}
@@ -81,8 +81,9 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
   if(f==='admin_hide_review'){hides.push(body);const row=(body.p_kind==='shop'?T.reviews:T.review_staff).find(x=>x.id===body.p_id);row.hidden=body.p_hidden;row.reported=false;return J(204,null)}
   if(f==='admin_support_rooms'){SQ.push([f,body]);return J(200,ROOMS)}
   if(f==='admin_support_messages'){SQ.push([f,body]);const L=(MS[body.p_user+'|'+body.p_app]||[]);return J(200,body.p_after?L.filter(m=>m.created_at>body.p_after):L)}
+  if(f==='admin_support_viewing'){VW.push(body);return J(200,body.p_on&&body.p_user==='sh9'?'สมศักดิ์':null)}
   if(f==='admin_support_mark_read'){SQ.push([f,body]);const r=ROOMS.find(x=>x.user_id===body.p_user&&x.app===body.p_app);if(r)r.unread=0;return J(204,null)}
-  if(f==='admin_support_reply'){SQ.push([f,body]);if(REPERR)return J(400,{code:'P0001',message:REPERR});const k=body.p_user+'|'+body.p_app;(MS[k]=MS[k]||[]).push({id:'r'+(++n),sender_id:'u1',sender_role:'admin',sender_name:'เจ้าหน้าที่ แอดมิน',body:body.p_body,created_at:new Date().toISOString()});const r=ROOMS.find(x=>x.user_id===body.p_user&&x.app===body.p_app);r.last_from='admin';r.last_body=body.p_body;return J(200,'mid')}
+  if(f==='admin_support_reply'){SQ.push([f,body]);if(REPERR)return J(400,{code:'P0001',message:REPERR});const k=body.p_user+'|'+body.p_app;(MS[k]=MS[k]||[]).push({id:'r'+(++n),sender_id:'u1',sender_role:'admin',sender_name:'เจ้าหน้าที่ แอดมิน',body:body.p_body,created_at:new Date().toISOString()});const r=ROOMS.find(x=>x.user_id===body.p_user&&x.app===body.p_app);r.last_from='admin';r.last_body=body.p_body;r.last_admin_name='เจ้าหน้าที่ แอดมิน';r.last_admin_at=new Date().toISOString();return J(200,'mid')}
   return J(404,{message:'no rpc '+f})}
  if(!me||!T.admins.includes(me.id))return J(403,{code:'42501',message:'permission denied'});
  const tb=path.replace('/rest/v1/','');if(T[tb]===undefined)return J(404,{message:'nf '+path});
@@ -109,11 +110,13 @@ const W=async(f,t=4000)=>{const e=Date.now()+t;while(Date.now()<e){try{if(await 
 await p.waitForSelector('#tabs [data-id=sup]',{timeout:5000});
 ok('chat menu in bottom nav with unreplied count',await W(async()=>((await p.getAttribute('#tabs [data-id=sup] .bdg','aria-label'))||'').includes('แชตที่ยังไม่ได้ตอบ 1')));
 await p.click('#tabs [data-id=sup]');
-ok('room list: unreplied first with type and status tags',await W(async()=>{const t=await p.$$eval('.supb',e=>e.map(x=>x.innerText));return t.length===2&&t[0].includes('สมชาย ใจดี')&&t[0].includes('ผู้ใช้งาน')&&t[0].includes('ยังไม่ได้ตอบ')&&t[0].includes('ใหม่ 2')&&t[1].includes('ร้านนวด')&&t[1].includes('คุณ: เรียบร้อยครับ')}));
+ok('room list: unreplied first with type and status tags',await W(async()=>{const t=await p.$$eval('.supb',e=>e.map(x=>x.innerText));return t.length===2&&t[0].includes('สมชาย ใจดี')&&t[0].includes('ผู้ใช้งาน')&&t[0].includes('ยังไม่ได้ตอบ')&&t[0].includes('ใหม่ 2')&&t[1].includes('ร้านนวด')&&t[1].includes('เจ้าหน้าที่: เรียบร้อยครับ')&&t[1].includes('ตอบแล้ว โดย สมหญิง, 1 ชั่วโมงที่แล้ว')&&t[1].includes('สมศักดิ์ กำลังดูอยู่')&&!t[0].includes('กำลังดูอยู่')&&!t[0].includes('ตอบแล้ว')}));
 await p.click('.supb[data-id=cu1]');
 ok('room opens with heading focused, type and phone link',await W(async()=>(await p.evaluate(()=>document.activeElement&&document.activeElement.id))==='suph')&&(await p.textContent('#main')).includes('ผู้ใช้งาน')&&!!(await p.$('#main a[href="tel:0812345678"]')));
 ok('messages shown (html escaped), auto reply labelled',(await p.$$('#supl .smsg')).length===3&&(await p.textContent('#supl')).includes('<b>ด่วน</b>')&&!(await p.$('#supl b'))&&(await p.textContent('#supl')).includes('ข้อความตอบรับอัตโนมัติ'));
 ok('log is a polite live region',(await p.getAttribute('#supl','role'))==='log'&&(await p.getAttribute('#supl','aria-live'))==='polite');
+ok('opening a room tells the server I am viewing it',await W(()=>VW.some(x=>x.p_user==='cu1'&&x.p_app==='user'&&x.p_on===true)));
+ok('no warning when nobody else is viewing',(await p.textContent('#supvw')).trim()==='');
 ok('room marked read',await W(()=>SQ.some(x=>x[0]==='admin_support_mark_read'&&x[1].p_user==='cu1'&&x[1].p_app==='user')));
 ok('reply box limited to 1000 characters',(await p.getAttribute('#supi','maxlength'))==='1000');
 await p.fill('#supi','  ตรวจสอบให้แล้วครับ  ');await p.click('#supsend');
@@ -125,7 +128,17 @@ ok('new user message appears by polling',await W(async()=>(await p.textContent('
 REPERR='ข้อความยาวเกินไป (ไม่เกิน 1,000 ตัวอักษร)';await p.fill('#supi','x');await p.click('#supsend');
 ok('server error shown',await W(async()=>(await p.textContent('#supe')).includes('ข้อความยาวเกินไป')));REPERR=null;
 await p.click('[data-a=supback]');
+ok('leaving the room clears my viewing mark',await W(()=>VW.some(x=>x.p_user==='cu1'&&x.p_on===false)));
 ok('back to the list',await W(async()=>(await p.$$('.supb')).length===2));
+ok('replied room now shows answered by me',await W(async()=>(await p.textContent('.supb[data-id=cu1]')).includes('ตอบแล้ว โดย แอดมิน')));
+await p.click('.supb[data-id=sh9]');
+ok('room another admin is viewing shows a warning (role=status)',await W(async()=>(await p.textContent('#supvw')).includes('สมศักดิ์ กำลังดูห้องนี้อยู่ ระวังตอบซ้ำ')&&(await p.getAttribute('#supvw .closed','role'))==='status'));
+ok('reply box still usable while warned',!(await p.$eval('#supi',e=>e.disabled)));
+await p.click('[data-a=supback]');await W(async()=>(await p.$$('.supb')).length===2);
+ROOMS.find(r=>r.user_id==='sh9').viewing_name=null;ROOMS.find(r=>r.user_id==='cu1').last_from='user';
+await p.focus('.supb[data-id=sh9]');
+ok('list refreshes by itself (15 s): viewing tag gone, new message puts room back to unanswered',await W(async()=>{const a=await p.textContent('.supb[data-id=sh9]'),b=await p.textContent('.supb[data-id=cu1]');return !a.includes('กำลังดูอยู่')&&b.includes('ยังไม่ได้ตอบ')},20000));
+ok('focus kept on the same room button after refresh',await p.evaluate(()=>document.activeElement&&document.activeElement.dataset.id==='sh9'));
 await p.click('#tabs [data-id=sys]');await p.waitForTimeout(300);await p.click('#main .subtabs[aria-label] [data-id=set]');await p.waitForTimeout(300);await p.click('[data-a=sub][data-id=g]').catch(()=>{});await p.waitForTimeout(300);
 ok('settings: LINE link field removed, hint mentions chat menu',!(await p.$('#c5'))&&!(await p.textContent('#main')).includes('LINE')&&(await p.textContent('#main')).includes('เมนู "แชต"'));
 await p.click('[data-a=setsave]');await p.waitForTimeout(800);

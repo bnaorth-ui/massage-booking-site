@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>แอดมิน - สมาคมวิทยากรฝึกอาชีพคนตาบอด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.20"><meta name="app-name" content="ระบบจองนวด สำหรับแอดมิน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.21"><meta name="app-name" content="ระบบจองนวด สำหรับแอดมิน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -922,20 +922,20 @@ function post(){
  if(S.tab==="shop"&&S.lic){var r=byId(D.regs,S.lic),el2=document.getElementById("lic_"+S.lic);if(r&&el2)loadBlobInto("/storage/v1/object/authenticated/licenses/"+r.license_path,el2,"ใบอนุญาตจัดตั้งร้านนวดของ "+esc(r.name),"licimg")}}
 /* ===== แชตกับผู้ใช้ (ฐานข้อมูล: admin_support_rooms, admin_support_messages, admin_support_mark_read, admin_support_reply)
    ผู้ใช้งาน ร้านนวด หมอนวด ทักมาจากหน้าติดต่อเราในแอปของตัวเอง แอดมินทุกคนเห็นห้องเดียวกัน ห้องที่ยังไม่ได้ตอบอยู่บนสุด ===== */
-var SUP={rooms:null,err:"",cur:null,msgs:[],ids:{},last:null,busy:false,sending:false,t:null,serr:""},SUPAPP={user:"ผู้ใช้งาน",shop:"ร้านนวด",staff:"หมอนวด"};
+var SUP={warn:"",hb:null,rooms:null,err:"",cur:null,msgs:[],ids:{},last:null,busy:false,sending:false,t:null,serr:""},SUPAPP={user:"ผู้ใช้งาน",shop:"ร้านนวด",staff:"หมอนวด"};
 function supPending(){return (SUP.rooms||[]).filter(function(r){return r.last_from==="user"}).length}
 function supLoad(){return rpc("admin_support_rooms").then(function(a){SUP.rooms=a||[];SUP.err=""},function(e){if(SUP.rooms===null)SUP.err=errTh(e,"โหลดแชตไม่สำเร็จ")})}
 function supRoom(){return SUP.cur?(SUP.rooms||[]).filter(function(r){return r.user_id===SUP.cur.u&&r.app===SUP.cur.a})[0]||SUP.cur.r:null}
 function supMsg(m){var mine=m.sender_role==="admin",auto=m.sender_role==="auto";return '<div class="smsg'+(mine?" mine":auto?" auto":"")+'"><small>'+esc(mine?m.sender_name||"เจ้าหน้าที่":auto?"ข้อความตอบรับอัตโนมัติ":(SUP.cur&&SUP.cur.r.name)||"ผู้ใช้")+', '+ntAt(m.created_at)+'</small><p>'+esc(m.body).replace(/\n/g,"<br>")+'</p></div>'}
 function supView(){
  if(SUP.cur){var r=supRoom(),tel=String(r.phone||"").replace(/[^0-9+]/g,"");
-  return '<div class="acts mgb"><button type="button" class="btn g" data-a="supback">← กลับไปรายชื่อแชต</button></div><h1 id="suph" tabindex="-1">'+esc(r.name||"ไม่มีชื่อ")+'</h1><p class="sub">'+SUPAPP[r.app]+(tel?', <a href="tel:'+esc(tel)+'">'+esc(r.phone)+'</a>':'')+'</p>'+
+  return '<div class="acts mgb"><button type="button" class="btn g" data-a="supback">← กลับไปรายชื่อแชต</button></div><h1 id="suph" tabindex="-1">'+esc(r.name||"ไม่มีชื่อ")+'</h1><p class="sub">'+SUPAPP[r.app]+(tel?', <a href="tel:'+esc(tel)+'">'+esc(r.phone)+'</a>':'')+'</p><div id="supvw">'+supVwHtml()+'</div>'+
    '<div id="supl" class="supl" role="log" aria-live="polite" aria-label="ข้อความในแชตกับ '+esc(r.name||"ผู้ใช้")+'">'+(SUP.msgs.length?SUP.msgs.map(supMsg).join(""):'<p class="sub">'+(SUP.busy?"กำลังโหลดข้อความ":"ยังไม่มีข้อความ")+'</p>')+'</div>'+
    '<div id="supe" class="err" role="alert" style="color:var(--bad)">'+esc(SUP.serr)+'</div><form id="supf" class="card form"><label for="supi">พิมพ์คำตอบ</label><textarea class="in" id="supi" rows="3" maxlength="1000" placeholder="พิมพ์คำตอบ (ไม่เกิน 1,000 ตัวอักษร)"></textarea><div class="acts"><button type="submit" class="btn" id="supsend">ส่ง</button></div></form>'}
  var L=SUP.rooms;
  return '<div class="head"><h1>แชตกับผู้ใช้</h1></div><p class="hint2">ผู้ใช้งาน ร้านนวด และหมอนวด ทักมาจากหน้าติดต่อเราในแอปของตัวเอง ห้องที่ยังไม่ได้ตอบอยู่บนสุด ระบบลบห้องที่ไม่มีข้อความใหม่ 6 เดือน</p>'+
   (SUP.err?'<div class="closed" role="alert">'+esc(SUP.err)+'</div>':L===null?'<p class="sub" role="status">กำลังโหลด</p>':!L.length?'<div class="empty">ยังไม่มีแชต</div>':
-  '<ul class="supr">'+L.map(function(r){var w=r.last_from==="user",n=+r.unread||0;return '<li><button type="button" class="supb" data-a="supopen" data-id="'+esc(r.user_id)+'" data-t="'+esc(r.app)+'"><span class="qh"><b>'+esc(r.name||"ไม่มีชื่อ")+'</b><span class="tag">'+SUPAPP[r.app]+'</span>'+(w?'<span class="tag w">ยังไม่ได้ตอบ</span>':'')+(n?'<span class="tag w">ใหม่ '+n+'</span>':'')+'</span><small>'+(w?"":"คุณ: ")+esc(r.last_body||"")+'</small><small>'+ntAt(r.last_at)+'</small></button></li>'}).join("")+'</ul>')}
+  '<ul class="supr">'+L.map(function(r){var w=r.last_from==="user",n=+r.unread||0;var an=String(r.last_admin_name||"").replace(/^เจ้าหน้าที่\s*/,"");return '<li><button type="button" class="supb" data-a="supopen" data-id="'+esc(r.user_id)+'" data-t="'+esc(r.app)+'"><span class="qh"><b>'+esc(r.name||"ไม่มีชื่อ")+'</b><span class="tag">'+SUPAPP[r.app]+'</span>'+(w?'<span class="tag w">ยังไม่ได้ตอบ</span>':'')+(n?'<span class="tag w">ใหม่ '+n+'</span>':'')+(r.viewing_name?'<span class="tag">'+esc(r.viewing_name)+' กำลังดูอยู่</span>':'')+'</span><small>'+(w?"":"เจ้าหน้าที่: ")+esc(r.last_body||"")+'</small><small>'+(!w&&an&&r.last_admin_at?'ตอบแล้ว โดย '+esc(an)+', '+tdAgo(r.last_admin_at)+'ที่แล้ว':ntAt(r.last_at))+'</small></button></li>'}).join("")+'</ul>')}
 function supFetch(){var c=SUP.cur;if(!c||SUP.busy&&SUP.msgs.length)return Promise.resolve();SUP.busy=true;
  return rpc("admin_support_messages",{p_user:c.u,p_app:c.a,p_after:SUP.last}).then(function(a){SUP.busy=false;if(SUP.cur!==c)return;var nw=(a||[]).filter(function(m){return !SUP.ids[m.id]});nw.forEach(function(m){SUP.ids[m.id]=1;SUP.msgs.push(m);SUP.last=m.created_at});
   var l=document.getElementById("supl");if(!c.shown){c.shown=true;draw();var h=document.getElementById("suph");if(h)h.focus();l=document.getElementById("supl");if(l)l.scrollTop=l.scrollHeight}
@@ -943,8 +943,12 @@ function supFetch(){var c=SUP.cur;if(!c||SUP.busy&&SUP.msgs.length)return Promis
   if(nw.some(function(m){return m.sender_role==="user"})||!c.read){c.read=true;rpc("admin_support_mark_read",{p_user:c.u,p_app:c.a}).then(function(){var r=supRoom();if(r)r.unread=0;navDraw()}).catch(function(){})}},
   function(e){SUP.busy=false;if(SUP.cur!==c)return;SUP.serr=errTh(e,"โหลดข้อความไม่สำเร็จ");if(!c.shown){c.shown=true;draw()}else{var x=document.getElementById("supe");if(x)x.textContent=SUP.serr}})}
 function supOpen(u,a){var r=(SUP.rooms||[]).filter(function(x){return x.user_id===u&&x.app===a})[0];if(!r)return;supClose();SUP.cur={u:u,a:a,r:r,shown:false,read:false};SUP.msgs=[];SUP.ids={};SUP.last=null;SUP.serr="";
- document.getElementById("main").innerHTML='<p class="sub" role="status">กำลังโหลดข้อความ</p>';supFetch();SUP.t=setInterval(function(){if(!document.hidden)supFetch()},5000)}
-function supClose(){clearInterval(SUP.t);SUP.t=null;SUP.cur=null;SUP.msgs=[];SUP.ids={};SUP.last=null;SUP.serr=""}
+ document.getElementById("main").innerHTML='<p class="sub" role="status">กำลังโหลดข้อความ</p>';supView1(true);SUP.hb=setInterval(function(){if(!document.hidden)supView1(true)},60000);supFetch();SUP.t=setInterval(function(){if(!document.hidden)supFetch()},5000)}
+function supVwHtml(){return SUP.warn?'<div class="closed" role="status">'+esc(SUP.warn)+' กำลังดูห้องนี้อยู่ ระวังตอบซ้ำ</div>':''}
+function supView1(on){var c=SUP.cur;if(!c)return Promise.resolve();return rpc("admin_support_viewing",{p_user:c.u,p_app:c.a,p_on:on}).then(function(nm){if(!on||SUP.cur!==c)return;var w=nm||"";if(w!==SUP.warn){SUP.warn=w;var el=document.getElementById("supvw");if(el)el.innerHTML=supVwHtml()}}).catch(function(){})}
+/* รายชื่อห้อง: อัปเดตป้ายทุก 15 วินาทีขณะเปิดอยู่ วาดใหม่เฉพาะเมื่อข้อมูลเปลี่ยน และคืนโฟกัสปุ่มเดิม */
+setInterval(function(){if(!D||S.tab!=="sup"||SUP.cur||SR.open||document.hidden)return;var o=JSON.stringify(SUP.rooms);supLoad().then(function(){if(S.tab!=="sup"||SUP.cur||SR.open||JSON.stringify(SUP.rooms)===o)return;var a=document.activeElement,k=a&&a.dataset&&a.dataset.a==="supopen"?[a.dataset.id,a.dataset.t]:null;draw();if(k){var b=document.querySelector('.supb[data-id="'+k[0]+'"][data-t="'+k[1]+'"]');if(b)b.focus()}})},15000);
+function supClose(){if(SUP.cur){supView1(false)}clearInterval(SUP.hb);SUP.hb=null;SUP.warn="";clearInterval(SUP.t);SUP.t=null;SUP.cur=null;SUP.msgs=[];SUP.ids={};SUP.last=null;SUP.serr=""}
 function supSend(){var c=SUP.cur,ta=document.getElementById("supi"),tx=ta?ta.value.trim():"";if(!c||SUP.sending)return;if(!tx){if(ta)ta.focus();return}
  SUP.sending=true;var bt=document.getElementById("supsend"),er=document.getElementById("supe");if(bt)bt.disabled=true;if(er)er.textContent="";SUP.serr="";
  rpc("admin_support_reply",{p_user:c.u,p_app:c.a,p_body:tx}).then(function(){SUP.sending=false;if(bt)bt.disabled=false;if(SUP.cur!==c)return;ta.value="";var r=supRoom();if(r){r.last_from="admin";r.last_body=tx;r.last_at=new Date().toISOString()}navDraw();SUP.busy=false;return supFetch().then(function(){var t=document.getElementById("supi");if(t)t.focus();ann("ส่งคำตอบแล้ว")})},
