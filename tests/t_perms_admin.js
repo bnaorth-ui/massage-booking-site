@@ -125,6 +125,7 @@ ok('owner sees all system sub-menus',(await subIds()).length===10);
 await p.click('#main .subtabs [data-id=set]');await p.waitForTimeout(300);await p.click('[data-a=sub][data-id=a]');
 ok('admin list shows perms (แอดมินหลัก)',await W(async()=>(await p.textContent('[data-sg=a]')).includes('สิทธิ์: แอดมินหลัก (ทำได้ทุกอย่าง)')));
 ok('add-admin form has perm picker, default = ผู้ช่วยทั่วไป',await p.$$eval('.pm_adp:checked',c=>c.map(x=>x.value).join())==='chat,queue,shop,staff'&&!(await p.$eval('#adp_owner',e=>e.checked)));
+ok('order: phone -> perms -> button (add and invite)',await p.evaluate(()=>{const b=(a,c)=>!!(a.compareDocumentPosition(c)&Node.DOCUMENT_POSITION_FOLLOWING);const f=document.querySelectorAll('fieldset.pmf');return b(document.getElementById('adph'),f[0])&&b(f[0],document.querySelector('[data-a=addadmin]'))&&b(document.getElementById('invph'),f[1])&&b(f[1],document.querySelector('[data-a=invcreate]'))}));
 ok('picker is a fieldset with legend',await p.$$eval('fieldset.pmf legend',l=>l.length)===2);
 await p.click('[data-a=pmpre][data-id="adp:fin"]');
 ok('preset ผู้ช่วยการเงิน ticks finance only (shop chats come with finance)',await p.$$eval('.pm_adp:checked',c=>c.map(x=>x.value).join())==='finance');
