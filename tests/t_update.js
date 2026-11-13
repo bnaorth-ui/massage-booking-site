@@ -1,6 +1,6 @@
 const {chromium}=require('playwright');
 const cfg=require('./config');
-const APPS=[['customer-booking.html','ผู้ใช้งาน'],['shop-owner.html','ร้านค้า'],['staff-app.html','พนักงาน'],['admin-panel.html','แอดมิน']];
+const APPS=[['customer-booking.html','ผู้ใช้งาน','แอปจองคิวนวด'],['shop-owner.html','ร้านค้า','แอปร้านนวด'],['staff-app.html','พนักงาน','แอปหมอนวด'],['admin-panel.html','แอดมิน','แอปสำหรับแอดมิน']];
 (async()=>{const b=await chromium.launch(cfg.launch);const errs=[];
 const ok=(nm,c)=>console.log((c?'PASS ':'FAIL ')+nm);
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -16,7 +16,7 @@ async function open(app,ver,pageRes){
  const p=await ctx.newPage();p.on('pageerror',e=>errs.push(e.message));
  await p.goto(cfg.page(app));return {p,ctx,st}}
 const cov=p=>p.$('#updcov');
-for(const [app,label] of APPS){
+for(const [app,label,aname] of APPS){
  console.log('--- '+label);const CUR=/name="app-version" content="([^"]+)"/.exec(require('fs').readFileSync(cfg.page(app).replace('file://',''),'utf8'))[1];
  // 1 เลขตรงกัน
  let s=await open(app,{body:{v:CUR,required:false,notes:[]}});await sleep(700);
@@ -28,11 +28,12 @@ for(const [app,label] of APPS){
  // 3 มีเวอร์ชันใหม่ (ปกติ)
  s=await open(app,{body:{v:'9.9',required:false,notes:['ข้อหนึ่ง','ข้อสอง','ข้อสาม','ข้อสี่ห้ามขึ้น']}});await s.p.waitForSelector('#updh',{timeout:3000});
  const t=await s.p.textContent('#updcov');
- ok(label+': update screen has association name, app name, heading',t.includes('สมาคมวิทยากรฝึกอาชีพคนตาบอด')&&t.includes('ระบบจองนวด')&&t.includes('มีเวอร์ชันใหม่ของแอป'));
+ ok(label+': update screen shows app name (no association name), heading',(await s.p.textContent('#updapp'))===aname&&!t.includes('สมาคม')&&t.includes('มีเวอร์ชันใหม่ของแอป'));
  ok(label+': shows up to 3 notes only',t.includes('ข้อสาม')&&!t.includes('ข้อสี่ห้ามขึ้น'));
  ok(label+': shows version current -> new',t.includes('เวอร์ชันของคุณ '+CUR+' → ใหม่ 9.9'));
  ok(label+': has update and later buttons',!!(await s.p.$('#updgo'))&&!!(await s.p.$('#updlater')));
- ok(label+': logo is the association logo file',(await s.p.getAttribute('#updcov img','src'))==='icon-logo-192.png');
+ ok(label+': logo is this app icon, decorative, not cropped to a circle',(await s.p.getAttribute('#updcov img','src'))==='icon-logo-192.png'&&(await s.p.getAttribute('#updcov img','alt'))===''&&(await s.p.$eval('#updcov img',e=>getComputedStyle(e).borderRadius))==='0px');
+ if(app==='customer-booking.html'){await s.ctx.close();s=await open(app,{body:{v:'9.9',required:false,notes:[]}});await s.p.evaluate(()=>{localStorage.setItem('brand',JSON.stringify({n:'นวดดี',l:''}));sessionStorage.clear()});await s.p.reload();await s.p.waitForSelector('#updh',{timeout:3000});ok(label+': customer uses brand name set by admin',(await s.p.textContent('#updapp'))==='แอปนวดดี');await s.p.evaluate(()=>localStorage.removeItem('brand'))}
  ok(label+': dialog semantics + focus on heading',(await s.p.getAttribute('#updcov','role'))==='dialog'&&(await s.p.getAttribute('#updcov','aria-modal'))==='true'&&(await s.p.evaluate(()=>document.activeElement&&document.activeElement.id))==='updh');
  ok(label+': app content behind is inert',await s.p.evaluate(()=>{const e=[...document.body.children].filter(x=>x.tagName!=='SCRIPT');return e.length>0&&e.every(x=>x.inert===true)}));
  await s.p.click('#updlater');ok(label+': later closes screen and un-inerts',(await cov(s.p))===null&&await s.p.evaluate(()=>[...document.body.children].every(x=>x.inert!==true)));

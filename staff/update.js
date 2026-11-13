@@ -5,13 +5,15 @@
    - กันวนซ้ำ: ถ้ากดอัปเดตแล้วเลขยังไม่ตรง (เช่นแคชปลายทางยังไม่ทัน) ในรอบการใช้งานเดียวกันจะไม่ถามซ้ำ */
 (function(){
  var mv=document.querySelector('meta[name="app-version"]');if(!mv)return;
- var cur=mv.getAttribute("content")||"",mn=document.querySelector('meta[name="app-name"]'),appName=mn?mn.getAttribute("content"):"ระบบจองนวด";
+ var cur=mv.getAttribute("content")||"",mn=document.querySelector('meta[name="app-name"]'),appName=mn?mn.getAttribute("content"):"จองคิวนวด";
+ /* แอปผู้ใช้งาน: ใช้ชื่อแอปที่แอดมินตั้งไว้ (จำไว้ในเครื่องตอนเปิดแอปครั้งก่อน) ให้ตรงกับหัวหน้าแรก */
+ try{var bc=JSON.parse(localStorage.getItem("brand"));if(bc&&typeof bc==="object"&&typeof bc.n==="string"&&bc.n.trim())appName=bc.n.trim().slice(0,40)}catch(e){}
  var ss={get:function(k){try{return sessionStorage.getItem(k)}catch(e){return null}},set:function(k,v){try{sessionStorage.setItem(k,v)}catch(e){}}};
  var verUrl=window.__APP_VER_URL||new URL("version.json",location.href).href;
  var pageUrl=window.__APP_PAGE_URL||location.href.split("#")[0].split("?")[0];
  var cov=document.createElement("div");cov.id="updcov";cov.setAttribute("role","dialog");cov.setAttribute("aria-modal","true");cov.setAttribute("aria-label","ตรวจสอบเวอร์ชันของแอป");
  cov.style.cssText="position:fixed;left:0;top:0;right:0;bottom:0;z-index:2147483000;background:#fff;color:#12312a;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px calc(24px + env(safe-area-inset-bottom,0px));text-align:center;overflow:auto;font-family:system-ui,-apple-system,'Sarabun','Noto Sans Thai',sans-serif";
- cov.innerHTML='<img src="icon-logo-192.png" alt="" width="112" height="112" style="width:112px;height:112px;border-radius:50%"><p id="updst" role="status" style="margin:16px 0 0;color:#4a6b62;font-size:1rem">กำลังตรวจสอบเวอร์ชัน</p>';
+ cov.innerHTML='<img src="icon-logo-192.png" alt="" width="112" height="112" style="width:112px;height:112px"><p id="updst" role="status" style="margin:16px 0 0;color:#4a6b62;font-size:1rem">กำลังตรวจสอบเวอร์ชัน</p>';
  var inerted=[];
  function setInert(on){try{var b=document.body;if(!b)return;if(on){[].slice.call(b.children).forEach(function(e){if(e===cov||e.tagName==="SCRIPT")return;if(e.inert!==true){e.inert=true;inerted.push(e)}})}else{inerted.forEach(function(e){e.inert=false});inerted=[]}}catch(x){}}
  function hide(){clearTimeout(tm);if(cov.parentNode)cov.parentNode.removeChild(cov);setInert(false)}
@@ -20,8 +22,8 @@
  function esc(s){var d=document.createElement("div");d.textContent=String(s==null?"":s);return d.innerHTML}
  function panel(r){clearTimeout(tm);var req=r.required===true,notes=Array.isArray(r.notes)?r.notes.filter(function(x){return typeof x==="string"&&x}).slice(0,3):[];
   cov.setAttribute("aria-label","มีเวอร์ชันใหม่ของแอป");
-  cov.innerHTML='<img src="icon-logo-192.png" alt="โลโก้สมาคมวิทยากรฝึกอาชีพคนตาบอด" width="112" height="112" style="width:112px;height:112px;border-radius:50%">'+
-   '<p style="margin:10px 0 0;font-weight:700">สมาคมวิทยากรฝึกอาชีพคนตาบอด</p><p style="margin:2px 0 0;color:#4a6b62;font-size:.95rem">'+esc(appName)+'</p>'+
+  cov.innerHTML='<img src="icon-logo-192.png" alt="" width="112" height="112" style="width:112px;height:112px">'+
+   '<p id="updapp" style="margin:12px 0 0;font-weight:700;font-size:1.15rem">แอป'+esc(appName)+'</p>'+
    '<h1 id="updh" tabindex="-1" style="margin:20px 0 6px;font-size:1.5rem;outline:none">มีเวอร์ชันใหม่ของแอป</h1>'+
    '<p style="margin:0 0 10px;color:#4a6b62">'+(req?"เวอร์ชันนี้จำเป็นต้องอัปเดตจึงจะใช้งานต่อได้":"อัปเดตใช้เวลาไม่ถึงนาที ข้อมูลของคุณไม่หาย")+'</p>'+
    (notes.length?'<div style="text-align:left;max-width:340px;width:100%;margin:0 0 10px"><p style="margin:0 0 4px;font-weight:700">สิ่งที่เปลี่ยน</p><ul style="margin:0;padding-left:1.2em">'+notes.map(function(n){return'<li>'+esc(n)+'</li>'}).join("")+'</ul></div>':"")+
