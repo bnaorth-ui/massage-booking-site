@@ -127,13 +127,14 @@ ok('admin list shows perms (แอดมินหลัก)',await W(async()=>(a
 ok('add-admin form has perm picker, default = ผู้ช่วยทั่วไป',await p.$$eval('.pm_adp:checked',c=>c.map(x=>x.value).join())==='chat,queue,shop,staff'&&!(await p.$eval('#adp_owner',e=>e.checked)));
 ok('picker is a fieldset with legend',await p.$$eval('fieldset.pmf legend',l=>l.length)===2);
 await p.click('[data-a=pmpre][data-id="adp:fin"]');
-ok('preset ผู้ช่วยการเงิน ticks chat+finance',await p.$$eval('.pm_adp:checked',c=>c.map(x=>x.value).join())==='chat,finance');
+ok('preset ผู้ช่วยการเงิน ticks finance only (shop chats come with finance)',await p.$$eval('.pm_adp:checked',c=>c.map(x=>x.value).join())==='finance');
+ok('chat category is labelled แชตกับลูกค้า',(await p.textContent('fieldset.pmf')).includes('แชตกับลูกค้า'));
 await p.click('#adp_owner');
 ok('ticking แอดมินหลัก disables the others',await p.$$eval('.pm_adp',c=>c.every(x=>x.disabled&&!x.checked)));
 await p.click('#adp_owner');await p.click('[data-a=pmpre][data-id="adp:fin"]');
 await p.fill('#adph','0822222222');await p.click('[data-a=addadmin]');
-ok('add_admin sends chosen perms',await W(async()=>ADDS.length===1&&JSON.stringify(ADDS[0].p_perms)==='["chat","finance"]'));
-ok('new admin row shows perms names',await W(async()=>(await p.textContent('[data-sg=a]')).includes('สิทธิ์: แชต, การเงิน')));
+ok('add_admin sends chosen perms',await W(async()=>ADDS.length===1&&JSON.stringify(ADDS[0].p_perms)==='["finance"]'));
+ok('new admin row shows perms names',await W(async()=>(await p.textContent('[data-sg=a]')).includes('สิทธิ์: การเงิน')));
 for(const c of await p.$$('.pm_adp:checked'))await c.uncheck();
 await p.fill('#adph','0844444444');await p.click('[data-a=addadmin]');
 ok('no perm ticked -> error, nothing sent',await W(async()=>(await p.textContent('#aerr')).includes('เลือกสิทธิ์อย่างน้อย 1 หมวด'))&&ADDS.length===1);
@@ -141,9 +142,9 @@ await p.fill('#invph','0855555555');await p.click('[data-a=pmpre][data-id="ivp:o
 ok('invite sends perms (owner preset)',await W(async()=>INVC.length===1&&JSON.stringify(INVC[0].p_perms)==='["owner"]'));
 ok('pending invite shows its perms',await W(async()=>/0855555555[\s\S]*สิทธิ์: แอดมินหลัก/.test(await p.textContent('[data-sg=a]'))));
 await p.click('[data-a=pmedit][data-id=u2]');
-ok('edit perms opens with current perms ticked and focus on heading',await W(async()=>(await p.$$eval('.pm_edp:checked',c=>c.map(x=>x.value).join()))==='chat,finance'&&(await p.evaluate(()=>document.activeElement.id))==='pmh'));
+ok('edit perms opens with current perms ticked and focus on heading',await W(async()=>(await p.$$eval('.pm_edp:checked',c=>c.map(x=>x.value).join()))==='finance'&&(await p.evaluate(()=>document.activeElement.id))==='pmh'));
 await p.check('.pm_edp[value=users]');await p.click('[data-a=pmsave][data-id=u2]');
-ok('admin_set_perms saved',await W(async()=>SETP.length===1&&SETP[0].p_user==='u2'&&JSON.stringify(SETP[0].p_perms)==='["chat","finance","users"]'));
+ok('admin_set_perms saved',await W(async()=>SETP.length===1&&SETP[0].p_user==='u2'&&JSON.stringify(SETP[0].p_perms)==='["finance","users"]'));
 ok('own row has no edit/remove buttons',!(await p.$('[data-a=pmedit][data-id=u1]'))&&!(await p.$('[data-a=rmadmin][data-id=u1]')));
 // ---- เข้าสู่ระบบเป็นผู้ช่วย (แชต การเงิน ผู้ใช้งาน)
 PERM.u2=['chat','finance'];
@@ -168,5 +169,13 @@ ok('todo lists only allowed items (top-up, chat; no shop registrations)',tk.incl
 await p.click('#tabs [data-id=fin]');await p.waitForTimeout(300);
 PERM.u2=['chat'];await p.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));
 ok('perms refresh: การเงิน disappears and page says no permission',await W(async()=>!(await navIds()).includes('fin')&&(await p.textContent('#main')).includes('บัญชีนี้ไม่มีสิทธิ์ใช้เมนูนี้ ติดต่อแอดมินหลัก'),6000));
+PERM.u2=['finance'];await p.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));
+ok('finance-only helper still has แชต menu (shop rooms)',await W(async()=>(await navIds()).includes('sup')&&(await navIds()).includes('fin'),6000));
+PERM.u2=['queue'];await p.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));
+ok('queue-only helper: no แชต menu, home shows queue',await W(async()=>!(await navIds()).includes('sup')&&!!(await p.$('#tabs [data-id=q]')),6000));
+await p.click('#tabs [data-id=q]');ok('queue section visible with คิวงาน',await W(async()=>!!(await p.$('#qh2'))));
+PERM.u2=['chat'];ROOMS[0].link='company';await p.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));
+await W(async()=>(await navIds()).includes('sup'),6000);await p.click('#tabs [data-id=sup]');
+ok('room of a company contact shows tag บริษัท',await W(async()=>/บริษัท/.test(await p.textContent('.supb[data-a=supopen]'))));
 ok('no page errors',errs.length===0);
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)})();

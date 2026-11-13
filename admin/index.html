@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>แอดมิน - สมาคมวิทยากรฝึกอาชีพคนตาบอด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.22"><meta name="app-name" content="ระบบจองนวด สำหรับแอดมิน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.23"><meta name="app-name" content="ระบบจองนวด สำหรับแอดมิน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -282,11 +282,12 @@ var NAV=[["q","หน้าหลัก","🏠","คิวงานใหม่"
 SUBM={pl:[["shop","ร้านนวด"],["org","หน่วยงาน"],["oreq","คำขอหน่วยงาน"],["comp","บริษัท"],["staff","พนักงาน"]],fin:[["pprq","คำขอเติมเงิน"],["ppac","บัญชีรับเงิน"],["rp","รายงาน"],["fm","สรุปการเงิน"]],sys:[["svc","บริการกลาง"],["cat","หมวดหมู่"],["rvw","รีวิว"],["usr","ผู้ใช้งาน"],["ann","ประกาศ"],["set","การตั้งค่า"],["hl","สถานะระบบ"],["ce","ข้อผิดพลาดหน้าเว็บ"],["au","ประวัติการทำงาน"],["me","บัญชีของฉัน"]]},
 NAVN={pl:"ทะเบียน",fin:"การเงิน",sys:"ระบบ"};
 /* ---- สิทธิ์แอดมิน: owner = แอดมินหลัก ทำได้ทุกอย่าง ผู้ช่วยเห็นเฉพาะเมนูของหมวดที่ได้รับ (หลังบ้านตรวจซ้ำทุกครั้ง) ---- */
-var AP=null,PMS=[["chat","แชต"],["queue","คิวงาน"],["shop","ร้านนวด"],["org","หน่วยงานและบริษัท"],["staff","หมอนวด"],["finance","การเงิน"],["safety","รีวิวและความปลอดภัย"],["users","ผู้ใช้งานและประกาศ"]],
-PMPRE=[["gen","ผู้ช่วยทั่วไป",["chat","queue","shop","staff"]],["fin","ผู้ช่วยการเงิน",["chat","finance"]],["own","ดูแลเต็มรูปแบบ",["owner"]]],
+var AP=null,PMS=[["chat","แชตกับลูกค้า"],["queue","คิวงาน"],["shop","ร้านนวด"],["org","หน่วยงานและบริษัท"],["staff","หมอนวด"],["finance","การเงิน"],["safety","รีวิวและความปลอดภัย"],["users","ผู้ใช้งานและประกาศ"]],
+PMPRE=[["gen","ผู้ช่วยทั่วไป",["chat","queue","shop","staff"]],["fin","ผู้ช่วยการเงิน",["finance"]],["own","ดูแลเต็มรูปแบบ",["owner"]]],
 TABA={sup:"chat",shop:"shop",org:"org",oreq:"org",comp:"org",staff:"staff",pprq:"finance",rp:"finance",fm:"finance",ppac:"owner",svc:"owner",cat:"owner",set:"owner",hl:"owner",ce:"owner",au:"owner",rvw:"safety",usr:"users",ann:"users"};
 function can(a){return !AP||AP.indexOf("owner")>-1||AP.indexOf(a)>-1}
-function tabOk(t){if(t==="pp")t=S.pps==="ac"?"ppac":"pprq";var a=TABA[t];return !a||can(a)}
+function supOk(){return can("chat")||can("shop")||can("finance")||can("staff")||can("org")}
+function tabOk(t){if(t==="sup")return supOk();if(t==="pp")t=S.pps==="ac"?"ppac":"pprq";var a=TABA[t];return !a||can(a)}
 function grpTabs(g){return (SUBM[g]||[]).filter(function(x){return tabOk(x[0])})}
 function navList(){return NAV.filter(function(x){return SUBM[x[0]]?grpTabs(x[0]).length>0:tabOk(x[0])})}
 function pmNames(p){p=p||[];if(p.indexOf("owner")>-1)return "แอดมินหลัก (ทำได้ทุกอย่าง)";return PMS.filter(function(x){return p.indexOf(x[0])>-1}).map(function(x){return x[1]}).join(", ")||"ยังไม่มีสิทธิ์"}
@@ -943,7 +944,7 @@ function post(){
    ผู้ใช้งาน ร้านนวด หมอนวด ทักมาจากหน้าติดต่อเราในแอปของตัวเอง แอดมินทุกคนเห็นห้องเดียวกัน ห้องที่ยังไม่ได้ตอบอยู่บนสุด ===== */
 var SUP={warn:"",hb:null,rooms:null,err:"",cur:null,msgs:[],ids:{},last:null,busy:false,sending:false,t:null,serr:""},SUPAPP={user:"ผู้ใช้งาน",shop:"ร้านนวด",staff:"หมอนวด"};
 function supPending(){return (SUP.rooms||[]).filter(function(r){return r.last_from==="user"}).length}
-function supLoad(){if(!can("chat")){SUP.rooms=[];return Promise.resolve()}return rpc("admin_support_rooms").then(function(a){SUP.rooms=a||[];SUP.err=""},function(e){if(SUP.rooms===null)SUP.err=errTh(e,"โหลดแชตไม่สำเร็จ")})}
+function supLoad(){if(!supOk()){SUP.rooms=[];return Promise.resolve()}return rpc("admin_support_rooms").then(function(a){SUP.rooms=a||[];SUP.err=""},function(e){if(SUP.rooms===null)SUP.err=errTh(e,"โหลดแชตไม่สำเร็จ")})}
 function supRoom(){return SUP.cur?(SUP.rooms||[]).filter(function(r){return r.user_id===SUP.cur.u&&r.app===SUP.cur.a})[0]||SUP.cur.r:null}
 function supMsg(m){var mine=m.sender_role==="admin",auto=m.sender_role==="auto";return '<div class="smsg'+(mine?" mine":auto?" auto":"")+'"><small>'+esc(mine?m.sender_name||"เจ้าหน้าที่":auto?"ข้อความตอบรับอัตโนมัติ":(SUP.cur&&SUP.cur.r.name)||"ผู้ใช้")+', '+ntAt(m.created_at)+'</small><p>'+esc(m.body).replace(/\n/g,"<br>")+'</p></div>'}
 function supView(){
@@ -954,7 +955,7 @@ function supView(){
  var L=SUP.rooms;
  return '<div class="head"><h1>แชตกับผู้ใช้</h1></div><p class="hint2">ผู้ใช้งาน ร้านนวด และหมอนวด ทักมาจากหน้าติดต่อเราในแอปของตัวเอง ห้องที่ยังไม่ได้ตอบอยู่บนสุด ระบบลบห้องที่ไม่มีข้อความใหม่ 6 เดือน</p>'+
   (SUP.err?'<div class="closed" role="alert">'+esc(SUP.err)+'</div>':L===null?'<p class="sub" role="status">กำลังโหลด</p>':!L.length?'<div class="empty">ยังไม่มีแชต</div>':
-  '<ul class="supr">'+L.map(function(r){var w=r.last_from==="user",n=+r.unread||0;var an=String(r.last_admin_name||"").replace(/^เจ้าหน้าที่\s*/,"");return '<li><button type="button" class="supb" data-a="supopen" data-id="'+esc(r.user_id)+'" data-t="'+esc(r.app)+'"><span class="qh"><b>'+esc(r.name||"ไม่มีชื่อ")+'</b><span class="tag">'+SUPAPP[r.app]+'</span>'+(w?'<span class="tag w">ยังไม่ได้ตอบ</span>':'')+(n?'<span class="tag w">ใหม่ '+n+'</span>':'')+(r.viewing_name?'<span class="tag">'+esc(r.viewing_name)+' กำลังดูอยู่</span>':'')+'</span><small>'+(w?"":"เจ้าหน้าที่: ")+esc(r.last_body||"")+'</small><small>'+(!w&&an&&r.last_admin_at?'ตอบแล้ว โดย '+esc(an)+', '+tdAgo(r.last_admin_at)+'ที่แล้ว':ntAt(r.last_at))+'</small></button></li>'}).join("")+'</ul>')}
+  '<ul class="supr">'+L.map(function(r){var w=r.last_from==="user",n=+r.unread||0;var an=String(r.last_admin_name||"").replace(/^เจ้าหน้าที่\s*/,"");return '<li><button type="button" class="supb" data-a="supopen" data-id="'+esc(r.user_id)+'" data-t="'+esc(r.app)+'"><span class="qh"><b>'+esc(r.name||"ไม่มีชื่อ")+'</b><span class="tag">'+SUPAPP[r.app]+'</span>'+(r.link?'<span class="tag">'+(r.link==="company"?"บริษัท":"หน่วยงาน")+'</span>':'')+(w?'<span class="tag w">ยังไม่ได้ตอบ</span>':'')+(n?'<span class="tag w">ใหม่ '+n+'</span>':'')+(r.viewing_name?'<span class="tag">'+esc(r.viewing_name)+' กำลังดูอยู่</span>':'')+'</span><small>'+(w?"":"เจ้าหน้าที่: ")+esc(r.last_body||"")+'</small><small>'+(!w&&an&&r.last_admin_at?'ตอบแล้ว โดย '+esc(an)+', '+tdAgo(r.last_admin_at)+'ที่แล้ว':ntAt(r.last_at))+'</small></button></li>'}).join("")+'</ul>')}
 function supFetch(){var c=SUP.cur;if(!c||SUP.busy&&SUP.msgs.length)return Promise.resolve();SUP.busy=true;
  return rpc("admin_support_messages",{p_user:c.u,p_app:c.a,p_after:SUP.last}).then(function(a){SUP.busy=false;if(SUP.cur!==c)return;var nw=(a||[]).filter(function(m){return !SUP.ids[m.id]});nw.forEach(function(m){SUP.ids[m.id]=1;SUP.msgs.push(m);SUP.last=m.created_at});
   var l=document.getElementById("supl");if(!c.shown){c.shown=true;draw();var h=document.getElementById("suph");if(h)h.focus();l=document.getElementById("supl");if(l)l.scrollTop=l.scrollHeight}
