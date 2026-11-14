@@ -97,7 +97,7 @@ await ctx.route('**/nominatim.openstreetmap.org/**',r=>{const u=new URL(r.reques
 await p.goto(URLF);
 ok('gate shows login',await has('เข้าสู่ระบบร้านค้า')&&!!(await p.$('#gph')));
 ok('main hidden at gate',await p.$eval('#main',e=>e.hidden));
-await p.click('[data-g=forgot]');ok('forgot -> contact association',(await txt('#gate')).includes('ติดต่อสมาคม'));
+await p.click('[data-g=forgot]');ok('forgot -> request form (call-back by staff)',(await txt('#gate')).includes('เจ้าหน้าที่จะโทรกลับเพื่อยืนยันตัวตน'));
 await p.click('[data-g=back]');
 await p.fill('#gph','0811111111');await p.fill('#gpw','wrong');await p.click('[data-g=login]');
 ok('wrong password message',await has('เบอร์มือถือหรือรหัสผ่านไม่ถูกต้อง'));

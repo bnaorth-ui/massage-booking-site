@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>สำหรับพนักงานนวด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="apple-mobile-web-app-title" content="หมอนวด"><meta name="app-version" content="1.18"><meta name="app-name" content="หมอนวด"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="apple-mobile-web-app-title" content="หมอนวด"><meta name="app-version" content="1.19"><meta name="app-name" content="หมอนวด"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -195,7 +195,9 @@ function pvBody(nm,tel){var L=function(a){return '<ul class="pvl">'+a.map(functi
   S2("การลบบัญชีพนักงาน",L(["กดปุ่ม &quot;ขอลบบัญชี&quot; ในเมนู &quot;บัญชี&quot; ได้ เมื่อไม่มีคิวที่ยังไม่เสร็จ แล้วร้านที่สังกัด (หรือสมาคม ถ้าเป็นพนักงานส่วนกลาง) จะตรวจสอบและอนุมัติ ยกเลิกคำขอได้ตราบที่ยังรออยู่","เมื่อลบแล้ว ชื่อ เบอร์โทร รูปโปรไฟล์ ข้อความแชต และการแจ้งเตือนของคุณถูกลบ และคุณจะไม่ปรากฏให้ลูกค้าเลือกจอง","คิวงาน รีวิว และยอดส่วนแบ่งที่ร้านใช้ทำรายงานยังอยู่ แต่ไม่ระบุว่าเป็นของคุณ"]))+
   S2("สิทธิ์ของคุณ",L(["ดูข้อมูลของตัวเอง เปลี่ยนรูปโปรไฟล์ และเปลี่ยนรหัสผ่านได้ในเมนู &quot;บัญชี&quot;","เปิดหรือปิดรับงาน และเลือกวันทำงานได้เอง","ปิดการแจ้งเตือนได้ในการตั้งค่าของมือถือ","ขอแก้ไขชื่อหรือเบอร์โทรได้โดยติดต่อสมาคม"]))+
   S2("ติดต่อเรา",'<p>'+esc(nm)+(tel?' โทร '+esc(tel):'')+'</p>')+'</div>'}
-function ctPub(){if(AG.ct===undefined&&!AG.ctL){AG.ctL=true;sbReq("/rest/v1/rpc/public_contact",{method:"POST",json:1,auth:false,body:"{}"}).then(function(j){AG.ct=j||null},function(){AG.ct=null}).then(function(){AG.ctL=false;if(AG.step==="pv")gateDraw()})}}
+function ctPub(){if(AG.ct===undefined&&!AG.ctL){AG.ctL=true;sbReq("/rest/v1/rpc/public_contact",{method:"POST",json:1,auth:false,body:"{}"}).then(function(j){AG.ct=j||null},function(){AG.ct=null}).then(function(){AG.ctL=false;if(AG.step==="pv"||AG.step==="fp"||AG.step==="fpok")gateDraw()})}}
+function mustPw(){var m=SBS&&SBS.user&&SBS.user.user_metadata;return !!(m&&m.must_change_pw)}
+function fmtTel(p){p=String(p||"");return /^0\d{9}$/.test(p)?p.slice(0,3)+"-"+p.slice(3,6)+"-"+p.slice(6):p}
 function gateDraw(){document.getElementById("hdr").innerHTML="";document.getElementById("nav").innerHTML="";document.getElementById("navb").style.display="none";
  var st=AG.step,h="",dv=function(k){return AG.d&&AG.d[k]?' value="'+esc(AG.d[k])+'"':""};if(!AG.d)AG.d={};
  var card=function(t,sub,body,links){return '<div class="agate"><h1>'+t+'</h1><p class="asub">'+sub+'</p>'+(AG.ok?'<div class="aok" role="status">'+esc(AG.ok)+'</div>':'')+'<form id="agf" novalidate>'+body+'<p class="aerr" id="aerr" role="alert">'+esc(AG.err)+'</p></form>'+(links||"")+'</div>'};
@@ -207,7 +209,16 @@ function gateDraw(){document.getElementById("hdr").innerHTML="";document.getElem
  if(st==="ins")h='<div class="agate"><div class="alinks"><button type="button" class="btn g" data-ins="skip">ใช้งานต่อโดยไม่ติดตั้ง</button></div>'+insBody()+'<button type="button" class="btn wide g" data-ins="skip">ใช้งานต่อโดยไม่ติดตั้ง</button></div>';
  if(st==="pv"){var pn=AG.ct&&AG.ct.name||"สมาคมวิทยากรฝึกอาชีพคนตาบอด";h='<div class="agate"><div class="alinks" style="text-align:left;margin:0 0 10px"><button type="button" class="btn g" data-ag="pvback">← กลับ</button></div><h1 id="pvt" tabindex="-1">นโยบายความเป็นส่วนตัว (พนักงาน)</h1>'+pvBody(pn,AG.ct&&AG.ct.phone)+'</div>';ctPub()}
  if(st==="tm"||st==="tmgate"){var tn=AG.ct&&AG.ct.name||(typeof CT!=="undefined"&&CT&&CT.name)||"สมาคมวิทยากรฝึกอาชีพคนตาบอด";h='<div class="agate">'+(st==="tm"?'<div class="alinks" style="text-align:left;margin:0 0 10px"><button type="button" class="btn g" data-ag="tmback">← กลับ</button></div>':'')+'<h1 id="'+(st==="tmgate"?"tmgt":"tmt")+'" tabindex="-1">เงื่อนไขการใช้งาน (หมอนวด)</h1>'+(st==="tmgate"?'<div class="flash">กรุณาอ่านและกดยอมรับเงื่อนไขการใช้งาน เพื่อใช้งานต่อ</div>':'')+tmBody(tn)+(st==="tmgate"?'<p class="aerr" id="aerr" role="alert">'+esc(AG.err)+'</p><button type="button" class="btn wide" data-ag="tmacc" id="tmacc">ยอมรับเงื่อนไขการใช้งาน</button><div class="alinks"><button type="button" class="btn g" data-ag="pv">อ่านนโยบายความเป็นส่วนตัว</button> <button type="button" class="btn g" data-ag="logout">ออกจากระบบ</button></div>':'')+'</div>';if(st==="tm")ctPub()}
- if(st==="fp")h='<div class="agate"><h1>ลืมรหัสผ่าน</h1><p class="asub">ยังไม่มีการส่ง SMS รีเซ็ตรหัสผ่านอัตโนมัติ ให้ติดต่อเจ้าหน้าที่ระบบหรือเจ้าของร้านที่สังกัด เพื่อให้ช่วยตั้งรหัสผ่านใหม่ให้</p><div class="alinks"><button type="button" class="btn g" data-ag="login">กลับไปเข้าสู่ระบบ</button></div></div>';
+ if(st==="fp"||st==="fpok"){ctPub();var ct=AG.ct,tel=ct&&String(ct.phone||"").replace(/[^0-9+]/g,"");
+  var call='<p class="asub">หรือให้เจ้าของร้านที่สังกัดช่วยตั้งรหัสผ่านใหม่ให้</p>'+(tel?'<p class="asub" style="margin-top:14px">ต้องการคุยกับเจ้าหน้าที่ทันที</p><a class="btn wide g" href="tel:'+esc(tel)+'">โทรหาเจ้าหน้าที่ '+esc(ct.phone)+'</a>':(AG.ctL?'<p class="asub" role="status">กำลังโหลดช่องทางติดต่อ…</p>':''))+(ct&&ct.hours?'<p class="asub">เวลาทำการ: '+esc(ct.hours)+'</p>':'');
+  if(st==="fp")h='<div class="agate"><h1 id="fph" tabindex="-1">ลืมรหัสผ่าน</h1><p class="asub">กรอกชื่อ นามสกุล และเบอร์มือถือที่ใช้สมัคร เจ้าหน้าที่จะโทรกลับเพื่อยืนยันตัวตน แล้วแจ้งรหัสผ่านชั่วคราวทางโทรศัพท์</p><form id="agf" novalidate>'+
+   afld("ffn","ชื่อ","text",'autocomplete="given-name"')+afld("fln","นามสกุล","text",'autocomplete="family-name"')+afld("fph2","เบอร์มือถือ","tel",'inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="0812345678"')+
+   '<p class="aerr" id="aerr" role="alert">'+esc(AG.err)+'</p>'+btn("ขอรหัสผ่านใหม่")+'</form>'+call+'<div class="alinks"><button type="button" class="btn g" data-ag="login">กลับไปเข้าสู่ระบบ</button></div></div>';
+  else h='<div class="agate"><h1 id="fph" tabindex="-1">ส่งคำขอแล้ว</h1><p>เจ้าหน้าที่จะโทรกลับที่เบอร์ '+esc(fmtTel(AG.fpPh))+' ในเวลาทำการ'+(ct&&ct.hours?' ('+esc(ct.hours)+')':'')+'</p>'+
+   '<p class="asub">เจ้าหน้าที่จะไม่ขอรหัสผ่านเดิม หรือรหัสใดๆ ที่ส่งมาทางข้อความจากคุณ</p><p class="asub">เมื่อได้รหัสชั่วคราวแล้ว ให้เข้าสู่ระบบ ระบบจะให้ตั้งรหัสผ่านใหม่ของคุณทันที</p><div class="alinks"><button type="button" class="btn g" data-ag="login">กลับไปเข้าสู่ระบบ</button></div></div>'}
+ if(st==="npw")h='<div class="agate"><h1 id="fph" tabindex="-1">ตั้งรหัสผ่านใหม่ของคุณ</h1><p class="asub">คุณเข้าสู่ระบบด้วยรหัสผ่านชั่วคราวจากเจ้าหน้าที่ กรุณาตั้งรหัสผ่านใหม่ที่คุณจำได้ก่อนใช้งาน</p><form id="agf" novalidate>'+
+   afld("npw1","รหัสผ่านใหม่ (อย่างน้อย 6 ตัวอักษร)","password",'autocomplete="new-password"')+afld("npw2","ยืนยันรหัสผ่านใหม่","password",'autocomplete="new-password"')+
+   '<p class="aerr" id="aerr" role="alert">'+esc(AG.err)+'</p>'+btn("บันทึกรหัสผ่านใหม่")+'</form><div class="alinks"><button type="button" class="btn g" data-ag="logout">ออกจากระบบ</button></div></div>';
  if(st==="denied")h='<div class="agate"><h1>บัญชีนี้ยังไม่ผูกกับพนักงาน</h1><p class="asub">เข้าสู่ระบบสำเร็จ แต่ไม่พบพนักงานที่ใช้เบอร์มือถือเดียวกับบัญชีนี้ ให้ร้านหรือแอดมินบันทึกพนักงานด้วยเบอร์เดียวกัน (ที่เมนูพนักงาน) แล้วออกจากระบบและเข้าใหม่อีกครั้ง</p><div class="alinks"><button type="button" class="btn" data-ag="retry">ตรวจสอบอีกครั้ง</button> <button type="button" class="btn g" data-ag="logout">ออกจากระบบ</button></div></div>';
  if(st==="loaderr")h='<div class="agate"><h1>โหลดข้อมูลไม่สำเร็จ</h1><p class="aerr" role="alert">'+esc(AG.err)+'</p><div class="alinks"><button type="button" class="btn" data-ag="retry">ลองใหม่</button> <button type="button" class="btn g" data-ag="logout">ออกจากระบบ</button></div></div>';
  if(st==="apply")h=apHtml();
@@ -215,9 +226,21 @@ function gateDraw(){document.getElementById("hdr").innerHTML="";document.getElem
  document.querySelectorAll("[data-ag]").forEach(function(e){e.onclick=function(){var a=e.dataset.ag;AG.err="";if(a==="logout"){doLogout();return}if(a==="retry"){enter();return}if(a==="tm"||a==="pv"){AG.back=st;if(st==="reg")AG.d={fn:gv("rfn"),ln:gv("rln"),ph:AG.join?"":gv("rph"),pw:gv("rpw"),pw2:gv("rpw2"),pv:!!(document.getElementById("rpv")||{}).checked};AG.step=a;gateDraw();var tp=document.getElementById(a==="tm"?"tmt":"pvt");if(tp)tp.focus();return}if(a==="pvback"||a==="tmback"){AG.step=AG.back||"login";gateDraw();return}if(a==="tmacc"){if(S.busy)return;S.busy=true;e.disabled=true;tmAccept().then(function(){S.busy=false;startMain();csAnn("ยอมรับเงื่อนไขการใช้งานแล้ว")},function(x){S.busy=false;e.disabled=false;var r=document.getElementById("aerr");if(r)r.textContent=errTh(x,"บันทึกไม่สำเร็จ ลองใหม่อีกครั้ง")});return}AG.step=a;gateDraw()}});
  document.querySelectorAll("[data-ins]").forEach(function(e){e.onclick=function(){if(e.dataset.ins==="go"){insGo();return}if(e.dataset.ins==="copy"){insCopy();return}if(e.dataset.ins==="open"){insOpen();return}wr("insSeen",true);AG.err="";AG.step=AG.join?"reg":"login";gateDraw()}});
  if(st==="ins"&&!INS.fd){INS.fd=true;var ti=document.getElementById("inst");if(ti)ti.focus()}
+ if((st==="fpok"||st==="npw")&&AG.fpFocus!==st){AG.fpFocus=st;var fh=document.getElementById("fph");if(fh)fh.focus()}else if(st!=="fpok"&&st!=="npw")AG.fpFocus=null;
  var f=document.getElementById("agf");if(f)f.onsubmit=function(ev){ev.preventDefault();gateSubmit(st)};if(st==="apply")apBind()}
 function busy(b){S.busy=b;var x=document.querySelector("#agf button[type=submit]");if(x)x.disabled=b}
 function gateSubmit(st){if(S.busy)return;
+ if(st==="fp"){var ffn=gv("ffn").trim(),fln=gv("fln").trim(),fp=phoneN(gv("fph2"));
+  if(!ffn||!fln){gerr("กรุณากรอกชื่อและนามสกุล");return}
+  if(!/^0\d{9}$/.test(fp)){gerr("กรุณากรอกเบอร์มือถือ 10 หลัก ขึ้นต้นด้วย 0");return}
+  busy(true);gerr("");
+  sbReq("/rest/v1/rpc/request_password_reset",{method:"POST",json:1,auth:false,body:JSON.stringify({p_first:ffn,p_last:fln,p_phone:fp,p_app:"staff"})}).then(function(){busy(false);AG.fpPh=fp;AG.step="fpok";gateDraw()},function(e){busy(false);gerr(errTh(e,"ส่งคำขอไม่สำเร็จ ลองใหม่อีกครั้ง"))});return}
+ if(st==="npw"){var n1=gv("npw1"),n2=gv("npw2");
+  if(n1.length<6){gerr("รหัสผ่านใหม่ต้องมีอย่างน้อย 6 ตัวอักษร");return}
+  if(n1!==n2){gerr("รหัสผ่านทั้งสองช่องไม่ตรงกัน");return}
+  busy(true);gerr("");
+  sbApi("/auth/v1/user",{method:"PUT",json:1,body:JSON.stringify({password:n1,data:{must_change_pw:false}})}).then(function(u){busy(false);if(u&&u.id&&SBS){SBS.user=u;sbSave(SBS)}return enter()})
+  .catch(function(e){busy(false);gerr(e.code==="same_password"?"รหัสผ่านใหม่ต้องไม่ซ้ำกับรหัสชั่วคราว":errTh(e,"บันทึกรหัสผ่านไม่สำเร็จ ลองใหม่อีกครั้ง"))});return}
  if(st==="login"){var ph=phoneN(gv("lph")),pw=gv("lpw"),now=Date.now();
   if(now<AG.lock){gerr("กรอกผิดหลายครั้ง กรุณารอ "+Math.ceil((AG.lock-now)/1000)+" วินาที แล้วลองใหม่");return}
   if(!/^0\d{9}$/.test(ph)||!pw){gerr("กรอกเบอร์มือถือ 10 หลักและรหัสผ่าน");return}
@@ -295,7 +318,7 @@ function apSend(){apCollect();var d=AP.d,er="";if(AP.busy)return;
  var p={full_name:d.name.trim(),nickname:d.nick,phone:d.phone,line_id:d.line,province:d.prov,amphoe:d.amp,tambon:d.tmb,address:d.addr.trim(),experience:d.exp,course:d.course,course_other:d.co,has_disability_card:d.dc==="y",has_hss_reg:d.hr==="y",work_history:d.wh,weekdays:d.wd,travel:d.tr,note:d.note,source:d.src,consent:"true"};
  rpc("staff_application_submit",{p_posting:APPLY,p:p}).then(function(){AP.busy=false;AP.done=true;AP.d=null;apNew();AP.flash="ส่งใบสมัครแล้ว ทีมงานจะติดต่อกลับทางเบอร์โทรที่ให้ไว้";return rpc("my_staff_applications").then(function(r){AP.list=r||[]},function(){}).then(function(){AG.step="apply";gateDraw();var t=document.getElementById("apt");if(t)t.focus()})},function(e){AP.busy=false;AP.err=errTh(e,"ส่งใบสมัครไม่สำเร็จ");gateDraw()})}
 var timer=null;
-function enter(){AG.d=null;AG.step="load";S.busy=false;gateDraw();
+function enter(){AG.d=null;S.busy=false;if(mustPw()){AG.err="";AG.step="npw";gateDraw();return Promise.resolve()}AG.step="load";gateDraw();
  return loadAll().then(function(ok){if(!ok){return rpc("my_staff_applications").catch(function(){return[]}).then(function(l){if(APPLY||(l&&l.length)){AP.list=l||[];AP.fd=false;AG.step="apply";gateDraw();return apInit()}AG.step="denied";gateDraw()})}return tmNeed().then(function(n){if(n){AG.step="tmgate";gateDraw();var t=document.getElementById("tmgt");if(t)t.focus();return}startMain()})}).catch(function(e){if(e&&(e.status===401||e.message==="NOSESS")){doLogout();return}AG.err=errTh(e,"โหลดข้อมูลไม่สำเร็จ");AG.step="loaderr";gateDraw()})}
 function startMain(){if(!S.hv)S.hv=ogPend()>0?"og":coPend()>0?"co":"cu";document.getElementById("navb").style.display="";if(S.tab==="nt")openNt();draw();
  if(!timer){timer=setInterval(refresh,20000);document.addEventListener("visibilitychange",function(){if(!document.hidden)refresh()})}}

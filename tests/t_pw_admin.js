@@ -104,9 +104,9 @@ await p.fill('#usq','081');await p.click('[data-a=usfind]');await p.waitForTimeo
 await p.click('[data-a=uspick][data-id=x1]');await p.waitForTimeout(200);
 ok('form shown + focus',await p.evaluate(()=>document.activeElement.id==='uspw')&&(await p.textContent('#main')).includes('0812345678'));
 await p.fill('#uspw','abc');await p.click('[data-a=usask]');await p.waitForTimeout(150);
-ok('short pw error',(await p.textContent('#main')).includes('อย่างน้อย 8')&&!(await p.$('[data-a=usgo]')));
+ok('short pw error (min 6)',(await p.textContent('#main')).includes('อย่างน้อย 6')&&!(await p.$('[data-a=usgo]')));
 await p.click('[data-a=usgen]');await p.waitForTimeout(150);const gp=await p.inputValue('#uspw');
-ok('random pw 8 chars',/^[a-z2-9]{8}$/.test(gp));
+ok('random pw = 6 digits',/^[0-9]{6}$/.test(gp));
 await p.fill('#uspw','Temp12345');
 await p.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));await p.waitForTimeout(600);
 ok('typed pw survives bg refresh',(await p.inputValue('#uspw'))==='Temp12345');
@@ -116,7 +116,7 @@ await p.click('[data-a=usno]');await p.waitForTimeout(100);ok('no -> back to for
 await p.click('[data-a=usask]');await p.click('[data-a=usgo]');await p.waitForTimeout(700);
 ok('payload',resets.length===1&&resets[0].p_user==='x1'&&resets[0].p_password==='Temp12345');
 t=await p.textContent('#main');
-ok('shows temp pw once + instructions',t.includes('Temp12345')&&t.includes('เปลี่ยนรหัสผ่านเองที่หน้าบัญชี'));
+ok('shows temp pw once + instructions',t.includes('Temp12345')&&t.includes('ระบบจะให้ตั้งรหัสผ่านใหม่ของตัวเองทันที'));
 ok('history updated',t.includes('สมชาย ใจดี')&&t.includes('ตั้งโดย แอดมิน หนึ่ง'));
 await p.click('[data-a=usdone]');await p.waitForTimeout(200);t=await p.textContent('#main');
 ok('pw gone after done',!t.includes('Temp12345'));

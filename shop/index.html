@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>สำหรับร้านนวด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.18"><meta name="app-name" content="ร้านนวด"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.19"><meta name="app-name" content="ร้านนวด"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -153,7 +153,9 @@ function pvBody(nm,tel){var L=function(a){return '<ul class="pvl">'+a.map(functi
   S2("การปิดบัญชีร้าน",L(["ร้านลบบัญชีเองทันทีไม่ได้ เพราะเกี่ยวข้องกับกระเป๋าเงินและยอดค้างชำระ","ขอปิดบัญชีได้ที่ ตั้งค่าร้าน > ปิดบัญชีร้าน แล้วสมาคมจะตรวจสอบและอนุมัติ โดยต้องไม่มียอดค้างชำระและไม่มีการจองที่ยังไม่เสร็จสิ้น","เมื่อปิดบัญชี ร้านจะไม่แสดงให้ลูกค้าเห็น ข้อมูลทางการเงินเก็บตามที่ระบุข้างต้น"]))+
   S2("สิทธิ์ของร้าน",L(["ดูและแก้ไขข้อมูลร้านได้เองในหน้า &quot;ตั้งค่าร้าน&quot; ส่วนข้อมูลที่แก้เองไม่ได้ (เช่น เบอร์มือถือเข้าสู่ระบบ) ติดต่อสมาคม","ขอให้ลบหรือแก้ไขข้อมูลอื่นได้โดยติดต่อสมาคม"]))+
   S2("ติดต่อเรา",'<p>'+esc(nm)+(tel?' โทร '+esc(tel):' (เบอร์โทรดูได้หลังเข้าสู่ระบบ)')+'</p>')+'</div>'}
-function ctLoad(){if(G.ct===undefined&&!G.ctL){G.ctL=true;sbReq("/rest/v1/rpc/public_contact",{method:"POST",json:1,auth:false,body:"{}"}).then(function(j){G.ct=j||null},function(){G.ct=null}).then(function(){G.ctL=false;if(G.mode==="forgot"||G.mode==="pv")gRender()})}}
+function ctLoad(){if(G.ct===undefined&&!G.ctL){G.ctL=true;sbReq("/rest/v1/rpc/public_contact",{method:"POST",json:1,auth:false,body:"{}"}).then(function(j){G.ct=j||null},function(){G.ct=null}).then(function(){G.ctL=false;if(G.mode==="forgot"||G.mode==="fpok"||G.mode==="pv")gRender()})}}
+function mustPw(){var m=SBS&&SBS.user&&SBS.user.user_metadata;return !!(m&&m.must_change_pw)}
+function fmtTel(p){p=String(p||"");return /^0\d{9}$/.test(p)?p.slice(0,3)+"-"+p.slice(3,6)+"-"+p.slice(6):p}
 var GPREG=10;
 function regDraft(){return{rn:val("rn"),rc:val("rc"),rph:val("rph"),rpw:val("rpw"),rpw2:val("rpw2"),rpv:!!(document.getElementById("rpv")||{}).checked,rgp:!!(document.getElementById("rgp")||{}).checked}}
 function errBox(){return'<div id="gerr" role="alert" style="color:var(--bad);min-height:1.4em;margin-bottom:8px">'+esc(G.err)+'</div>'}
@@ -213,10 +215,16 @@ function gRender(){var h=gateTitle();
  else if(G.mode==="loaderr")h+='<div class="card form"><b>โหลดข้อมูลไม่สำเร็จ</b><div role="alert" style="color:var(--bad)">'+esc(G.err)+'</div><button type="button" class="btn" data-g="retry">ลองใหม่</button><button type="button" class="btn g" data-g="logout">ออกจากระบบ</button></div>';
  else if(G.mode==="in"){if(G.ok)h+='<div class="saved" role="status">'+esc(G.ok)+'</div>';
   h+=field("gph","เบอร์มือถือ","tel",'inputmode="numeric" maxlength="10" autocomplete="username" placeholder="0812345678" value="'+esc(G.ph)+'"')+field("gpw","รหัสผ่าน","password",'autocomplete="current-password"')+errBox()+'<button type="button" class="btn" data-g="login" style="width:100%"'+(G.busy?' disabled':'')+'>เข้าสู่ระบบ</button><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px"><button type="button" class="btn g" data-g="forgot">ลืมรหัสผ่าน</button><button type="button" class="btn g" data-g="reg">ลงทะเบียนร้านนวดใหม่</button><button type="button" class="btn g" data-g="pv">นโยบายความเป็นส่วนตัว</button><button type="button" class="btn g" data-g="tm">เงื่อนไขการใช้งาน</button>'+(insKind()?'<button type="button" class="btn g" data-g="ins">วิธีติดตั้งแอปไว้ที่หน้าจอโฮม</button>':"")+'</div>'}
- else if(G.mode==="forgot"){var ct=G.ct,tel=ct&&String(ct.phone||"").replace(/[^0-9+]/g,"");
-  h+='<div class="card form"><b>ลืมรหัสผ่าน</b><p class="hint2" style="margin:0">ระบบยังไม่มีการรีเซ็ตรหัสผ่านอัตโนมัติ กรุณาติดต่อ'+esc(ct&&ct.name||"สมาคมวิทยากรฝึกอาชีพคนตาบอด")+' เจ้าหน้าที่จะสอบถามข้อมูลเพื่อยืนยันตัวตนก่อน แล้วตั้งรหัสผ่านชั่วคราวให้</p>'+
-   (tel?'<a class="btn" href="tel:'+esc(tel)+'" style="text-align:center;text-decoration:none">โทร '+esc(ct.phone)+'</a>':'')+(ct&&ct.hours?'<p class="hint2" style="margin:0">เวลาทำการ: '+esc(ct.hours)+'</p>':(G.ctL?'<p class="hint2" style="margin:0" role="status">กำลังโหลดช่องทางติดต่อ…</p>':''))+
-   '<p class="hint2" style="margin:0">หลังได้รหัสชั่วคราว ให้เข้าสู่ระบบ แล้วเปลี่ยนรหัสผ่านเองทันทีที่ &quot;จัดการร้าน&quot; &gt; &quot;ตั้งค่าร้าน&quot; &gt; &quot;เปลี่ยนรหัสผ่าน&quot;</p></div><div style="text-align:center;margin-top:14px"><button type="button" class="btn g" data-g="back">กลับไปหน้าเข้าสู่ระบบ</button></div>'}
+ else if(G.mode==="forgot"||G.mode==="fpok"){var ct=G.ct,tel=ct&&String(ct.phone||"").replace(/[^0-9+]/g,"");
+  var call=(tel?'<p class="hint2" style="margin:8px 0 0">ต้องการคุยกับเจ้าหน้าที่ทันที</p><a class="btn g" href="tel:'+esc(tel)+'" style="text-align:center;text-decoration:none">โทรหาเจ้าหน้าที่ '+esc(ct.phone)+'</a>':(G.ctL?'<p class="hint2" style="margin:0" role="status">กำลังโหลดช่องทางติดต่อ…</p>':''))+(ct&&ct.hours?'<p class="hint2" style="margin:0">เวลาทำการ: '+esc(ct.hours)+'</p>':'');
+  if(G.mode==="forgot")h+='<div class="card form"><h2 id="fph" tabindex="-1" style="margin:0;font-size:1.15rem">ลืมรหัสผ่าน</h2><p class="hint2" style="margin:0">กรอกชื่อ นามสกุล และเบอร์มือถือที่ใช้สมัคร เจ้าหน้าที่จะโทรกลับเพื่อยืนยันตัวตน แล้วแจ้งรหัสผ่านชั่วคราวทางโทรศัพท์</p>'+
+   field("ffn","ชื่อ","text",'autocomplete="given-name"')+field("fln","นามสกุล","text",'autocomplete="family-name"')+field("fph2","เบอร์มือถือ","tel",'inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="0812345678"')+errBox()+
+   '<button type="button" class="btn" data-g="fpsend"'+(G.busy?' disabled':'')+'>ขอรหัสผ่านใหม่</button>'+call+'</div><div style="text-align:center;margin-top:14px"><button type="button" class="btn g" data-g="back">กลับไปหน้าเข้าสู่ระบบ</button></div>';
+  else h+='<div class="card form"><h2 id="fph" tabindex="-1" style="margin:0;font-size:1.15rem">ส่งคำขอแล้ว</h2><p style="margin:0">เจ้าหน้าที่จะโทรกลับที่เบอร์ '+esc(fmtTel(G.fpPh))+' ในเวลาทำการ'+(ct&&ct.hours?' ('+esc(ct.hours)+')':'')+'</p>'+
+   '<p class="hint2" style="margin:0">เจ้าหน้าที่จะไม่ขอรหัสผ่านเดิม หรือรหัสใดๆ ที่ส่งมาทางข้อความจากคุณ</p><p class="hint2" style="margin:0">เมื่อได้รหัสชั่วคราวแล้ว ให้เข้าสู่ระบบ ระบบจะให้ตั้งรหัสผ่านใหม่ของคุณทันที</p></div><div style="text-align:center;margin-top:14px"><button type="button" class="btn g" data-g="back">กลับไปหน้าเข้าสู่ระบบ</button></div>'}
+ else if(G.mode==="npw"){h='<div class="card form"><h1 id="fph" tabindex="-1" style="margin:0;font-size:1.3rem">ตั้งรหัสผ่านใหม่ของคุณ</h1><p class="hint2" style="margin:0">คุณเข้าสู่ระบบด้วยรหัสผ่านชั่วคราวจากเจ้าหน้าที่ กรุณาตั้งรหัสผ่านใหม่ที่คุณจำได้ก่อนใช้งาน</p>'+
+   field("npw1","รหัสผ่านใหม่ (อย่างน้อย 6 ตัวอักษร)","password",'autocomplete="new-password"')+field("npw2","ยืนยันรหัสผ่านใหม่","password",'autocomplete="new-password"')+errBox()+
+   '<button type="button" class="btn" data-g="npwsave"'+(G.busy?' disabled':'')+'>บันทึกรหัสผ่านใหม่</button></div><div style="text-align:center;margin-top:14px"><button type="button" class="btn g" data-g="logout">ออกจากระบบ</button></div>'}
  else if(G.mode==="pv"){var pn=G.ct&&G.ct.name||"สมาคมวิทยากรฝึกอาชีพคนตาบอด";h+='<div style="margin-bottom:10px"><button type="button" class="btn g" data-g="pvback">← กลับ</button></div><div class="card"><h1 id="pvt" tabindex="-1" style="font-size:1.3rem;margin:0 0 8px">นโยบายความเป็นส่วนตัว (ร้านค้า)</h1>'+pvBody(pn,G.ct&&G.ct.phone)+'</div>'}
  else if(G.mode==="tm"||G.mode==="tmgate"){var tn=G.ct&&G.ct.name||(typeof CT!=="undefined"&&CT&&CT.name)||"สมาคมวิทยากรฝึกอาชีพคนตาบอด";h+=(G.mode==="tm"?'<div style="margin-bottom:10px"><button type="button" class="btn g" data-g="tmback">← กลับ</button></div>':'')+'<div class="card"><h1 id="'+(G.mode==="tmgate"?"tmgt":"tmt")+'" tabindex="-1" style="font-size:1.3rem;margin:0 0 8px">เงื่อนไขการใช้งาน (ร้านนวด)</h1>'+(G.mode==="tmgate"?'<div class="flash">กรุณาอ่านและกดยอมรับเงื่อนไขการใช้งาน เพื่อใช้งานต่อ</div>':'')+tmBody(tn)+'</div>'+(G.mode==="tmgate"?errBox()+'<div class="card form"><button type="button" class="btn" data-g="tmacc" id="tmacc"'+(G.busy?' disabled':'')+'>ยอมรับเงื่อนไขการใช้งาน</button><button type="button" class="btn g" data-g="pv">อ่านนโยบายความเป็นส่วนตัว</button><button type="button" class="btn g" data-g="logout">ออกจากระบบ</button></div>':'')}
  else if(G.mode==="reg")h+=regForm(false);
@@ -226,6 +234,7 @@ function gRender(){var h=gateTitle();
    (r.status==="pending"?'<button type="button" class="btn" data-g="retry">ตรวจสอบสถานะ</button>':'<button type="button" class="btn" data-g="reg2">ลงทะเบียนใหม่</button>')+'<button type="button" class="btn g" data-g="logout">ออกจากระบบ</button></div>'+(r.status==="pending"&&insKind()?'<div class="card" id="insbox">'+insBody(true)+'</div>':'')}
  box.innerHTML=h;
  if(G.mode==="pv"){var tp=document.getElementById("pvt");if(tp)tp.focus()}
+ if((G.mode==="fpok"||G.mode==="npw")&&G.fpFocus!==G.mode){G.fpFocus=G.mode;var fh=document.getElementById("fph");if(fh)fh.focus()}else if(G.mode!=="fpok"&&G.mode!=="npw")G.fpFocus=null;
  if((G.mode==="tm"||G.mode==="tmgate")&&!G.busy){var tt=document.getElementById(G.mode==="tmgate"?"tmgt":"tmt");if(tt)tt.focus()}
  if(G.draft&&(G.mode==="reg"||G.mode==="reg2")){var d=G.draft;["rn","rc","rph","rpw","rpw2"].forEach(function(k){var e=document.getElementById(k);if(e&&d[k]!=null&&d[k]!=="")e.value=d[k]});var cb=document.getElementById("rpv");if(cb)cb.checked=!!d.rpv;var cg=document.getElementById("rgp");if(cg)cg.checked=!!d.rgp;G.draft=null}}
 function gMode(m){G.mode=m;G.err="";gRender()}
@@ -239,7 +248,7 @@ document.addEventListener("change",function(e){var t=e.target;if(!t||!t.files||!
 function loadCats(){if(G.cats)return Promise.resolve();return sbReq("/rest/v1/categories?select=id,name&kind=eq.shop&active=eq.true&order=created_at",{auth:false}).then(function(a){G.cats=a||[]},function(){G.cats=[]})}
 function whoAmI(){var u=SBS.user,m=u.user_metadata||{};WHO={id:u.id,phone:m.phone||""}}
 /* หลังเข้าสู่ระบบ: ดูว่าเป็นเจ้าของร้านที่อนุมัติแล้วหรือยัง */
-function afterLogin(){showGate(true);G.mode="load";G.err="";gRender();whoAmI();
+function afterLogin(){showGate(true);if(mustPw()){G.busy=false;gMode("npw");return Promise.resolve()}G.mode="load";G.err="";gRender();whoAmI();
  return sbApi("/rest/v1/shop_members?select=place_id&user_id=eq."+WHO.id+"&limit=1").then(function(m){
   if(m&&m[0]){return loadShop(m[0].place_id).then(function(){return tmNeed()}).then(function(n){if(n){gMode("tmgate");return}showGate(false);startMain()})}
   return sbApi("/rest/v1/shop_registrations?select=*&owner_user_id=eq."+WHO.id+"&order=created_at.desc&limit=1").then(function(r){
@@ -266,6 +275,19 @@ document.addEventListener("click",function(e){var el=e.target.closest&&e.target.
  if(a==="ins"){INS.fd=false;gMode("ins");return}
  if(a==="logout"){doLogout();return}
  if(a==="retry"){afterLogin();return}
+ if(a==="fpsend"){if(G.busy)return;var ffn=val("ffn").trim(),fln=val("fln").trim(),fp=val("fph2").replace(/[\s-]/g,"");
+  var fe=function(t){G.err=t;var x=document.getElementById("gerr");if(x)x.textContent=t};
+  if(!ffn||!fln){fe("กรุณากรอกชื่อและนามสกุล");return}
+  if(!/^0\d{9}$/.test(fp)){fe("กรุณากรอกเบอร์มือถือ 10 หลัก ขึ้นต้นด้วย 0");return}
+  G.busy=true;fe("");el.disabled=true;
+  sbReq("/rest/v1/rpc/request_password_reset",{method:"POST",json:1,auth:false,body:JSON.stringify({p_first:ffn,p_last:fln,p_phone:fp,p_app:"shop"})}).then(function(){G.busy=false;G.fpPh=fp;gMode("fpok")},function(e){G.busy=false;el.disabled=false;fe(errTh(e,"ส่งคำขอไม่สำเร็จ ลองใหม่อีกครั้ง"))});return}
+ if(a==="npwsave"){if(G.busy)return;var n1=val("npw1"),n2=val("npw2");
+  var ne=function(t){G.err=t;var x=document.getElementById("gerr");if(x)x.textContent=t};
+  if(n1.length<6){ne("รหัสผ่านใหม่ต้องมีอย่างน้อย 6 ตัวอักษร");return}
+  if(n1!==n2){ne("รหัสผ่านทั้งสองช่องไม่ตรงกัน");return}
+  G.busy=true;ne("");el.disabled=true;
+  sbApi("/auth/v1/user",{method:"PUT",json:1,body:JSON.stringify({password:n1,data:{must_change_pw:false}})}).then(function(u){G.busy=false;if(u&&u.id&&SBS){SBS.user=u;sbSave(SBS)}return afterLogin()})
+  .catch(function(e){G.busy=false;el.disabled=false;ne(e.code==="same_password"?"รหัสผ่านใหม่ต้องไม่ซ้ำกับรหัสชั่วคราว":errTh(e,"บันทึกรหัสผ่านไม่สำเร็จ ลองใหม่อีกครั้ง"))});return}
  if(a==="login"){var ph=val("gph").replace(/[\s-]/g,""),pw=val("gpw");G.ph=ph;
   if(Date.now()<G.lock){G.err="ลองผิดหลายครั้ง กรุณารอ "+Math.ceil((G.lock-Date.now())/1000)+" วินาที";gRender();return}
   if(!/^0\d{9}$/.test(ph)||!pw){G.err="กรุณากรอกเบอร์มือถือ 10 หลักและรหัสผ่าน";gRender();return}

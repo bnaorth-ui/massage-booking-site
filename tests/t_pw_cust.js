@@ -80,10 +80,10 @@ await p.waitForSelector('#lph');
 // forgot password page
 await p.click('[data-ag=fp]');await p.waitForTimeout(500);
 let t=await A();
-ok('fp: name+hours',t.includes('สมาคมทดสอบ')&&t.includes('จ-ศ 9-17'));
+ok('fp: hours + call button',t.includes('จ-ศ 9-17')&&t.includes('โทรหาเจ้าหน้าที่'));
 ok('fp: tel link',await p.evaluate(()=>{const a=document.querySelector('a[href^="tel:"]');return !!a&&a.getAttribute('href')==='tel:021234567'}));
 ok('fp: no LINE link (replaced by in-app chat, 13 Nov)',await p.evaluate(()=>!document.querySelector('a[href*="line.me"]')));
-ok('fp: verify + change text',t.includes('ยืนยันตัวตน')&&t.includes('เปลี่ยนรหัสผ่าน'));
+ok('fp: verify + temp password text',t.includes('ยืนยันตัวตน')&&t.includes('รหัสผ่านชั่วคราว'));
 await p.click('[data-ag=login]');
 await p.fill('#lph','0811111111');await p.fill('#lpw','abc123');await p.click('button[type=submit]');await p.waitForSelector('[data-pl]',{timeout:4000});
 await p.click('[data-tab="ac"]');await p.waitForTimeout(300);

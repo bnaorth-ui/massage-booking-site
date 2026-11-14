@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>แอดมิน - สมาคมวิทยากรฝึกอาชีพคนตาบอด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.25"><meta name="app-name" content="สำหรับแอดมิน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.26"><meta name="app-name" content="สำหรับแอดมิน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -422,6 +422,7 @@ function todoItems(){var L=[];function add(k,ic,txt,n,unit,old,tab,urgH){if(!n)r
  var tp=(D.tp||[]).filter(function(x){return x.st==="pending"});add("tp","💰","เติมเงินรอยืนยัน",tp.length,"รายการ",tdOld(tp,"at"),"pprq",2);
  var sr=(SUP.rooms||[]).filter(function(r){return r.last_from==="user"});add("sup","💬","แชตยังไม่ได้ตอบ",sr.length,"ห้อง",tdOld(sr,"last_at"),"sup",2);
  var qn=(D.bk||[]).filter(function(b){return qCat(b)==="new"});if(qn.length){var f=tdOld(qn,"starts_at");L.push({k:"q",ic:"🗓️",txt:"คิวงานใหม่ ยังไม่มีพนักงานกดรับ "+qn.length+" งาน",sub:f?"งานแรกเริ่ม "+new Date(f).toLocaleString("th-TH",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit",timeZone:"Asia/Bangkok"})+" น.":"",late:false,tab:"q"})}
+ var pq=PR.list||[];add("pw","🔑","คำขอรหัสผ่านใหม่",pq.length,"รายการ",tdOld(pq,"created_at"),"usr",4);
  var rg=(D.regs||[]).filter(function(x){return x.status==="pending"});add("reg","🏪","ร้านสมัครใหม่ รออนุมัติ",rg.length,"ร้าน",tdOld(rg,"created_at"),"shop",0);
  var oq=(D.oreq||[]).filter(function(r){return r.status==="pending"||r.status==="paid_review"});add("oreq","🏢","คำขอบริการของหน่วยงาน",oq.length,"รายการ",tdOld(oq,"created_at"),"oreq",0);
  var sc=D.scrOff?[]:(D.scr||[]);add("scr","📝","คำขอปิดบัญชีร้าน",sc.length,"รายการ",tdOld(sc,"requested_at"),"shop",0);
@@ -431,7 +432,7 @@ function todoItems(){var L=[];function add(k,ic,txt,n,unit,old,tab,urgH){if(!n)r
  add("ce","⚠️","ข้อผิดพลาดหน้าเว็บวันนี้",ceN(),"ครั้ง",null,"ce",0);
  return L.filter(function(x){return x.k==="q"?can("queue"):tabOk(x.tab)})}
 function todoHtml(){var L=todoItems();return '<div class="head"><h1>งานที่ต้องทำ</h1></div>'+(L.length?'<ul class="supr tdl">'+L.map(function(x){return '<li><button type="button" class="supb'+(x.late?' late':'')+'" '+(x.k==="q"?'data-a="todoq"':'data-a="tab" data-id="'+x.tab+'"')+' data-td="'+x.k+'"><span class="qh"><span aria-hidden="true">'+x.ic+'</span> <b>'+esc(x.txt)+'</b>'+(x.late?'<span class="tag w">รอนาน</span>':'')+'</span>'+(x.sub?'<small>'+esc(x.sub)+'</small>':'')+'</button></li>'}).join("")+'</ul>':'<p class="tdok" role="status"><span aria-hidden="true">✓ </span>ไม่มีงานค้าง</p>')}
-function todoWarm(){var a=[];if(!RW.loaded&&can("safety"))a.push(rvwLoad());if(!HL.d&&can("owner"))a.push(hlLoad());if(!CE.d&&can("owner"))a.push(ceLoad());return Promise.all(a.map(function(x){return Promise.resolve(x).catch(function(){})})).then(function(){if(S.tab==="q"&&!SR.open)softDraw()})}
+function todoWarm(){var a=[];if(!PR.list&&can("users"))a.push(prLoad());if(!RW.loaded&&can("safety"))a.push(rvwLoad());if(!HL.d&&can("owner"))a.push(hlLoad());if(!CE.d&&can("owner"))a.push(ceLoad());return Promise.all(a.map(function(x){return Promise.resolve(x).catch(function(){})})).then(function(){if(S.tab==="q"&&!SR.open)softDraw()})}
 function qView(){var L={new:[],wait:[],done:[],cx:[]};(D.bk||[]).forEach(function(b){L[qCat(b)].push(b)});
  var TB=[["new","งานใหม่"],["wait","งานที่รออยู่"],["done","งานที่เสร็จสิ้น"],["cx","ถูกยกเลิก"]],qt=L[S.qt]?S.qt:"new",
  list=L[qt].slice().sort(function(a,z){return qt==="new"||qt==="wait"?(a.starts_at<z.starts_at?-1:1):(a.starts_at<z.starts_at?1:-1)}),body="",last="";
@@ -538,19 +539,48 @@ var RW={loaded:false,err:"",sh:[],st:[]};
 function nsCard(c){return c.nsOk?'<div class="card form"><b>แจ้งเตือนร้านนวดใหม่</b><p class="hint">เมื่ออนุมัติร้านใหม่ (และร้านมีพิกัด เปิดรับจอง) ระบบแจ้งผู้ใช้งานที่เปิดตำแหน่งไว้ในรัศมีนี้ ส่งครั้งเดียวต่อร้าน</p><label class="ck"><input type="checkbox" id="nson"'+(c.nso?" checked":"")+'> แจ้งเตือนผู้ใช้งานเมื่อมีร้านนวดใหม่</label><div class="two">'+num("nsr","รัศมีแจ้งเตือนร้านใหม่ (กม.)",c.nsr,null,1)+'</div></div>':''}
 function rvwLoad(){if(!can("safety"))return Promise.resolve();crLoad();return Promise.all([sbApi("/rest/v1/reviews?select=*&or=(reported.eq.true,hidden.eq.true,shop_rating.lte.2)&order=created_at.desc&limit=200"),sbApi("/rest/v1/review_staff?select=*&or=(reported.eq.true,hidden.eq.true,rating.lte.2)&order=created_at.desc&limit=200")]).then(function(r){RW.sh=r[0]||[];RW.st=r[1]||[];RW.loaded=true;RW.err="";if(S.tab==="rvw"&&!S.rvwC)draw()},function(e){RW.loaded=true;RW.err=errTh(e,"โหลดรีวิวไม่สำเร็จ ตรวจสอบว่ารันไฟล์ SQL ส่วนที่ 23 แล้ว");if(S.tab==="rvw")draw()})}
 /* ---- ผู้ใช้งาน: ตั้งรหัสผ่านใหม่ให้ผู้ใช้ที่ลืมรหัส ---- */
-var US={q:"",res:null,loading:false,err:"",sel:null,pw:"",cfm:false,done:null,copied:false,log:null,logErr:""},UKIND={user:"ผู้ใช้ทั่วไป",shop:"ร้านค้า",staff:"พนักงาน"};
+var PR={list:null,hist:null,err:"",showHist:false,close:null,reason:"",other:""},PRAPP={user:"แอปผู้ใช้งาน",shop:"แอปร้านนวด",staff:"แอปหมอนวด"},PRWHY=["โทรไม่ติด","ไม่ใช่เจ้าของบัญชี","ผู้ใช้จำรหัสผ่านได้แล้ว","อื่นๆ"],
+US={q:"",res:null,loading:false,err:"",sel:null,pw:"",cfm:false,done:null,copied:false,log:null,logErr:"",fromReq:null},UKIND={user:"ผู้ใช้ทั่วไป",shop:"ร้านค้า",staff:"พนักงาน"};
+/* ---- คำขอรหัสผ่านใหม่ จากหน้า "ลืมรหัสผ่าน" ของแอปผู้ใช้งาน ร้านนวด หมอนวด (ฐานข้อมูล: admin_password_requests) ---- */
+function prLoad(redraw){if(!can("users"))return Promise.resolve();return rpc("admin_password_requests",{p_history:false}).then(function(a){PR.list=a||[];PR.err="";if(redraw||S.tab==="usr"&&!S.busy&&!US.sel)draw()},function(e){PR.err=errTh(e,"โหลดคำขอไม่สำเร็จ");if(S.tab==="usr")draw()})}
+function prHistLoad(){return rpc("admin_password_requests",{p_history:true}).then(function(a){PR.hist=a||[];draw()},function(e){PR.err=errTh(e,"โหลดประวัติคำขอไม่สำเร็จ");draw()})}
+function pwGen(){var u=new Uint32Array(1);crypto.getRandomValues(u);return String(100000+u[0]%900000)}
+function prTel(p){p=String(p||"");return /^0\d{9}$/.test(p)?p.slice(0,3)+"-"+p.slice(3,6)+"-"+p.slice(6):p}
+function prAt(t){return new Date(t).toLocaleString("th-TH",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit",timeZone:"Asia/Bangkok"})+" น."}
+function prTag(x){if(!x.user_id)return '<span class="tag o">ไม่พบบัญชี</span>';if(x.is_admin)return '<span class="tag o">บัญชีแอดมิน</span>';
+ return x.name_match?'<span class="tag">ชื่อตรงกับบัญชี</span>':'<span class="tag o">ชื่อไม่ตรงกับบัญชี</span>'}
+function prItem(x){var nm=esc((x.first_name+" "+x.last_name).trim());
+ var h='<div class="card" role="group" aria-label="คำขอของ '+nm+'"><b>'+nm+'</b> '+prTag(x)+'<small>เบอร์ '+esc(prTel(x.phone))+', จาก'+esc(PRAPP[x.app]||"")+', ขอเมื่อ '+prAt(x.created_at)+(x.attempts>1?', กดขอ '+x.attempts+' ครั้ง':'')+'</small>'+
+  (x.user_id&&!x.name_match?'<small>ชื่อในบัญชี: '+esc(x.account_name||"-")+'</small>':'')+
+  (x.is_admin?'<small>ตั้งรหัสให้บัญชีแอดมินที่นี่ไม่ได้</small>':'')+
+  (!x.user_id?'<small>เบอร์นี้ไม่มีบัญชีในระบบ อาจกรอกเบอร์ผิด โทรถามก่อนปิดคำขอ</small>':'');
+ if(PR.close===x.id){h+='<fieldset class="pmf" style="margin-top:8px"><legend>เหตุผลที่ปิดคำขอ</legend><div class="dchk">'+PRWHY.map(function(w,i){return '<label><input type="radio" name="prwhy" value="'+esc(w)+'"'+(PR.reason===w?" checked":"")+(i===0?' id="prw0"':'')+'> '+esc(w)+'</label>'}).join("")+'</div>'+
+   '<div><label for="proth">รายละเอียด (ถ้าเลือก อื่นๆ)</label><input class="in" id="proth" maxlength="150" value="'+esc(PR.other)+'"></div></fieldset><div id="prerr" role="alert" style="color:var(--bad)"></div>'+
+   '<div class="acts" style="margin-top:8px"><button type="button" class="btn d" data-a="prcgo" data-id="'+x.id+'">ยืนยันปิดคำขอ</button><button type="button" class="btn g" data-a="prcno">ยกเลิก</button></div>'}
+ else h+='<div class="acts" style="margin-top:8px"><a class="btn g" href="tel:'+esc(x.phone)+'" aria-label="โทรหา '+nm+' '+esc(prTel(x.phone))+'">โทรหา</a>'+
+  (x.user_id&&!x.is_admin?'<button type="button" class="btn" data-a="prset" data-id="'+x.id+'" aria-label="ตั้งรหัสชั่วคราวให้ '+nm+'">ตั้งรหัสชั่วคราว</button>':'')+
+  '<button type="button" class="btn g" data-a="prclose" data-id="'+x.id+'" aria-label="ปิดคำขอของ '+nm+'">ปิดคำขอ</button></div>';
+ return h+'</div>'}
+function prHtml(){var L=PR.list,h='<h2 id="prh" tabindex="-1" style="margin:4px 0 8px;font-size:1.05rem">คำขอรหัสผ่านใหม่'+(L&&L.length?' ('+L.length+')':'')+'</h2><p class="hint2">โทรกลับที่เบอร์ในคำขอเพื่อยืนยันตัวตนก่อนตั้งรหัส เจ้าของบัญชีจะต้องตั้งรหัสผ่านใหม่เองทันทีที่เข้าสู่ระบบ</p>';
+ if(PR.err)h+='<div role="alert" style="color:var(--bad)">'+esc(PR.err)+'</div>';
+ else if(!L)h+='<p class="hint2" role="status">กำลังโหลด</p>';
+ else h+=L.length?L.map(prItem).join(""):'<div class="empty">ไม่มีคำขอที่รอดำเนินการ</div>';
+ h+='<div class="acts" style="margin:8px 0 18px"><button type="button" class="btn g" data-a="prhist" aria-expanded="'+(PR.showHist?"true":"false")+'">'+(PR.showHist?"ซ่อนคำขอที่จัดการแล้ว":"ดูคำขอที่จัดการแล้ว (60 วัน)")+'</button></div>';
+ if(PR.showHist){if(!PR.hist)h+='<p class="hint2" role="status">กำลังโหลด</p>';
+  else h+=PR.hist.length?PR.hist.map(function(x){return '<div class="row"><div><b>'+esc((x.first_name+" "+x.last_name).trim())+'</b> <span class="tag">'+(x.status==="done"?"ตั้งรหัสแล้ว":"ปิดคำขอ")+'</span><small>เบอร์ '+esc(prTel(x.phone))+', ขอเมื่อ '+prAt(x.created_at)+'</small><small>'+esc(x.close_reason||"")+(x.handled_name?' โดย '+esc(x.handled_name):'')+(x.handled_at?', '+prAt(x.handled_at):'')+'</small></div></div>'}).join(""):'<div class="empty">ยังไม่มีคำขอที่จัดการแล้ว</div>'}
+ return h}
 function usrFind(){var q=((document.getElementById("usq")||{}).value||"").trim();US.q=q;var d=q.replace(/\D/g,"");
  if(d.length<3){US.err="พิมพ์เบอร์อย่างน้อย 3 หลัก";US.res=null;draw();return}
  US.err="";US.loading=true;US.sel=null;US.done=null;draw();
  rpc("admin_find_users",{p_q:q}).then(function(a){US.res=a||[];US.loading=false;draw()},function(e){US.loading=false;US.res=null;US.err=errTh(e,"ค้นหาไม่สำเร็จ ตรวจสอบว่ารันไฟล์ SQL ส่วนที่ 27 แล้ว");draw()})}
 function usrLogLoad(redraw){if(!can("users"))return Promise.resolve();return sbApi("/rest/v1/password_reset_log?select=*&order=created_at.desc&limit=50").then(function(a){US.log=a||[];US.logErr="";if(S.tab==="usr"&&!S.busy||redraw)draw()},function(e){US.logErr=errTh(e,"โหลดประวัติไม่สำเร็จ ตรวจสอบว่ารันไฟล์ SQL ส่วนที่ 27 แล้ว");if(S.tab==="usr")draw()})}
-function usrView(){var h='<div class="head"><h1>ผู้ใช้งาน</h1></div><p class="hint2">ใช้เมื่อผู้ใช้ลืมรหัสผ่านและติดต่อสมาคม ค้นหาจากเบอร์ ตั้งรหัสผ่านชั่วคราวให้ แล้วแจ้งผู้ใช้ให้เข้าสู่ระบบและเปลี่ยนรหัสเองที่หน้าบัญชีทันที</p>';
- if(US.done){var d=US.done;h+='<div class="card" role="status"><b>ตั้งรหัสผ่านใหม่ให้ '+esc(d.name||"-")+' แล้ว</b><small>เบอร์ '+esc(d.phone||"-")+'</small><div style="font-size:1.6rem;font-weight:700;letter-spacing:.12em;margin:10px 0;overflow-wrap:anywhere" id="uspwshow">'+esc(d.pw)+'</div><div class="acts"><button type="button" class="btn g" data-a="uscopy">'+(US.copied?"คัดลอกแล้ว":"คัดลอกรหัส")+'</button></div><p class="hint2" style="margin:10px 0 0">แจ้งรหัสนี้ให้เจ้าของบัญชีทางโทรศัพท์ แล้วบอกให้เข้าสู่ระบบและเปลี่ยนรหัสผ่านเองที่หน้าบัญชีทันที รหัสนี้จะไม่แสดงอีกหลังกด "เสร็จสิ้น" เครื่องที่ล็อกอินค้างไว้ถูกบังคับออกจากระบบแล้ว</p><button type="button" class="btn" data-a="usdone" style="margin-top:8px">เสร็จสิ้น</button></div>'}
- else if(US.sel){var u=US.sel;h+='<div class="card form"><b>ตั้งรหัสผ่านใหม่ให้ '+esc(u.name||"-")+'</b><small>เบอร์ '+esc(u.phone||"-")+', '+esc(UKIND[u.kind]||"")+'</small><div><label for="uspw">รหัสผ่านชั่วคราว (อย่างน้อย 8 ตัวอักษร)</label><input class="in" id="uspw" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="'+esc(US.pw)+'"'+(US.cfm?" readonly":"")+'></div>'+
+function usrView(){var h='<div class="head"><h1>ผู้ใช้งาน</h1></div>';
+ if(US.done){var d=US.done;h+='<div class="card" role="status"><b>ตั้งรหัสผ่านใหม่ให้ '+esc(d.name||"-")+' แล้ว</b><small>เบอร์ '+esc(d.phone||"-")+'</small><div style="font-size:1.6rem;font-weight:700;letter-spacing:.12em;margin:10px 0;overflow-wrap:anywhere" id="uspwshow">'+esc(d.pw)+'</div><div class="acts"><button type="button" class="btn g" data-a="uscopy">'+(US.copied?"คัดลอกแล้ว":"คัดลอกรหัส")+'</button></div><p class="hint2" style="margin:10px 0 0">แจ้งรหัสนี้ให้เจ้าของบัญชีทางโทรศัพท์ เมื่อเข้าสู่ระบบด้วยรหัสนี้ ระบบจะให้ตั้งรหัสผ่านใหม่ของตัวเองทันที รหัสนี้จะไม่แสดงอีกหลังกด "เสร็จสิ้น" เครื่องที่ล็อกอินค้างไว้ถูกบังคับออกจากระบบแล้ว</p><button type="button" class="btn" data-a="usdone" style="margin-top:8px">เสร็จสิ้น</button></div>'}
+ else if(US.sel){var u=US.sel;h+='<div class="card form"><b>ตั้งรหัสผ่านใหม่ให้ '+esc(u.name||"-")+'</b><small>เบอร์ '+esc(u.phone||"-")+', '+esc(UKIND[u.kind]||"")+'</small><div><label for="uspw">รหัสผ่านชั่วคราว (อย่างน้อย 6 ตัวอักษร)</label><input class="in" id="uspw" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="'+esc(US.pw)+'"'+(US.cfm?" readonly":"")+'></div>'+
   (US.cfm?'<div role="alert" style="margin-top:8px;font-weight:600">ยืนยันว่าได้สอบถามและยืนยันตัวตนของ '+esc(u.name||"-")+' (เบอร์ '+esc(u.phone||"-")+') ทางโทรศัพท์แล้ว? เครื่องที่ล็อกอินค้างไว้จะถูกบังคับออกจากระบบ</div><div class="acts" style="margin-top:8px"><button type="button" class="btn d" data-a="usgo">ยืนยันตั้งรหัสผ่านใหม่</button><button type="button" class="btn g" data-a="usno">ยังไม่ตั้ง</button></div>'
    :'<div class="acts" style="margin-top:8px"><button type="button" class="btn" data-a="usask">ตั้งรหัสผ่านใหม่</button><button type="button" class="btn g" data-a="usgen">สุ่มรหัสให้</button><button type="button" class="btn g" data-a="uscancel">ยกเลิก</button></div>')+
   (US.err?'<div role="alert" style="color:var(--bad);margin-top:8px">'+esc(US.err)+'</div>':'')+'</div>'}
- else{h+='<div class="srch"><input class="in" id="usq" type="tel" inputmode="numeric" aria-label="ค้นหาเบอร์ผู้ใช้" placeholder="🔍 พิมพ์เบอร์มือถืออย่างน้อย 3 หลัก" value="'+esc(US.q)+'" autocomplete="off"></div><div class="acts" style="margin-bottom:10px"><button type="button" class="btn" data-a="usfind">ค้นหา</button></div>'+(US.err?'<div role="alert" style="color:var(--bad);margin-bottom:8px">'+esc(US.err)+'</div>':'');
+ else{h+=prHtml()+'<h2 style="margin:4px 0 8px;font-size:1.05rem">ค้นหาจากเบอร์</h2><p class="hint2">ใช้เมื่อผู้ใช้โทรมาเองโดยไม่ได้ส่งคำขอ</p><div class="srch"><input class="in" id="usq" type="tel" inputmode="numeric" aria-label="ค้นหาเบอร์ผู้ใช้" placeholder="🔍 พิมพ์เบอร์มือถืออย่างน้อย 3 หลัก" value="'+esc(US.q)+'" autocomplete="off"></div><div class="acts" style="margin-bottom:10px"><button type="button" class="btn" data-a="usfind">ค้นหา</button></div>'+(US.err?'<div role="alert" style="color:var(--bad);margin-bottom:8px">'+esc(US.err)+'</div>':'');
   if(US.loading)h+='<p class="hint2" role="status">กำลังค้นหา</p>';
   else if(US.res)h+=US.res.length?US.res.map(function(x){return '<div class="row"><div><b>'+esc(x.name||"(ไม่ระบุชื่อ)")+'</b> <span class="tag">'+esc(UKIND[x.kind]||"")+'</span>'+(x.is_admin?' <span class="tag o">แอดมิน</span>':'')+'<small>เบอร์ '+esc(x.phone||"-")+'</small></div>'+(x.is_admin?'<small>ตั้งรหัสให้แอดมินไม่ได้</small>':'<button type="button" class="btn g" data-a="uspick" data-id="'+x.id+'">ตั้งรหัสผ่านใหม่</button>')+'</div>'}).join(""):'<div class="empty">ไม่พบผู้ใช้ที่ตรงกับเบอร์นี้</div>'}
  h+='<h2 style="margin:22px 0 8px;font-size:1.05rem">ประวัติการตั้งรหัสผ่านใหม่</h2><p class="hint2">แสดง 50 รายการล่าสุด ไม่เก็บรหัสผ่าน</p>';
@@ -1011,7 +1041,7 @@ document.addEventListener("keydown",function(e){var t=e.target,typing=t&&(t.tagN
 function meView(){var tel=String(WHO.phone||"");return '<div class="head"><h1>บัญชีของฉัน</h1></div><div class="card"><p><b>ชื่อ:</b> '+esc(WHO.name)+'</p>'+(tel?'<p><b>เบอร์:</b> '+esc(tel)+'</p>':'')+'<p class="hint2" style="margin:0">เข้าสู่ระบบในฐานะแอดมิน</p></div><div class="acts"><button type="button" class="btn d" data-a="logout">ออกจากระบบ</button></div>'}
 function draw(){navDraw();document.getElementById("main").innerHTML=view();post()}
 function softDraw(){navDraw();var a=document.activeElement;if(S.form||S.busy||(a&&/INPUT|SELECT|TEXTAREA/.test(a.tagName)&&a.id!=="")||S.tab==="set"||S.tab==="usr"||S.tab==="hl"||S.tab==="ce"||S.tab==="au"||S.tab==="fm"||SR.open||(S.tab==="sup"&&SUP.cur))return;document.getElementById("main").innerHTML=view();post()}
-function refresh(){if(!D||S.busy)return Promise.resolve();if(S.tab==="rvw"||RW.loaded)rvwLoad();return Promise.all([apLoad(),loadLive(),loadBk(),supLoad()]).then(function(r){if(r[0]){S.form=null;draw()}else softDraw()},function(e){if(e&&e.status===401)doLogout()})}
+function refresh(){if(!D||S.busy)return Promise.resolve();if(S.tab==="rvw"||RW.loaded)rvwLoad();return Promise.all([apLoad(),loadLive(),loadBk(),supLoad(),prLoad()]).then(function(r){if(r[0]){S.form=null;draw()}else softDraw()},function(e){if(e&&e.status===401)doLogout()})}
 
 /* ===================== เหตุการณ์ ===================== */
 function setPin(la,lo){document.getElementById("olat").value=la;document.getElementById("olng").value=lo;document.getElementById("pinst").innerHTML=pinStatus(String(la),String(lo));pinName(+la,+lo)}
@@ -1105,7 +1135,7 @@ document.addEventListener("click",function(e){
  if(a==="rpcsv"){rpCsv();return}
  if(a==="ss"){S.ss=id;S.form=null;S.lic=null;S.rej=null;S.shmsg="";draw();return}
  if(a==="shinv"){shInvShare(id==="copy");return}
- if(a==="tab"){srClear();if(S.last[id])id=S.last[id];if(SUBM[groupOf(id)]&&!tabOk(id)){var gl=grpTabs(groupOf(id));if(gl.length)id=gl[0][0]}var gg=groupOf(id);if(S.last[gg])S.last[gg]=id;if(id==="pprq"||id==="ppac"){S.pps=id.slice(2);id="pp"}S.tab=id;S.sdc=null;S.sdn=null;S.ppsaved=false;S.form=null;S.del=null;S.saved=false;S.info="";S.stnew=null;S.stmsg="";S.hmsg="";S.rej=null;S.lic=null;S.tpc=null;S.tpr=null;S.slipv=null;S.oqr=null;S.oqS=null;draw();if(id==="nt"||id==="pp"||id==="shop"||id==="q")refresh();if(id==="rvw")rvwLoad();if(id==="usr")usrLogLoad();if(id==="hl")hlLoad();if(id==="ce")ceLoad();if(id==="au")auLoad();if(id==="fm")fmLoad();if(id==="sup"){supClose();supLoad().then(function(){if(S.tab==="sup"&&!SUP.cur)draw()})}else supClose();if(id==="set"&&S.sub==="a")loadAdmins().then(draw);return}
+ if(a==="tab"){srClear();if(S.last[id])id=S.last[id];if(SUBM[groupOf(id)]&&!tabOk(id)){var gl=grpTabs(groupOf(id));if(gl.length)id=gl[0][0]}var gg=groupOf(id);if(S.last[gg])S.last[gg]=id;if(id==="pprq"||id==="ppac"){S.pps=id.slice(2);id="pp"}S.tab=id;S.sdc=null;S.sdn=null;S.ppsaved=false;S.form=null;S.del=null;S.saved=false;S.info="";S.stnew=null;S.stmsg="";S.hmsg="";S.rej=null;S.lic=null;S.tpc=null;S.tpr=null;S.slipv=null;S.oqr=null;S.oqS=null;draw();if(id==="nt"||id==="pp"||id==="shop"||id==="q")refresh();if(id==="rvw")rvwLoad();if(id==="usr")usrLogLoad();if(id==="usr")prLoad();if(id==="hl")hlLoad();if(id==="ce")ceLoad();if(id==="au")auLoad();if(id==="fm")fmLoad();if(id==="sup"){supClose();supLoad().then(function(){if(S.tab==="sup"&&!SUP.cur)draw()})}else supClose();if(id==="set"&&S.sub==="a")loadAdmins().then(draw);return}
  if(a==="sub"){S.saved=false;S.del=null;var sv=document.querySelector(".saved");if(sv)sv.remove();subTo(id);if(id==="c"){SLP.msg="";SLP.cfm=false;slipCount()}if(id==="a")loadAdmins().then(function(){var h=document.querySelector("[data-sg=a]");if(h&&S.sub==="a")h.innerHTML=adminHtml()},function(x){showErr(errTh(x))});return}
  if(a==="ntf"){S.ntf=id;draw();return}
   if(a==="ntc"){S.ntc=id;draw();return}
@@ -1269,12 +1299,20 @@ document.addEventListener("click",function(e){
  if(a==="rmadmin"){if(S.del!=="adm"+id){S.del="adm"+id;draw();return}S.del=null;
   act(function(){return rpc("remove_admin",{p_user:id}).then(loadAdmins)},function(){S.saved="ถอดสิทธิ์แอดมินแล้ว"});return}
  if(a==="usfind"){usrFind();return}
+ if(a==="prset"){var rq=(PR.list||[]).filter(function(x){return x.id===id})[0];if(!rq)return;US.sel={id:rq.user_id,name:rq.account_name||(rq.first_name+" "+rq.last_name),phone:rq.phone,kind:rq.kind};US.pw=pwGen();US.cfm=false;US.err="";US.done=null;US.fromReq=id;PR.close=null;draw();var e2=g("uspw");if(e2)e2.focus();return}
+ if(a==="prclose"){PR.close=id;PR.reason="";PR.other="";draw();var r0=g("prw0");if(r0)r0.focus();return}
+ if(a==="prcno"){var pc=PR.close;PR.close=null;draw();var cb2=document.querySelector('[data-a=prclose][data-id="'+pc+'"]');if(cb2)cb2.focus();return}
+ if(a==="prcgo"){var ck=document.querySelector("input[name=prwhy]:checked"),why=ck?ck.value:"",oth=((g("proth")||{}).value||"").trim();PR.reason=why;PR.other=oth;
+  if(!why){g("prerr").textContent="กรุณาเลือกเหตุผล";return}
+  if(why==="อื่นๆ"){if(!oth){g("prerr").textContent="กรุณากรอกรายละเอียด";g("proth").focus();return}why="อื่นๆ: "+oth}
+  OKM="ปิดคำขอแล้ว";act(function(){return rpc("admin_password_request_close",{p_id:id,p_reason:why}).then(function(){PR.close=null;PR.hist=null;return prLoad()})},function(){if(PR.showHist)prHistLoad();var ph=g("prh");if(ph)ph.focus()});return}
+ if(a==="prhist"){PR.showHist=!PR.showHist;if(PR.showHist&&!PR.hist)prHistLoad();draw();return}
  if(a==="uspick"){US.sel=(US.res||[]).filter(function(x){return x.id===id})[0]||null;US.pw="";US.cfm=false;US.err="";US.done=null;draw();var e1=g("uspw");if(e1)e1.focus();return}
- if(a==="usgen"){var al="abcdefghjkmnpqrstuvwxyz23456789",u8=new Uint8Array(8),o="";crypto.getRandomValues(u8);for(var i=0;i<8;i++)o+=al[u8[i]%al.length];US.pw=o;US.cfm=false;US.err="";draw();return}
- if(a==="usask"){var pw=(g("uspw")||{}).value||"";US.pw=pw;if(pw.length<8){US.err="รหัสผ่านชั่วคราวต้องมีอย่างน้อย 8 ตัวอักษร";US.cfm=false}else{US.err="";US.cfm=true}draw();return}
+ if(a==="usgen"){US.pw=pwGen();US.cfm=false;US.err="";draw();return}
+ if(a==="usask"){var pw=(g("uspw")||{}).value||"";US.pw=pw;if(pw.length<6){US.err="รหัสผ่านชั่วคราวต้องมีอย่างน้อย 6 ตัวอักษร";US.cfm=false}else{US.err="";US.cfm=true}draw();return}
  if(a==="usno"){US.cfm=false;draw();return}
- if(a==="uscancel"){US.sel=null;US.pw="";US.cfm=false;US.err="";draw();return}
- if(a==="usgo"){var tg=US.sel,pw2=US.pw;OKM="ตั้งรหัสผ่านชั่วคราวแล้ว";act(function(){return rpc("admin_reset_password",{p_user:tg.id,p_password:pw2}).then(function(){US.done={name:tg.name,phone:tg.phone,pw:pw2};US.sel=null;US.pw="";US.cfm=false;return usrLogLoad(true)})},function(){});return}
+ if(a==="uscancel"){var fr=US.fromReq;US.sel=null;US.pw="";US.cfm=false;US.err="";US.fromReq=null;draw();if(fr){var pb=document.querySelector('[data-a=prset][data-id="'+fr+'"]');if(pb)pb.focus()}return}
+ if(a==="usgo"){var tg=US.sel,pw2=US.pw;OKM="ตั้งรหัสผ่านชั่วคราวแล้ว";act(function(){return rpc("admin_reset_password",{p_user:tg.id,p_password:pw2}).then(function(){US.done={name:tg.name,phone:tg.phone,pw:pw2};US.sel=null;US.pw="";US.cfm=false;US.fromReq=null;return Promise.all([usrLogLoad(true),prLoad()])})},function(){var sh=g("uspwshow");if(sh){sh.setAttribute("tabindex","-1");sh.focus()}});return}
  if(a==="usdone"){US.done=null;draw();return}
  if(a==="hlre"){hlLoad(true);return}
  if(a==="cere"){ceLoad(true);return}
