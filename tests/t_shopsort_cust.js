@@ -88,7 +88,7 @@ ok('filter free today: full shop hidden, button pressed',o.length===3&&!o.includ
 ok('sub text lists the filter',(await sub()).includes('พบ 3 ร้าน เรียงตามว่างเร็วสุด เฉพาะที่ว่างวันนี้'));
 await p.click('[data-sf=p]');await p.waitForTimeout(300);
 ok('both filters: only shop with promo and free today',(await order()).join(',')==='sh1'&&(await sub()).includes('เฉพาะที่ว่างวันนี้ และมีโปรโมชัน'));
-ok('choices saved on this device',(await p.evaluate(()=>localStorage.getItem('custShopSort')))==='{"s":"soon","a":true,"p":true}');
+ok('choices saved on this device',(await p.evaluate(()=>localStorage.getItem('custShopSort')))==='{"s":"soon","a":true,"p":true,"b":false}');
 busy('st1',D0,'10:00','21:00');busy('st2',D0,'10:00','21:00');await refresh();
 ok('nothing matches: message with clear button',(await p.textContent('#sfempty')).includes('ไม่มีร้านที่ตรงเงื่อนไข')&&!!(await p.$('[data-sf=clear]')));
 await p.click('[data-sf=clear]');await p.waitForTimeout(300);

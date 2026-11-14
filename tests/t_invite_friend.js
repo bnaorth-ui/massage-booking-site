@@ -119,7 +119,7 @@ ok('invite: status line is a polite live region',(await p.getAttribute('#invmsg'
 await p.evaluate(()=>{window.__sh=null;navigator.share=(o)=>{window.__sh=o;return Promise.resolve()}});
 await p.click('[data-inv]');await p.waitForTimeout(200);
 const sh=await p.evaluate(()=>window.__sh);
-ok('share: one text with the message, then the link on its own line',!!sh&&sh.text==='ลองจองหมอนวดผ่านแอป "จองคิวนวด" สะดวก ได้ช่วยสร้างอาชีพให้คนตาบอดด้วย\nhttps://massage-customer-bna.pages.dev/');
+ok('share: one text with the message, then the link on its own line',!!sh&&sh.text==='ลองจองหมอนวดผ่านแอป "จองคิวนวด" จองง่าย เลือกร้านใกล้บ้านได้ มีร้านของคนพิการทางการเห็นให้เลือกด้วย\nhttps://massage-customer-bna.pages.dev/');
 ok('share: title and text name the app, not the association',!!sh&&sh.title==='ชวนเพื่อนจองหมอนวด'&&!sh.text.includes('สมาคม'));
 ok('share: link not sent separately (some apps keep only one part)',!!sh&&sh.url===undefined);
 ok('share: no error message shown on success',(await p.textContent('#invmsg')).trim()==='');
@@ -135,7 +135,7 @@ ok('share fails: falls back to copy',(await p.evaluate(()=>window.__cp))!==null&
 await p.evaluate(()=>{window.__cp=null;navigator.share=undefined});
 await p.click('[data-inv]');await p.waitForTimeout(250);
 const cp=await p.evaluate(()=>window.__cp);
-ok('no share api: copies text and link together',cp==='ลองจองหมอนวดผ่านแอป "จองคิวนวด" สะดวก ได้ช่วยสร้างอาชีพให้คนตาบอดด้วย\nhttps://massage-customer-bna.pages.dev/');
+ok('no share api: copies text and link together',cp==='ลองจองหมอนวดผ่านแอป "จองคิวนวด" จองง่าย เลือกร้านใกล้บ้านได้ มีร้านของคนพิการทางการเห็นให้เลือกด้วย\nhttps://massage-customer-bna.pages.dev/');
 ok('no share api: message says copied',(await p.textContent('#invmsg')).includes('คัดลอกข้อความและลิงก์แล้ว'));
 ok('invite button stays on the account page (no navigation)',(await T()).includes('ออกจากระบบ'));
 
