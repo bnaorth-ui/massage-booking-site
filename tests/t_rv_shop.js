@@ -104,7 +104,7 @@ let t=await txt('#main');
 ok('shop average ignores hidden (2,5 => 3.5)',t.includes('3.5 จาก 5 (2 รีวิว)'));
 ok('staff average',t.includes('พนักงาน คุณนุ่น')&&t.includes('4.0 จาก 5 (1 รีวิว)'));
 ok('no other shop review',!t.includes('ไม่ควรเห็น'));
-ok('hidden shows tag, no buttons for hidden',t.includes('แอดมินซ่อนไว้'));
+ok('hidden shows tag, no buttons for hidden',t.includes('เจ้าหน้าที่ซ่อนไว้'));
 ok('replied review has no reply button',(await p.$$('[data-a=rvreply]')).length===2);
 await p.click('[data-a=rvreply][data-id="shop:rv1"]');await sleep(200);
 ok('textarea shown focused',await p.evaluate(()=>document.activeElement&&document.activeElement.id==='rvtxt'));
@@ -116,5 +116,5 @@ ok('reply payload',reps.length===1&&reps[0].p_kind==='shop'&&reps[0].p_id==='rv1
 t=await txt('#main');ok('reply shown + banner',t.includes('ขออภัยค่ะ จะปรับปรุง')&&t.includes('ส่งคำตอบแล้ว'));
 await p.click('[data-a=rvrep][data-id="staff:rs1"]');await sleep(400);
 ok('report payload',reps[1]&&reps[1].p_kind==='staff'&&reps[1].p_id==='rs1');
-t=await txt('#main');ok('shows แจ้งแอดมินแล้ว',t.includes('แจ้งแอดมินแล้ว'));
+t=await txt('#main');ok('shows แจ้งเจ้าหน้าที่แล้ว',t.includes('แจ้งเจ้าหน้าที่แล้ว'));
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)})();

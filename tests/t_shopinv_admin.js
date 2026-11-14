@@ -119,11 +119,11 @@ if(process.env.NOREG){
 }else{
  ok('invite card on top of the new-registrations tab',t.includes('ชวนร้านนวดมาสมัคร')&&t.indexOf('ชวนร้านนวดมาสมัคร')<t.indexOf('ร้านนวดลงทะเบียนเองจากหน้าร้านค้า'));
  const msg=await p.textContent('#shinvtxt');
- ok('message: association name + invitation',msg.startsWith('สมาคมวิทยากรฝึกอาชีพคนตาบอด ขอเชิญร้านนวดเข้าร่วมระบบจองนวดออนไลน์'));
+ ok('message: app name + invitation + 500 credit, no association name',msg.startsWith('ขอเชิญร้านนวดเข้าร่วม "จองคิวนวด" แอปจองนวดออนไลน์\n\n🎁 ร้านที่เข้าร่วมใหม่ รับเครดิต 500 บาท ไว้ใช้หักค่าบริการระบบ')&&!msg.includes('สมาคม'));
  ok('message: licence requirement and GP 10%',msg.includes('ได้รับอนุญาตจัดตั้งสถานประกอบการเพื่อสุขภาพ')&&msg.includes('(GP) 10% ของราคาหลังหักโปรโมชัน'));
  ok('message: short link /reg alone on its own line (no ? & =)',msg.includes('\nลงทะเบียนที่นี่\nhttps://shop.example/reg\n')&&!/reg=1|openExternalBrowser|[?&]/.test(msg.split('ลงทะเบียนที่นี่')[1].split('\n')[1]));
- ok('message: association phone',msg.includes('สอบถาม: 021234567'));
- ok('message: no middle dot separator, no emoji',!/[·\u{1F300}-\u{1FAFF}]/u.test(msg));
+ ok('message: staff phone',msg.includes('สอบถามเจ้าหน้าที่: 021234567'));
+ ok('message: no middle dot separator, only the one gift emoji',!/[·]/.test(msg)&&(msg.match(/[\u{1F300}-\u{1FAFF}]/gu)||[]).join('')==='🎁');
  await p.evaluate(()=>{window.__cp=null;Object.defineProperty(navigator,'clipboard',{value:{writeText:t=>{window.__cp=t;return Promise.resolve()}},configurable:true})});
  await p.click('[data-a=shinv][data-id=copy]');await p.waitForTimeout(250);
  ok('copy: exact message copied',(await p.evaluate(()=>window.__cp))===msg.trim()||(await p.evaluate(()=>window.__cp))===(await p.evaluate(()=>document.getElementById('shinvtxt').textContent)));

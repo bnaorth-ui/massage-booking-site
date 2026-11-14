@@ -103,6 +103,7 @@ ok('temporarily-closed shop counted',(await txt('#main')).includes('ร้าน
 ok('registration shows GP acceptance',(await p.textContent('#main')).includes('ยอมรับค่า GP 10%')&&(await p.textContent('#main')).includes('ยังไม่มีบันทึกการยอมรับค่า GP'));await p.click('[data-a=reglic][data-id=r1]');ok('licence loaded via authenticated read',await until(()=>document.querySelector('#lic_r1 img')));
 ok('licence fetched with admin bearer from licenses bucket',await W(()=>calls.some(c=>c.path==='/storage/v1/object/authenticated/licenses/u8/license-x.jpg'&&c.auth==='at-u1')));
 await p.fill('#rg_r1','150');await p.click('[data-a=regok][data-id=r1]');ok('GP range validation',await has('0-100'));
+ok('approve: starting credit defaults to 500 (matches invite message)',(await p.inputValue('#rc_r1'))==='500');
 await p.fill('#rg_r1','12');await p.fill('#rc_r1','500');await p.click('[data-a=regok][data-id=r1]');
 ok('approved info message',await has('อนุมัติร้าน ร้านใหม่หนึ่ง แล้ว'));
 const ap=calls.filter(c=>c.path.endsWith('approve_shop_registration')).pop();ok('approve rpc args',ap&&ap.body.p_reg==='r1'&&ap.body.p_gp===12&&ap.body.p_credit===500);

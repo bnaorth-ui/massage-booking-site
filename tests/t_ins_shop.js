@@ -135,12 +135,12 @@ await a.close();
 for(const [k,ua,want] of [['android',UAS.android,'⋮'],['ios',UAS.ios,'เพิ่มไปยังหน้าจอโฮม'],['line',UAS.line,'เปิดใน Chrome']]){
  a=await mk(ua);const sk=await a.$('[data-g=insskip]');if(sk){await a.click('[data-g=insskip] >> nth=-1');await sleep(200)}
  await a.fill('#gph','0822222222');await a.fill('#gpw','abc123');await a.click('[data-g=login]');await sleep(900);t=await T0(a);
- ok(k+': pending status then install steps below it',t.includes('ส่งคำขอลงทะเบียนแล้ว รอแอดมินอนุมัติ')&&t.indexOf('ติดตั้งแอปร้านนวดไว้รอผลอนุมัติ')>t.indexOf('ส่งคำขอลงทะเบียนแล้ว')&&t.includes(want));
+ ok(k+': pending status then install steps below it',t.includes('ส่งคำขอลงทะเบียนแล้ว รอเจ้าหน้าที่อนุมัติ')&&t.indexOf('ติดตั้งแอปร้านนวดไว้รอผลอนุมัติ')>t.indexOf('ส่งคำขอลงทะเบียนแล้ว')&&t.includes(want));
  ok(k+': install heading is h2 (one h1-level result on the page), no skip button',await a.$eval('#insbox h2',e=>e.textContent)==='ติดตั้งแอปร้านนวดไว้รอผลอนุมัติ'&&!(await a.$('#insbox h1'))&&!(await a.$('[data-g=insskip]')));
  ok(k+': focus not moved to install section',await a.evaluate(()=>!document.activeElement||!document.getElementById('insbox').contains(document.activeElement)));
  await a.close()}
 // แอปติดตั้งแล้ว (เปิดจากหน้าจอโฮม): ไม่แสดง
 a=await ctx.newPage();await a.addInitScript(u=>{Object.defineProperty(navigator,'userAgent',{get:()=>u});Object.defineProperty(navigator,'standalone',{get:()=>true})},UAS.ios);await a.goto(URLB);await a.evaluate(()=>localStorage.clear());await a.goto(URLB);await sleep(500);
 await a.fill('#gph','0822222222');await a.fill('#gpw','abc123');await a.click('[data-g=login]');await sleep(900);t=await T0(a);
-ok('installed app: pending status without install steps',t.includes('ส่งคำขอลงทะเบียนแล้ว รอแอดมินอนุมัติ')&&!(await a.$('#insbox')));await a.close();
+ok('installed app: pending status without install steps',t.includes('ส่งคำขอลงทะเบียนแล้ว รอเจ้าหน้าที่อนุมัติ')&&!(await a.$('#insbox')));await a.close();
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)})();

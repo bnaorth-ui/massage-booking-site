@@ -113,7 +113,7 @@ await p.setInputFiles('#rlic',{name:'l.png',mimeType:'image/png',buffer:PNG});aw
 await p.click('[data-g=regsend]');ok('password mismatch',await has('รหัสผ่านสองช่องไม่ตรงกัน'));
 await p.fill('#rpw','secret1');await p.fill('#rpw2','secret1');await p.setInputFiles('#rimg',{name:'s.png',mimeType:'image/png',buffer:PNG});await until(()=>document.querySelector('#gprev img'));
 await p.click('[data-g=regsend]');
-ok('registration -> pending status',await has('ส่งคำขอลงทะเบียนแล้ว รอแอดมินอนุมัติ'));
+ok('registration -> pending status',await has('ส่งคำขอลงทะเบียนแล้ว รอเจ้าหน้าที่อนุมัติ'));
 const lic=stor.find(s=>s.path.startsWith('licenses/u'));const shopimg=stor.find(s=>s.path.startsWith('avatars/u'));
 ok('licence uploaded to private bucket under uid',!!lic&&/^licenses\/u\d+\/license-.*\.jpg$/.test(lic.path)&&lic.len>100);
 ok('shop image uploaded to avatars/uid',!!shopimg);
@@ -123,7 +123,7 @@ ok('signup sent phone alias + metadata',(c=>c&&c.body.email==='0833333333@gmail.
 await p.click('[data-g=logout]');await p.waitForLoadState();
 // ---- ผู้ใช้ที่รออนุมัติ
 await until(()=>document.querySelector('#gph'));await p.fill('#gph','0822222222');await p.fill('#gpw','abc123');await p.click('[data-g=login]');
-ok('pending owner sees status',await has('ร้านรอผล')&&await has('รอแอดมินอนุมัติ'));
+ok('pending owner sees status',await has('ร้านรอผล')&&await has('รอเจ้าหน้าที่อนุมัติ'));
 T.shop_members.push({place_id:'sh1',user_id:'u2',role:'owner'});
 await p.click('[data-g=retry]');ok('after approval opens app',await until(()=>!document.getElementById('main').hidden&&document.getElementById('hdr').textContent.includes('สบายดี')));
 // ---- ใช้งานร้าน (สลับเป็นเจ้าของ u1 ผ่านรีโหลด)
@@ -189,9 +189,9 @@ ok('promptpay info shown',(await txt('#main')).includes('0812345678'));
 await p.setInputFiles('#slipf',{name:'s.png',mimeType:'image/png',buffer:PNG});await until(()=>!document.getElementById('slipsend').disabled);
 const dlP=p.waitForEvent('download',{timeout:5000}).catch(()=>null);await p.click('[data-a=qrsave]');const dl=await dlP;ok('QR saved as png download',!!dl&&/^QR-.*\.png$/.test(dl.suggestedFilename()));
 await sleep(200);ok('QR save message',await has('บันทึกรูป'));
-await p.click('#slipsend');await sleep(200);ok('confirm step shown (not sent yet)',await has('ยืนยันส่งสลิปให้แอดมิน')&&!stor.some(s=>/^slips\//.test(s.path)));
-await p.click('[data-a=slipno]');await sleep(200);ok('cancel confirm',!(await has('ยืนยันส่งสลิปให้แอดมิน'))&&!stor.some(s=>/^slips\//.test(s.path)));
-await p.click('#slipsend');await sleep(200);await p.click('#slipsend');ok('slip sent',await has('ส่งสลิปให้แอดมินแล้ว'));ok('admin-notified message',await has('แอดมินได้รับแจ้งเตือน'));
+await p.click('#slipsend');await sleep(200);ok('confirm step shown (not sent yet)',await has('ยืนยันส่งสลิปให้เจ้าหน้าที่')&&!stor.some(s=>/^slips\//.test(s.path)));
+await p.click('[data-a=slipno]');await sleep(200);ok('cancel confirm',!(await has('ยืนยันส่งสลิปให้เจ้าหน้าที่'))&&!stor.some(s=>/^slips\//.test(s.path)));
+await p.click('#slipsend');await sleep(200);await p.click('#slipsend');ok('slip sent',await has('ส่งสลิปให้เจ้าหน้าที่แล้ว'));ok('staff-will-check message',await has('เจ้าหน้าที่จะตรวจสอบและอนุมัติ'));
 ok('slip stored in slips bucket under place',stor.some(s=>new RegExp('^slips/sh1/'+tp.ref+'-').test(s.path))&&/^sh1\//.test(tp.slip_path));
 ok('slip preview loaded via authenticated read',await until(()=>document.querySelector('#slipcur img')));
 await p.click('[role=tab][data-a=wt][data-id=his]');ok('topup in history waiting',(await txt('#main')).includes('รอยืนยัน')&&(await txt('#main')).includes('แนบสลิปแล้ว'));

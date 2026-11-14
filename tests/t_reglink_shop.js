@@ -41,8 +41,8 @@ ok('normal browser: no open-in-browser box',!(await p.$('#regext')));
 // แชร์ข้อความชวนต่อ
 await p.evaluate(()=>{window.__sh=null;navigator.share=o=>{window.__sh=o;return Promise.resolve()}});
 await p.click('[data-g=invshare]');await sleep(250);let sh=await p.evaluate(()=>window.__sh);
-ok('share onward: native share with the full message',!!sh&&sh.title==='ชวนร้านนวดเข้าร่วมระบบจองนวด'&&sh.text.startsWith('สมาคมทดสอบ ขอเชิญร้านนวดเข้าร่วมระบบจองนวดออนไลน์'));
-ok('share onward: short link alone on its own line, then phone',!!sh&&sh.text.includes('\nลงทะเบียนที่นี่\n'+BASE+'/reg\nสอบถาม: 0989983654')&&!/reg=1|openExternalBrowser/.test(sh.text));
+ok('share onward: native share with the full message',!!sh&&sh.title==='ชวนร้านนวดเข้าร่วมระบบจองนวด'&&sh.text.startsWith('ขอเชิญร้านนวดเข้าร่วม "จองคิวนวด" แอปจองนวดออนไลน์\n\n🎁 ร้านที่เข้าร่วมใหม่ รับเครดิต 500 บาท ไว้ใช้หักค่าบริการระบบ')&&!sh.text.includes('สมาคม'));
+ok('share onward: short link alone on its own line, then phone',!!sh&&sh.text.includes('\nลงทะเบียนที่นี่\n'+BASE+'/reg\nสอบถามเจ้าหน้าที่: 0989983654')&&!/reg=1|openExternalBrowser/.test(sh.text));
 await p.evaluate(()=>{delete navigator.share;window.__cp=null;Object.defineProperty(navigator,'share',{value:undefined,configurable:true});Object.defineProperty(navigator,'clipboard',{value:{writeText:t=>{window.__cp=t;return Promise.resolve()}},configurable:true})});
 await p.click('[data-g=invshare]');await sleep(250);
 ok('share onward without native share: copies the same text and says so',(await p.evaluate(()=>window.__cp))===sh.text&&(await p.textContent('#invmsg')).includes('คัดลอกข้อความชวนแล้ว'));

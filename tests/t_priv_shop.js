@@ -98,7 +98,7 @@ await p.evaluate(()=>localStorage.clear());await p.reload();
 await until(()=>document.querySelector('#gph'));
 await p.click('[data-g=pv]');await sleep(500);
 let t=await p.textContent('body');
-ok('login policy page',t.includes('นโยบายความเป็นส่วนตัว (ร้านค้า)')&&t.includes('เก็บไม่เกิน 1 ปี')&&t.includes('ตามที่สมาคมกำหนด')&&t.includes('02-123-4567'));
+ok('login policy page',t.includes('นโยบายความเป็นส่วนตัว (ร้านค้า)')&&t.includes('เก็บไม่เกิน 1 ปี')&&t.includes('ตามที่สมาคมทดสอบกำหนด')&&t.includes('เจ้าหน้าที่เห็นข้อมูลร้านเท่าที่จำเป็น')&&!t.includes('แอดมิน')&&t.includes('02-123-4567'));
 await p.click('[data-g=pvback]');await until(()=>document.querySelector('#gph'));ok('back to login',!!(await p.$('#gph')));
 await p.click('[data-g=reg]');await until(()=>document.querySelector('#rn'));
 ok('consent checkbox covers terms and privacy',!!(await p.$('#rpv'))&&(await p.textContent('label[for=rpv]')).includes('เงื่อนไขการใช้งานและนโยบายความเป็นส่วนตัว'));
