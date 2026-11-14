@@ -116,9 +116,10 @@ await p.waitForSelector('#tabs [data-id=sup]',{timeout:5000});await p.click('#ta
 const items=async()=>p.$$eval('.tdl .supb',b=>b.map(x=>({k:x.dataset.td,t:x.innerText.replace(/\s+/g,' ').trim(),late:x.classList.contains('late')})));
 ok('home starts with heading งานที่ต้องทำ, queue becomes h2',await W(async()=>(await p.textContent('#main h1'))==='งานที่ต้องทำ'&&(await p.textContent('#qh2'))==='คิวงาน'));
 let L;await W(async()=>{L=await items();return L.some(x=>x.k==='sup')});
-ok('only pending things listed, most urgent first',L.length>=3&&L[0].k==='tp'&&L[1].k==='sup'&&L.findIndex(x=>x.k==='reg')>1);
-ok('top-ups: count, oldest wait in days, late tag',L[0].t.includes('เติมเงินรอยืนยัน 3 รายการ')&&/รอนานสุด \d+ วัน/.test(L[0].t)&&L[0].late&&L[0].t.includes('รอนาน'));
-ok('chat: 1 room waiting minutes, not late',L[1].t.includes('แชตยังไม่ได้ตอบ 1 ห้อง')&&/รอนานสุด \d+ นาที/.test(L[1].t)&&!L[1].late);
+ok('only pending things listed, overdue items first (top-up, then shop registrations over 1 day)',L.length>=3&&L[0].k==='tp'&&L[1].k==='reg'&&L[1].late&&L[2].k==='sup');
+ok('top-ups: count, oldest wait in days, late tag',L[0].t.includes('เติมเงินรอยืนยัน 3 รายการ')&&/รอนานสุด \d+ วัน/.test(L[0].t)&&L[0].late&&L[0].t.includes('เกินเวลา'));
+ok('chat: 1 room waiting minutes, not late (under 30 min)',L[2].t.includes('แชตยังไม่ได้ตอบ 1 ห้อง')&&/รอนานสุด \d+ นาที/.test(L[2].t)&&!L[2].late);
+ok('late items say เกินเวลา in text (not colour only)',L.filter(x=>x.late).every(x=>x.t.includes('เกินเวลา'))&&L.filter(x=>!x.late).every(x=>!x.t.includes('เกินเวลา')));
 ok('shop registrations: 2 shops',(L.find(x=>x.k==='reg')||{t:''}).t.includes('ร้านสมัครใหม่ รออนุมัติ 2 ร้าน'));
 ok('items are real buttons in a list',await p.$$eval('.tdl > li > button',b=>b.length)===L.length);
 ok('icons hidden from screen readers',await p.$$eval('.tdl .supb > .qh > span[aria-hidden=true]',e=>e.length)===L.length);
@@ -129,6 +130,8 @@ await W(async()=>!!(await p.$('.tdl [data-td=sup]')));await p.click('.tdl [data-
 ok('chat item opens the chat list',await W(async()=>(await p.$$('.supb[data-a=supopen]')).length===2));
 await p.click('#tabs [data-id=q]');await W(async()=>!!(await p.$('.tdl [data-td=reg]')));await p.click('.tdl [data-td=reg]');
 ok('registration item opens ร้านนวด under ทะเบียน',await W(async()=>await p.$eval('#tabs [data-id=pl]',e=>e.classList.contains('on'))&&(await p.textContent('#main')).includes('ร้านใหม่หนึ่ง')));
+ROOMS.find(r=>r.last_from==='user').last_at=iso(40);await p.click('#tabs [data-id=q]');await p.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));
+ok('chat waiting over 30 min -> เกินเวลา',await W(async()=>{const L2=await items();const c=L2.find(x=>x.k==='sup');return !!c&&c.late&&c.t.includes('เกินเวลา')},6000));
 T.topup_requests.forEach(x=>x.status='confirmed');T.shop_registrations.forEach(x=>x.status='approved');ROOMS.forEach(r=>r.last_from='admin');T.bookings=[];(T.reviews||[]).forEach(r=>r.reported=false);T.review_staff.forEach(r=>r.reported=false);
 await p.reload();await p.waitForSelector('#tabs [data-id=q]',{timeout:8000});await p.click('#tabs [data-id=q]');
 ok('nothing pending: single line ไม่มีงานค้าง (status)',await W(async()=>(await p.textContent('#main')).includes('ไม่มีงานค้าง')&&!(await p.$('.tdl'))&&(await p.getAttribute('.tdok','role'))==='status',8000));

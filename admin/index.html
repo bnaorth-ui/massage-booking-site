@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>แอดมิน - สมาคมวิทยากรฝึกอาชีพคนตาบอด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.26"><meta name="app-name" content="สำหรับแอดมิน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.27"><meta name="app-name" content="สำหรับแอดมิน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -418,20 +418,23 @@ function qCard(b){var c=qCat(b),its=(b.booking_items||[]).slice().sort(function(
 /* ===== งานที่ต้องทำ (บนสุดของหน้าหลัก) รวมเรื่องค้างจากทุกเมนู เรียงตามความเร่งด่วน ใช้ข้อมูลที่โหลดอยู่แล้ว ===== */
 function tdAgo(iso){var m=Math.max(0,Math.round((Date.now()-new Date(iso).getTime())/60000));return m<60?m+" นาที":m<2880?Math.round(m/60)+" ชั่วโมง":Math.round(m/1440)+" วัน"}
 function tdOld(a,k){var t=null;a.forEach(function(x){var v=x[k];if(v&&(!t||v<t))t=v});return t}
-function todoItems(){var L=[];function add(k,ic,txt,n,unit,old,tab,urgH){if(!n)return;var late=old&&urgH&&(Date.now()-new Date(old).getTime())>urgH*3600000;L.push({k:k,ic:ic,txt:txt+" "+n+" "+unit,sub:old?"รอนานสุด "+tdAgo(old):"",late:late,tab:tab})}
- var tp=(D.tp||[]).filter(function(x){return x.st==="pending"});add("tp","💰","เติมเงินรอยืนยัน",tp.length,"รายการ",tdOld(tp,"at"),"pprq",2);
- var sr=(SUP.rooms||[]).filter(function(r){return r.last_from==="user"});add("sup","💬","แชตยังไม่ได้ตอบ",sr.length,"ห้อง",tdOld(sr,"last_at"),"sup",2);
+function todoItems(){var L=[];/* เกณฑ์ "เกินเวลา" ตรงกับการแจ้งเตือนจากระบบ (admin_overdue_alerts) */
+ function add(k,ic,txt,n,unit,old,tab,urgH,lateFrom){if(!n)return;var lf=lateFrom===undefined?old:lateFrom,late=!!(lf&&urgH&&(Date.now()-new Date(lf).getTime())>urgH*3600000);L.push({k:k,ic:ic,txt:txt+" "+n+" "+unit,sub:old?"รอนานสุด "+tdAgo(old):"",late:late,tab:tab})}
+ var tp=(D.tp||[]).filter(function(x){return x.st==="pending"});add("tp","💰","เติมเงินรอยืนยัน",tp.length,"รายการ",tdOld(tp,"at"),"pprq",2,tdOld(tp.filter(function(x){return x.slipPath}).map(function(x){return{t:x.slipAt||x.at}}),"t"));
+ var sr=(SUP.rooms||[]).filter(function(r){return r.last_from==="user"});add("sup","💬","แชตยังไม่ได้ตอบ",sr.length,"ห้อง",tdOld(sr,"last_at"),"sup",0.5);
  var qn=(D.bk||[]).filter(function(b){return qCat(b)==="new"});if(qn.length){var f=tdOld(qn,"starts_at");L.push({k:"q",ic:"🗓️",txt:"คิวงานใหม่ ยังไม่มีพนักงานกดรับ "+qn.length+" งาน",sub:f?"งานแรกเริ่ม "+new Date(f).toLocaleString("th-TH",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit",timeZone:"Asia/Bangkok"})+" น.":"",late:false,tab:"q"})}
- var pq=PR.list||[];add("pw","🔑","คำขอรหัสผ่านใหม่",pq.length,"รายการ",tdOld(pq,"created_at"),"usr",4);
- var rg=(D.regs||[]).filter(function(x){return x.status==="pending"});add("reg","🏪","ร้านสมัครใหม่ รออนุมัติ",rg.length,"ร้าน",tdOld(rg,"created_at"),"shop",0);
+ var pq=PR.list||[];add("pw","🔑","คำขอรหัสผ่านใหม่",pq.length,"รายการ",tdOld(pq,"created_at"),"usr",2);
+ var rg=(D.regs||[]).filter(function(x){return x.status==="pending"});add("reg","🏪","ร้านสมัครใหม่ รออนุมัติ",rg.length,"ร้าน",tdOld(rg,"created_at"),"shop",24);
  var oq=(D.oreq||[]).filter(function(r){return r.status==="pending"||r.status==="paid_review"});add("oreq","🏢","คำขอบริการของหน่วยงาน",oq.length,"รายการ",tdOld(oq,"created_at"),"oreq",0);
- var sc=D.scrOff?[]:(D.scr||[]);add("scr","📝","คำขอปิดบัญชีร้าน",sc.length,"รายการ",tdOld(sc,"requested_at"),"shop",0);
- var sd=D.sdrOff?[]:(D.sdr||[]);add("sdr","📝","คำขอลบบัญชีพนักงาน",sd.length,"รายการ",tdOld(sd,"requested_at"),"staff",0);
+ var sc=D.scrOff?[]:(D.scr||[]);add("scr","📝","คำขอปิดบัญชีร้าน",sc.length,"รายการ",tdOld(sc,"requested_at"),"shop",24);
+ var sd=D.sdrOff?[]:(D.sdr||[]);add("sdr","📝","คำขอลบบัญชีพนักงาน",sd.length,"รายการ",tdOld(sd,"requested_at"),"staff",24);
+ var sa=(D.sa||[]).filter(function(x){return x.status==="new"});add("sa","📋","หมอนวดสมัครงานใหม่",sa.length,"คน",tdOld(sa,"created_at"),"oreq",24);
  add("rvw","⭐","รีวิวที่ถูกรายงาน",RW.loaded?rvwPending():0,"รายการ",null,"rvw",0);
  add("hl","⚠️","ระบบตรวจพบเรื่องที่ควรดู",hlN(),"เรื่อง",null,"hl",0);
  add("ce","⚠️","ข้อผิดพลาดหน้าเว็บวันนี้",ceN(),"ครั้ง",null,"ce",0);
- return L.filter(function(x){return x.k==="q"?can("queue"):tabOk(x.tab)})}
-function todoHtml(){var L=todoItems();return '<div class="head"><h1>งานที่ต้องทำ</h1></div>'+(L.length?'<ul class="supr tdl">'+L.map(function(x){return '<li><button type="button" class="supb'+(x.late?' late':'')+'" '+(x.k==="q"?'data-a="todoq"':'data-a="tab" data-id="'+x.tab+'"')+' data-td="'+x.k+'"><span class="qh"><span aria-hidden="true">'+x.ic+'</span> <b>'+esc(x.txt)+'</b>'+(x.late?'<span class="tag w">รอนาน</span>':'')+'</span>'+(x.sub?'<small>'+esc(x.sub)+'</small>':'')+'</button></li>'}).join("")+'</ul>':'<p class="tdok" role="status"><span aria-hidden="true">✓ </span>ไม่มีงานค้าง</p>')}
+ L=L.filter(function(x){return x.k==="q"?can("queue"):x.k==="sa"?can("staff")&&tabOk("oreq"):tabOk(x.tab)});
+ return L.filter(function(x){return x.late}).concat(L.filter(function(x){return !x.late}))}
+function todoHtml(){var L=todoItems();return '<div class="head"><h1>งานที่ต้องทำ</h1></div>'+(L.length?'<ul class="supr tdl">'+L.map(function(x){return '<li><button type="button" class="supb'+(x.late?' late':'')+'" '+(x.k==="q"?'data-a="todoq"':'data-a="tab" data-id="'+x.tab+'"')+' data-td="'+x.k+'"><span class="qh"><span aria-hidden="true">'+x.ic+'</span> <b>'+esc(x.txt)+'</b>'+(x.late?'<span class="tag w">เกินเวลา</span>':'')+'</span>'+(x.sub?'<small>'+esc(x.sub)+'</small>':'')+'</button></li>'}).join("")+'</ul>':'<p class="tdok" role="status"><span aria-hidden="true">✓ </span>ไม่มีงานค้าง</p>')}
 function todoWarm(){var a=[];if(!PR.list&&can("users"))a.push(prLoad());if(!RW.loaded&&can("safety"))a.push(rvwLoad());if(!HL.d&&can("owner"))a.push(hlLoad());if(!CE.d&&can("owner"))a.push(ceLoad());return Promise.all(a.map(function(x){return Promise.resolve(x).catch(function(){})})).then(function(){if(S.tab==="q"&&!SR.open)softDraw()})}
 function qView(){var L={new:[],wait:[],done:[],cx:[]};(D.bk||[]).forEach(function(b){L[qCat(b)].push(b)});
  var TB=[["new","งานใหม่"],["wait","งานที่รออยู่"],["done","งานที่เสร็จสิ้น"],["cx","ถูกยกเลิก"]],qt=L[S.qt]?S.qt:"new",
