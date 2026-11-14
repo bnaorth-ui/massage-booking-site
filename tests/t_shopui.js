@@ -151,7 +151,7 @@ ok('duplicate phone message from server',await has('เบอร์มือถ�
 await p.fill('#fph','12');await p.click('[data-a=save]');ok('phone format validation',await has('เบอร์มือถือต้องเป็นตัวเลข 10 หลัก'));
 await p.fill('#fph','0877777777');await p.click('[data-a=save]');ok('staff saved',await has('รอพนักงานสมัครสมาชิกด้วยเบอร์นี้'));
 const ns=T.staff.find(s=>s.name==='คุณใหม่');ok('staff rpc body',ns&&ns.phone==='0877777777'&&T.staff_services.some(q=>q.staff_id===ns.id)&&calls.find(c=>c.path.endsWith('shop_save_staff')).body.p_place==='sh1');
-await p.click(`[data-a=tog][data-t=staff][data-id=${ns.id}]`);await until(()=>document.body.innerText.includes('ระงับ'));ok('staff suspended',T.staff.find(s=>s.id===ns.id).active===false);
+await p.click(`[data-a=tog][data-t=staff][data-id=${ns.id}]`);await until(()=>document.body.innerText.includes('ระงับ'));ok('staff suspended',await require('./config').waitFor(()=>T.staff.find(s=>s.id===ns.id).active===false));
 // ---- โปรโมชั่น
 await sub('promo');ok('promo listed',(await txt('#main')).includes('ลดนวดเท้า')&&(await txt('#main')).includes('ลด 10%'));
 await p.click('[data-a=new][data-t=promo]');await p.fill('#mt','ลด 50 บาท');await p.selectOption('#mty','baht');await p.fill('#mv','50');await p.fill('#ms1','2026-10-20');await p.fill('#me1','2026-10-10');
@@ -159,7 +159,7 @@ await p.click('[data-a=save]');ok('promo date validation',await has('วัน�
 await p.fill('#me1','2026-11-20');await p.click('[data-a=save]');await has('ลด 50 บาท');
 const np=T.promotions.find(x=>x.title==='ลด 50 บาท');ok('promo saved as amount',np&&np.type==='amount'&&np.value===50&&np.applies_all===true);
 ok('promo shows baht discount',(await txt('#main')).includes('ลด 50 บาท'));
-await p.click(`[data-a=tog][data-t=promo][data-id=${np.id}]`);await until(()=>true);await p.waitForTimeout(150);ok('promo toggled off',T.promotions.find(x=>x.id===np.id).active===false);
+await p.click(`[data-a=tog][data-t=promo][data-id=${np.id}]`);ok('promo toggled off',await require('./config').waitFor(()=>T.promotions.find(x=>x.id===np.id).active===false));
 await p.click(`[data-a=del][data-t=promo][data-id=${np.id}]`);await p.click(`[data-a=del][data-t=promo][data-id=${np.id}]`);await p.waitForTimeout(200);ok('promo deleted',!T.promotions.some(x=>x.id===np.id));
 // ---- กระเป๋าเงิน
 await p.click('[data-a=tab][data-id=wal]');await has('960');
@@ -204,7 +204,7 @@ await p.fill('#olat','13.7');await p.setInputFiles('#pimg',{name:'a.png',mimeTyp
 ok('shop image updated immediately',/^place-images\/sh1\/shop-.*\.jpg$/.test(T.places[0].image_path)&&await p.$eval('#hdr',h=>!!h.querySelector('img')));
 // ---- ปิด/เปิดร้าน
 await sub('svc');await p.click('[data-a=toggle]');await until(()=>document.body.innerText.includes('ปิดรับจองชั่วคราว'));
-ok('shop toggled off',T.places[0].active===false);await p.click('[data-a=toggle]');await p.waitForTimeout(200);ok('shop toggled on',T.places[0].active===true);
+ok('shop toggled off',await require('./config').waitFor(()=>T.places[0].active===false));await p.click('[data-a=toggle]');ok('shop toggled on',await require('./config').waitFor(()=>T.places[0].active===true));
 // ติดลบ: ปิดอัตโนมัติ
 T.places[0].active=false;T.places[0].auto_closed=true;T.wallet_tx.push({id:'w10',place_id:'sh1',type:'gp',amount:-2000,note:'หัก GP',status:'success',created_at:now()});
 await p.click('[data-a=tab][data-id=wal]');await has('ถูกปิดชั่วคราวอัตโนมัติ');
