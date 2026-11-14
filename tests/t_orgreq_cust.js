@@ -4,7 +4,7 @@ const {chromium}=require('playwright');
 const bkk=(n=0)=>{const d=new Date(Date.now()+7*3600000+n*86400000);return d.toISOString().slice(0,10)};
 (async()=>{const b=await chromium.launch(require('./config').launch);
 const ctx=await b.newContext({timezoneId:'Asia/Bangkok',locale:'th-TH'});const errs=[],calls=[];
-let mode={cat:true,rpcMissing:false};const RVS=[],RCGET=[],CMPR=[],CMPS=[],CMPL=[],CMPV=[],CMPSUB=[];let CMPON=false;const CMPMO=new Date(Date.now()+7*3600000).toISOString().slice(0,7);let RVFAIL='';const ORL=[],SUBS=[],CANC=[],ATT=[],UPL=[];let SUBFAIL='';let seq=100000;const BKS=[];const NOTES=[];
+let mode={cat:true,rpcMissing:false};const RVS=[],RCGET=[],CMPR=[],CMPS=[],CMPL=[],CMPV=[],CMPSUB=[];let CMPON=false;const CMPMO=new Date(Date.now()+7*3600000).toISOString().slice(0,7);let RVFAIL='';const ORL=[],SUBS=[],CANC=[],ATT=[],UPL=[];let SHOPPP=0;const ORGPP={org_pp_on:true,org_pp_type:'tax',org_pp_id:'0994000000001',org_pp_name:'สมาคมทดสอบ'};let SUBFAIL='';let seq=100000;const BKS=[];const NOTES=[];
 const UID='uuid-1';
 const places=[
  {id:'sh1',type:'shop',name:'ร้านสบายดี สปา',area:'สุขุมวิท',lat:13.76,lng:100.51,open_days:[0,1,2,3,4,5,6],open_time:'10:00:00',close_time:'21:00:00',fixed_date:null,advance_days:14,cancel_hours:24,image_path:null,status:'approved',active:true},
@@ -33,7 +33,9 @@ await ctx.route('**/*supabase.co/**',async r=>{const q=r.request(),u=new URL(q.u
  if(path==='/rest/v1/rpc/org_request_update'){UPD.push(body);const q=ORL.find(x=>x.id===body.p_id);Object.assign(q,{org_name:body.p.name,contact_name:body.p.contact_name,service_id:body.p.service,staff_ids:body.p.staff});return J(200,q.id)}
  if(path==='/rest/v1/rpc/org_free_staff'){FREECALLS.push(body.p_date);return J(200,body.p_date===bkk(19)?['st4']:body.p_date===bkk(22)?[]:['st3','st4'])}
  if(path==='/rest/v1/rpc/org_request_info')return J(200,{rate:400,districts:['ปทุมวัน','พญาไท','บางรัก','ดุสิต'],lead_days:10,pay_before_days:3,max_days:120,services:[{id:'sv15',name:'นวดคอบ่าไหล่',minutes:15,rest_minutes:5},{id:'sv30',name:'นวดไทย',minutes:30,rest_minutes:0}]});
- if(path==='/rest/v1/app_settings'&&m==='GET'&&u.search.includes('promptpay'))return J(200,[{promptpay_on:true,promptpay_type:'mobile',promptpay_id:'0812345678',promptpay_name:'สมาคมทดสอบ'}]);
+ if(path==='/rest/v1/app_settings'&&m==='GET'&&u.search.includes('promptpay')){SHOPPP++;return J(200,[{promptpay_on:true,promptpay_type:'mobile',promptpay_id:'0812345678',promptpay_name:'บัญชีร้านนวด'}])}
+ if(path==='/rest/v1/app_settings'&&m==='GET'&&u.search.includes('org_pp'))return J(200,[ORGPP]);
+ if(path==='/rest/v1/rpc/support_room')return J(200,{messages:[]});
  if(path.startsWith('/storage/v1/object/authenticated/receipts/')){RCGET.push(path);return r.fulfill({status:200,contentType:'application/pdf',body:Buffer.from('%PDF-1.4 rc')})}
  if(path==='/rest/v1/rpc/my_company_places')return J(200,CMPON?[{id:'cmp1',name:'บริษัท ไทยออฟฟิศ'}]:[]);
  if(path==='/rest/v1/rpc/my_company_schedule'){CMPS.push(body);const d0=body.p_from,dd=n=>new Date(Date.parse(d0+'T00:00:00Z')+n*86400000).toISOString().slice(0,10);return J(200,{open:'09:00:00',close:'17:00:00',staff:[{name:'คุณนุ่น',days:[1,3]},{name:'คุณแพร',days:[3]}],days:[{day:dd(0),present:['คุณนุ่น'],leave:[]},{day:dd(1),present:['คุณแพร (แทน)'],leave:[{name:'คุณนุ่น',reason:'ไปหาหมอ',sub:'คุณแพร'}]},{day:dd(5),present:['คุณแพร'],leave:[{name:'คุณนุ่น',reason:'ธุระครอบครัว'}]},{day:dd(20),present:['คุณนุ่น','คุณแพร'],leave:[]},{day:dd(30),present:['คุณนุ่น'],leave:[]}]})}
@@ -175,8 +177,9 @@ await p.click('[data-orq=open]');await p.waitForSelector('[data-orq=pay]');
 ok('list shows amount + therapists accepted',await p.$eval('.orqc',e=>e.textContent.includes('4,000')&&e.textContent.includes('คุณนุ่น ตอบรับ')&&e.textContent.includes('คุณมะลิ ตอบรับ')&&e.textContent.includes('ชำระภายใน')));
 await p.click('[data-orq=pay]');await p.waitForSelector('#orqqr[data-qr]',{timeout:4000});
 {const q=await p.getAttribute('#orqqr','data-qr');
- ok('QR is PromptPay with fixed amount',q.startsWith('000201010212')&&q.includes('A000000677010111')&&q.includes('0066812345678')&&q.includes('54074000.00')&&q.includes('5802TH')&&/6304[0-9A-F]{4}$/.test(q));}
-ok('pay page shows amount + account',await p.$eval('#app',e=>e.textContent.includes('4,000')&&e.textContent.includes('0812345678')&&e.textContent.includes('สมาคมทดสอบ')));
+ ok('QR is PromptPay (association tax ID) with fixed amount',q.startsWith('000201010212')&&q.includes('A000000677010111')&&q.includes('02130994000000001')&&!q.includes('0066812345678')&&q.includes('54074000.00')&&q.includes('5802TH')&&/6304[0-9A-F]{4}$/.test(q));}
+ok('org payment never reads the shop top-up account',SHOPPP===0);
+ok('pay page shows amount + association account',await p.$eval('#app',e=>e.textContent.includes('4,000')&&e.textContent.includes('0994000000001')&&e.textContent.includes('สมาคมทดสอบ')&&!e.textContent.includes('บัญชีร้านนวด')));
 ok('send disabled without slip',await p.$eval('[data-orq=slipsend]',e=>e.disabled));
 await p.setInputFiles('#orq_slip',{name:'slip.png',mimeType:'image/png',buffer:PNG});await p.waitForSelector('#orq_sprev img',{timeout:3000});
 ok('slip preview + send enabled',await p.$eval('[data-orq=slipsend]',e=>!e.disabled));
@@ -356,6 +359,15 @@ await p.selectOption('#cmp_month',CMPMO);await p.waitForSelector('.orqsum',{time
 {const [dl]=await Promise.all([p.waitForEvent('download',{timeout:8000}),p.click('[data-orq=cmppdf]')]);const buf=require('fs').readFileSync(await dl.path());
 ok('monthly PDF downloads (ASCII name, valid PDF)',dl.suggestedFilename()==='company-report-'+CMPMO+'.pdf'&&buf.slice(0,5).toString()==='%PDF-'&&buf.length>3000);}
 await p.click('[data-orq=cmpback]');await p.waitForTimeout(300);ok('back returns to account page',!!(await p.$('[data-orq=cmpopen]')));
+// ---- บัญชีหน่วยงานปิดอยู่: ไม่มี QR ให้แชตหรือโทรหาเจ้าหน้าที่ (ไม่ใช้บัญชีร้านนวดแทน)
+ORGPP.org_pp_on=false;ORL[0].status='awaiting_payment';ORL[0].note='';
+await p.reload();await p.waitForSelector('[data-tab=ac]',{timeout:8000});await p.click('[data-tab=ac]');await p.click('[data-orq=open]');await p.waitForSelector('[data-orq=pay]');await p.click('[data-orq=pay]');
+await p.waitForSelector('#orqnopp',{timeout:4000});
+{const t=await p.textContent('#app');
+ ok('org account off: no QR, clear message',!(await p.$('#orqqr'))&&t.includes('ยังไม่เปิดรับชำระผ่าน QR')&&t.includes('กรุณาติดต่อเจ้าหน้าที่เพื่อชำระค่าบริการ')&&!t.includes('0812345678'));
+ ok('org account off: chat button first, then call',await p.evaluate(()=>{const c=document.querySelector('#orqnopp [data-orq=paychat]');return !!c&&c.textContent==='แชตกับเจ้าหน้าที่'})&&SHOPPP===0);}
+await p.click('#orqnopp [data-orq=paychat]');
+ok('chat opens with prepared message (not sent)',await p.waitForFunction(()=>{const t=document.getElementById('chi');return t&&t.value.startsWith('ขอชำระค่าบริการ คำขอเลขที่ ')&&t.value.endsWith('ยอด 4,000 บาท')},null,{timeout:4000}).then(()=>true,()=>false)&&!calls.some(c=>c.path==='/rest/v1/rpc/support_send'));
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)
 })()
 
