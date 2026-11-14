@@ -201,7 +201,7 @@ ok('replace uploads new file and deletes the old one',rcUps.length===2&&rcUps[1]
 await p.click('[data-a=oqrcrm][data-id=q4]');await p.waitForTimeout(900);
 ok('remove clears path and deletes file',rcCalls[rcCalls.length-1].p_path===null&&rcDels.some(x=>x[0]===rcUps[1].path)&&(await p.textContent('[aria-label="ใบเสร็จของ หน่วยงานยืนยันแล้ว"]')).includes('ยังไม่ได้แนบใบเสร็จ'));
 await p.click('[data-a=oqsub][data-id=rq]');await p.waitForTimeout(200);
-ok('sub-tab bar: 4 tabs with roles, one selected',await p.evaluate(()=>{const b=[...document.querySelectorAll('#main [data-a=oqsub]')];return b.length===4&&b.every(x=>x.getAttribute('role')==='tab')&&b.filter(x=>x.getAttribute('aria-selected')==='true').length===1&&b.map(x=>x.dataset.id).join()==='rq,co,rc,rt'}));
+ok('sub-tab bar: 3 tabs with roles, one selected (recruitment moved to staff page)',await p.evaluate(()=>{const b=[...document.querySelectorAll('#main [data-a=oqsub]')];return b.length===3&&b.every(x=>x.getAttribute('role')==='tab')&&b.filter(x=>x.getAttribute('aria-selected')==='true').length===1&&b.map(x=>x.dataset.id).join()==='rq,co,rt'}));
 await p.click('[data-a=oqsub][data-id=rt]');await p.waitForTimeout(200);
 ok('ratings tab shows only rating panels',await p.evaluate(()=>!!document.getElementById('crvq')&&!!document.getElementById('orvq')&&!document.getElementById('chvq')&&!document.getElementById('capq')&&!document.getElementById('spq')&&!document.querySelector('.item [data-a=oqrm]')));
 await p.click('[data-a=oqsub][data-id=co]');await p.waitForTimeout(200);

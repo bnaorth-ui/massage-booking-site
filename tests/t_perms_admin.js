@@ -97,6 +97,8 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
   if(f==='admin_support_messages'){SQ.push([f,body]);const L=(MS[body.p_user+'|'+body.p_app]||[]);return J(200,body.p_after?L.filter(m=>m.created_at>body.p_after):L)}
   if(f==='admin_support_mark_read'){SQ.push([f,body]);const r=ROOMS.find(x=>x.user_id===body.p_user&&x.app===body.p_app);if(r)r.unread=0;return J(204,null)}
   if(f==='admin_support_reply'){SQ.push([f,body]);if(REPERR)return J(400,{code:'P0001',message:REPERR});const k=body.p_user+'|'+body.p_app;(MS[k]=MS[k]||[]).push({id:'r'+(++n),sender_id:'u1',sender_role:'admin',sender_name:'เจ้าหน้าที่ แอดมิน',body:body.p_body,created_at:new Date().toISOString()});const r=ROOMS.find(x=>x.user_id===body.p_user&&x.app===body.p_app);r.last_from='admin';r.last_body=body.p_body;return J(200,'mid')}
+  if(f==='admin_staff_postings')return J(200,[{id:'po1',title:'รับสมัครหมอนวดประจำ',detail:'',slots:2,deadline:null,is_open:true,open:true,total:1,fresh:1}]);
+  if(f==='admin_staff_applications')return J(200,[{id:'sa1',posting_id:'po1',full_name:'ผู้สมัคร ทดสอบ',phone:'0899999999',status:'new',created_at:now()}]);
   return J(404,{message:'no rpc '+f})}
  if(!me||!T.admins.includes(me.id))return J(403,{code:'42501',message:'permission denied'});
  const tb=path.replace('/rest/v1/','');if(T[tb]===undefined)return J(404,{message:'nf '+path});
@@ -178,5 +180,16 @@ await p.click('#tabs [data-id=q]');ok('queue section visible with คิวง�
 PERM.u2=['chat'];ROOMS[0].link='company';await p.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));
 await W(async()=>(await navIds()).includes('sup'),6000);await p.click('#tabs [data-id=sup]');
 ok('room of a company contact shows tag บริษัท',await W(async()=>/บริษัท/.test(await p.textContent('.supb[data-a=supopen]'))));
+// ผู้ดูแลหมอนวดอย่างเดียว: เปิดหน้ารับสมัครหมอนวดได้ (เดิมซ่อนอยู่ใต้คำขอหน่วยงานซึ่งต้องใช้สิทธิ์หน่วยงาน)
+PERM.u2=['staff'];await p.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));
+await W(async()=>(await navIds()).includes('pl'),6000);await p.click('#tabs [data-id=pl]');await p.waitForTimeout(400);
+ok('staff-only helper: ทะเบียน shows only the staff page (no org requests)',JSON.stringify(await subIds()).includes('"staff"')&&!(await subIds()).includes('oreq'));
+await W(async()=>!!(await p.$('[data-a=stsub][data-id=rc]')),6000);
+await p.click('[data-a=stsub][data-id=rc]');
+ok('staff-only helper opens recruitment and sees the posting',await W(async()=>(await p.textContent('#main')).includes('รับสมัครหมอนวดประจำ')));
+await p.click('#tabs [data-id=q]');
+ok('staff-only helper: todo item for new applications',await W(async()=>!!(await p.$('.tdl .supb[data-td=sa]'))));
+await p.click('.tdl .supb[data-td=sa]');
+ok('todo item opens the recruitment subtab',await W(async()=>(await p.getAttribute('[data-a=stsub][data-id=rc]','aria-selected'))==='true'));
 ok('no page errors',errs.length===0);
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)})();

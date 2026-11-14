@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>แอดมิน - สมาคมวิทยากรฝึกอาชีพคนตาบอด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.31"><meta name="app-name" content="สำหรับแอดมิน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.32"><meta name="app-name" content="สำหรับแอดมิน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -434,11 +434,11 @@ function todoItems(){var L=[];/* เกณฑ์ "เกินเวลา" ต�
  var oq=(D.oreq||[]).filter(function(r){return r.status==="pending"||r.status==="paid_review"});add("oreq","🏢","คำขอบริการของหน่วยงาน",oq.length,"รายการ",tdOld(oq,"created_at"),"oreq",0);
  var sc=D.scrOff?[]:(D.scr||[]);add("scr","📝","คำขอปิดบัญชีร้าน",sc.length,"รายการ",tdOld(sc,"requested_at"),"shop",24);
  var sd=D.sdrOff?[]:(D.sdr||[]);add("sdr","📝","คำขอลบบัญชีพนักงาน",sd.length,"รายการ",tdOld(sd,"requested_at"),"staff",24);
- var sa=(D.sa||[]).filter(function(x){return x.status==="new"});add("sa","📋","หมอนวดสมัครงานใหม่",sa.length,"คน",tdOld(sa,"created_at"),"oreq",24);
+ var sa=(D.sa||[]).filter(function(x){return x.status==="new"});add("sa","📋","หมอนวดสมัครงานใหม่",sa.length,"คน",tdOld(sa,"created_at"),"staff",24);
  add("rvw","⭐","รีวิวที่ถูกรายงาน",RW.loaded?rvwPending():0,"รายการ",null,"rvw",0);
  add("hl","⚠️","ระบบตรวจพบเรื่องที่ควรดู",hlN(),"เรื่อง",null,"hl",0);
  add("ce","⚠️","ข้อผิดพลาดหน้าเว็บวันนี้",ceN(),"ครั้ง",null,"ce",0);
- L=L.filter(function(x){return x.k==="q"?can("queue"):x.k==="sa"?can("staff")&&tabOk("oreq"):tabOk(x.tab)});
+ L=L.filter(function(x){return x.k==="q"?can("queue"):tabOk(x.tab)});
  return L.filter(function(x){return x.late}).concat(L.filter(function(x){return !x.late}))}
 function todoHtml(){var L=todoItems();return '<div class="head"><h1>งานที่ต้องทำ</h1></div>'+(L.length?'<ul class="supr tdl">'+L.map(function(x){return '<li><button type="button" class="supb'+(x.late?' late':'')+'" '+(x.k==="q"?'data-a="todoq"':'data-a="tab" data-id="'+x.tab+'"')+' data-td="'+x.k+'"><span class="qh"><span aria-hidden="true">'+x.ic+'</span> <b>'+esc(x.txt)+'</b>'+(x.late?'<span class="tag w">เกินเวลา</span>':'')+'</span>'+(x.sub?'<small>'+esc(x.sub)+'</small>':'')+'</button></li>'}).join("")+'</ul>':'<p class="tdok" role="status"><span aria-hidden="true">✓ </span>ไม่มีงานค้าง</p>')}
 function todoWarm(){var a=[];if(!PR.list&&can("users"))a.push(prLoad());if(!RW.loaded&&can("safety"))a.push(rvwLoad());if(!HL.d&&can("owner"))a.push(hlLoad());if(!CE.d&&can("owner"))a.push(ceLoad());return Promise.all(a.map(function(x){return Promise.resolve(x).catch(function(){})})).then(function(){if(S.tab==="q"&&!SR.open)softDraw()})}
@@ -868,7 +868,8 @@ function view(){if(SR.open)return srView();return view0()}
 function view0(){return subBar(groupOf(S.tab))+(tabOk(S.tab)?viewIn():noPerm())}
 function viewIn(){var t=S.tab;
  if(t==="q")return qView();if(t==="rp")return rpView();if(t==="shop")return shopView();if(t==="org"||t==="comp")return orgView(t);if(t==="oreq")return oreqView();
- if(t==="staff")return (S.info?'<div class="saved" role="status">'+esc(S.info)+'</div>':'')+(S.stmsg?'<div class="'+(S.stok?"saved":"closed")+'" role="status">'+esc(S.stmsg)+'</div>':'')+stNewCard()+sdrCard()+'<div class="head"><h1>เพิ่มพนักงาน</h1>'+addBtn("staff")+'</div>'+(S.form&&S.form.t==="staff"?staffForm():searchBox("staff","ค้นหาชื่อหรือเบอร์พนักงาน")+'<div id="lst">'+staffList()+'</div>');
+ if(t==="staff"&&S.stS==="rc"&&!D.spOff)return (S.info?'<div class="saved" role="status">'+esc(S.info)+'</div>':'')+stSubBar()+(spPanel()||'<p class="sub">ไม่มีรายการ</p>');
+ if(t==="staff")return (S.info?'<div class="saved" role="status">'+esc(S.info)+'</div>':'')+(S.stmsg?'<div class="'+(S.stok?"saved":"closed")+'" role="status">'+esc(S.stmsg)+'</div>':'')+stSubBar()+stNewCard()+sdrCard()+'<div class="head"><h1>เพิ่มพนักงาน</h1>'+addBtn("staff")+'</div>'+(S.form&&S.form.t==="staff"?staffForm():searchBox("staff","ค้นหาชื่อหรือเบอร์พนักงาน")+'<div id="lst">'+staffList()+'</div>');
  if(t==="svc")return svcView();if(t==="cat")return catView();if(t==="ann")return annView();if(t==="rvw")return rvwView();if(t==="usr")return usrView();if(t==="hl")return hlView();if(t==="ce")return ceView();if(t==="au")return auView();if(t==="me")return meView();if(t==="fm")return fmView();if(t==="nt")return ntView();if(t==="sup")return supView();if(t==="pp")return ppView();return setView()}
 var OQ_ST={pending:["รออนุมัติ","closed"],invited:["รอหมอนวดตอบรับ","saved"],awaiting_payment:["รอชำระเงิน","saved"],paid_review:["รอตรวจสลิป","closed"],confirmed:["ยืนยันแล้ว","saved"],rejected:["ไม่อนุมัติ",""],cancelled:["ยกเลิก",""],expired:["หมดเวลา",""],no_staff:["ไม่มีหมอนวดรับงาน",""]},OQ_IS={pending:"รอตอบ",accepted:"รับงาน",declined:"ปฏิเสธ",expired:"หมดเวลา",cancelled:"ยกเลิก",replaced:"เปลี่ยนตัวแล้ว"};
 function oqDate(d){var x=new Date(d+"T00:00:00");return x.toLocaleDateString("th-TH",{day:"numeric",month:"short",year:"numeric"})}
@@ -963,25 +964,27 @@ function chvPanel(){if(D.chvOff)return"";var C=D.chv||{handovers:[],uncovered:[]
 function oreqView(){if(D.oreqOff)return'<div class="closed" role="status">ยังไม่ได้เปิดระบบคำขอหน่วยงานในฐานข้อมูล</div>';
  var L=D.oreq||[],act_=L.filter(function(r){return/^(pending|invited|awaiting_payment|paid_review)$/.test(r.status)}),done=L.filter(function(r){return act_.indexOf(r)<0});
  return(S.info?'<div class="saved" role="status">'+esc(S.info)+'</div>':'')+'<div class="head"><h1>คำขอบริการสำหรับหน่วยงาน</h1></div>'+oqSubBar()+oqSubBody(act_,done)}
-var OQS=[["rq","คำขอหน่วยงาน"],["co","บริษัท"],["rc","รับสมัครหมอนวด"],["rt","คะแนนและปัญหา"]];
+var OQS=[["rq","คำขอหน่วยงาน"],["co","บริษัท"],["rt","คะแนนและปัญหา"]];
+/* หน้าหมอนวด: แท็บย่อย รายชื่อ / รับสมัครหมอนวด (ใบสมัครใช้สิทธิ์หมวดหมอนวด ตรงกับฐานข้อมูล) */
+var STS=[["all","รายชื่อ"],["rc","รับสมัครหมอนวด"]];
+function spFresh(){return (D.sp||[]).reduce(function(a,x){return a+(+x.fresh||0)},0)}
+function stSubBar(){if(D.spOff)return"";var c=S.stS==="rc"?"rc":"all";return'<div class="subtabs mgb" role="tablist" aria-label="หมวดในหน้าหมอนวด">'+STS.map(function(x){var n=x[0]==="rc"?spFresh():0;return'<button type="button" role="tab" data-a="stsub" data-id="'+x[0]+'" class="'+(x[0]===c?"on":"")+'" aria-selected="'+(x[0]===c)+'">'+x[1]+(n?' ('+n+' ใหม่)':'')+'</button>'}).join("")+'</div>'}
 function oqCnt(id){var f=function(x){return x.problem||x.rating<=2};
  if(id==="rq")return oreqPending()+(D.ho||[]).filter(function(x){return x.status==="pending_admin"}).length;
  if(id==="co"){var C=D.chv||{handovers:[],uncovered:[]};return (D.cap||[]).filter(function(x){return x.status==="new"}).length+(C.handovers||[]).filter(function(x){return x.status==="pending_admin"}).length+(C.uncovered||[]).length}
- if(id==="rc")return (D.sp||[]).reduce(function(a,x){return a+(+x.fresh||0)},0);
  return (D.orv||[]).filter(f).length+(D.crv||[]).filter(f).length}
 function oqCur(){if(!S.oqS){S.oqS="rq";for(var i=0;i<OQS.length;i++){if(oqCnt(OQS[i][0])>0){S.oqS=OQS[i][0];break}}}return S.oqS}
 function oqSubBar(){var c=oqCur();return'<div class="subtabs mgb" role="tablist" aria-label="หมวดในหน้าคำขอหน่วยงาน">'+OQS.map(function(x){var n=oqCnt(x[0]);return'<button type="button" role="tab" data-a="oqsub" data-id="'+x[0]+'" class="'+(x[0]===c?"on":"")+'" aria-selected="'+(x[0]===c)+'">'+x[1]+(n?' ('+n+')':'')+'</button>'}).join("")+'</div>'}
 function oqSubBody(act_,done){var c=oqCur(),h="";
  if(c==="rq")return dlPanel()+hoPanel()+(act_.length?act_.map(oreqCard).join(""):'<p class="sub">ไม่มีคำขอที่ต้องดำเนินการ</p>')+(done.length?'<h2 class="mgt">ประวัติ</h2>'+done.map(oreqCard).join(""):'');
  if(c==="co")h=chvPanel()+capPanel();
- else if(c==="rc")h=spPanel();
  else h=rvOrgPanel()+crvPanel();
  return h||'<p class="sub">ไม่มีรายการ</p>'}
 function listHtml(tab){return tab==="org"||tab==="comp"?orgList(tab):tab==="shop"?shopList():staffList()}
 function navDraw(){var g=groupOf(S.tab);document.getElementById("navb").hidden=false;
  document.getElementById("tabs").innerHTML=navList().map(function(x){var u=x[0]==="sup"?supPending():x[0]==="nt"?ntUnread():x[0]==="pl"?plPending():x[0]==="fin"?(can("finance")?tpPending():0):x[0]==="q"?(can("queue")?qNew():0):0;return '<button type="button" data-a="tab" data-id="'+x[0]+'" class="'+(x[0]===g?"on":"")+'"><span aria-hidden="true">'+x[2]+'</span>'+x[1]+(u?'<i class="bdg" aria-label="'+x[3]+' '+u+' รายการ">'+u+'</i>':'')+'</button>'}).join("");
  document.getElementById("hacts").innerHTML='<button type="button" class="srb" data-a="sropen" aria-label="ค้นหา" title="ค้นหา (กด /)"><span aria-hidden="true">🔍</span></button>'}
-function subBar(g){var L=SUBM[g]?grpTabs(g):null;if(!L||!L.length)return"";var cur=curSub();return '<div class="subtabs mgb" role="tablist" aria-label="'+NAVN[g]+'">'+L.map(function(x){var u=x[0]==="shop"?regPending():x[0]==="pprq"?tpPending():x[0]==="rvw"?rvwPending():x[0]==="oreq"?oreqPending():x[0]==="hl"?hlN():x[0]==="ce"?ceN():0;return '<button type="button" role="tab" data-a="tab" data-id="'+x[0]+'" class="'+(x[0]===cur?"on":"")+'" aria-selected="'+(x[0]===cur)+'">'+x[1]+(u?' ('+u+')':'')+'</button>'}).join("")+'</div>'}
+function subBar(g){var L=SUBM[g]?grpTabs(g):null;if(!L||!L.length)return"";var cur=curSub();return '<div class="subtabs mgb" role="tablist" aria-label="'+NAVN[g]+'">'+L.map(function(x){var u=x[0]==="shop"?regPending():x[0]==="pprq"?tpPending():x[0]==="rvw"?rvwPending():x[0]==="oreq"?oreqPending():x[0]==="staff"?spFresh():x[0]==="hl"?hlN():x[0]==="ce"?ceN():0;return '<button type="button" role="tab" data-a="tab" data-id="'+x[0]+'" class="'+(x[0]===cur?"on":"")+'" aria-selected="'+(x[0]===cur)+'">'+x[1]+(u?' ('+u+')':'')+'</button>'}).join("")+'</div>'}
 function post(){
  if(S.tab==="pp"){if(D.pp.id&&ppValid(D.pp.type,D.pp.id)&&document.getElementById("ppqr"))drawQr("ppqr",ppPayload(D.pp.type,D.pp.id,0));if(D.opp&&D.opp.id&&ppValid(D.opp.type,D.opp.id)&&document.getElementById("oppqr"))drawQr("oppqr",ppPayload(D.opp.type,D.opp.id,0));
   slipHashAll();D.tp.forEach(function(t){var el=document.getElementById("slipth_"+t.id);if(el&&t.slipPath)loadBlobInto("/storage/v1/object/authenticated/slips/"+t.slipPath,el,"สลิปการโอน","slipth",t.slipPath);var bg=document.getElementById("slipbig_"+t.id);if(bg&&t.slipPath)loadBlobInto("/storage/v1/object/authenticated/slips/"+t.slipPath,bg,"สลิปการโอนขยาย","slipbig")})}
@@ -1152,7 +1155,7 @@ document.addEventListener("click",function(e){
  if(a==="rpcsv"){rpCsv();return}
  if(a==="ss"){S.ss=id;S.form=null;S.lic=null;S.rej=null;S.shmsg="";draw();return}
  if(a==="shinv"){shInvShare(id==="copy");return}
- if(a==="tab"){srClear();if(S.last[id])id=S.last[id];if(SUBM[groupOf(id)]&&!tabOk(id)){var gl=grpTabs(groupOf(id));if(gl.length)id=gl[0][0]}var gg=groupOf(id);if(S.last[gg])S.last[gg]=id;if(id==="pprq"||id==="ppac"){S.pps=id.slice(2);id="pp"}S.tab=id;S.sdc=null;S.sdn=null;S.ppsaved=false;S.form=null;S.del=null;S.saved=false;S.info="";S.stnew=null;S.stmsg="";S.hmsg="";S.rej=null;S.lic=null;S.tpc=null;S.tpr=null;S.slipv=null;S.oqr=null;S.oqS=null;draw();if(id==="nt"||id==="pp"||id==="shop"||id==="q")refresh();if(id==="rvw")rvwLoad();if(id==="usr")usrLogLoad();if(id==="usr")prLoad();if(id==="hl")hlLoad();if(id==="ce")ceLoad();if(id==="au")auLoad();if(id==="fm")fmLoad();if(id==="sup"){supClose();supLoad().then(function(){if(S.tab==="sup"&&!SUP.cur)draw()})}else supClose();if(id==="set"&&S.sub==="a")loadAdmins().then(draw);return}
+ if(a==="tab"){srClear();if(S.last[id])id=S.last[id];if(SUBM[groupOf(id)]&&!tabOk(id)){var gl=grpTabs(groupOf(id));if(gl.length)id=gl[0][0]}var gg=groupOf(id);if(S.last[gg])S.last[gg]=id;if(id==="pprq"||id==="ppac"){S.pps=id.slice(2);id="pp"}S.tab=id;S.sdc=null;S.sdn=null;S.ppsaved=false;S.form=null;S.del=null;S.saved=false;S.info="";S.stnew=null;S.stmsg="";S.hmsg="";S.rej=null;S.lic=null;S.tpc=null;S.tpr=null;S.slipv=null;S.oqr=null;S.oqS=null;S.stS=el.dataset.td==="sa"?"rc":null;draw();if(id==="nt"||id==="pp"||id==="shop"||id==="q")refresh();if(id==="rvw")rvwLoad();if(id==="usr")usrLogLoad();if(id==="usr")prLoad();if(id==="hl")hlLoad();if(id==="ce")ceLoad();if(id==="au")auLoad();if(id==="fm")fmLoad();if(id==="sup"){supClose();supLoad().then(function(){if(S.tab==="sup"&&!SUP.cur)draw()})}else supClose();if(id==="set"&&S.sub==="a")loadAdmins().then(draw);return}
  if(a==="sub"){S.saved=false;S.del=null;var sv=document.querySelector(".saved");if(sv)sv.remove();subTo(id);if(id==="c"){SLP.msg="";SLP.cfm=false;slipCount()}if(id==="a")loadAdmins().then(function(){var h=document.querySelector("[data-sg=a]");if(h&&S.sub==="a")h.innerHTML=adminHtml()},function(x){showErr(errTh(x))});return}
  if(a==="ntf"){S.ntf=id;draw();return}
   if(a==="ntc"){S.ntc=id;draw();return}
@@ -1230,6 +1233,7 @@ document.addEventListener("click",function(e){
  if(a==="oqrpno"){S.rep=null;draw();return}
  if(a==="oqrpsend"){if(!S.rep||!S.rep.sel){S.hmsg="กรุณาเลือกหมอนวดที่ว่างก่อน";draw();return}var rpTo=S.rep.sel;act(function(){return rpc("admin_org_replace_staff",{p_invite:id,p_to:rpTo,p_reason:null}).then(loadCore).then(loadLive)},function(){S.rep=null;S.info="ส่งคำเชิญหมอนวดแทนแล้ว หมอนวดเดิมยังรับผิดชอบจนกว่าคนใหม่จะตอบรับ"});return}
  if(a==="oqrm"){if(S.rmI!==id){S.rmI=id;draw();ann("กรอกเหตุผล แล้วกดยืนยันถอดหมอนวดออกจากงาน");return}var rn=g("rmn_"+id),rnote=rn?rn.value.trim():"";act(function(){return rpc("admin_org_remove_staff",{p_invite:id,p_reason:rnote||null}).then(loadCore).then(loadLive)},function(){S.rmI=null;S.info="ถอดหมอนวดออกจากงานแล้ว และแจ้งหมอนวดกับผู้ขอแล้ว"});return}
+ if(a==="stsub"){S.stS=id;S.info="";draw();var sb2=document.querySelector('#main [data-a=stsub].on');if(sb2)sb2.focus();ann("แสดงหมวด "+(STS.filter(function(x){return x[0]===id})[0]||["",""])[1]);return}
  if(a==="oqsub"){S.oqS=id;draw();var ob=document.querySelector('#main [data-a=oqsub].on');if(ob)ob.focus();ann("แสดงหมวด "+(OQS.filter(function(x){return x[0]===id})[0]||["",""])[1]);return}
  if(a==="spnew"){S.spE="new";draw();var t1=g("sp_t");if(t1)t1.focus();return}
  if(a==="spedit"){S.spE=id;draw();var t2=g("sp_t");if(t2)t2.focus();return}
