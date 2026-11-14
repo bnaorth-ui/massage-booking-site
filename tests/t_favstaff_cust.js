@@ -1,4 +1,4 @@
-// เมนูรายการโปรด: แถบหมอโปรด (เวลาว่าง เรียง ไม่รับจอง หน้าว่าง) และจองกับหมอโปรด (บริการที่หมอทำได้ เวลาที่หมอว่าง เลือกหมอไว้ให้ ไม่ระบุหมอ จองหลายคน)
+// เมนูรายการชื่นชอบ: แถบหมอนวดที่ชื่นชอบ (เวลาว่าง เรียง ไม่รับจอง หน้าว่าง) และจองกับหมอนวดที่ชื่นชอบ (บริการที่หมอทำได้ เวลาที่หมอว่าง เลือกหมอไว้ให้ ไม่ระบุหมอ จองหลายคน)
 const {chromium}=require('playwright');
 const bkk=(n=0)=>{const d=new Date(Date.now()+7*3600000+n*86400000);return d.toISOString().slice(0,10)};
 (async()=>{const b=await chromium.launch(require('./config').launch);
@@ -70,22 +70,22 @@ const D0=bkk(0),D1=bkk(1);const T=(d,hm)=>Date.parse(d+'T'+hm+':00+07:00');
 const busy=(staff,d,from,to)=>{BKS.push({ref:'X'+(seq++),place_id:'sh1',status:'confirmed',items:[{staff_id:staff,s:T(d,from),e:T(d,to),active:true}],s:T(d,from),e:T(d,to)})};
 const app=async()=>(await p.textContent('#app')).replace(/\s+/g,' ');
 await p.clock.setFixedTime(new Date(D0+'T10:12:00+07:00'));
-// ไม่มีรายการโปรด
+// ไม่มีรายการชื่นชอบ
 await p.click('#tabs [data-tab="fv"]');await p.waitForTimeout(500);
-ok('menu named รายการโปรด, heading too',(await p.textContent('#tabs [data-tab="fv"]')).includes('รายการโปรด')&&(await p.textContent('#fvt'))==='รายการโปรด');
-ok('two tabs, staff first and selected, counts shown',(await p.$$eval('[data-fvk]',e=>e.map(x=>x.dataset.fvk+':'+x.textContent))).join('|')==='s:หมอโปรด (0)|p:ร้านโปรด (0)'&&(await p.getAttribute('[data-fvk=s]','aria-pressed'))==='true');
-ok('no favourite staff: explains how to add',(await app()).includes('ยังไม่มีหมอโปรด')&&(await app()).includes('กดรูปหัวใจที่ชื่อหมอนวด'));
-// มีแต่ร้านโปรด -> เปิดแถบร้านโปรด
+ok('menu named ชื่นชอบ, heading too',(await p.textContent('#tabs [data-tab="fv"]')).includes('ชื่นชอบ')&&(await p.textContent('#fvt'))==='ชื่นชอบ');
+ok('two tabs, staff first and selected, counts shown',(await p.$$eval('[data-fvk]',e=>e.map(x=>x.dataset.fvk+':'+x.textContent))).join('|')==='s:หมอนวดที่ชื่นชอบ (0)|p:ร้านที่ชื่นชอบ (0)'&&(await p.getAttribute('[data-fvk=s]','aria-pressed'))==='true');
+ok('no favourite staff: explains how to add',(await app()).includes('ยังไม่มีหมอนวดที่ชื่นชอบ')&&(await app()).includes('กดรูปหัวใจที่ชื่อหมอนวด'));
+// มีแต่ร้านที่ชื่นชอบ -> เปิดแถบร้านที่ชื่นชอบ
 FP.push('sh1');await p.evaluate(()=>loadFavs().then(()=>{}));await p.click('#tabs [data-tab=""]');await p.waitForTimeout(300);await p.click('#tabs [data-tab="fv"]');await p.waitForTimeout(500);
 ok('only favourite shops: opens on the shop tab',(await p.getAttribute('[data-fvk=p]','aria-pressed'))==='true'&&!!(await p.$('[data-pl="sh1"]')));
-// หมอโปรด 3 คน: st2 ว่างวันนี้ 11:00, st1 วันนี้เต็ม -> พรุ่งนี้, bg1 ร้านใหญ่
+// หมอนวดที่ชื่นชอบ 3 คน: st2 ว่างวันนี้ 11:00, st1 วันนี้เต็ม -> พรุ่งนี้, bg1 ร้านใหญ่
 FS.push('st1','st2','bg1');busy('st1',D0,'10:00','21:00');
 await p.evaluate(()=>loadFavs().then(()=>{CQ={}}));await p.click('#tabs [data-tab=""]');await p.waitForTimeout(300);await p.click('#tabs [data-tab="fv"]');await p.waitForTimeout(900);
-ok('opening the menu again goes back to the staff tab',(await p.getAttribute('[data-fvk=s]','aria-pressed'))==='true'&&(await p.textContent('[data-fvk=s]'))==='หมอโปรด (3)');
+ok('opening the menu again goes back to the staff tab',(await p.getAttribute('[data-fvk=s]','aria-pressed'))==='true'&&(await p.textContent('[data-fvk=s]'))==='หมอนวดที่ชื่นชอบ (3)');
 let t=await app();
 ok('staff cards show shop and next free time',t.includes('คุณสมศรี')&&t.includes('ร้านสบายดี สปา')&&t.includes('ว่างวันนี้ 11:00 น.')&&t.includes('คุณวิภา')&&t.includes('ว่างพรุ่งนี้ 10:00 น.')&&t.includes('หมอ1')&&t.includes('ร้านใหญ่'));
 const ord=await p.$$eval('[data-fvb]',e=>e.map(x=>x.dataset.fvb));ok('sorted by soonest free: tomorrow one last',ord[ord.length-1]==='st1'&&ord.length===3);
-ok('each card: book button named with the staff, labelled remove button',(await p.textContent('[data-fvb="st2"]'))==='จองกับคุณสมศรี'&&(await p.getAttribute('[data-fv="s:st2"]','aria-label'))==='เอาคุณสมศรีออกจากหมอโปรด');
+ok('each card: book button named with the staff, labelled remove button',(await p.textContent('[data-fvb="st2"]'))==='จองกับคุณสมศรี'&&(await p.getAttribute('[data-fv="s:st2"]','aria-label'))==='เอาคุณสมศรีออกจากหมอนวดที่ชื่นชอบ');
 // หมอที่ปิดรับงาน
 await p.evaluate(()=>{var pl=PLACES.filter(x=>x.id==='sh2')[0];pl.staff.forEach(c=>{if(c.id==='bg1')c.on=0});CQC={};render(true)});await p.waitForTimeout(300);
 ok('staff not taking bookings: says so, no book button, can remove',(await app()).includes('ไม่รับจองในขณะนี้')&&!(await p.$('[data-fvb="bg1"]'))&&!!(await p.$('[data-fv="s:bg1"]')));
@@ -103,7 +103,7 @@ ok('staff step: she is already selected',(await p.getAttribute('[data-st="st1"]'
 // ไม่ระบุหมอ
 await p.click('#back');await p.waitForSelector('#selT');await p.click('[data-want=clear]');await p.waitForTimeout(900);
 nf=await p.$$eval('[data-nf]',e=>e.map(x=>x.dataset.nf));ok('no preference: bar gone, times from all staff (today 11:00)',!(await p.$('[data-want]'))&&nf[0]===D0+'|660');
-// จองหลายคนพร้อมกันกับหมอโปรด: คุณวิภารับคนแรก
+// จองหลายคนพร้อมกันกับหมอนวดที่ชื่นชอบ: คุณวิภารับคนแรก
 await p.click('#tabs [data-tab="fv"]');await p.waitForTimeout(600);await p.click('[data-fvb="st1"]');await p.waitForSelector('[data-qty]');
 await p.click('[data-qty="sa"][data-dir="1"]');await p.click('[data-qty="sa"][data-dir="1"]');await p.click('#next');await p.waitForSelector('#selT');await p.waitForTimeout(900);
 nf=await p.$$eval('[data-nf]',e=>e.map(x=>x.dataset.nf));ok('two people together: needs her plus one more (tomorrow 10:00)',nf[0]===D1+'|600');

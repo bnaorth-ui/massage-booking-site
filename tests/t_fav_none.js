@@ -88,5 +88,5 @@ ok('no โปรดของฉัน',!(await p.$('[data-fvp]'))&&(await p.text
 ok('no error text',!(await p.textContent('#app')).includes('ฐานข้อมูล'));
 await p.click('#tabs [data-tab="fv"]');await p.waitForTimeout(500);
 ok('fav tab still there (5 tabs) when favourites cannot load',(await p.$$('#tabs [data-tab]')).length===5);
-ok('fav tab shows a friendly load error with retry, no technical text',(await p.textContent('#app')).includes('โหลดรายการโปรดไม่สำเร็จ')&&!!(await p.$('[data-fvr]'))&&!(await p.textContent('#app')).includes('ฐานข้อมูล')&&!(await p.textContent('#app')).includes('PGRST'));
+ok('fav tab shows a friendly load error with retry, no technical text',(await p.textContent('#app')).includes('โหลดรายการชื่นชอบไม่สำเร็จ')&&!!(await p.$('[data-fvr]'))&&!(await p.textContent('#app')).includes('ฐานข้อมูล')&&!(await p.textContent('#app')).includes('PGRST'));
 console.log('errs',JSON.stringify(errs));await b.close();})();
