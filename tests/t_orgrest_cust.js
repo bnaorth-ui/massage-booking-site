@@ -45,7 +45,7 @@ await ctx.route('**/*supabase.co/**',async r=>{const q=r.request(),u=new URL(q.u
    const its=[];let tot=0,dis=0,promo=null;
    for(const it of body.p_items){const sv=services.find(s=>s.id===it.service_id);const s=start+it.offset_min*60000,e=s+(sv.minutes+(pl.type==='shop'?0:(sv.rest_minutes||0)))*60000;
      const pool=busyItems().filter(i=>!(old&&old.items.includes(i)));
-     if(pool.some(i=>i.staff_id===it.staff_id&&i.s<e&&i.e>s))return J(400,{code:'P0001',message:'คิวนี้เพิ่งเต็ม กรุณาเลือกเวลาหรือพนักงานใหม่'});
+     if(pool.some(i=>i.staff_id===it.staff_id&&i.s<e&&i.e>s))return J(400,{code:'P0001',message:'คิวนี้เพิ่งเต็ม กรุณาเลือกเวลาหรือหมอนวดใหม่'});
      let d=0;const pm=promos.find(p=>p.place_id===pl.id&&(pms.some(q=>q.promotion_id===p.id&&q.service_id===sv.id)));if(pm){d=Math.round(sv.price*pm.value)/100;promo=pm.title}
      tot+=sv.price-d;dis+=d;its.push({id:'it'+Math.random(),service_id:sv.id,service_name:sv.name,staff_id:it.staff_id,minutes:sv.minutes,price:sv.price-d,s,e,active:true})}
    if(old){old.status='rescheduled';old.items.forEach(i=>i.active=false)}
@@ -84,7 +84,7 @@ r=await pick('r20');m=Object.fromEntries(r.o.map(x=>[x.v,x]));ok('r20: 10:15 blo
 r=await pick('n30');m=Object.fromEntries(r.o.map(x=>[x.v,x]));ok('n30: 10:00 full, 10:30 free',m[600].dis&&!m[630].dis);
 // เลือก 10:20 ของ r15 -> หน้าพนักงานแสดงเวลานวดจริง 10:20-10:35 ไม่รวมเวลาพัก
 r=await pick('r15');await p.selectOption('#selT','620');await p.waitForTimeout(400);
-ok('staff step shows massage time only',(await p.textContent('h1'))==='เลือกพนักงาน'&&(await p.textContent('.sub')).includes('10:20 น.-10:35 น.')&&!(await p.textContent('.sub')).includes('10:40'));
+ok('staff step shows massage time only',(await p.textContent('h1'))==='เลือกหมอนวด'&&(await p.textContent('.sub')).includes('10:20 น.-10:35 น.')&&!(await p.textContent('.sub')).includes('10:40'));
 for(const [sv,n,mx] of [['r15',6,700],['r20',5,700],['r25',4,690]]){const r=await pick(sv,'og2');const v=vals(r);
  ok(sv+' og2 morning slots '+n+', none overlap lunch/close',v.filter(x=>x<720).length===n&&v.every(x=>x>=600&&x<=960));
  if(sv==='r20')ok('r20 og2: 11:40 offered (rest may fall in lunch), afternoon last 15:30',v.includes(700)&&v.includes(780)&&v.slice(-1)[0]===930&&!v.includes(955));

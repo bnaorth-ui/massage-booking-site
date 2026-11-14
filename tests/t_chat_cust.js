@@ -45,7 +45,7 @@ await ctx.route('**/*supabase.co/**',async r=>{const q=r.request(),u=new URL(q.u
    const its=[];let tot=0,dis=0,promo=null;
    for(const it of body.p_items){const sv=services.find(s=>s.id===it.service_id);const s=start+it.offset_min*60000,e=s+sv.minutes*60000;
      const pool=busyItems().filter(i=>!(old&&old.items.includes(i)));
-     if(pool.some(i=>i.staff_id===it.staff_id&&i.s<e&&i.e>s))return J(400,{code:'P0001',message:'คิวนี้เพิ่งเต็ม กรุณาเลือกเวลาหรือพนักงานใหม่'});
+     if(pool.some(i=>i.staff_id===it.staff_id&&i.s<e&&i.e>s))return J(400,{code:'P0001',message:'คิวนี้เพิ่งเต็ม กรุณาเลือกเวลาหรือหมอนวดใหม่'});
      let d=0;const pm=promos.find(p=>p.place_id===pl.id&&(pms.some(q=>q.promotion_id===p.id&&q.service_id===sv.id)));if(pm){d=Math.round(sv.price*pm.value)/100;promo=pm.title}
      tot+=sv.price-d;dis+=d;its.push({id:'it'+Math.random(),service_id:sv.id,service_name:sv.name,staff_id:it.staff_id,minutes:sv.minutes,price:sv.price-d,s,e,active:true})}
    if(old){old.status='rescheduled';old.items.forEach(i=>i.active=false)}
@@ -68,7 +68,7 @@ await p.fill('#lph','0811111111');await p.fill('#lpw','abc123');await p.click('b
 
 await p.click('[data-tab="bk"]');await p.waitForTimeout(500);
 let btns=await p.$$eval('[data-chat]',b=>b.map(x=>x.textContent.trim()));console.log('chat buttons',btns.join(' | '));
-ok('shop + staff buttons on upcoming booking',btns.some(x=>x.includes('แชตกับร้าน'))&&btns.some(x=>x.includes('แชตกับพนักงาน คุณวิภา')));
+ok('shop + staff buttons on upcoming booking',btns.some(x=>x.includes('แชตกับร้าน'))&&btns.some(x=>x.includes('แชตกับหมอนวด คุณวิภา')));
 ok('unread badge on shop button',!!(await p.$('[data-chat][data-room=shop] .cn[aria-label*="ข้อความใหม่ 1"]')));
 ok('no chat buttons on old booking',(await p.$$('[data-chat][data-ref=MS2]')).length===0);
 await p.click('[data-chat="bid-MS1"][data-room=shop]');await p.waitForTimeout(600);

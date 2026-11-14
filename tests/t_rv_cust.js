@@ -49,7 +49,7 @@ await ctx.route('**/*supabase.co/**',async r=>{const q=r.request(),u=new URL(q.u
    const its=[];let tot=0,dis=0,promo=null;
    for(const it of body.p_items){const sv=services.find(s=>s.id===it.service_id);const s=start+it.offset_min*60000,e=s+sv.minutes*60000;
      const pool=busyItems().filter(i=>!(old&&old.items.includes(i)));
-     if(pool.some(i=>i.staff_id===it.staff_id&&i.s<e&&i.e>s))return J(400,{code:'P0001',message:'คิวนี้เพิ่งเต็ม กรุณาเลือกเวลาหรือพนักงานใหม่'});
+     if(pool.some(i=>i.staff_id===it.staff_id&&i.s<e&&i.e>s))return J(400,{code:'P0001',message:'คิวนี้เพิ่งเต็ม กรุณาเลือกเวลาหรือหมอนวดใหม่'});
      let d=0;const pm=promos.find(p=>p.place_id===pl.id&&(pms.some(q=>q.promotion_id===p.id&&q.service_id===sv.id)));if(pm){d=Math.round(sv.price*pm.value)/100;promo=pm.title}
      tot+=sv.price-d;dis+=d;its.push({id:'it'+Math.random(),service_id:sv.id,service_name:sv.name,staff_id:it.staff_id,minutes:sv.minutes,price:sv.price-d,s,e,active:true})}
    if(old){old.status='rescheduled';old.items.forEach(i=>i.active=false)}
@@ -76,7 +76,7 @@ ok('rate button on completed booking',(await p.$$('[data-rate="bid-MS5"]')).leng
 ok('no rate button on confirmed/cancelled',(await p.$$('[data-rate]')).length===1);
 await p.click('[data-rate="bid-MS5"]');await p.waitForTimeout(300);
 ok('form title + tabs visible',(await p.textContent('#rvt')).includes('ให้คะแนนบริการ')&&await p.$eval('#tabs',e=>getComputedStyle(e).display!=='none'));
-ok('shop + staff sections',(await p.textContent('#app')).includes('คะแนนร้าน')&&(await p.textContent('#app')).includes('คะแนนพนักงาน คุณวิภา'));
+ok('shop + staff sections',(await p.textContent('#app')).includes('คะแนนร้าน')&&(await p.textContent('#app')).includes('คะแนนหมอนวด คุณวิภา'));
 ok('score buttons labelled',(await p.$$eval('.rvs button',b=>b.map(x=>x.textContent))).slice(0,5).join()==='1 คะแนน,2 คะแนน,3 คะแนน,4 คะแนน,5 คะแนน');
 await p.click('#rvsend');await p.waitForTimeout(200);
 ok('empty submit blocked',(await p.textContent('#rve')).includes('อย่างน้อย 1 ส่วน')&&subs.length===0);

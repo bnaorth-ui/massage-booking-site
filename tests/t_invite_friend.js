@@ -58,7 +58,7 @@ await ctx.route('**/*supabase.co/**',async r=>{const q=r.request(),u=new URL(q.u
    const its=[];let tot=0,dis=0,promo=null;
    for(const it of body.p_items){const sv=services.find(s=>s.id===it.service_id);const s=start+it.offset_min*60000,e=s+sv.minutes*60000;
      const pool=busyItems().filter(i=>!(old&&old.items.includes(i)));
-     if(pool.some(i=>i.staff_id===it.staff_id&&i.s<e&&i.e>s))return J(400,{code:'P0001',message:'คิวนี้เพิ่งเต็ม กรุณาเลือกเวลาหรือพนักงานใหม่'});
+     if(pool.some(i=>i.staff_id===it.staff_id&&i.s<e&&i.e>s))return J(400,{code:'P0001',message:'คิวนี้เพิ่งเต็ม กรุณาเลือกเวลาหรือหมอนวดใหม่'});
      let d=0;const pm=promos.find(p=>p.place_id===pl.id&&(pms.some(q=>q.promotion_id===p.id&&q.service_id===sv.id)));if(pm){d=Math.round(sv.price*pm.value)/100;promo=pm.title}
      tot+=sv.price-d;dis+=d;its.push({id:'it'+Math.random(),service_id:sv.id,service_name:sv.name,staff_id:it.staff_id,minutes:sv.minutes,price:sv.price-d,s,e,active:true})}
    if(old){old.status='rescheduled';old.items.forEach(i=>i.active=false)}
@@ -119,7 +119,8 @@ ok('invite: status line is a polite live region',(await p.getAttribute('#invmsg'
 await p.evaluate(()=>{window.__sh=null;navigator.share=(o)=>{window.__sh=o;return Promise.resolve()}});
 await p.click('[data-inv]');await p.waitForTimeout(200);
 const sh=await p.evaluate(()=>window.__sh);
-ok('share: one text with the message, then the link on its own line',!!sh&&sh.text==='ลองจองหมอนวดผ่านสมาคมวิทยากรฝึกอาชีพคนตาบอด สะดวก ได้ช่วยสร้างอาชีพให้คนตาบอดด้วย\nhttps://massage-customer-bna.pages.dev/');
+ok('share: one text with the message, then the link on its own line',!!sh&&sh.text==='ลองจองหมอนวดผ่านแอป "จองคิวนวด" สะดวก ได้ช่วยสร้างอาชีพให้คนตาบอดด้วย\nhttps://massage-customer-bna.pages.dev/');
+ok('share: title and text name the app, not the association',!!sh&&sh.title==='ชวนเพื่อนจองหมอนวด'&&!sh.text.includes('สมาคม'));
 ok('share: link not sent separately (some apps keep only one part)',!!sh&&sh.url===undefined);
 ok('share: no error message shown on success',(await p.textContent('#invmsg')).trim()==='');
 // 2) ผู้ใช้ยกเลิกหน้าต่างแชร์ -> ไม่ขึ้นข้อความผิดพลาด ไม่คัดลอก
@@ -134,7 +135,7 @@ ok('share fails: falls back to copy',(await p.evaluate(()=>window.__cp))!==null&
 await p.evaluate(()=>{window.__cp=null;navigator.share=undefined});
 await p.click('[data-inv]');await p.waitForTimeout(250);
 const cp=await p.evaluate(()=>window.__cp);
-ok('no share api: copies text and link together',cp==='ลองจองหมอนวดผ่านสมาคมวิทยากรฝึกอาชีพคนตาบอด สะดวก ได้ช่วยสร้างอาชีพให้คนตาบอดด้วย\nhttps://massage-customer-bna.pages.dev/');
+ok('no share api: copies text and link together',cp==='ลองจองหมอนวดผ่านแอป "จองคิวนวด" สะดวก ได้ช่วยสร้างอาชีพให้คนตาบอดด้วย\nhttps://massage-customer-bna.pages.dev/');
 ok('no share api: message says copied',(await p.textContent('#invmsg')).includes('คัดลอกข้อความและลิงก์แล้ว'));
 ok('invite button stays on the account page (no navigation)',(await T()).includes('ออกจากระบบ'));
 

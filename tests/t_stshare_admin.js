@@ -112,7 +112,7 @@ await p.evaluate(()=>{window.__cp=null;Object.defineProperty(navigator,'share',{
 ok('card shown',await has('เพิ่มคุณใหม่แล้ว'));
 await p.click('.card [data-a=stshare]');await wait(200);
 const cp=await p.evaluate(()=>window.__cp);
-ok('copied msg has link+join',!!cp&&cp.includes('https://app.example/staff?join=0855555555')&&cp.includes('สมาคมเพิ่มคุณเข้าระบบรับงานแล้ว')&&cp.includes('คุณใหม่'));
+ok('copied msg has link+join',!!cp&&cp.includes('https://app.example/staff?join=0855555555')&&cp.includes('เจ้าหน้าที่เพิ่มคุณเข้าระบบรับงานแล้ว')&&cp.includes('คุณใหม่'));
 ok('NEW admin link has openExternalBrowser=1 + short msg',!!cp&&cp.includes('join=0855555555&openExternalBrowser=1')&&cp.includes('กดลิงก์ แล้วทำตามขั้นตอนติดตั้งในหน้านั้น')&&cp.includes('สมัครด้วยเบอร์ 0855555555')&&!cp.includes('ตั้งรหัสผ่านเอง\nx'));
 ok('copied toast',await has('คัดลอกข้อความและลิงก์ของ คุณใหม่ แล้ว'));
 await p.click('[data-a=stnewno]');ok('later hides card',!(await has2('เพิ่มคุณใหม่แล้ว')));

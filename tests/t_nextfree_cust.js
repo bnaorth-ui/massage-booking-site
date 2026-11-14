@@ -43,7 +43,7 @@ await ctx.route('**/*supabase.co/**',async r=>{const q=r.request(),u=new URL(q.u
    const its=[];let tot=0,dis=0,promo=null;
    for(const it of body.p_items){const sv=services.find(s=>s.id===it.service_id);const s=start+it.offset_min*60000,e=s+sv.minutes*60000;
      const pool=busyItems().filter(i=>!(old&&old.items.includes(i)));
-     if(pool.some(i=>i.staff_id===it.staff_id&&i.s<e&&i.e>s))return J(400,{code:'P0001',message:'คิวนี้เพิ่งเต็ม กรุณาเลือกเวลาหรือพนักงานใหม่'});
+     if(pool.some(i=>i.staff_id===it.staff_id&&i.s<e&&i.e>s))return J(400,{code:'P0001',message:'คิวนี้เพิ่งเต็ม กรุณาเลือกเวลาหรือหมอนวดใหม่'});
      let d=0;const pm=promos.find(p=>p.place_id===pl.id&&(pms.some(q=>q.promotion_id===p.id&&q.service_id===sv.id)));if(pm){d=Math.round(sv.price*pm.value)/100;promo=pm.title}
      tot+=sv.price-d;dis+=d;its.push({id:'it'+Math.random(),service_id:sv.id,service_name:sv.name,staff_id:it.staff_id,minutes:sv.minutes,price:sv.price-d,s,e,active:true})}
    if(old){old.status='rescheduled';old.items.forEach(i=>i.active=false)}
@@ -99,7 +99,7 @@ await p.click('[data-nf="'+D1+'|660"]');await p.waitForTimeout(900);
 ok('pick: date and time selected, button pressed, focus on next',(await p.$eval('#selD',e=>e.value))===D1&&(await p.$eval('#selT',e=>e.value))==='660'&&(await p.$eval('[data-nf="'+D1+'|660"]',e=>e.getAttribute('aria-pressed')))==='true'&&(await p.evaluate(()=>document.activeElement&&document.activeElement.id))==='go3');
 ok('pick: announced for screen readers',(await p.evaluate(()=>(document.querySelector('#sr')||{}).textContent||'')).includes('เลือก พรุ่งนี้ เวลา 11:00 น. แล้ว'));
 await p.click('#go3');await p.waitForTimeout(400);
-ok('next goes to staff step with the picked time',(await p.textContent('h1'))==='เลือกพนักงาน'&&(await p.textContent('.sub')).includes('11:00'));
+ok('next goes to staff step with the picked time',(await p.textContent('h1'))==='เลือกหมอนวด'&&(await p.textContent('.sub')).includes('11:00'));
 // ---- วันนี้ยังว่าง ----
 BKS.length=0;await p.click('#back');await p.waitForSelector('#selT');await p.evaluate(()=>{NF={};S.date=null;S.time=null;S.autoTime=false;render(true)});await p.waitForTimeout(900);
 nf=await p.$$eval('[data-nf]',e=>e.map(x=>x.querySelector('.nfd').textContent+' '+x.querySelector('b').textContent));ok('today free: 11:00, 11:30, 12:00 today',nf.join('|')==='วันนี้ 11:00|วันนี้ 11:30|วันนี้ 12:00'&&!(await p.$('#nffull')));

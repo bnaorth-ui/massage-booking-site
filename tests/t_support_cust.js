@@ -47,7 +47,7 @@ await ctx.route('**/*supabase.co/**',async r=>{const q=r.request(),u=new URL(q.u
    const its=[];let tot=0,dis=0,promo=null;
    for(const it of body.p_items){const sv=services.find(s=>s.id===it.service_id);const s=start+it.offset_min*60000,e=s+sv.minutes*60000;
      const pool=busyItems().filter(i=>!(old&&old.items.includes(i)));
-     if(pool.some(i=>i.staff_id===it.staff_id&&i.s<e&&i.e>s))return J(400,{code:'P0001',message:'คิวนี้เพิ่งเต็ม กรุณาเลือกเวลาหรือพนักงานใหม่'});
+     if(pool.some(i=>i.staff_id===it.staff_id&&i.s<e&&i.e>s))return J(400,{code:'P0001',message:'คิวนี้เพิ่งเต็ม กรุณาเลือกเวลาหรือหมอนวดใหม่'});
      let d=0;const pm=promos.find(p=>p.place_id===pl.id&&(pms.some(q=>q.promotion_id===p.id&&q.service_id===sv.id)));if(pm){d=Math.round(sv.price*pm.value)/100;promo=pm.title}
      tot+=sv.price-d;dis+=d;its.push({id:'it'+Math.random(),service_id:sv.id,service_name:sv.name,staff_id:it.staff_id,minutes:sv.minutes,price:sv.price-d,s,e,active:true})}
    if(old){old.status='rescheduled';old.items.forEach(i=>i.active=false)}
@@ -79,7 +79,7 @@ ok('contact: phone and hours still shown',!!(await p.$('a[href^="tel:"]'))&&t.in
 await p.click('[data-supgo]');
 ok('opens chat room with heading focused',await W(async()=>(await p.evaluate(()=>document.activeElement&&document.activeElement.id))==='chtitle'));
 t=await A();
-ok('room explains who sees it and 6-month retention',t.includes('แชตกับเจ้าหน้าที่')&&t.includes('เจ้าหน้าที่ของสมาคม')&&t.includes('6 เดือน'));
+ok('room explains who sees it and 6-month retention',t.includes('แชตกับเจ้าหน้าที่')&&t.includes('เห็นเฉพาะคุณกับเจ้าหน้าที่')&&!t.includes('สมาคม')&&t.includes('6 เดือน'));
 ok('empty hint and 1000-char limit',t.includes('พิมพ์คำถาม')&&(await p.getAttribute('#chi','maxlength'))==='1000');
 ok('no report/block buttons in staff chat',!(await p.$('#chsx button')));
 ok('loaded via support_room for the customer app',SUPQ.some(x=>x[0]==='room'&&x[1].p_app==='user'));

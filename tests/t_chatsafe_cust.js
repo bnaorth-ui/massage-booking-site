@@ -46,7 +46,7 @@ await ctx.route('**/*supabase.co/**',async r=>{const q=r.request(),u=new URL(q.u
    const its=[];let tot=0,dis=0,promo=null;
    for(const it of body.p_items){const sv=services.find(s=>s.id===it.service_id);const s=start+it.offset_min*60000,e=s+sv.minutes*60000;
      const pool=busyItems().filter(i=>!(old&&old.items.includes(i)));
-     if(pool.some(i=>i.staff_id===it.staff_id&&i.s<e&&i.e>s))return J(400,{code:'P0001',message:'คิวนี้เพิ่งเต็ม กรุณาเลือกเวลาหรือพนักงานใหม่'});
+     if(pool.some(i=>i.staff_id===it.staff_id&&i.s<e&&i.e>s))return J(400,{code:'P0001',message:'คิวนี้เพิ่งเต็ม กรุณาเลือกเวลาหรือหมอนวดใหม่'});
      let d=0;const pm=promos.find(p=>p.place_id===pl.id&&(pms.some(q=>q.promotion_id===p.id&&q.service_id===sv.id)));if(pm){d=Math.round(sv.price*pm.value)/100;promo=pm.title}
      tot+=sv.price-d;dis+=d;its.push({id:'it'+Math.random(),service_id:sv.id,service_name:sv.name,staff_id:it.staff_id,minutes:sv.minutes,price:sv.price-d,s,e,active:true})}
    if(old){old.status='rescheduled';old.items.forEach(i=>i.active=false)}
@@ -122,9 +122,9 @@ await p.click('[data-view=tm]');await p.waitForTimeout(200);
 ok('terms page from account',(await A()).includes('เงื่อนไขการใช้งาน')&&(await A()).includes('ห้ามชวนหมอนวดรับงานหรือรับเงินนอกระบบ'));
 await p.click('[data-view=ac]');await p.waitForTimeout(200);
 await p.click('[data-blk=open]');await p.waitForSelector('[data-ublk]',{timeout:4000});
-ok('blocked list shows names and kinds',(await A()).includes('ร้านสบายดี สปา (ร้าน)')&&(await A()).includes('คุณวิภา (พนักงาน)')&&SAFE.calls.some(c=>c[0]==='list'&&c[1].p_app==='customer'));
+ok('blocked list shows names and kinds',(await A()).includes('ร้านสบายดี สปา (ร้าน)')&&(await A()).includes('คุณวิภา (หมอนวด)')&&SAFE.calls.some(c=>c[0]==='list'&&c[1].p_app==='customer'));
 await p.click('[data-ublk=b1]');await p.waitForTimeout(400);
-ok('unblock from list removes the row and says so',!(await A()).includes('ร้านสบายดี สปา (ร้าน)')&&(await A()).includes('คุณวิภา (พนักงาน)')&&(await p.textContent('#blkm')).includes('ยกเลิกบล็อกแล้ว'));
+ok('unblock from list removes the row and says so',!(await A()).includes('ร้านสบายดี สปา (ร้าน)')&&(await A()).includes('คุณวิภา (หมอนวด)')&&(await p.textContent('#blkm')).includes('ยกเลิกบล็อกแล้ว'));
 await p.click('[data-blk=no]');await p.waitForTimeout(200);
 ok('back to account page',(await A()).includes('ผู้ที่บล็อกไว้')&&!(await p.$('[data-ublk]')));
 console.log('errors:',errs.join('|')||'none');ok('no page errors',errs.length===0);await b.close();process.exit(0)})();

@@ -40,7 +40,7 @@ await ctx.route('**/*supabase.co/**',async r=>{const q=r.request(),u=new URL(q.u
    const its=[];let tot=0,dis=0,promo=null;
    for(const it of body.p_items){const sv=services.find(s=>s.id===it.service_id);const s=start+it.offset_min*60000,e=s+sv.minutes*60000;
      const pool=busyItems().filter(i=>!(old&&old.items.includes(i)));
-     if(pool.some(i=>i.staff_id===it.staff_id&&i.s<e&&i.e>s))return J(400,{code:'P0001',message:'คิวนี้เพิ่งเต็ม กรุณาเลือกเวลาหรือพนักงานใหม่'});
+     if(pool.some(i=>i.staff_id===it.staff_id&&i.s<e&&i.e>s))return J(400,{code:'P0001',message:'คิวนี้เพิ่งเต็ม กรุณาเลือกเวลาหรือหมอนวดใหม่'});
      let d=0;const pm=promos.find(p=>p.place_id===pl.id&&(pms.some(q=>q.promotion_id===p.id&&q.service_id===sv.id)));if(pm){d=Math.round(sv.price*pm.value)/100;promo=pm.title}
      tot+=sv.price-d;dis+=d;its.push({id:'it'+Math.random(),service_id:sv.id,service_name:sv.name,staff_id:it.staff_id,minutes:sv.minutes,price:sv.price-d,s,e,active:true})}
    if(old){old.status='rescheduled';old.items.forEach(i=>i.active=false)}
@@ -73,10 +73,10 @@ await flow(D0+'T05:00:00+07:00');r=await st();ok('05:00 -> 10:00 today',r.t.star
 await flow(D0+'T20:45:00+07:00');r=await st();console.log('20:45',JSON.stringify(r));ok('20:45 no slots today -> tomorrow 10:00',r.dv===day(1)&&r.t.startsWith('10:00'));
 await flow(D0+'T10:12:00+07:00');
 await p.selectOption('#selD',day(2));await p.waitForTimeout(500);r=await st();ok('change date -> time empty, no next',r.dv===day(2)&&r.t.startsWith('เลือกเวลา')&&!r.next);
-await p.selectOption('#selT','900');await p.waitForTimeout(400);ok('choose time -> staff step',(await p.textContent('h1'))==='เลือกพนักงาน');
+await p.selectOption('#selT','900');await p.waitForTimeout(400);ok('choose time -> staff step',(await p.textContent('h1'))==='เลือกหมอนวด');
 await p.click('#back');await p.waitForSelector('#selT');await p.waitForTimeout(300);r=await st();ok('back keeps date/time',r.dv===day(2)&&r.t.startsWith('15:00')&&r.next);
-await p.click('#go3');await p.waitForTimeout(300);ok('next button -> staff step',(await p.textContent('h1'))==='เลือกพนักงาน');
-await flow(D0+'T10:12:00+07:00');await p.click('#go3');await p.waitForTimeout(300);ok('default next -> staff step with 11:00',(await p.textContent('h1'))==='เลือกพนักงาน'&&(await p.textContent('.sub')).includes('11:00'));
+await p.click('#go3');await p.waitForTimeout(300);ok('next button -> staff step',(await p.textContent('h1'))==='เลือกหมอนวด');
+await flow(D0+'T10:12:00+07:00');await p.click('#go3');await p.waitForTimeout(300);ok('default next -> staff step with 11:00',(await p.textContent('h1'))==='เลือกหมอนวด'&&(await p.textContent('.sub')).includes('11:00'));
 for(const pid of ['cp1','og1']){await p.clock.setFixedTime(new Date(D0+'T10:12:00+07:00'));await p.click('[data-tab=""]');for(let i=0;i<5&&!(await p.$('[data-pl]'));i++){await p.click('#back');await p.waitForTimeout(150)}await p.waitForSelector('[data-pl]');await p.click('[data-kind=org]');await p.waitForSelector('[data-pl="'+pid+'"]');
  await p.click('[data-pl="'+pid+'"]');await p.waitForSelector('#next');try{await p.click('[data-qty]:not([disabled]) >> nth=0',{timeout:1500})}catch(e){try{await p.click('[data-svc] >> nth=0',{timeout:1500})}catch(e2){}}await p.click('#next');await p.waitForSelector('#selT');await p.waitForTimeout(500);
  const tv=await p.$eval('#selT',e=>e.value),dv=(await p.$('#selD'))?await p.$eval('#selD',e=>e.value):'(fixed)';ok(pid+' not auto-filled (date="'+dv+'", time="'+tv+'")',tv===''&&(dv===''||dv==='(fixed)')&&!(await p.$('#go3')))}
