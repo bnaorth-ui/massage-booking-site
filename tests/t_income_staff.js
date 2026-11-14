@@ -83,7 +83,7 @@ mode.incErr=true;await p.click('#nav button:nth-child(1)');await p.click('#nav b
 ok('error + retry',t.includes('โหลดรายได้ไม่สำเร็จ')&&t.includes('ลองใหม่'));
 mode.incErr=false;await p.click('[data-a=incretry]');await sleep(500);ok('retry ok',(await T0(p)).includes('350 บาท'));
 mode.incOff=true;await p.click('#nav button:nth-child(1)');await p.click('#nav button:nth-child(3)');await sleep(500);
-ok('sql missing message',(await T0(p)).includes('SQL ส่วนที่ 33'));mode.incOff=false;
+ok('menu not ready -> plain message to contact staff (no SQL talk)',(await T0(p)).includes('เมนูนี้ยังไม่พร้อมใช้งาน กรุณาติดต่อเจ้าหน้าที่')&&!(await T0(p)).includes('SQL'));mode.incOff=false;
 // password
 await p.click('#nav button:nth-child(5)');await sleep(400);
 ok('pw button',(await T0(p)).includes('เปลี่ยนรหัสผ่าน'));

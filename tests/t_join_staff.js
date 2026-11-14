@@ -51,7 +51,7 @@ async function mk(ua,query,clear=true){const pg=await ctx.newPage();pg.on('pagee
 const T0=async pg=>await pg.evaluate(()=>document.body.innerText);
 // 1 desktop + join -> reg, readonly prefilled
 let a=await mk(null,'?join=0877777777');
-ok('desktop join -> reg page',(await T0(a)).includes('สร้างบัญชีพนักงาน')&&!(await T0(a)).includes('ติดตั้งแอปรับงานพนักงาน'));
+ok('desktop join -> reg page',(await T0(a)).includes('สร้างบัญชีหมอนวด')&&!(await T0(a)).includes('ติดตั้งแอปหมอนวด'));
 ok('phone prefilled + readonly',await a.$eval('#rph',e=>e.value==='0877777777'&&e.readOnly));
 ok('label notes shop saved it',(await T0(a)).includes('ร้านบันทึกไว้ให้แล้ว'));
 // complete signup
@@ -59,18 +59,18 @@ await a.fill('#rfn','ใหม่');await a.fill('#rpw','abcdef');await a.fill('
 ok('signup sent with joined phone',calls.some(c=>c.path==='/auth/v1/signup'&&c.body&&c.body.email.startsWith('0877777777@')));
 await a.close();
 // 2 invalid join ignored
-a=await mk(null,'?join=123');ok('invalid join -> login',(await T0(a)).includes('เข้าสู่ระบบพนักงาน')&&!(await a.$('#rph')));await a.close();
+a=await mk(null,'?join=123');ok('invalid join -> login',(await T0(a)).includes('เข้าสู่ระบบหมอนวด')&&!(await a.$('#rph')));ok('login subtitle is app name, no association name, staff not admin',(await T0(a)).includes('แอปหมอนวด')&&!(await T0(a)).includes('สมาคม')&&!(await T0(a)).includes('แอดมิน')&&(await T0(a)).includes('ร้านหรือเจ้าหน้าที่บันทึกเบอร์มือถือ'));await a.close();
 // 3 no join -> login, no ins even on android
-a=await mk(UAS.android,'');ok('no join android -> login (no install intro)',(await T0(a)).includes('เข้าสู่ระบบพนักงาน'));await a.close();
+a=await mk(UAS.android,'');ok('no join android -> login (no install intro)',(await T0(a)).includes('เข้าสู่ระบบหมอนวด'));await a.close();
 // 4 android + join -> install intro manual
 a=await mk(UAS.android,'?join=0877777777');let t=await T0(a);
 ok('NEW android: features 5 + icons 3 + numbers 3 + no copy btn',(await a.$$('.insft li')).length===5&&(await a.$$('.insst li svg')).length===3&&(await a.$$('.insst .insn')).length===3&&!(await a.$('[data-ins=copy]'))&&t.includes('แอปนี้ทำอะไรได้')&&t.includes('รับงาน'));
 ok('NEW icons decorative (aria-hidden)',await a.evaluate(()=>[...document.querySelectorAll('.insi,.insn,.insft li span:first-child')].every(e=>e.getAttribute('aria-hidden')==='true')));
-ok('android join -> install intro',t.includes('ติดตั้งแอปรับงานพนักงาน')&&t.includes('ติดตั้งแอป')&&t.includes('⋮'));
+ok('android join -> install intro',t.includes('ติดตั้งแอปหมอนวด')&&t.includes('ติดตั้งแอป')&&t.includes('⋮'));
 ok('title focused',await a.evaluate(()=>document.activeElement&&document.activeElement.id==='inst'));
 await a.click('button[data-ins=skip] >> nth=-1');await sleep(300);
-ok('skip -> reg with phone',(await T0(a)).includes('สร้างบัญชีพนักงาน')&&(await a.inputValue('#rph'))==='0877777777');
-await a.reload();await sleep(400);ok('seen -> reg directly next time',(await T0(a)).includes('สร้างบัญชีพนักงาน')&&!(await T0(a)).includes('ติดตั้งแอปรับงาน'));await a.close();
+ok('skip -> reg with phone',(await T0(a)).includes('สร้างบัญชีหมอนวด')&&(await a.inputValue('#rph'))==='0877777777');
+await a.reload();await sleep(400);ok('seen -> reg directly next time',(await T0(a)).includes('สร้างบัญชีหมอนวด')&&!(await T0(a)).includes('ติดตั้งแอปรับงาน'));await a.close();
 // 4b beforeinstallprompt -> button
 a=await mk(UAS.android,'?join=0877777777');
 await a.evaluate(()=>{const e=new Event('beforeinstallprompt');e.prompt=()=>{window.__pr=1};e.userChoice=Promise.resolve({outcome:'accepted'});window.dispatchEvent(e)});await sleep(200);
@@ -83,7 +83,7 @@ ok('NEW LINE: copy+open buttons, url shown',!!(await a.$('[data-ins=copy]'))&&!!
 await a.evaluate(()=>{Object.defineProperty(navigator,'clipboard',{value:{writeText:t=>{window.__cp=t;return Promise.resolve()}},configurable:true})});
 await a.click('[data-ins=copy]');await sleep(200);
 ok('NEW copy writes full url w/ join',((await a.evaluate(()=>window.__cp))||'').includes('join=0877777777')&&(await a.textContent('#insmsg')).includes('คัดลอกลิงก์แล้ว'));
-ok('NEW copy keeps page (still install intro)',(await T0(a)).includes('ติดตั้งแอปรับงานพนักงาน'));
+ok('NEW copy keeps page (still install intro)',(await T0(a)).includes('ติดตั้งแอปหมอนวด'));
 await a.evaluate(()=>{Object.defineProperty(navigator,'clipboard',{value:{writeText:t=>Promise.reject(new Error('no'))},configurable:true});document.execCommand=()=>false});
 await a.click('[data-ins=copy]');await sleep(250);ok('NEW copy failure -> message tells to long-press',(await a.textContent('#insmsg')).includes('ไม่สำเร็จ'));
 await a.close();
@@ -98,10 +98,10 @@ ok('NEW open fallback message shown',(await a.textContent('#insmsg')).includes('
 await a.close();
 // 7 existing account -> login prefilled
 a=await mk(null,'?join=0844444444');await a.fill('#rfn','นุ่น');await a.fill('#rpw','abcdef');await a.fill('#rpw2','abcdef');await a.check('#rpv');await a.click('#agf .btn[type=submit]');await sleep(500);
-t=await T0(a);ok('existing -> login with msg + phone',t.includes('เข้าสู่ระบบพนักงาน')&&t.includes('เบอร์นี้มีบัญชีอยู่แล้ว')&&(await a.inputValue('#lph'))==='0844444444');
+t=await T0(a);ok('existing -> login with msg + phone',t.includes('เข้าสู่ระบบหมอนวด')&&t.includes('เบอร์นี้มีบัญชีอยู่แล้ว')&&(await a.inputValue('#lph'))==='0844444444');
 // 8 logged in + join -> app, not reg
 await a.fill('#lpw','staffpass1');await a.click('#agf .btn');await sleep(900);
 ok('logged in as staff',!(await a.$('#agf')));
 await a.goto(URLB+'?join=0877777777');await sleep(900);
-ok('logged-in + join link keeps session (no reg page)',!(await a.$('#rph'))&&!(await T0(a)).includes('สร้างบัญชีพนักงาน'));
+ok('logged-in + join link keeps session (no reg page)',!(await a.$('#rph'))&&!(await T0(a)).includes('สร้างบัญชีหมอนวด'));
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)})();

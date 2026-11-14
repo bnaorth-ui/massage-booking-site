@@ -47,14 +47,14 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
 const p=await ctx.newPage();await p.setViewportSize({width:420,height:900});p.on('pageerror',e=>errs.push(e.message));p.on('dialog',d=>{errs.push('DIALOG '+d.message());d.dismiss()});
 const ok=(nm,c)=>console.log((c?'PASS ':'FAIL ')+nm);const txt=async s=>await p.textContent(s||'body');const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 await p.goto(require('./config').page('staff-app.html'));await sleep(300);
-ok('login gate shown',(await txt()).includes('เข้าสู่ระบบพนักงาน'));
+ok('login gate shown',(await txt()).includes('เข้าสู่ระบบหมอนวด'));
 ok('nav hidden at gate',await p.$eval('#navb',e=>getComputedStyle(e).display)==='none');
 // bad password
 await p.fill('#lph','0844444444');await p.fill('#lpw','wrong');await p.click('#agf .btn');await sleep(300);
 ok('bad pw message',(await txt()).includes('เบอร์มือถือหรือรหัสผ่านไม่ถูกต้อง'));
 // non-staff account
 await p.fill('#lph','0899999999');await p.fill('#lpw','nopass111');await p.click('#agf .btn');await sleep(400);
-ok('non-staff -> denied',(await txt()).includes('ยังไม่ผูกกับพนักงาน'));
+ok('non-staff -> denied',(await txt()).includes('ยังไม่ผูกกับหมอนวด'));
 await p.click('[data-ag=logout]');await sleep(400);
 // register path validation
 await p.click('[data-ag=reg]');await p.fill('#rfn','ใหม่');await p.fill('#rph','0877777777');await p.fill('#rpw','abc');await p.fill('#rpw2','abc');await p.click('#agf .btn[type=submit]');
@@ -98,6 +98,6 @@ await p.click('[data-a=tab][data-id=q]');await sleep(200);ok('home: no logout/ph
 
 await p.click('[data-a=tab][data-id=q]');await sleep(200);ok('back to home tab',(await p.textContent('h1'))==='คิวงาน');
 await p.setViewportSize({width:390,height:844});await p.click('[data-a=tab][data-id=ac]');await sleep(200);await p.screenshot({path:'staff_ct.png'});
-await p.click('[data-a=tab][data-id=ac]');await sleep(200);await p.click('#logout');await sleep(500);ok('logout works -> login gate',(await txt()).includes('เข้าสู่ระบบพนักงาน'));
+await p.click('[data-a=tab][data-id=ac]');await sleep(200);await p.click('#logout');await sleep(500);ok('logout works -> login gate',(await txt()).includes('เข้าสู่ระบบหมอนวด'));
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)
 })()

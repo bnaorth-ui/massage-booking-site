@@ -68,8 +68,9 @@ ok('reg has consent checkbox + read button',!!(await a.$('#rpv'))&&t.includes('�
 // fill, open policy, come back: draft kept
 await a.fill('#rfn','ใหม่');await a.fill('#rln','ทดสอบ');await a.fill('#rph','0866666666');await a.fill('#rpw','abcdef');await a.fill('#rpw2','abcdef');await a.check('#rpv');
 await a.click('[data-ag=pv]');await sleep(500);t=await T0(a);
-ok('policy page shows title + association name + phone',t.includes('นโยบายความเป็นส่วนตัว (พนักงาน)')&&t.includes('สมาคมทดสอบ')&&t.includes('029998888'));
-ok('policy sections',['เราเก็บข้อมูลอะไร','ใครเห็นข้อมูลของคุณ','เราเก็บนานแค่ไหน','การลบบัญชีพนักงาน','สิทธิ์ของคุณ','ติดต่อเรา'].every(x=>t.includes(x)));
+ok('policy page shows title + association name + phone',t.includes('นโยบายความเป็นส่วนตัว (หมอนวด)')&&t.includes('สมาคมทดสอบ')&&t.includes('029998888'));
+ok('policy wording: เจ้าหน้าที่ / หมอนวด, association name only where legally needed',t.includes('เจ้าหน้าที่เห็นข้อมูลเท่าที่จำเป็นต่อการดูแลระบบ')&&t.includes('เก็บตามที่สมาคมทดสอบกำหนด')&&t.includes('หมอนวดคนอื่นไม่เห็นคิว')&&!t.includes('แอดมิน')&&!/พนักงาน/.test(t.replace(/เพิ่มพนักงาน/g,'')));
+ok('policy sections',['เราเก็บข้อมูลอะไร','ใครเห็นข้อมูลของคุณ','เราเก็บนานแค่ไหน','การลบบัญชีหมอนวด','สิทธิ์ของคุณ','ติดต่อเรา'].every(x=>t.includes(x)));
 ok('no placeholder brackets',!/\[[^\]]*\]/.test(t));
 await a.screenshot({path:'pv_staff.png',fullPage:true});
 await a.click('[data-ag=pvback]');await sleep(300);
@@ -100,7 +101,7 @@ ok('re-enter nt: defaults (no new now) -> สมาคม',await p.$eval('.nf bu
 await p.click('#nav button:nth-child(5)');await sleep(300);
 ok('account has policy button',(await T0(p)).includes('นโยบายความเป็นส่วนตัว'));
 await p.click('[data-a=pv]');await sleep(300);t=await T0(p);
-ok('account policy view (assoc name from CT)',t.includes('นโยบายความเป็นส่วนตัว (พนักงาน)')&&t.includes('เราเก็บข้อมูลอะไร'));
+ok('account policy view (assoc name from CT)',t.includes('นโยบายความเป็นส่วนตัว (หมอนวด)')&&t.includes('เราเก็บข้อมูลอะไร'));
 await p.click('[data-a=pvno]');await sleep(300);ok('back to account',(await T0(p)).includes('เปลี่ยนรหัสผ่าน'));
 await p.click('#nav button:nth-child(2)');await p.click('#nav button:nth-child(5)');await sleep(200);ok('policy view resets on tab change',!(await T0(p)).includes('เราเก็บข้อมูลอะไร'));
 await p.setViewportSize({width:340,height:700});await a.setViewportSize({width:340,height:700});

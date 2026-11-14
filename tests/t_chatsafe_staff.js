@@ -83,12 +83,12 @@ await p.click('[data-ag=tmback]');await sleep(200);ok('signup draft kept',(await
 await p.click('#agf button[type=submit]');await sleep(300);ok('signup blocked without consent',(await txt('#aerr')).includes('ยอมรับเงื่อนไขการใช้งานและนโยบายความเป็นส่วนตัว'));
 await p.check('#rpv');await p.click('#agf button[type=submit]');
 ok('terms accepted right after signup',await W(()=>CS.some(c=>c.f==='accept_terms'&&c.p_app==='staff'&&c.u!=='u1')));
-await until(()=>document.body.innerText.includes('ยังไม่ผูกกับพนักงาน'));await p.click('[data-ag=logout]');await sleep(500);
+await until(()=>document.body.innerText.includes('ยังไม่ผูกกับหมอนวด'));await p.click('[data-ag=logout]');await sleep(500);
 // พนักงานเดิม: ยอมรับครั้งเดียว
 await p.fill('#lph','0844444444');await p.fill('#lpw','staffpass1');await p.click('#agf .btn');
 ok('existing staff: terms gate, focus on its title',await until(()=>document.getElementById('tmacc')&&document.activeElement.id==='tmgt'));
 ok('gate: nav hidden, privacy and logout offered',await p.$eval('#navb',e=>getComputedStyle(e).display)==='none'&&!!(await p.$('[data-ag=pv]'))&&!!(await p.$('[data-ag=logout]')));
-await p.click('[data-ag=pv]');await sleep(200);ok('gate: privacy page',(await txt('#pvt')).includes('นโยบายความเป็นส่วนตัว (พนักงาน)')&&(await txt()).includes('เก็บรายงานไว้ 12 เดือน'));
+await p.click('[data-ag=pv]');await sleep(200);ok('gate: privacy page',(await txt('#pvt')).includes('นโยบายความเป็นส่วนตัว (หมอนวด)')&&(await txt()).includes('เก็บรายงานไว้ 12 เดือน'));
 await p.click('[data-ag=pvback]');await sleep(200);ok('back to the gate',!!(await p.$('#tmacc')));
 await p.click('#tmacc');
 ok('accept opens the app',await until(()=>document.getElementById('navb').style.display!=='none'&&!!document.querySelector('[data-chat=bk1]'))&&CS.some(c=>c.f==='accept_terms'&&c.u==='u1'&&c.p_app==='staff'));

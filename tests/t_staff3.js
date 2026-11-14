@@ -49,14 +49,14 @@ const nap=ms=>new Promise(r=>setTimeout(r,ms));
 // รอเวลาที่กำหนด แล้วรอต่อจนไม่มีคำขอค้างอย่างต่อเนื่อง 200 มิลลิวินาที (กันเทสต์ล้มเองเมื่อเครื่องช้า)
 const sleep=async ms=>{await nap(ms);let quiet=0,t0=Date.now();while(quiet<200&&Date.now()-t0<10000){await nap(50);if(pend<=0)quiet+=50;else quiet=0}};
 await p.goto(require('./config').page('staff-app.html'));await sleep(300);
-ok('login gate shown',(await txt()).includes('เข้าสู่ระบบพนักงาน'));
+ok('login gate shown',(await txt()).includes('เข้าสู่ระบบหมอนวด'));
 ok('nav hidden at gate',await p.$eval('#navb',e=>getComputedStyle(e).display)==='none');
 // bad password
 await p.fill('#lph','0844444444');await p.fill('#lpw','wrong');await (async()=>{const c=await p.$('#rpv');if(c)await c.check();await p.click('#agf .btn[type=submit]')})();await sleep(300);
 ok('bad pw message',(await txt()).includes('เบอร์มือถือหรือรหัสผ่านไม่ถูกต้อง'));
 // non-staff account
 await p.fill('#lph','0899999999');await p.fill('#lpw','nopass111');await (async()=>{const c=await p.$('#rpv');if(c)await c.check();await p.click('#agf .btn[type=submit]')})();await sleep(400);
-ok('non-staff -> denied',(await txt()).includes('ยังไม่ผูกกับพนักงาน'));
+ok('non-staff -> denied',(await txt()).includes('ยังไม่ผูกกับหมอนวด'));
 await p.click('[data-ag=logout]');await sleep(400);
 // register path validation
 await p.click('[data-ag=reg]');await p.fill('#rfn','ใหม่');await p.fill('#rph','0877777777');await p.fill('#rpw','abc');await p.fill('#rpw2','abc');await (async()=>{const c=await p.$('#rpv');if(c)await c.check();await p.click('#agf .btn[type=submit]')})();
@@ -137,7 +137,7 @@ ok('no badge element',await p.$('#navb .bdg')===null);
 await p.reload();await sleep(700);ok('session restored after reload',(await txt('#app')).includes('คิวงาน'));
 // network down on refresh doesn't break
 mode.net=true;await p.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));await sleep(300);ok('page still shown offline',(await txt('#app')).includes('คิวงาน'));mode.net=false;
-await p.click('#nav button:last-child');await sleep(300);await p.click('#logout');await sleep(500);ok('logout -> login gate & session cleared',(await txt()).includes('เข้าสู่ระบบพนักงาน')&&await p.evaluate(()=>!localStorage.getItem('sbSessionStaff')));
+await p.click('#nav button:last-child');await sleep(300);await p.click('#logout');await sleep(500);ok('logout -> login gate & session cleared',(await txt()).includes('เข้าสู่ระบบหมอนวด')&&await p.evaluate(()=>!localStorage.getItem('sbSessionStaff')));
 ok('no page errors',errs.length===0);if(errs.length)console.log(errs);
 ok('no demo/localStorage business data',!(await p.evaluate(()=>Object.keys(localStorage).some(k=>/staffData|staffProfile|bookings|shopInbox/.test(k)))));
 await b.close()})();

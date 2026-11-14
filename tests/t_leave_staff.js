@@ -112,7 +112,7 @@ ok('candidates loaded for that place+day',shCalls[0][0]==='cands'&&shCalls[0][1]
 await p.click('[data-a=subsend]');await sleep(300);t=await T0(p);
 ok('must choose a colleague',t.includes('กรุณาเลือกเพื่อนที่จะไปแทน')&&shCalls.length===1);
 await p.selectOption('#subto','sx');await p.fill('#subre','ป่วย');await p.click('[data-a=subsend]');await sleep(800);t=await T0(p);
-ok('request rpc + waiting for admin shown',shCalls[1][0]==='req'&&shCalls[1][1].p_to==='sx'&&shCalls[1][1].p_reason==='ป่วย'&&t.includes('รอแอดมินอนุมัติ (คุณเพื่อน)')&&!!(await p.$('[data-a=subcancel]')));
+ok('request rpc + waiting for admin shown',shCalls[1][0]==='req'&&shCalls[1][1].p_to==='sx'&&shCalls[1][1].p_reason==='ป่วย'&&t.includes('รอเจ้าหน้าที่อนุมัติ (คุณเพื่อน)')&&!!(await p.$('[data-a=subcancel]')));
 await p.click('[data-a=subcancel]');await sleep(800);t=await T0(p);
 ok('cancel substitute request',shCalls[2][0]==='cancel'&&t.includes('ยกเลิกคำขอหาคนแทนแล้ว')&&!!(await p.$('[data-a=subopen]')));
 await p.click('[data-a=tab][data-id=q]');await sleep(400);t=await T0(p);

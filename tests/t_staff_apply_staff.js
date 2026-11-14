@@ -32,7 +32,7 @@ ok('apply link opens applicant registration (not staff login)',t.includes('ส�
 await p.fill('#rfn','สมหญิง');await p.fill('#rln','ใจดี');await p.fill('#rph','0855555555');await p.fill('#rpw','abc12345');await p.fill('#rpw2','abc12345');await p.check('#rpv');await p.click('#agf button[type=submit]');
 await p.waitForSelector('#apf',{timeout:6000});
 t=await p.evaluate(()=>document.body.innerText);
-ok('not blocked by denied screen; form shown with posting',!t.includes('ยังไม่ผูกกับพนักงาน')&&t.includes('รับสมัครหมอนวดประจำ')&&t.includes('เปิดรับ 5 คน'));
+ok('not blocked by denied screen; form shown with posting',!t.includes('ยังไม่ผูกกับหมอนวด')&&t.includes('รับสมัครหมอนวดประจำ')&&t.includes('เปิดรับ 5 คน'));
 ok('docs list 5 sets + photos',t.includes('อย่างละ 5 ชุด')&&t.includes('สำเนาบัตรคนพิการ')&&t.includes('255 ชั่วโมง')&&t.includes('รูปถ่าย 1 นิ้ว จำนวน 5 รูป'));
 ok('only Mon-Fri; removed fields absent',(await p.$$('[data-apwd]')).length===5&&!t.includes('วันที่เริ่มงาน')&&!t.includes('ช่วงเวลา')&&!t.includes('รูปแบบงานที่สนใจ')&&!t.includes('รูปแบบการนวดที่ทำได้'));
 ok('prefilled name/phone',(await p.inputValue('#ap_name'))==='สมหญิง ใจดี'&&(await p.inputValue('#ap_phone'))==='0855555555');
@@ -62,9 +62,9 @@ await p.check('#ap_terms');await sub();await sleep(600);
 ok('submitted with right payload',SUBM.length===1&&SUBM[0].p_posting==='po1'&&SUBM[0].p.province==='กรุงเทพมหานคร'&&SUBM[0].p.amphoe==='บางรัก'&&!!SUBM[0].p.tambon&&SUBM[0].p.address==='99 ถ.สีลม'&&SUBM[0].p.area===undefined&&SUBM[0].p.experience==='gt3'&&SUBM[0].p.course==='hss255'&&SUBM[0].p.has_disability_card===true&&SUBM[0].p.has_hss_reg===false&&JSON.stringify(SUBM[0].p.weekdays)==='[1,5]'&&SUBM[0].p.travel==='guide'&&SUBM[0].p.consent==='true');
 t=await p.evaluate(()=>document.body.innerText);
 ok('success: message, status, docs, no form',t.includes('ส่งใบสมัครแล้ว')&&t.includes('รอเจ้าหน้าที่ตรวจสอบ')&&t.includes('อย่างละ 5 ชุด')&&!(await p.$('#apf')));
-ok('install-app box shown inline (staff app install)',t.includes('ติดตั้งแอปรับงานพนักงาน'));
+ok('install-app box shown inline (staff app install)',t.includes('ติดตั้งแอปหมอนวด'));
 ok('no dialog popups',errs.every(e=>!e.startsWith('DIALOG')));
 await p.reload();await sleep(900);t=await p.evaluate(()=>document.body.innerText);
-ok('reopen app later (no link): still shows application status, not denied',t.includes('ใบสมัครหมอนวดของฉัน')&&t.includes('รอเจ้าหน้าที่ตรวจสอบ')&&!t.includes('ยังไม่ผูกกับพนักงาน'));
+ok('reopen app later (no link): still shows application status, not denied',t.includes('ใบสมัครหมอนวดของฉัน')&&t.includes('รอเจ้าหน้าที่ตรวจสอบ')&&!t.includes('ยังไม่ผูกกับหมอนวด'));
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)
 })()

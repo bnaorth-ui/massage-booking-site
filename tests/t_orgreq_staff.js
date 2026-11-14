@@ -93,7 +93,7 @@ ok('free colleagues listed',(await p.$$eval('#hoto option',o=>o.map(x=>x.textCon
 await p.click('[data-a=hosend]');await sleep(300);t=await T0(p);
 ok('must choose a colleague first',t.includes('กรุณาเลือกเพื่อน')&&hoCalls.length===0);
 await p.selectOption('#hoto','sx');await p.fill('#hore','ไม่สะดวก');await p.click('[data-a=hosend]');await sleep(800);t=await T0(p);
-ok('handover request rpc + waiting state',hoCalls[0]&&hoCalls[0][0]==='req'&&hoCalls[0][1].p_invite==='iv2'&&hoCalls[0][1].p_to==='sx'&&hoCalls[0][1].p_reason==='ไม่สะดวก'&&t.includes('รอแอดมินอนุมัติ')&&!(await p.$('[data-a=hoopen][data-id=iv2]')));
+ok('handover request rpc + waiting state',hoCalls[0]&&hoCalls[0][0]==='req'&&hoCalls[0][1].p_invite==='iv2'&&hoCalls[0][1].p_to==='sx'&&hoCalls[0][1].p_reason==='ไม่สะดวก'&&t.includes('รอเจ้าหน้าที่อนุมัติ')&&!(await p.$('[data-a=hoopen][data-id=iv2]')));
 await p.click('[data-a=hocancel]');await sleep(800);t=await T0(p);
 ok('handover cancel rpc',hoCalls[1][0]==='cancel'&&hoCalls[1][1].p_id==='h1'&&!!(await p.$('[data-a=hoopen][data-id=iv2]')));
 HO.push({id:'h2',role:'to',status:'pending_staff',org_name:'บริษัทรับช่วง',service_date:addD(todayS,9),start_time:'09:00:00',end_time:'12:00:00',from_name:'คุณเพื่อน',to_name:'ฉัน',reason:'ติดธุระ',admin_note:null,invite_id:'zz'});
