@@ -6,8 +6,9 @@ const ok=(n,c)=>console.log((c?'PASS ':'FAIL ')+n);
 const ROOT=path.resolve(__dirname,'..','site');
 const day=i=>new Date(Date.UTC(2026,10,17-i)).toISOString().slice(0,10);
 const DB=[];for(let i=1;i<=15;i++)DB.push({no:i,kind:i%3?'news':'article',title:'เรื่องที่ '+i,summary:'สรุป '+i,body:'เนื้อหา '+i,cover_path:null,cover_alt:'',day:day(i),pinned:false,active:true});
+const kindF=(r,v)=>v.startsWith('neq.')?r.filter(a=>a.kind!==v.slice(4)):r.filter(a=>a.kind===v.slice(3));
 const adjF=(r,p)=>{const o=p.get('or');if(!o)return r;const m=/^\(day\.(lt|gt)\.([\d-]+),and\(day\.eq\.[\d-]+,no\.(?:lt|gt)\.(\d+)\)\)$/.exec(o);if(!m)throw new Error('bad or '+o);const lt=m[1]==='lt',d=m[2],n=+m[3];r=r.filter(a=>lt?(a.day<d||(a.day===d&&a.no<n)):(a.day>d||(a.day===d&&a.no>n)));const asc=(p.get('order')||'').startsWith('day.asc');return r.sort((a,b)=>(asc?1:-1)*((a.day<b.day?-1:a.day>b.day?1:0)||(a.no-b.no)))};
-function q(u){const x=new URL(u),p=x.searchParams;let r=DB.filter(a=>a.active);if(p.get('kind'))r=r.filter(a=>a.kind===p.get('kind').slice(3));if(p.get('no'))r=r.filter(a=>a.no===+p.get('no').slice(3));if(p.get('or'))r=adjF(r,p);
+function q(u){const x=new URL(u),p=x.searchParams;let r=DB.filter(a=>a.active);if(p.get('kind'))r=kindF(r,p.get('kind'));if(p.get('no'))r=r.filter(a=>a.no===+p.get('no').slice(3));if(p.get('or'))r=adjF(r,p);
  const off=+(p.get('offset')||0),lim=+(p.get('limit')||1000);return r.slice(off,off+lim)}
 const CONTACT={name:'สมาคมวิทยากรฝึกอาชีพคนตาบอด',phone:'0989983654',email:'info@example.org',hours:'จันทร์ - ศุกร์ 09:00 - 17:00 น.'};
 // fetch ฝั่งเซิร์ฟเวอร์ (middleware) ใช้ข้อมูลจำลอง
@@ -41,7 +42,7 @@ ok('home: first load does not move focus to heading (normal page load)',await p.
 ok('home: nav marked, contact order phone/email/hours',await p.evaluate(()=>document.querySelector('nav.main a[aria-current="page"]').textContent==='หน้าแรก'&&[...document.querySelectorAll('#contact p[id]:not(#copy)')].map(x=>x.id).join()==='cName,cPhone,cEmail,cHours'));
 await p.click('#latest a[href="/news/1"]');await p.waitForSelector('article.post h1');
 ok('click from server page: article opens in page, h1 focused',p.url()===BASE+'/news/1'&&await p.evaluate(()=>document.activeElement===document.querySelector('#view h1')&&document.activeElement.textContent==='เรื่องที่ 1'));
-await p.goBack();ok('back: home again (rendered by browser)',await p.waitForSelector('#latest .card',{timeout:5000}).then(()=>true,()=>false)&&(await p.textContent('#view h1')).startsWith('นวดไทย'));
+await p.goBack();ok('back: home again (rendered by browser)',await p.waitForSelector('#latest .card',{timeout:5000}).then(()=>true,()=>false)&&(await p.textContent('#view h1')).startsWith('จ้างงานคนตาบอด'));
 // หน้ารวมจากเซิร์ฟเวอร์ แล้วกดดูเพิ่มเติม
 REQ.length=0;await p.goto(BASE+'/news/');await p.waitForLoadState('networkidle');
 ok('list from server: 12 items and more button, no request',await p.$$eval('#list .card',a=>a.length)===12&&!!await p.$('button[data-more]')&&!REQ.some(u=>u.includes('site_articles')));

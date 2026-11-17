@@ -24,7 +24,10 @@ export async function onRequest(ctx) {
   let r = V.parse(u.pathname, u.search);
   const contactP = sbRpc('public_contact').catch(() => null);
   let view = null, status = 200, art = null, info = null;
-  if (r.name === 'home') view = V.homeHTML(await sbGet(V.listQ(null, 6)).catch(() => null));
+  if (r.name === 'home') {
+    const [l, w] = await Promise.all([sbGet(V.listQ('!work', 6)).catch(() => null), sbGet(V.listQ('work', 3)).catch(() => null)]);
+    view = V.homeHTML(l, w);
+  }
   else if (r.name === 'company') {
     const [c, w] = await Promise.all([contactP, sbGet(V.listQ('work', 3)).catch(() => null)]);
     info = { rate: c && c.org_rate, phone: c && c.phone, email: c && c.email, works: w };
@@ -50,7 +53,7 @@ export async function onRequest(ctx) {
   const cp = V.canonPath(r);
   const url = cp ? u.origin + cp : null;
   const m = V.meta(r, art, info);
-  const org = { '@context': 'https://schema.org', '@type': 'Organization', name: V.SITE_NAME, url: u.origin + '/', logo: u.origin + '/icon-512.png' };
+  const org = { '@context': 'https://schema.org', '@type': 'Organization', name: V.SITE_NAME, url: V.ORG_SITE, sameAs: [V.ORG_SITE, u.origin + '/'], logo: u.origin + '/icon-512.png' };
   if (contact && contact.phone) org.telephone = String(contact.phone);
   if (contact && contact.email) org.email = String(contact.email);
   const jsonld = [org];

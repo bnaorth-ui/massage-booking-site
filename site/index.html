@@ -154,6 +154,7 @@ footer .copy{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);f
   <p id="cPhone"></p>
   <p id="cEmail"></p>
   <p id="cHours"></p>
+  <p>เว็บไซต์สมาคม <a href="https://bna.or.th/">bna.or.th</a></p>
   <p><a href="https://massage-customer-bna.pages.dev/privacy/">นโยบายความเป็นส่วนตัว</a></p>
   <p class="copy" id="copy">© สมาคมวิทยากรฝึกอาชีพคนตาบอด สงวนลิขสิทธิ์</p>
  </div>
@@ -176,7 +177,7 @@ function navKey(r){return r.name==="home"?"home":r.name==="company"?"company":(r
 function focusH1(){var h=document.querySelector("#view h1");if(h){h.setAttribute("tabindex","-1");h.focus({preventScroll:true})}window.scrollTo(0,0)}
 
 function loadLatest(){var el=$("latest");el.removeAttribute("data-pending");
- api(V.listQ(null,6)).then(function(a){if($("latest")===el)el.innerHTML=V.latestHTML(a)},function(){if($("latest")===el)el.innerHTML=V.errBox("โหลดข่าวไม่สำเร็จ")})}
+ api(V.listQ("!work",6)).then(function(a){if($("latest")===el)el.innerHTML=V.latestHTML(a)},function(){if($("latest")===el)el.innerHTML=V.errBox("โหลดข่าวไม่สำเร็จ")})}
 function loadList(kind,offset){var el=$("list");el.removeAttribute("data-pending");
  api(V.listQ(kind,V.PAGE+1,offset)).then(function(a){if($("list")!==el)return;var btn=el.querySelector(".more");if(btn)btn.remove();
   if(!offset){el.innerHTML=V.listBody(kind,a,0);return}
@@ -208,9 +209,9 @@ function showPost(r){$("view").innerHTML=V.LOADING;
   function(){$("view").innerHTML='<h1>ข่าวและบทความ</h1>'+V.errBox();focusH1()})}
 function show(r,msg){markNav(navKey(r));setHead(r,null,r.name==="company"?companyInfo():null);
  if(r.name==="post")return showPost(r);
- $("view").innerHTML=r.name==="home"?V.homeHTML(null):r.name==="company"?V.companyHTML(companyInfo()):r.name==="list"?V.listHTML(r.kind,null):V.notFoundHTML(msg);
+ $("view").innerHTML=r.name==="home"?V.homeHTML(null,null):r.name==="company"?V.companyHTML(companyInfo()):r.name==="list"?V.listHTML(r.kind,null):V.notFoundHTML(msg);
  focusH1();
- if(r.name==="home")loadLatest();if(r.name==="list")loadList(r.kind,0);if(r.name==="company")loadWorks()}
+ if(r.name==="home"){loadLatest();loadWorks()}if(r.name==="list")loadList(r.kind,0);if(r.name==="company")loadWorks()}
 function route(){show(V.parse(location.pathname,location.search))}
 /* เปิดหน้าครั้งแรก: ถ้า Cloudflare ใส่เนื้อหาของหน้านี้มาแล้ว (data-ssr) ใช้ของเดิม ไม่สร้างใหม่ (ไม่ย้ายโฟกัส) โหลดเฉพาะส่วนที่ยังขาด */
 function start(){var v=$("view"),r=V.parse(location.pathname,location.search);

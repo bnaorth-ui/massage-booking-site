@@ -16,12 +16,13 @@ const ROWS=[{no:7,kind:'news',title:'อบรม "หมอนวด" <รุ�
  {no:9,kind:'work',title:'นวดให้พนักงานบริษัท ก',summary:'',body:'x',cover_path:'place-images/x/site-w.jpg',cover_alt:'หมอนวดกำลังนวด',day:'2026-11-01',pinned:false,active:true},
  {no:8,kind:'article',title:'ประโยชน์ของการนวด',summary:'',body:'เนื้อหา',cover_path:null,cover_alt:'',day:'2026-11-10',pinned:false,active:true}];
 let FAIL=false,ASKED=[],CONTACT={name:'สมาคมวิทยากรฝึกอาชีพคนตาบอด',phone:'0989983654',email:'info@example.org',hours:'จันทร์ - ศุกร์ 09:00 - 17:00 น.',org_rate:400};
+const kindF=(r,v)=>v.startsWith('neq.')?r.filter(a=>a.kind!==v.slice(4)):r.filter(a=>a.kind===v.slice(3));
 const adjF=(r,p)=>{const o=p.get('or');if(!o)return r;const m=/^\(day\.(lt|gt)\.([\d-]+),and\(day\.eq\.[\d-]+,no\.(?:lt|gt)\.(\d+)\)\)$/.exec(o);if(!m)throw new Error('bad or '+o);const lt=m[1]==='lt',d=m[2],n=+m[3];r=r.filter(a=>lt?(a.day<d||(a.day===d&&a.no<n)):(a.day>d||(a.day===d&&a.no>n)));const asc=(p.get('order')||'').startsWith('day.asc');return r.sort((a,b)=>(asc?1:-1)*((a.day<b.day?-1:a.day>b.day?1:0)||(a.no-b.no)))};
 global.fetch=async(u,o)=>{u=String(u);ASKED.push({u,h:o&&o.headers});if(FAIL)return new Response('x',{status:500});
  const J=x=>new Response(JSON.stringify(x),{headers:{'Content-Type':'application/json'}});
  if(u.includes('/rpc/public_contact'))return J(CONTACT);
  const q=new URL(u).searchParams;let r=ROWS.filter(a=>a.active);
- if(q.get('kind'))r=r.filter(a=>a.kind===q.get('kind').slice(3));if(q.get('no'))r=r.filter(a=>a.no===+q.get('no').slice(3));if(q.get('or'))r=adjF(r,q);
+ if(q.get('kind'))r=kindF(r,q.get('kind'));if(q.get('no'))r=r.filter(a=>a.no===+q.get('no').slice(3));if(q.get('or'))r=adjF(r,q);
  return J(r.slice(0,+(q.get('limit')||100)))};
 const B='https://massage-home-bna.pages.dev';
 const get=async p=>{const r=await mw.onRequest({request:new Request(B+p),next});return{r,h:await r.text()}};
@@ -32,10 +33,11 @@ const titleOf=h=>(h.match(/<title>([^<]*)<\/title>/)||[])[1];
 // หน้าแรก
 let {r,h}=await get('/');
 ok('home: 200 html, short cache',r.status===200&&/text\/html/.test(r.headers.get('Content-Type'))&&r.headers.get('Cache-Control')==='public, max-age=60');
-ok('home: content in page without script (h1, sections, latest news)',view(h).includes('<h1>นวดไทยโดยหมอนวดตาบอด ที่ขึ้นทะเบียนถูกต้อง</h1>')&&view(h).includes('สำหรับบริษัทและหน่วยงาน')&&view(h).includes('href="https://massage-customer-bna.pages.dev/?orgreq=1"')&&view(h).includes('href="/news/7"')&&!view(h).includes('data-pending')&&h.includes('data-ssr="/"'));
-ok('home: title and description for home',titleOf(h)==='นวดไทยโดยหมอนวดตาบอดที่ขึ้นทะเบียนถูกต้อง | สมาคมวิทยากรฝึกอาชีพคนตาบอด'&&h.includes('<meta name="description" content="นวดแผนไทยโดยหมอนวดตาบอด'));
+ok('home: content in page without script (h1, sections, latest news)',view(h).includes('<h1>จ้างงานคนตาบอดผ่านงานนวด ที่ขึ้นทะเบียนถูกต้อง</h1>')&&view(h).includes('สำหรับบริษัทและหน่วยงาน')&&view(h).includes('href="https://massage-customer-bna.pages.dev/?orgreq=1"')&&view(h).includes('href="/news/7"')&&!view(h).includes('data-pending')&&h.includes('data-ssr="/"'));
+ok('home: title and description for home (employment focus, differs from bna.or.th)',titleOf(h)==='จ้างงานคนตาบอด มาตรา 33, 35 และบริการนวดโดยหมอนวดตาบอด | สมาคมวิทยากรฝึกอาชีพคนตาบอด'&&h.includes('<meta name="description" content="จ้างหมอนวดผู้พิการทางการเห็น'));
+ok('home: works section first, latest news excludes works, footer links bna.or.th',view(h).indexOf('id="worksSec"')>-1&&view(h).indexOf('id="worksSec"')<view(h).indexOf('id="hLatest"')&&view(h).indexOf('id="hBiz"')<view(h).indexOf('id="worksSec"')&&!(view(h).split('id="hLatest"')[1].split('</section>')[0]).includes('href="/news/9"')&&h.includes('เว็บไซต์สมาคม <a href="https://bna.or.th/">bna.or.th</a>'));
 ok('home: canonical, og:url, full share image, og:type website',h.includes('<link rel="canonical" href="'+B+'/">')&&h.includes('<meta property="og:url" content="'+B+'/">')&&h.includes('<meta property="og:image" content="'+B+'/og-share.png">')&&h.includes('<meta property="og:type" content="website">'));
-let L=ld(h);ok('home: Organization data uses this site (no unverified domain), phone and email',L.length===1&&L[0].j['@type']==='Organization'&&L[0].j.url===B+'/'&&L[0].j.logo===B+'/icon-512.png'&&L[0].j.telephone==='0989983654'&&L[0].j.email==='info@example.org'&&!h.includes('bna.or.th'));
+let L=ld(h);ok('home: Organization data = association site bna.or.th (sameAs this site), phone and email',L.length===1&&L[0].j['@type']==='Organization'&&L[0].j.url==='https://bna.or.th/'&&L[0].j.sameAs.join()==='https://bna.or.th/,'+B+'/'&&L[0].j.logo===B+'/icon-512.png'&&L[0].j.telephone==='0989983654'&&L[0].j.email==='info@example.org');
 ok('home: nav marks หน้าแรก',h.includes('data-k="home" aria-current="page">'));
 ok('footer: contact filled in order phone, email, hours',/<p id="cPhone">โทร <a href="tel:0989983654">098-998-3654<\/a><\/p>\s*<p id="cEmail">อีเมล <a href="mailto:info@example.org">info@example.org<\/a><\/p>\s*<p id="cHours">จันทร์ - ศุกร์ 09:00 - 17:00 น.<\/p>/.test(h));
 ok('footer: copyright with Thai year',h.includes('<p class="copy" id="copy">© '+(new Date().getUTCFullYear()+543)+' สมาคมวิทยากรฝึกอาชีพคนตาบอด สงวนลิขสิทธิ์</p>'));
@@ -77,7 +79,7 @@ ok('missing/draft post: 404, noindex, not-found message in page, no canonical',r
 
 // ฐานข้อมูลไม่ตอบ
 FAIL=true;
-({r,h}=await get('/'));ok('db down home: 200, page still has content, latest marked for browser to load, contact default',r.status===200&&view(h).includes('<h1>นวดไทย')&&view(h).includes('<div id="latest" data-pending>')&&h.includes('<p id="cName">สมาคมวิทยากรฝึกอาชีพคนตาบอด</p>')&&h.includes('<p id="cPhone"></p>'));
+({r,h}=await get('/'));ok('db down home: 200, page still has content, latest marked for browser to load, contact default',r.status===200&&view(h).includes('<h1>จ้างงานคนตาบอด')&&view(h).includes('<div id="latest" data-pending>')&&h.includes('<p id="cName">สมาคมวิทยากรฝึกอาชีพคนตาบอด</p>')&&h.includes('<p id="cPhone"></p>'));
 ({r,h}=await get('/news/7'));ok('db down post: 200, page left for browser to load (no data-ssr)',r.status===200&&!h.includes('id="view" data-ssr')&&!h.includes('noindex'));
 FAIL=false;
 

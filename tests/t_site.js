@@ -17,10 +17,11 @@ function mk(){const A=[];
  for(let i=4;i<=18;i++)A.push({no:i,kind:'news',title:'ข่าวลำดับ '+i,summary:'สรุป '+i,body:'เนื้อหา '+i,cover_path:null,cover_alt:'',day:day(10+i),pinned:false,active:true});
  return A}
 let DB=mk(),FAIL=false,REQ=[];
+const kindF=(r,v)=>v.startsWith('neq.')?r.filter(a=>a.kind!==v.slice(4)):r.filter(a=>a.kind===v.slice(3));
 const adjF=(r,p)=>{const o=p.get('or');if(!o)return r;const m=/^\(day\.(lt|gt)\.([\d-]+),and\(day\.eq\.[\d-]+,no\.(?:lt|gt)\.(\d+)\)\)$/.exec(o);if(!m)throw new Error('bad or '+o);const lt=m[1]==='lt',d=m[2],n=+m[3];r=r.filter(a=>lt?(a.day<d||(a.day===d&&a.no<n)):(a.day>d||(a.day===d&&a.no>n)));const asc=(p.get('order')||'').startsWith('day.asc');return r.sort((a,b)=>(asc?1:-1)*((a.day<b.day?-1:a.day>b.day?1:0)||(a.no-b.no)))};
 function q(u){const x=new URL(u),p=x.searchParams;let r=DB.slice();
  if(p.get('active')==='eq.true')r=r.filter(a=>a.active);
- if(p.get('kind'))r=r.filter(a=>a.kind===p.get('kind').slice(3));
+ if(p.get('kind'))r=kindF(r,p.get('kind'));
  if(p.get('no'))r=r.filter(a=>a.no===+p.get('no').slice(3));
  if(p.get('or'))r=adjF(r,p);else r.sort((a,b)=>(b.pinned-a.pinned)||(b.day<a.day?-1:b.day>a.day?1:0)||(b.no-a.no));
  const off=+(p.get('offset')||0),lim=+(p.get('limit')||1000);return r.slice(off,off+lim)}
@@ -38,17 +39,18 @@ const h1=()=>p.evaluate(()=>{const h=document.querySelectorAll('#view h1');retur
 
 // หน้าแรก
 await p.goto(BASE+'/');await p.waitForSelector('#latest .card');
-let H=await h1();ok('home: one h1 and it has focus',H.n===1&&H.focus&&/หมอนวดตาบอด/.test(H.t));
+let H=await h1();ok('home: one h1 and it has focus',H.n===1&&H.focus&&/คนตาบอด/.test(H.t));
 const latest=await p.$$eval('#latest .card h3',a=>a.map(x=>x.textContent));
 ok('home: 6 latest, pinned first, drafts hidden',latest.length===6&&/ประโยชน์/.test(latest[0])&&!latest.some(t=>/ร่าง/.test(t)));
 ok('home: list query only asks for published items',REQ.every(u=>u.includes('active=eq.true')));
 ok('home: book / shop / staff links go to the existing apps',await p.evaluate(()=>['massage-customer-bna.pages.dev/','massage-shop-bna.pages.dev/reg/','massage-staff-bna.pages.dev/apply/'].every(u=>!!document.querySelector('a[href="https://'+u+'"]'))));
 ok('home: contact phone from public_contact is a tel: link',await W(()=>true)&&await p.evaluate(()=>{const a=document.querySelector('#cPhone a');return !!a&&a.getAttribute('href')==='tel:0989983654'&&a.textContent==='098-998-3654'}));
 ok('home: hours shown',(await p.textContent('#cHours')).includes('09:00'));
-ok('home: tab title',(await p.title())==='นวดไทยโดยหมอนวดตาบอดที่ขึ้นทะเบียนถูกต้อง | สมาคมวิทยากรฝึกอาชีพคนตาบอด');
+ok('home: tab title',(await p.title())==='จ้างงานคนตาบอด มาตรา 33, 35 และบริการนวดโดยหมอนวดตาบอด | สมาคมวิทยากรฝึกอาชีพคนตาบอด');
 ok('contact order: name, phone, email, hours',await p.evaluate(()=>[...document.querySelectorAll('#contact p[id]:not(#copy)')].map(x=>x.id).join(',')==='cName,cPhone,cEmail,cHours'));
 ok('visitor stats: Cloudflare Web Analytics beacon with token and spa on',await p.evaluate(()=>{const x=document.querySelector('script[src="https://static.cloudflareinsights.com/beacon.min.js"]');if(!x)return false;const c=JSON.parse(x.getAttribute('data-cf-beacon'));return x.defer&&c.token==='84e868c35fa94960abe34feda073bcaf'&&c.spa===true}));
-ok('no unverified organisation link in page',!(await p.content()).includes('bna.or.th'));
+ok('footer links to association site bna.or.th',await p.evaluate(()=>{const a=document.querySelector('#contact a[href="https://bna.or.th/"]');return !!a&&a.textContent==='bna.or.th'}));
+ok('home: order hero > company > works > latest; works section shows work item, latest has no work items',await p.waitForFunction(()=>{const ids=[...document.querySelectorAll('#view section h2')].map(h=>h.id);const w=document.querySelectorAll('#works .card').length;const lw=[...document.querySelectorAll('#latest .card .tag')].some(t=>t.textContent==='ผลงานบริการ');return ids.slice(0,3).join()==='hBiz,hWorks,hLatest'&&w===1&&!lw},null,{timeout:4000}).then(()=>true,()=>false));
 ok('home: email from public_contact is a mailto link',await p.evaluate(()=>{const a=document.querySelector('#cEmail a');return !!a&&a.getAttribute('href')==='mailto:info@example.org'&&a.textContent==='info@example.org'}));
 ok('footer: copyright with Thai year and association name',(await p.textContent('#copy'))==='© '+(new Date().getFullYear()+543)+' สมาคมวิทยากรฝึกอาชีพคนตาบอด สงวนลิขสิทธิ์');
 ok('main nav order: หน้าแรก, ข่าวและบทความ, บริษัทและหน่วยงาน, จองนวด, ติดต่อเรา',await p.evaluate(()=>[...document.querySelectorAll('nav.main a')].map(a=>a.textContent).join()==='หน้าแรก,ข่าวและบทความ,บริษัทและหน่วยงาน,จองนวด,ติดต่อเรา'));
@@ -110,7 +112,7 @@ ok('unknown filter treated as all',await p.$$eval('#list .card',a=>a.length)===1
 
 // หน้าสำหรับบริษัท
 await p.goto(BASE+'/');await p.waitForSelector('#latest .card');
-ok('home: hero has button to company page',await p.evaluate(()=>[...document.querySelectorAll('.hero .btn')].map(a=>a.textContent+'>'+a.getAttribute('href')).join('|')==='จองนวดออนไลน์>https://massage-customer-bna.pages.dev/|สำหรับบริษัทและหน่วยงาน>/company/|อ่านข่าวและบทความ>/news/'));
+ok('home: hero buttons (company first, booking kept)',await p.evaluate(()=>[...document.querySelectorAll('.hero .btn')].map(a=>a.textContent+'>'+a.getAttribute('href')).join('|')==='สำหรับบริษัทและหน่วยงาน>/company/|จองนวดออนไลน์>https://massage-customer-bna.pages.dev/|อ่านข่าวและบทความ>/news/'));
 ok('home: company box links to /company/ and to org service request',await p.evaluate(()=>!!document.querySelector('#view a[href="/company/"]')&&!!document.querySelector('#view a[href="https://massage-customer-bna.pages.dev/?orgreq=1"]')&&document.getElementById('hBiz').textContent==='สำหรับบริษัทและหน่วยงาน'));
 await p.click('nav.main a[href="/company/"]');await p.waitForSelector('#hLaw');
 H=await h1();ok('company: url, h1 focused, nav current',p.url()===BASE+'/company/'&&H.focus&&H.t==='สำหรับบริษัทและหน่วยงาน'&&await p.evaluate(()=>document.querySelector('nav.main a[aria-current="page"]').textContent==='บริษัทและหน่วยงาน'));

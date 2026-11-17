@@ -8,6 +8,8 @@
   var APP = { book: "https://massage-customer-bna.pages.dev/", shop: "https://massage-shop-bna.pages.dev/reg/", staff: "https://massage-staff-bna.pages.dev/apply/", company: "https://massage-customer-bna.pages.dev/?company=1", orgreq: "https://massage-customer-bna.pages.dev/?orgreq=1", privacy: "https://massage-customer-bna.pages.dev/privacy/" };
   var KIND = { news: "ข่าวและกิจกรรม", article: "บทความ", work: "ผลงานบริการ" };
   var SITE_NAME = "สมาคมวิทยากรฝึกอาชีพคนตาบอด";
+  /* เว็บไซต์หลักของสมาคม (ผู้ใช้ยืนยัน 18 พ.ย. 2569) เว็บนี้เน้นการจ้างงานคนตาบอด ข่าว ผลงาน การสมัคร และจองนวด */
+  var ORG_SITE = "https://bna.or.th/";
   /* ข้อมูลกฎหมายหน้า "สำหรับบริษัท" ตรวจเมื่อ พ.ย. 2569 (กรมการจัดหางาน, กรมส่งเสริมและพัฒนาคุณภาพชีวิตคนพิการ) มูลค่ามาตรา 35 เปลี่ยนทุกปี ปรับที่นี่ */
   var LAW = { s35Value: "123,005", s35Year: "2570" };
   var LIST_COLS = "no,kind,title,summary,cover_path,cover_alt,day,pinned";
@@ -18,7 +20,8 @@
   function imgUrl(p) { if (!p) return null; if (/^https?:\/\//.test(p)) return p; return SB.url + "/storage/v1/object/public/" + (/^place-images\//.test(p) ? p : "place-images/" + p); }
   /* วันที่ไทย เช่น 17 พฤศจิกายน 2569 (เขียนเอง ไม่พึ่ง Intl ให้ผลเหมือนกันทั้งในเครื่องและบน Cloudflare) */
   function thDate(s) { var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(s || "")); if (!m) return ""; var mo = +m[2]; if (mo < 1 || mo > 12) return ""; return (+m[3]) + " " + MONTHS[mo - 1] + " " + (+m[1] + 543); }
-  function listQ(kind, limit, offset) { return "/rest/v1/site_articles?select=" + LIST_COLS + "&active=eq.true" + (kind ? "&kind=eq." + kind : "") + "&order=pinned.desc,day.desc,no.desc&limit=" + limit + (offset ? "&offset=" + offset : ""); }
+  /* kind: "" = ทุกประเภท, "!work" = ทุกประเภทยกเว้นผลงานบริการ (ข่าวล่าสุดหน้าแรก เพราะผลงานมีส่วนของตัวเอง) */
+  function listQ(kind, limit, offset) { return "/rest/v1/site_articles?select=" + LIST_COLS + "&active=eq.true" + (kind === "!work" ? "&kind=neq.work" : kind ? "&kind=eq." + kind : "") + "&order=pinned.desc,day.desc,no.desc&limit=" + limit + (offset ? "&offset=" + offset : ""); }
   function postQ(no) { return "/rest/v1/site_articles?select=*&active=eq.true&no=eq." + no + "&limit=1"; }
 
   /* เนื้อหาบทความ: ข้อความธรรมดา บรรทัดว่างคั่นย่อหน้า, "## " = หัวข้อย่อย, "- " = รายการ, ลิงก์ http(s) กดได้ (ไม่รับ HTML) */
@@ -63,19 +66,28 @@
 
   /* ชื่อหน้า (แถบเบราว์เซอร์ / ผลค้นหา Google) และคำอธิบาย แยกตามหน้า */
   function meta(r, a, info) {
-    if (r.name === "home") return { title: "นวดไทยโดยหมอนวดตาบอดที่ขึ้นทะเบียนถูกต้อง | " + SITE_NAME, desc: "นวดแผนไทยโดยหมอนวดตาบอดที่ขึ้นทะเบียนกับกรมสนับสนุนบริการสุขภาพ จองนวดออนไลน์ จ้างหมอนวดไปนวดที่บริษัท สมัครเปิดร้านนวด สมัครเป็นหมอนวด และข่าวสารจาก" + SITE_NAME };
+    if (r.name === "home") return { title: "จ้างงานคนตาบอด มาตรา 33, 35 และบริการนวดโดยหมอนวดตาบอด | " + SITE_NAME, desc: "จ้างหมอนวดผู้พิการทางการเห็นที่ขึ้นทะเบียนถูกต้องไปนวดให้พนักงานแบบครั้งคราว หรือจ้างประจำตามมาตรา 33, 35 ผลงานที่ไปให้บริการ ข่าวสาร สมัครเป็นหมอนวด และจองนวดออนไลน์ จาก" + SITE_NAME };
     if (r.name === "company") { var pr = baht(info && info.rate); return { title: "นวดออฟฟิศซินโดรมให้พนักงาน และจ้างงานคนพิการ มาตรา 33, 35 | " + SITE_NAME, desc: "จ้างหมอนวดตาบอดที่ขึ้นทะเบียนถูกต้องไปนวดออฟฟิศซินโดรมให้พนักงานที่บริษัท" + (pr ? " " + pr + " ต่อหมอนวด 1 คน ต่อชั่วโมง (กรุงเทพฯ)" : "") + " หรือจ้างประจำตามมาตรา 33, 35 ใช้แทนการส่งเงินเข้ากองทุนตามมาตรา 34" }; }
     if (r.name === "list") { var t = r.kind ? KIND[r.kind] : "ข่าวและบทความ"; return { title: t + " | " + SITE_NAME, desc: (r.kind === "work" ? "หน่วยงานและบริษัทที่" + SITE_NAME + "ส่งหมอนวดตาบอดไปให้บริการนวด" : "รวม" + t + "จาก" + SITE_NAME + " เรื่องการนวดแผนไทย หมอนวดตาบอด และกิจกรรมของสมาคม") }; }
     if (r.name === "post" && a) return { title: a.title + " | " + SITE_NAME, desc: String(a.summary || a.title).slice(0, 300) };
     return { title: "ไม่พบหน้านี้ | " + SITE_NAME, desc: "" };
   }
 
-  function homeHTML(latest) {
-    return '<div class="hero"><h1>นวดไทยโดยหมอนวดตาบอด ที่ขึ้นทะเบียนถูกต้อง</h1><p>หมอนวดของเราเป็นคนพิการทางการเห็นที่ขึ้นทะเบียนกับกรมสนับสนุนบริการสุขภาพ กระทรวงสาธารณสุข จองคิวกับร้านนวดใกล้บ้านได้ทันที</p><div class="btns"><a class="btn" href="' + APP.book + '">จองนวดออนไลน์</a><a class="btn ghost" href="/company/" data-nav>สำหรับบริษัทและหน่วยงาน</a><a class="btn ghost" href="/news/" data-nav>อ่านข่าวและบทความ</a></div></div>' +
-      '<section aria-labelledby="hLatest"><div class="secHead"><h2 id="hLatest">ข่าวและบทความล่าสุด</h2><a href="/news/" data-nav>ดูทั้งหมด</a></div>' + (latest ? '<div id="latest">' + latestHTML(latest) + '</div>' : '<div id="latest" data-pending>' + LOADING + '</div>') + '</section>' +
+  /* หน้าแรก (เน้นการจ้างงานคนตาบอด ยังมีการจองนวด): หัวข้อหลัก -> บริษัทและหน่วยงาน -> ผลงานบริการ -> ข่าวและบทความล่าสุด -> ร่วมงานกับเรา -> จองนวด
+     latest / works: แถวจากฐานข้อมูล หรือ null = ให้หน้าเว็บโหลดเอง (works [] = ซ่อนส่วนผลงาน) */
+  function homeHTML(latest, works) {
+    return '<div class="hero"><h1>จ้างงานคนตาบอดผ่านงานนวด ที่ขึ้นทะเบียนถูกต้อง</h1><p>จ้างหมอนวดผู้พิการทางการเห็นไปนวดให้พนักงานแบบครั้งคราว หรือจ้างประจำตามมาตรา 33, 35 และร่วมสร้างอาชีพที่มั่นคงให้คนตาบอด</p><div class="btns"><a class="btn" href="/company/" data-nav>สำหรับบริษัทและหน่วยงาน</a><a class="btn ghost" href="' + APP.book + '">จองนวดออนไลน์</a><a class="btn ghost" href="/news/" data-nav>อ่านข่าวและบทความ</a></div></div>' +
       '<section aria-labelledby="hBiz"><h2 id="hBiz">สำหรับบริษัทและหน่วยงาน</h2><div class="box"><h3>นวดออฟฟิศซินโดรมให้พนักงาน หรือจ้างประจำตามมาตรา 33, 35</h3><p>จ้างหมอนวดตาบอดไปนวดที่บริษัทเป็นครั้งคราวสำหรับงานกิจกรรม หรือจ้างประจำเพื่อใช้เป็นการจ้างงานคนพิการตามกฎหมาย</p><div class="btns"><a class="btn" href="/company/" data-nav>ดูรายละเอียดและราคา</a><a class="btn ghost" href="' + APP.orgreq + '">ขอบริการสำหรับหน่วยงาน</a></div></div></section>' +
-      '<section aria-labelledby="hJoin"><h2 id="hJoin">ร่วมงานกับเรา</h2><div class="cols"><div class="box"><h3>สมัครเปิดร้านนวด</h3><p>ร้านนวดที่จดทะเบียนถูกต้อง สมัครเข้าระบบเพื่อรับคิวจากลูกค้าออนไลน์</p><a class="btn" href="' + APP.shop + '">สมัครเปิดร้าน</a></div><div class="box"><h3>สมัครเป็นหมอนวด</h3><p>หมอนวดที่ขึ้นทะเบียนแล้ว สมัครเพื่อรับงานจากร้านและหน่วยงานในระบบ</p><a class="btn" href="' + APP.staff + '">สมัครเป็นหมอนวด</a></div></div></section>' +
+      worksSection(works) +
+      '<section aria-labelledby="hLatest"><div class="secHead"><h2 id="hLatest">ข่าวและบทความล่าสุด</h2><a href="/news/" data-nav>ดูทั้งหมด</a></div>' + (latest ? '<div id="latest">' + latestHTML(latest) + '</div>' : '<div id="latest" data-pending>' + LOADING + '</div>') + '</section>' +
+      '<section aria-labelledby="hJoin"><h2 id="hJoin">ร่วมงานกับเรา</h2><div class="cols"><div class="box"><h3>สมัครเป็นหมอนวด</h3><p>หมอนวดที่ขึ้นทะเบียนแล้ว สมัครเพื่อรับงานจากร้านและหน่วยงานในระบบ</p><a class="btn" href="' + APP.staff + '">สมัครเป็นหมอนวด</a></div><div class="box"><h3>สมัครเปิดร้านนวด</h3><p>ร้านนวดที่จดทะเบียนถูกต้อง สมัครเข้าระบบเพื่อรับคิวจากลูกค้าออนไลน์</p><a class="btn" href="' + APP.shop + '">สมัครเปิดร้าน</a></div></div></section>' +
       '<section aria-labelledby="hHow"><h2 id="hHow">จองนวดง่ายๆ 3 ขั้นตอน</h2><div class="box"><ol class="steps"><li>เลือกร้านนวดใกล้คุณ และเลือกบริการที่ต้องการ</li><li>เลือกวัน เวลา และหมอนวด</li><li>เข้าสู่ระบบด้วยเบอร์โทร แล้วยืนยันการจอง เลื่อนหรือยกเลิกเองได้ภายหลัง</li></ol><p style="margin:14px 0 0"><a class="btn" href="' + APP.book + '">เริ่มจองนวด</a></p></div></section>';
+  }
+  /* ส่วน "หน่วยงานที่เราเคยไปให้บริการ" (ใช้ทั้งหน้าแรกและหน้าบริษัท) */
+  function worksSection(works) {
+    var head = '<section aria-labelledby="hWorks" id="worksSec"><div class="secHead"><h2 id="hWorks">หน่วยงานที่เราเคยไปให้บริการ</h2><a href="/news/?k=work" data-nav>ดูทั้งหมด</a></div>';
+    if (works === null || works === undefined) return head + '<div id="works" data-pending>' + LOADING + '</div></section>';
+    return works.length ? head + '<div id="works"><ul class="grid">' + works.map(function (x) { return card(x, 3); }).join("") + '</ul></div></section>' : '';
   }
   function latestHTML(a) { return a.length ? '<ul class="grid">' + a.map(function (x) { return card(x, 3); }).join("") + '</ul>' : '<div class="empty">ยังไม่มีข่าวในตอนนี้ ติดตามได้เร็วๆ นี้</div>'; }
 
@@ -162,9 +174,7 @@
     var ph = String(info.phone || "").replace(/\D/g, ""), phShow = ph.length === 10 ? ph.slice(0, 3) + "-" + ph.slice(3, 6) + "-" + ph.slice(6) : (info.phone || "");
     var okMail = info.email && /^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/.test(info.email);
     var call = '<a class="btn ghost js-tel" href="' + esc(tel) + '">โทรสอบถาม</a>';
-    var worksHead = '<section aria-labelledby="hWorks" id="worksSec"><div class="secHead"><h2 id="hWorks">หน่วยงานที่เราเคยไปให้บริการ</h2><a href="/news/?k=work" data-nav>ดูทั้งหมด</a></div>';
-    var works = info.works === null || info.works === undefined ? worksHead + '<div id="works" data-pending>' + LOADING + '</div></section>'
-      : info.works.length ? worksHead + '<div id="works"><ul class="grid">' + info.works.map(function (x) { return card(x, 3); }).join("") + '</ul></div></section>' : '';
+    var works = worksSection(info.works);
     return '<article class="post wide"><h1>สำหรับบริษัทและหน่วยงาน</h1><p class="lead">ดูแลสุขภาพพนักงานด้วยการนวดแผนไทยจากหมอนวดตาบอดที่ขึ้นทะเบียนกับกรมสนับสนุนบริการสุขภาพ กระทรวงสาธารณสุข เลือกได้ทั้งแบบครั้งคราวและแบบจ้างประจำ</p>' +
       '<div class="cols offers">' +
       '<div class="box offer"><span class="badge once">ครั้งคราว</span><h2>นวดออฟฟิศซินโดรมให้พนักงาน</h2>' +
@@ -208,7 +218,7 @@
   function copyText(year) { return "© " + year + " " + SITE_NAME + " สงวนลิขสิทธิ์"; }
 
   G.SV = {
-    SB: SB, APP: APP, KIND: KIND, SITE_NAME: SITE_NAME, LAW: LAW, PAGE: PAGE, POST_GONE: POST_GONE, LOADING: LOADING,
+    SB: SB, APP: APP, ORG_SITE: ORG_SITE, KIND: KIND, SITE_NAME: SITE_NAME, LAW: LAW, PAGE: PAGE, POST_GONE: POST_GONE, LOADING: LOADING,
     esc: esc, imgUrl: imgUrl, thDate: thDate, renderBody: renderBody, card: card, errBox: errBox, listQ: listQ, postQ: postQ,
     parse: parse, canonPath: canonPath, meta: meta, homeHTML: homeHTML, latestHTML: latestHTML, listHTML: listHTML, listBody: listBody, moreBtn: moreBtn,
     postHTML: postHTML, adjQ: adjQ, adjHTML: adjHTML, notFoundHTML: notFoundHTML, companyHTML: companyHTML, faqLD: faqLD, baht: baht, telHref: telHref, contactParts: contactParts, copyText: copyText
