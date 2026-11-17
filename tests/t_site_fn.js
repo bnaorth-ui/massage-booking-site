@@ -72,6 +72,12 @@ FAIL=true;
 ({r,h}=await get('/news/7'));ok('db down post: 200, page left for browser to load (no data-ssr)',r.status===200&&!h.includes('id="view" data-ssr')&&!h.includes('noindex'));
 FAIL=false;
 
+// ไฟล์ยืนยัน Google Search Console
+for(const gp of ['/google388ba24f989c9ab1.html','/google388ba24f989c9ab1']){({r,h}=await get(gp));ok('google verify file served directly at '+gp,r.status===200&&h==='google-site-verification: google388ba24f989c9ab1.html'&&/text\/html/.test(r.headers.get('Content-Type')))}
+ok('google verify file also in site folder with same content',fs.readFileSync(path.join(SITE,'google388ba24f989c9ab1.html'),'utf8').trim()==='google-site-verification: google388ba24f989c9ab1.html');
+r=await mw.onRequest({request:new Request(B+'/other'),next:async()=>new Response('<p>other</p>',{status:200,headers:{'Content-Type':'text/html'}})});
+ok('other html (not our page) passed through unchanged',r.status===200&&(await r.text())==='<p>other</p>');
+
 // ไฟล์อื่นไม่แตะ
 let called=0;const png=new Response('PNG',{headers:{'Content-Type':'image/png'}});
 r=await mw.onRequest({request:new Request(B+'/icon-192.png'),next:async()=>{called++;return png}});

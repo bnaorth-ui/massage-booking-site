@@ -6,11 +6,17 @@ import '../shared/views.js';
 import { sbGet, sbRpc, imgUrl, withMeta } from '../shared/meta.js';
 
 const V = globalThis.SV;
+const GOOGLE_VERIFY = 'google388ba24f989c9ab1.html';
 const NAV = { home: 'home', company: 'company', list: 'news', post: 'news' };
 
 export async function onRequest(ctx) {
   const req = ctx.request;
   const u = new URL(req.url);
+  // ไฟล์ยืนยันเจ้าของเว็บกับ Google Search Console (ไฟล์เดียวกับ site/google388ba24f989c9ab1.html)
+  // ส่งตรงที่ลิงก์เดิม เพราะ Cloudflare จะพาลิงก์ .html ไปลิงก์ที่ไม่มี .html ซึ่ง Google อาจไม่ยอมรับ
+  if (u.pathname === '/' + GOOGLE_VERIFY || u.pathname === '/' + GOOGLE_VERIFY.replace(/\.html$/, '')) {
+    return new Response('google-site-verification: ' + GOOGLE_VERIFY, { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
+  }
   if (req.method !== 'GET' || /\.[A-Za-z0-9]+$/.test(u.pathname)) return ctx.next();
   const res = await ctx.next();
   if (!(res.headers.get('Content-Type') || '').includes('text/html')) return res;
@@ -31,6 +37,7 @@ export async function onRequest(ctx) {
 
   const contact = await contactP;
   let html = await res.text();
+  if (!html.includes('<div class="wrap" id="view">')) return new Response(html, { status: res.status, headers: res.headers }); // ไม่ใช่หน้าเว็บหลัก ส่งต่อตามเดิม
   const cp = V.canonPath(r);
   const url = cp ? u.origin + cp : null;
   const m = V.meta(r, art);
