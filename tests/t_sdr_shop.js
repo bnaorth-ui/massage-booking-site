@@ -32,7 +32,7 @@ const T={
  reviews:[{id:'rv1',booking_id:'b3',customer_id:'c',place_id:'sh1',reviewer_first:'สมชาย',shop_rating:2,shop_comment:'รอนาน',shop_reply:null,hidden:false,reported:false,created_at:D1(-1)},{id:'rv2',booking_id:'b2',customer_id:'c',place_id:'sh1',reviewer_first:'มาลี',shop_rating:5,shop_comment:'ดีมาก',shop_reply:'ขอบคุณค่ะ',hidden:false,reported:false,created_at:D1(-2)},{id:'rv3',booking_id:'b8',customer_id:'c',place_id:'sh1',reviewer_first:'ผู้ซ่อน',shop_rating:1,shop_comment:'ไม่สุภาพ',hidden:true,reported:false,created_at:D1(-3)},{id:'rv9',booking_id:'b9',customer_id:'c',place_id:'sh9',reviewer_first:'ร้านอื่น',shop_rating:1,shop_comment:'ไม่ควรเห็น',hidden:false,reported:false,created_at:D1(-3)}],
  review_staff:[{id:'rs1',review_id:'rv1',booking_id:'b3',place_id:'sh1',staff_id:'p1',reviewer_first:'สมชาย',rating:4,comment:'สุภาพ',reply:null,hidden:false,reported:false,created_at:D1(-1)}],
  bookings:BK,
- notifications:[{id:'n9',audience:'shop',place_id:'sh1',kind:'announce',title:'📢 ปิดปรับปรุงระบบ',body:'คืนนี้',created_at:'2026-10-16T01:00:01Z'},{id:'n10',audience:'shop',place_id:'sh1',kind:'cancel',title:'ระบบยกเลิกคิวอัตโนมัติ',body:'MS9',created_at:'2026-10-17T01:00:00Z'},{id:'n1',audience:'shop',place_id:'sh1',kind:'booking',title:'มีการจองใหม่',body:'MS000001',created_at:'2026-10-15T02:00:00Z'},{id:'n2',audience:'shop',place_id:'sh1',kind:'job',title:'พนักงานเริ่มงาน',body:'x',created_at:'2026-10-15T03:00:00Z'},{id:'n3',audience:'shop',place_id:'sh1',kind:'wallet_low',title:'ยอดต่ำ',body:'y',created_at:'2026-10-15T04:00:00Z'}],
+ notifications:[{id:'n9',audience:'shop',place_id:'sh1',kind:'announce',title:'📢 ปิดปรับปรุงระบบ',body:'คืนนี้',created_at:'2026-10-16T01:00:01Z'},{id:'n10',audience:'shop',place_id:'sh1',kind:'cancel',title:'ระบบยกเลิกคิวอัตโนมัติ',body:'MS9',created_at:'2026-10-17T01:00:00Z'},{id:'n1',audience:'shop',place_id:'sh1',kind:'booking',title:'มีการจองใหม่',body:'MS000001',created_at:'2026-10-15T02:00:00Z'},{id:'n2',audience:'shop',place_id:'sh1',kind:'job',title:'หมอนวดเริ่มงาน',body:'x',created_at:'2026-10-15T03:00:00Z'},{id:'n3',audience:'shop',place_id:'sh1',kind:'wallet_low',title:'ยอดต่ำ',body:'y',created_at:'2026-10-15T04:00:00Z'}],
  notification_reads:[],
  announcements:[{id:'a1',title:'ปิดปรับปรุงระบบ',body:'คืนนี้',audiences:['ร้านค้า'],active:true,day:'2026-10-16',created_at:'2026-10-16T01:00:00Z'},{id:'a2',title:'เฉพาะผู้ใช้',body:'x',audiences:['ผู้ใช้งาน'],active:true,day:'2026-10-16',created_at:'2026-10-16T01:00:00Z'}],
  app_settings:[{promptpay_on:true,promptpay_type:'mobile',promptpay_id:'0812345678',promptpay_name:'สมาคมฯ',association_name:'สมาคมทดสอบ',address:'1 ถนนทดสอบ',phone:'021234567',line_url:'https://line.me/R/ti/p/@x',hours_text:'จ-ศ 9-17',wallet_warn1:100,wallet_warn2:50}]};
@@ -59,8 +59,8 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
  const rm=path.match(/^\/rest\/v1\/rpc\/(\w+)/);
  if(rm){const f=rm[1];
   if(f==='shop_staff_delete_requests'){if(process.env.NOSQL)return J(404,{message:'Could not find the function public.shop_staff_delete_requests in the schema cache'});return J(200,SDR.filter(x=>x.st==='pending'&&body.p_place==='sh1').map(x=>x.row))}
-  if(f==='shop_staff_delete_resolve'){sdrCalls.push(body);const x=SDR.find(z=>z.row.id===body.p_req&&z.st==='pending');if(!x)return J(400,{code:'P0001',message:'ไม่พบคำขอของพนักงานในร้านนี้'});x.st=body.p_approve?'done':'rejected';if(body.p_approve){Object.assign(T.staff.find(q=>q.id===x.row.staff_id),{name:'พนักงานที่ออกจากระบบ',phone:null,active:false,user_id:null})}return J(204,null)}
-  if(f==='shop_save_staff'){if(T.staff.some(s=>s.phone===body.p_phone&&s.id!==body.p_id))return J(400,{code:'P0001',message:'เบอร์มือถือนี้ถูกใช้กับพนักงานคนอื่นแล้ว'});
+  if(f==='shop_staff_delete_resolve'){sdrCalls.push(body);const x=SDR.find(z=>z.row.id===body.p_req&&z.st==='pending');if(!x)return J(400,{code:'P0001',message:'ไม่พบคำขอของหมอนวดในร้านนี้'});x.st=body.p_approve?'done':'rejected';if(body.p_approve){Object.assign(T.staff.find(q=>q.id===x.row.staff_id),{name:'หมอนวดที่ออกจากระบบ',phone:null,active:false,user_id:null})}return J(204,null)}
+  if(f==='shop_save_staff'){if(T.staff.some(s=>s.phone===body.p_phone&&s.id!==body.p_id))return J(400,{code:'P0001',message:'เบอร์มือถือนี้ถูกใช้กับหมอนวดคนอื่นแล้ว'});
    let s=body.p_id&&T.staff.find(x=>x.id===body.p_id);if(!s){s={id:'p'+(++n),place_id:body.p_place,active:true,user_id:null,created_at:'9'};T.staff.push(s)}
    Object.assign(s,{name:body.p_name,phone:body.p_phone,photo_path:body.p_photo});T.staff_services=T.staff_services.filter(x=>x.staff_id!==s.id).concat(body.p_services.map(v=>({staff_id:s.id,service_id:v})));return J(200,s.id)}
   if(f==='shop_save_promotion'){let p=body.p_id&&T.promotions.find(x=>x.id===body.p_id);if(!p){p={id:'m'+(++n),place_id:body.p_place,active:true,created_at:'9'};T.promotions.push(p)}
@@ -96,7 +96,7 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
  if(m==='DELETE'){if(tb==='services'&&mode.fkErr&&sp.get('id')==='eq.vUsed')return J(409,{code:'23503',message:'violates foreign key constraint'});const keep=rows.filter(x=>!filt([x]).length);T[tb]=keep;if(tb==='services')T.staff_services=T.staff_services.filter(x=>keep.some(s=>s.id===x.service_id));return J(204,null)}
  return J(404,{message:'nf'})});
 const SDR=[{st:'pending',row:{id:'q1',staff_id:'p3',name:'คุณสาม',phone:'0877777777',requested_at:'2026-10-29T03:00:00Z',open_jobs:0}},{st:'pending',row:{id:'q2',staff_id:'p1',name:'คุณนุ่น',phone:'0899999999',requested_at:'2026-10-30T03:00:00Z',open_jobs:1}}],sdrCalls=[];
-T.staff.push({id:'p3',place_id:'sh1',name:'คุณสาม',phone:'0877777777',photo_path:null,active:true,user_id:'u5',created_at:'2'},{id:'p9',place_id:'sh1',name:'พนักงานที่ออกจากระบบ',phone:null,photo_path:null,active:false,user_id:null,created_at:'0'});
+T.staff.push({id:'p3',place_id:'sh1',name:'คุณสาม',phone:'0877777777',photo_path:null,active:true,user_id:'u5',created_at:'2'},{id:'p9',place_id:'sh1',name:'หมอนวดที่ออกจากระบบ',phone:null,photo_path:null,active:false,user_id:null,created_at:'0'});
 const p=await ctx.newPage();p.on('pageerror',e=>errs.push(e.message));p.on('dialog',d=>{errs.push('DIALOG '+d.message());d.dismiss()});
 const ok=(nm,c)=>console.log((c?'PASS ':'FAIL ')+nm);
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -109,10 +109,10 @@ ok('app opens',await until(()=>!document.getElementById('main').hidden&&document
 await p.click('#tabs [data-id=mg]');await sleep(300);
 await p.click('[role=tab][data-id=staff]');await sleep(500);
 let t=await p.evaluate(()=>document.body.innerText);
-if(process.env.NOSQL){ok('sql missing: no card, staff list ok',!t.includes('คำขอลบบัญชีพนักงาน')&&t.includes('คุณนุ่น'));console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)}
-ok('request card with 2 items',t.includes('คำขอลบบัญชีพนักงาน (2)')&&t.includes('คุณสาม')&&t.includes('คุณนุ่น'));
+if(process.env.NOSQL){ok('sql missing: no card, staff list ok',!t.includes('คำขอลบบัญชีหมอนวด')&&t.includes('คุณนุ่น'));console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)}
+ok('request card with 2 items',t.includes('คำขอลบบัญชีหมอนวด (2)')&&t.includes('คุณสาม')&&t.includes('คุณนุ่น'));
 ok('open-jobs warning and approve disabled for คุณนุ่น',t.includes('ยังมีคิวที่ยังไม่เสร็จ 1 คิว')&&await p.$eval('[data-a=sdrok][data-id=q2]',e=>e.disabled));
-ok('anonymized staff hidden; list count 2',!t.includes('พนักงานที่ออกจากระบบ')&&t.includes('พนักงานทั้งหมด (2)'));
+ok('anonymized staff hidden; list count 2',!t.includes('หมอนวดที่ออกจากระบบ')&&t.includes('หมอนวดทั้งหมด (2)'));
 await p.screenshot({path:'sdr_shop.png',fullPage:true});
 await p.click('[data-a=sdrok][data-id=q1]');await sleep(200);
 ok('first click confirms only',sdrCalls.length===0&&(await p.evaluate(()=>document.body.innerText)).includes('กดอีกครั้งเพื่อยืนยันลบ'));
@@ -120,8 +120,8 @@ await p.click('[data-a=sdrx]');await sleep(200);ok('cancel',!(await p.evaluate((
 await p.click('[data-a=sdrno][data-id=q2]');await sleep(200);ok('reason box',!!(await p.$('#sdn_q2')));
 await p.fill('#sdn_q2','ยังมีงานค้าง');await p.click('[data-a=sdrno][data-id=q2]');await sleep(700);
 ok('reject rpc with place + note',sdrCalls.length===1&&sdrCalls[0].p_place==='sh1'&&sdrCalls[0].p_req==='q2'&&sdrCalls[0].p_approve===false&&sdrCalls[0].p_note==='ยังมีงานค้าง');
-t=await p.evaluate(()=>document.body.innerText);ok('1 left + message',t.includes('คำขอลบบัญชีพนักงาน (1)')&&t.includes('บันทึกการไม่อนุมัติแล้ว'));
+t=await p.evaluate(()=>document.body.innerText);ok('1 left + message',t.includes('คำขอลบบัญชีหมอนวด (1)')&&t.includes('บันทึกการไม่อนุมัติแล้ว'));
 await p.click('[data-a=sdrok][data-id=q1]');await p.click('[data-a=sdrok][data-id=q1]');await sleep(800);
 ok('approve rpc',sdrCalls.length===2&&sdrCalls[1].p_req==='q1'&&sdrCalls[1].p_approve===true&&sdrCalls[1].p_place==='sh1');
-t=await p.evaluate(()=>document.body.innerText);ok('card gone, staff removed, message',!t.includes('คำขอลบบัญชีพนักงาน (')&&t.includes('ลบบัญชีพนักงานแล้ว')&&!t.includes('คุณสาม')&&t.includes('พนักงานทั้งหมด (1)'));
+t=await p.evaluate(()=>document.body.innerText);ok('card gone, staff removed, message',!t.includes('คำขอลบบัญชีหมอนวด (')&&t.includes('ลบบัญชีหมอนวดแล้ว')&&!t.includes('คุณสาม')&&t.includes('หมอนวดทั้งหมด (1)'));
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)})();

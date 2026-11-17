@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>แอปหมอนวด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="apple-mobile-web-app-title" content="หมอนวด"><meta name="app-version" content="1.20"><meta name="app-name" content="หมอนวด"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="apple-mobile-web-app-title" content="หมอนวด"><meta name="app-version" content="1.21"><meta name="app-name" content="หมอนวด"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -131,7 +131,7 @@ function thS(d){return new Date(d+"T00:00:00Z").toLocaleDateString("th-TH",{day:
 function ntAt(a){var t=Date.parse(a),d=bkDate(t);return thS(d)+" "+hm(bkMin(t))+" น."}
 function ini(n){return String(n).replace(/^คุณ/,"").charAt(0)||"?"}
 var DAYF=["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัสบดี","ศุกร์","เสาร์"],DAYS=["อา","จ","อ","พ","พฤ","ศ","ส"];
-var TABS=[["q","หน้าหลัก","🏠"],["sc","ตารางงาน","📅"],["inc","รายได้","💰"],["nt","การแจ้งเตือน","🔔"],["ac","บัญชี","👤"]];
+var TABS=[["q","หน้าหลัก","🏠"],["sc","ตารางงาน","📅"],["inc","รายได้","💰"],["nt","แจ้งเตือน","🔔"],["ac","บัญชี","👤"]];
 var CT={};
 var JSTEPS=[["accept","รับงาน","accepted"],["start","เริ่มงาน","in_progress"],["finish","เสร็จสิ้นงาน","done"]];
 var JRANK={pending:0,accepted:1,in_progress:2,done:3},JL=["รอรับงาน","รับงานแล้ว","กำลังนวด","เสร็จสิ้นแล้ว"];
@@ -219,7 +219,7 @@ function gateDraw(){document.getElementById("hdr").innerHTML="";document.getElem
  if(st==="npw")h='<div class="agate"><h1 id="fph" tabindex="-1">ตั้งรหัสผ่านใหม่ของคุณ</h1><p class="asub">คุณเข้าสู่ระบบด้วยรหัสผ่านชั่วคราวจากเจ้าหน้าที่ กรุณาตั้งรหัสผ่านใหม่ที่คุณจำได้ก่อนใช้งาน</p><form id="agf" novalidate>'+
    afld("npw1","รหัสผ่านใหม่ (อย่างน้อย 6 ตัวอักษร)","password",'autocomplete="new-password"')+afld("npw2","ยืนยันรหัสผ่านใหม่","password",'autocomplete="new-password"')+
    '<p class="aerr" id="aerr" role="alert">'+esc(AG.err)+'</p>'+btn("บันทึกรหัสผ่านใหม่")+'</form><div class="alinks"><button type="button" class="btn g" data-ag="logout">ออกจากระบบ</button></div></div>';
- if(st==="denied")h='<div class="agate"><h1>บัญชีนี้ยังไม่ผูกกับหมอนวด</h1><p class="asub">เข้าสู่ระบบสำเร็จ แต่ไม่พบหมอนวดที่ใช้เบอร์มือถือเดียวกับบัญชีนี้ ให้ร้านหรือเจ้าหน้าที่บันทึกหมอนวดด้วยเบอร์เดียวกัน (ร้านทำได้ที่เมนู &quot;เพิ่มพนักงาน&quot; ในแอปร้านนวด) แล้วออกจากระบบและเข้าใหม่อีกครั้ง</p><div class="alinks"><button type="button" class="btn" data-ag="retry">ตรวจสอบอีกครั้ง</button> <button type="button" class="btn g" data-ag="logout">ออกจากระบบ</button></div></div>';
+ if(st==="denied")h='<div class="agate"><h1>บัญชีนี้ยังไม่ผูกกับหมอนวด</h1><p class="asub">เข้าสู่ระบบสำเร็จ แต่ไม่พบหมอนวดที่ใช้เบอร์มือถือเดียวกับบัญชีนี้ ให้ร้านหรือเจ้าหน้าที่บันทึกหมอนวดด้วยเบอร์เดียวกัน (ร้านทำได้ที่เมนู &quot;เพิ่มหมอนวด&quot; ในแอปร้านนวด) แล้วออกจากระบบและเข้าใหม่อีกครั้ง</p><div class="alinks"><button type="button" class="btn" data-ag="retry">ตรวจสอบอีกครั้ง</button> <button type="button" class="btn g" data-ag="logout">ออกจากระบบ</button></div></div>';
  if(st==="loaderr")h='<div class="agate"><h1>โหลดข้อมูลไม่สำเร็จ</h1><p class="aerr" role="alert">'+esc(AG.err)+'</p><div class="alinks"><button type="button" class="btn" data-ag="retry">ลองใหม่</button> <button type="button" class="btn g" data-ag="logout">ออกจากระบบ</button></div></div>';
  if(st==="apply")h=apHtml();
  document.getElementById("app").innerHTML=h;AG.ok="";
@@ -518,7 +518,7 @@ function ntView(){var L=feed(),n=S.ntNew||[],CATS=[["admin","จากระบ�
  cnt=function(k){return L.filter(function(x){return x.from===k}).length},nw=function(k){return L.filter(function(x){return x.from===k&&n.indexOf(x.id)>-1}).length};
  if(!S.ntf||S.ntf==="all"){var first=CATS.filter(function(c){return nw(c[0])>0})[0];S.ntf=first?first[0]:"admin"}
  var f=S.ntf,F=L.filter(function(x){return x.from===f});
- return'<h1>การแจ้งเตือน</h1><p class="sub">เลือกหมวดที่ต้องการดู: ข้อความจากระบบ (ประกาศ) และข้อความเกี่ยวกับคิวของคุณ (คิวใหม่ ยกเลิก เลื่อนคิว)</p><div class="nf" role="group" aria-label="เลือกหมวดการแจ้งเตือน">'+CATS.map(function(x){var w=nw(x[0]);return'<button type="button" data-a="ntf" data-id="'+x[0]+'" class="'+(f===x[0]?"on":"")+'" aria-pressed="'+(f===x[0])+'">'+x[1]+' ('+cnt(x[0])+')'+(w?', ใหม่ '+w:'')+'</button>'}).join("")+'</div>'+
+ return'<h1>แจ้งเตือน</h1><p class="sub">เลือกหมวดที่ต้องการดู: ข้อความจากระบบ (ประกาศ) และข้อความเกี่ยวกับคิวของคุณ (คิวใหม่ ยกเลิก เลื่อนคิว)</p><div class="nf" role="group" aria-label="เลือกหมวดการแจ้งเตือน">'+CATS.map(function(x){var w=nw(x[0]);return'<button type="button" data-a="ntf" data-id="'+x[0]+'" class="'+(f===x[0]?"on":"")+'" aria-pressed="'+(f===x[0])+'">'+x[1]+' ('+cnt(x[0])+')'+(w?', ใหม่ '+w:'')+'</button>'}).join("")+'</div>'+
  (F.length?F.map(function(x){return'<div class="nti"><div class="qh"><b>'+esc(x.title)+'</b><span class="tag'+(x.from==="admin"?"":" w")+'">'+(x.from==="admin"?"ระบบ":"คิว")+'</span>'+(n.indexOf(x.id)>-1?'<span class="tag w">ใหม่</span>':'')+'</div><small>'+ntAt(x.at)+'</small><pre>'+esc(x.text)+'</pre>'+(x.sup?'<div class="acts"><button type="button" class="btn g" data-supgo="1">เปิดแชตกับเจ้าหน้าที่</button></div>':'')+'</div>'}).join(""):'<div class="empty">ยังไม่มีการแจ้งเตือนในหมวดนี้</div>')}
 function hoOpen(x){return x.status==="pending_admin"||x.status==="pending_staff"}
 function hoForm(i){var H=S.ho;if(!H||H.inv!==i.id)return"";

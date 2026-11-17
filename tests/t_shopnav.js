@@ -28,7 +28,7 @@ const T={
  wallet_tx:[{id:'w1',place_id:'sh1',type:'credit',amount:1000,note:'เครดิตวงเงินเบื้องต้นจากสมาคม',ref:null,status:'success',created_at:'2026-10-10T02:00:00Z'},{id:'w2',place_id:'sh1',type:'gp',amount:-40,note:'หักค่า GP งาน MS1',ref:null,status:'success',created_at:'2026-10-12T02:00:00Z'}],
  topup_requests:[],
  bookings:BK,
- notifications:[{id:'n9',audience:'shop',place_id:'sh1',kind:'announce',title:'📢 ปิดปรับปรุงระบบ',body:'คืนนี้',created_at:'2026-10-16T01:00:01Z'},{id:'n10',audience:'shop',place_id:'sh1',kind:'cancel',title:'ระบบยกเลิกคิวอัตโนมัติ',body:'MS9',created_at:'2026-10-17T01:00:00Z'},{id:'n1',audience:'shop',place_id:'sh1',kind:'booking',title:'มีการจองใหม่',body:'MS000001',created_at:'2026-10-15T02:00:00Z'},{id:'n2',audience:'shop',place_id:'sh1',kind:'job',title:'พนักงานเริ่มงาน',body:'x',created_at:'2026-10-15T03:00:00Z'},{id:'n3',audience:'shop',place_id:'sh1',kind:'wallet_low',title:'ยอดต่ำ',body:'y',created_at:'2026-10-15T04:00:00Z'}],
+ notifications:[{id:'n9',audience:'shop',place_id:'sh1',kind:'announce',title:'📢 ปิดปรับปรุงระบบ',body:'คืนนี้',created_at:'2026-10-16T01:00:01Z'},{id:'n10',audience:'shop',place_id:'sh1',kind:'cancel',title:'ระบบยกเลิกคิวอัตโนมัติ',body:'MS9',created_at:'2026-10-17T01:00:00Z'},{id:'n1',audience:'shop',place_id:'sh1',kind:'booking',title:'มีการจองใหม่',body:'MS000001',created_at:'2026-10-15T02:00:00Z'},{id:'n2',audience:'shop',place_id:'sh1',kind:'job',title:'หมอนวดเริ่มงาน',body:'x',created_at:'2026-10-15T03:00:00Z'},{id:'n3',audience:'shop',place_id:'sh1',kind:'wallet_low',title:'ยอดต่ำ',body:'y',created_at:'2026-10-15T04:00:00Z'}],
  notification_reads:[],
  announcements:[{id:'a1',title:'ปิดปรับปรุงระบบ',body:'คืนนี้',audiences:['ร้านค้า'],active:true,day:'2026-10-16',created_at:'2026-10-16T01:00:00Z'},{id:'a2',title:'เฉพาะผู้ใช้',body:'x',audiences:['ผู้ใช้งาน'],active:true,day:'2026-10-16',created_at:'2026-10-16T01:00:00Z'}],
  app_settings:[{promptpay_on:true,promptpay_type:'mobile',promptpay_id:'0812345678',promptpay_name:'สมาคมฯ',association_name:'สมาคมทดสอบ',address:'1 ถนนทดสอบ',phone:'021234567',line_url:'https://line.me/R/ti/p/@x',hours_text:'จ-ศ 9-17',wallet_warn1:100,wallet_warn2:50}]};
@@ -50,7 +50,7 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
  if(!me&&path!=='/rest/v1/categories')return J(401,{message:'JWT required',code:'PGRST301'});
  const rm=path.match(/^\/rest\/v1\/rpc\/(\w+)/);
  if(rm){const f=rm[1];
-  if(f==='shop_save_staff'){if(T.staff.some(s=>s.phone===body.p_phone&&s.id!==body.p_id))return J(400,{code:'P0001',message:'เบอร์มือถือนี้ถูกใช้กับพนักงานคนอื่นแล้ว'});
+  if(f==='shop_save_staff'){if(T.staff.some(s=>s.phone===body.p_phone&&s.id!==body.p_id))return J(400,{code:'P0001',message:'เบอร์มือถือนี้ถูกใช้กับหมอนวดคนอื่นแล้ว'});
    let s=body.p_id&&T.staff.find(x=>x.id===body.p_id);if(!s){s={id:'p'+(++n),place_id:body.p_place,active:true,user_id:null,created_at:'9'};T.staff.push(s)}
    Object.assign(s,{name:body.p_name,phone:body.p_phone,photo_path:body.p_photo});T.staff_services=T.staff_services.filter(x=>x.staff_id!==s.id).concat(body.p_services.map(v=>({staff_id:s.id,service_id:v})));return J(200,s.id)}
   if(f==='shop_save_promotion'){let p=body.p_id&&T.promotions.find(x=>x.id===body.p_id);if(!p){p={id:'m'+(++n),place_id:body.p_place,active:true,created_at:'9'};T.promotions.push(p)}
@@ -89,19 +89,19 @@ ok('app opens',await until(()=>!document.getElementById('main').hidden&&document
 
 const nav=async()=>await p.$$eval('#tabs button',b=>b.map(x=>x.textContent.replace(/\d+$/,'').trim()));
 const names=await nav();console.log(names.join(' | '));
-ok('5 bottom buttons in order',names.map(x=>x.replace(/\d+$/,'')).join()==='🏠หน้าหลัก,💰กระเป๋าเงิน,📊รายงาน,🔔การแจ้งเตือน,⚙️จัดการร้าน');
+ok('5 bottom buttons in order',names.map(x=>x.replace(/\d+$/,'')).join()==='🏠หน้าหลัก,💰กระเป๋าเงิน,📊รายงาน,🔔แจ้งเตือน,⚙️จัดการร้าน');
 ok('nav fixed at bottom',await p.$eval('#navb',e=>getComputedStyle(e).position==='fixed'&&e.getBoundingClientRect().bottom>=innerHeight-1));
 ok('no nav landmark / aria-current',(await p.$$('#navb nav,#navb [aria-current]')).length===0&&(await p.$$('nav')).length===0);
 ok('home active, queue shown',(await p.$eval('#tabs button.on',e=>e.textContent)).includes('หน้าหลัก')&&(await p.textContent('#main')).includes('คิวงาน'));
 await p.click('#tabs [data-id=wal]');ok('wallet',(await p.textContent('#main')).includes('ยอด')||(await p.textContent('#main')).length>20);
 ok('wallet active',(await p.$eval('#tabs button.on',e=>e.textContent)).includes('กระเป๋าเงิน'));
 await p.click('#tabs [data-id=nt]');{const f=await p.$$eval('#main .nf button',b=>b.map(x=>x.textContent.replace(/\s*\(\d+\).*/,'').trim()));console.log(f.join());{const tx=await p.textContent('#main');ok('announce shown once',(tx.match(/ปิดปรับปรุงระบบ/g)||[]).length===1&&!tx.includes('📢'));
-await p.click('#main [data-id=admin]');const cards=await p.$$eval('.nti',c=>c.map(x=>x.textContent));ok('auto-cancel under สมาคม',cards.some(x=>x.includes('ระบบยกเลิกคิวอัตโนมัติ')));await p.click('#main [data-id=user]');const cu=await p.$$eval('.nti',c=>c.map(x=>x.textContent));ok('auto-cancel not under ผู้ใช้งาน',!cu.some(x=>x.includes('ระบบยกเลิกคิวอัตโนมัติ')));}ok('nt filters: 4 cats, no ทั้งหมด',f.join()==='จากระบบ,จากผู้ใช้งาน,จากพนักงาน,ค่า GP');ok('no สมาคม tab',!f.includes('จากสมาคม'))}ok('notifications',(await p.$eval('#tabs button.on',e=>e.textContent)).includes('การแจ้งเตือน'));
+await p.click('#main [data-id=admin]');const cards=await p.$$eval('.nti',c=>c.map(x=>x.textContent));ok('auto-cancel under สมาคม',cards.some(x=>x.includes('ระบบยกเลิกคิวอัตโนมัติ')));await p.click('#main [data-id=user]');const cu=await p.$$eval('.nti',c=>c.map(x=>x.textContent));ok('auto-cancel not under ผู้ใช้งาน',!cu.some(x=>x.includes('ระบบยกเลิกคิวอัตโนมัติ')));}ok('nt filters: 4 cats, no ทั้งหมด',f.join()==='จากระบบ,จากผู้ใช้งาน,จากหมอนวด,ค่า GP');ok('no สมาคม tab',!f.includes('จากสมาคม'))}ok('notifications',(await p.$eval('#tabs button.on',e=>e.textContent)).includes('แจ้งเตือน'));
 await p.click('#tabs [data-id=mg]');
 let sb=await p.$$eval('#main .nf button',b=>b.map(x=>x.textContent.trim()));console.log(sb.join(' | '));
-ok('manage opens svc with 8 sub-tabs',sb.join()==='เพิ่มบริการ,เพิ่มพนักงาน,โปรโมชั่น,ส่วนแบ่ง,รีวิว,ตั้งค่าร้าน,ปิดบัญชีร้าน,ติดต่อเรา'&&(await p.textContent('#main')).includes('เพิ่มบริการ'));
+ok('manage opens svc with 8 sub-tabs',sb.join()==='เพิ่มบริการ,เพิ่มหมอนวด,โปรโมชั่น,ส่วนแบ่ง,รีวิว,ตั้งค่าร้าน,ปิดบัญชีร้าน,ติดต่อเรา'&&(await p.textContent('#main')).includes('เพิ่มบริการ'));
 ok('manage button active',(await p.$eval('#tabs button.on',e=>e.textContent)).includes('จัดการร้าน'));
-for(const [id,key] of [['staff','เพิ่มพนักงาน'],['promo','โปรโมชั่น'],['set','บันทึกการตั้งค่า']]){await p.click('#main [data-id='+id+']');ok('sub '+id,(await p.textContent('#main')).includes(key)&&(await p.$eval('#tabs button.on',e=>e.textContent)).includes('จัดการร้าน')&&(await p.$eval('#main .nf button.on',e=>e.dataset.id))===id)}
+for(const [id,key] of [['staff','เพิ่มหมอนวด'],['promo','โปรโมชั่น'],['set','บันทึกการตั้งค่า']]){await p.click('#main [data-id='+id+']');ok('sub '+id,(await p.textContent('#main')).includes(key)&&(await p.$eval('#tabs button.on',e=>e.textContent)).includes('จัดการร้าน')&&(await p.$eval('#main .nf button.on',e=>e.dataset.id))===id)}
 ok('logout button inside settings',!!(await p.$('[data-a=logout]')));
 await p.click('#main [data-id=ct]');let t=await p.textContent('#main');
 ok('contact: no association name or address (choice ก, 12 Nov)',!t.includes('สมาคมทดสอบ')&&!t.includes('1 ถนนทดสอบ'));

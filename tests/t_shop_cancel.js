@@ -32,7 +32,7 @@ const T={
  wallet_tx:[{id:'w1',place_id:'sh1',type:'credit',amount:1000,note:'เครดิตวงเงินเบื้องต้นจากสมาคม',ref:null,status:'success',created_at:'2026-10-10T02:00:00Z'},{id:'w2',place_id:'sh1',type:'gp',amount:-40,note:'หักค่า GP งาน MS1',ref:null,status:'success',created_at:'2026-10-12T02:00:00Z'}],
  topup_requests:[],
  bookings:BK,
- notifications:[{id:'n1',audience:'shop',place_id:'sh1',kind:'booking',title:'มีการจองใหม่',body:'MS000001',created_at:'2026-10-15T02:00:00Z'},{id:'n2',audience:'shop',place_id:'sh1',kind:'job',title:'พนักงานเริ่มงาน',body:'x',created_at:'2026-10-15T03:00:00Z'},{id:'n3',audience:'shop',place_id:'sh1',kind:'wallet_low',title:'ยอดต่ำ',body:'y',created_at:'2026-10-15T04:00:00Z'}],
+ notifications:[{id:'n1',audience:'shop',place_id:'sh1',kind:'booking',title:'มีการจองใหม่',body:'MS000001',created_at:'2026-10-15T02:00:00Z'},{id:'n2',audience:'shop',place_id:'sh1',kind:'job',title:'หมอนวดเริ่มงาน',body:'x',created_at:'2026-10-15T03:00:00Z'},{id:'n3',audience:'shop',place_id:'sh1',kind:'wallet_low',title:'ยอดต่ำ',body:'y',created_at:'2026-10-15T04:00:00Z'}],
  notification_reads:[],
  announcements:[{id:'a1',title:'ปิดปรับปรุงระบบ',body:'คืนนี้',audiences:['ร้านค้า'],active:true,day:'2026-10-16',created_at:'2026-10-16T01:00:00Z'},{id:'a2',title:'เฉพาะผู้ใช้',body:'x',audiences:['ผู้ใช้งาน'],active:true,day:'2026-10-16',created_at:'2026-10-16T01:00:00Z'}],
  app_settings:[{promptpay_on:true,promptpay_type:'mobile',promptpay_id:'0812345678',promptpay_name:'สมาคมฯ',wallet_warn1:100,wallet_warn2:50}]};
@@ -54,14 +54,14 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
  if(!me&&path!=='/rest/v1/categories')return J(401,{message:'JWT required',code:'PGRST301'});
  const rm=path.match(/^\/rest\/v1\/rpc\/(\w+)/);
  if(rm){const f=rm[1];
-  if(f==='shop_save_staff'){if(T.staff.some(s=>s.phone===body.p_phone&&s.id!==body.p_id))return J(400,{code:'P0001',message:'เบอร์มือถือนี้ถูกใช้กับพนักงานคนอื่นแล้ว'});
+  if(f==='shop_save_staff'){if(T.staff.some(s=>s.phone===body.p_phone&&s.id!==body.p_id))return J(400,{code:'P0001',message:'เบอร์มือถือนี้ถูกใช้กับหมอนวดคนอื่นแล้ว'});
    let s=body.p_id&&T.staff.find(x=>x.id===body.p_id);if(!s){s={id:'p'+(++n),place_id:body.p_place,active:true,user_id:null,created_at:'9'};T.staff.push(s)}
    Object.assign(s,{name:body.p_name,phone:body.p_phone,photo_path:body.p_photo});T.staff_services=T.staff_services.filter(x=>x.staff_id!==s.id).concat(body.p_services.map(v=>({staff_id:s.id,service_id:v})));return J(200,s.id)}
   if(f==='shop_save_promotion'){let p=body.p_id&&T.promotions.find(x=>x.id===body.p_id);if(!p){p={id:'m'+(++n),place_id:body.p_place,active:true,created_at:'9'};T.promotions.push(p)}
    Object.assign(p,{title:body.p_title,description:body.p_desc,type:body.p_type,value:body.p_value,applies_all:body.p_all,start_date:body.p_start,end_date:body.p_end,image_path:body.p_image});
    T.promotion_services=T.promotion_services.filter(x=>x.promotion_id!==p.id).concat(body.p_services.map(v=>({promotion_id:p.id,service_id:v})));return J(200,p.id)}
   if(f==='attach_topup_slip'){const t=T.topup_requests.find(x=>x.id===body.p_id);if(!t||t.status!=='pending')return J(400,{code:'P0001',message:'รายการนี้ปิดแล้ว ส่งสลิปไม่ได้'});t.slip_path=body.p_path;t.slip_at=now();return J(204,null)}
-  if(f==='cancel_booking'){const bk=T.bookings.find(x=>x.ref===body.p_ref);if(mode.cxErr)return J(400,{code:'P0001',message:'พนักงานเริ่มให้บริการแล้ว ยกเลิกไม่ได้'});bk.status='cancelled';bk.booking_items.forEach(i=>i.active=false);return J(204,null)}
+  if(f==='cancel_booking'){const bk=T.bookings.find(x=>x.ref===body.p_ref);if(mode.cxErr)return J(400,{code:'P0001',message:'หมอนวดเริ่มให้บริการแล้ว ยกเลิกไม่ได้'});bk.status='cancelled';bk.booking_items.forEach(i=>i.active=false);return J(204,null)}
   if(f==='shop_mark_no_show'){const bk=T.bookings.find(x=>x.ref===body.p_ref);bk.status='no_show';bk.booking_items.forEach(i=>i.active=false);return J(204,null)}
   if(f==='cancel_topup'){const t=T.topup_requests.find(x=>x.id===body.p_id);t.status='cancelled';return J(204,null)}
   return J(404,{message:'no rpc '+f})}
@@ -104,13 +104,13 @@ await p.click('[data-a=qcxno][data-id=b1]');
 ok('no-cancel closes panel and returns focus',await p.$('#qcr_b1')===null&&await until(()=>document.activeElement&&document.activeElement.getAttribute('data-a')==='qcx'));
 await p.click('[data-a=qcx][data-id=b1]');await p.selectOption('#qcr_b1','0');await p.fill('#qco_b1','ติดธุระ');
 mode.cxErr=true;await p.click('[data-a=qcxok][data-id=b1]');
-ok('server error shown, booking unchanged',await until(()=>document.body.textContent.includes('พนักงานเริ่มให้บริการแล้ว')));
+ok('server error shown, booking unchanged',await until(()=>document.body.textContent.includes('หมอนวดเริ่มให้บริการแล้ว')));
 mode.cxErr=false;
 if(await p.$('#qcr_b1')===null){await p.click('[data-a=qcx][data-id=b1]')}
 await p.selectOption('#qcr_b1','0');await p.fill('#qco_b1','ติดธุระ');await p.click('[data-a=qcxok][data-id=b1]');
 await until(()=>!document.querySelector('[data-a=qcx][data-id=b1]'));
 const cc=calls.filter(c=>c.path.endsWith('/rpc/cancel_booking')).pop();
-ok('rpc sent ref + reason',!!cc&&cc.body.p_ref==='MS1'&&cc.body.p_reason==='พนักงานไม่สะดวก - ติดธุระ');
+ok('rpc sent ref + reason',!!cc&&cc.body.p_ref==='MS1'&&cc.body.p_reason==='หมอนวดไม่สะดวก - ติดธุระ');
 await p.waitForTimeout(300);const mtx=await p.textContent('#main');if(mtx.includes('ลูกค้าA'))console.log('MAIN:',mtx.slice(0,400));ok('card left waiting tab',!mtx.includes('ลูกค้าA'));
 await p.click('[data-a=qt][data-id=cx]');ok('card now in cancelled tab',(await p.textContent('#main')).includes('ลูกค้าA'));
 ok('no cancel button on cancelled card',await p.$('[data-a=qcx]')===null);

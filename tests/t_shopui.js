@@ -17,7 +17,7 @@ const T={
  promotion_services:[{promotion_id:'m1',service_id:'vUsed'}],
  wallet_tx:[{id:'w1',place_id:'sh1',type:'credit',amount:1000,note:'เครดิตวงเงินเบื้องต้นจากสมาคม',ref:null,status:'success',created_at:'2026-10-10T02:00:00Z'},{id:'w2',place_id:'sh1',type:'gp',amount:-40,note:'หักค่า GP งาน MS1',ref:null,status:'success',created_at:'2026-10-12T02:00:00Z'}],
  topup_requests:[],
- notifications:[{id:'n1',audience:'shop',place_id:'sh1',kind:'booking',title:'มีการจองใหม่',body:'MS000001',created_at:'2026-10-15T02:00:00Z'},{id:'n2',audience:'shop',place_id:'sh1',kind:'job',title:'พนักงานเริ่มงาน',body:'x',created_at:'2026-10-15T03:00:00Z'},{id:'n3',audience:'shop',place_id:'sh1',kind:'wallet_low',title:'ยอดต่ำ',body:'y',created_at:'2026-10-15T04:00:00Z'}],
+ notifications:[{id:'n1',audience:'shop',place_id:'sh1',kind:'booking',title:'มีการจองใหม่',body:'MS000001',created_at:'2026-10-15T02:00:00Z'},{id:'n2',audience:'shop',place_id:'sh1',kind:'job',title:'หมอนวดเริ่มงาน',body:'x',created_at:'2026-10-15T03:00:00Z'},{id:'n3',audience:'shop',place_id:'sh1',kind:'wallet_low',title:'ยอดต่ำ',body:'y',created_at:'2026-10-15T04:00:00Z'}],
  notification_reads:[],
  announcements:[{id:'a1',title:'ปิดปรับปรุงระบบ',body:'คืนนี้',audiences:['ร้านค้า'],active:true,day:'2026-10-16',created_at:'2026-10-16T01:00:00Z'},{id:'a2',title:'เฉพาะผู้ใช้',body:'x',audiences:['ผู้ใช้งาน'],active:true,day:'2026-10-16',created_at:'2026-10-16T01:00:00Z'}],
  app_settings:[{promptpay_on:true,promptpay_type:'mobile',promptpay_id:'0812345678',promptpay_name:'สมาคมฯ',wallet_warn1:100,wallet_warn2:50}]};
@@ -39,7 +39,7 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
  if(!me&&path!=='/rest/v1/categories')return J(401,{message:'JWT required',code:'PGRST301'});
  const rm=path.match(/^\/rest\/v1\/rpc\/(\w+)/);
  if(rm){const f=rm[1];
-  if(f==='shop_save_staff'){if(T.staff.some(s=>s.phone===body.p_phone&&s.id!==body.p_id))return J(400,{code:'P0001',message:'เบอร์มือถือนี้ถูกใช้กับพนักงานคนอื่นแล้ว'});
+  if(f==='shop_save_staff'){if(T.staff.some(s=>s.phone===body.p_phone&&s.id!==body.p_id))return J(400,{code:'P0001',message:'เบอร์มือถือนี้ถูกใช้กับหมอนวดคนอื่นแล้ว'});
    let s=body.p_id&&T.staff.find(x=>x.id===body.p_id);if(!s){s={id:'p'+(++n),place_id:body.p_place,active:true,user_id:null,created_at:'9'};T.staff.push(s)}
    Object.assign(s,{name:body.p_name,phone:body.p_phone,photo_path:body.p_photo});T.staff_services=T.staff_services.filter(x=>x.staff_id!==s.id).concat(body.p_services.map(v=>({staff_id:s.id,service_id:v})));return J(200,s.id)}
   if(f==='shop_save_promotion'){let p=body.p_id&&T.promotions.find(x=>x.id===body.p_id);if(!p){p={id:'m'+(++n),place_id:body.p_place,active:true,created_at:'9'};T.promotions.push(p)}
@@ -141,15 +141,15 @@ ok('service deleted',!T.services.some(s=>s.id==='v1')&&!(await txt('#main')).inc
 await p.click('[data-a=del][data-t=svc][data-id=vUsed]');await p.click('[data-a=del][data-t=svc][data-id=vUsed]');
 ok('delete used service -> suspend message',await has('ให้ปิดหรือระงับแทนการลบ'));
 ok('used service still listed',(await txt('#main')).includes('นวดเท้า'));
-// ---- พนักงาน
+// ---- หมอนวด
 await sub('staff');
 ok('staff listed with linked',(await txt('#main')).includes('คุณนุ่น')&&(await txt('#main')).includes('เชื่อมบัญชีแล้ว'));
 await p.click('[data-a=new][data-t=staff]');
 ok('staff form has no password field',!(await p.$('#fpw')));
 await p.fill('#fn','คุณใหม่');await p.fill('#fph','0899999999');await p.click('.ss >> nth=0');await p.click('[data-a=save]');
-ok('duplicate phone message from server',await has('เบอร์มือถือนี้ถูกใช้กับพนักงานคนอื่นแล้ว'));
+ok('duplicate phone message from server',await has('เบอร์มือถือนี้ถูกใช้กับหมอนวดคนอื่นแล้ว'));
 await p.fill('#fph','12');await p.click('[data-a=save]');ok('phone format validation',await has('เบอร์มือถือต้องเป็นตัวเลข 10 หลัก'));
-await p.fill('#fph','0877777777');await p.click('[data-a=save]');ok('staff saved',await has('รอพนักงานสมัครสมาชิกด้วยเบอร์นี้'));
+await p.fill('#fph','0877777777');await p.click('[data-a=save]');ok('staff saved',await has('รอหมอนวดสมัครสมาชิกด้วยเบอร์นี้'));
 const ns=T.staff.find(s=>s.name==='คุณใหม่');ok('staff rpc body',ns&&ns.phone==='0877777777'&&T.staff_services.some(q=>q.staff_id===ns.id)&&calls.find(c=>c.path.endsWith('shop_save_staff')).body.p_place==='sh1');
 await p.click(`[data-a=tog][data-t=staff][data-id=${ns.id}]`);await until(()=>document.body.innerText.includes('ระงับ'));ok('staff suspended',await require('./config').waitFor(()=>T.staff.find(s=>s.id===ns.id).active===false));
 // ---- โปรโมชั่น
@@ -190,7 +190,7 @@ ok('other-audience announcement hidden',!(await txt('#main')).includes('เฉ�
 await p.waitForTimeout(200);
 ok('reads posted for db notifications only',(c=>c&&c.body.length===3&&c.body.every(x=>x.user_id==='u1'&&/^n\d$/.test(x.notification_id))&&c.q.includes('on_conflict')&&c.pref.includes('ignore-duplicates'))(calls.filter(c=>c.path.endsWith('notification_reads')&&c.m==='POST').pop()));
 ok('badge cleared',!(await p.textContent('#tabs')).match(/\d/));
-await p.click('[data-a=ntf][data-id=staff]');ok('filter staff',(await txt('#main')).includes('พนักงานเริ่มงาน')&&!(await txt('#main')).includes('มีการจองใหม่'));
+await p.click('[data-a=ntf][data-id=staff]');ok('filter staff',(await txt('#main')).includes('หมอนวดเริ่มงาน')&&!(await txt('#main')).includes('มีการจองใหม่'));
 // ---- ตั้งค่า
 await sub('set');
 ok('settings: phone readonly, no duration select',await p.$eval('#lph',e=>e.readOnly&&e.value==='0811111111')&&!(await p.$('#r1')));

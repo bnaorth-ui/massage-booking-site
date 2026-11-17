@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>สำหรับร้านนวด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.21"><meta name="app-name" content="ร้านนวด"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.22"><meta name="app-name" content="ร้านนวด"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -146,10 +146,10 @@ function val(id){var e=document.getElementById(id);return e?e.value:""}
 /* ===== นโยบายความเป็นส่วนตัว (ร้านค้า) ===== */
 function pvBody(nm,tel){var L=function(a){return '<ul class="pvl">'+a.map(function(x){return '<li>'+x+'</li>'}).join("")+'</ul>'},S2=function(t,b){return '<h2 class="stl" style="margin:16px 0 4px;font-size:1.1rem">'+t+'</h2>'+b};
  return '<div class="pv"><p>'+esc(nm)+' เป็นผู้ดูแลข้อมูลของร้านในระบบจองคิวนวดนี้</p>'+
-  S2("เราเก็บข้อมูลอะไร",L(["ชื่อร้าน รายละเอียดร้าน ที่ตั้งและตำแหน่งหมุด เวลาทำการ บริการ และโปรโมชั่น","ชื่อ เบอร์มือถือ และรูปโปรไฟล์ของเจ้าของร้าน","รูปใบอนุญาตจัดตั้งร้านนวด","รูปบัตรประจำตัวคนพิการ (เฉพาะร้านที่ขอป้ายร้านของคนพิการทางการเห็น) ลบทิ้งหลังเจ้าหน้าที่ตรวจเสร็จ ระบบจำไว้เพียงว่าร้านได้รับป้ายหรือไม่","ชื่อ เบอร์โทร และรูปของพนักงานที่ร้านเพิ่มเข้าระบบ","รายการจอง รีวิว และข้อความแชตกับลูกค้า","ยอดกระเป๋าเงิน รายการเติมเงิน รูปสลิปการโอน และค่า GP"]))+
+  S2("เราเก็บข้อมูลอะไร",L(["ชื่อร้าน รายละเอียดร้าน ที่ตั้งและตำแหน่งหมุด เวลาทำการ บริการ และโปรโมชั่น","ชื่อ เบอร์มือถือ และรูปโปรไฟล์ของเจ้าของร้าน","รูปใบอนุญาตจัดตั้งร้านนวด","รูปบัตรประจำตัวคนพิการ (เฉพาะร้านที่ขอป้ายร้านของคนพิการทางการเห็น) ลบทิ้งหลังเจ้าหน้าที่ตรวจเสร็จ ระบบจำไว้เพียงว่าร้านได้รับป้ายหรือไม่","ชื่อ เบอร์โทร และรูปของหมอนวดที่ร้านเพิ่มเข้าระบบ","รายการจอง รีวิว และข้อความแชตกับลูกค้า","ยอดกระเป๋าเงิน รายการเติมเงิน รูปสลิปการโอน และค่า GP"]))+
   S2("เราใช้ข้อมูลทำอะไร",L(["แสดงร้านให้ลูกค้าเลือกจอง และให้ร้านรับจองและบริหารร้าน","ตรวจสอบใบอนุญาตก่อนอนุมัติร้าน และตรวจบัตรคนพิการก่อนแสดงป้ายร้านของคนพิการทางการเห็น","คิดค่า GP ตรวจยอดเติมเงิน และปิดร้านชั่วคราวเมื่อยอดค้างชำระ","ส่งการแจ้งเตือนเรื่องการจอง ยอดเงิน และการดูแลระบบ"]))+
-  S2("ใครเห็นข้อมูลของร้าน",L(["ลูกค้าเห็นชื่อร้าน ที่ตั้ง บริการ ราคา โปรโมชั่น รีวิว ป้ายร้านของคนพิการทางการเห็น (ถ้าร้านยินยอมและได้รับป้าย) และชื่อกับรูปของพนักงานที่ให้บริการ","เจ้าหน้าที่เห็นข้อมูลร้านเท่าที่จำเป็นต่อการดูแลระบบ รวมถึงใบอนุญาตและรายการเงิน","เราไม่ขายข้อมูลของร้านให้ใคร"]))+
-  S2("หน้าที่ของร้านต่อข้อมูลลูกค้า",L(["ร้านเห็นชื่อและเบอร์โทรของลูกค้าเฉพาะการจองของร้านตัวเอง","ใช้เพื่อให้บริการและติดต่อเรื่องการจองนั้นเท่านั้น","ห้ามนำไปใช้ทำการตลาด เปิดเผยให้ผู้อื่น หรือคัดลอกเก็บไว้นอกระบบ","ร้านต้องแจ้งพนักงานของร้านให้ทราบและปฏิบัติตามด้วย"]))+
+  S2("ใครเห็นข้อมูลของร้าน",L(["ลูกค้าเห็นชื่อร้าน ที่ตั้ง บริการ ราคา โปรโมชั่น รีวิว ป้ายร้านของคนพิการทางการเห็น (ถ้าร้านยินยอมและได้รับป้าย) และชื่อกับรูปของหมอนวดที่ให้บริการ","เจ้าหน้าที่เห็นข้อมูลร้านเท่าที่จำเป็นต่อการดูแลระบบ รวมถึงใบอนุญาตและรายการเงิน","เราไม่ขายข้อมูลของร้านให้ใคร"]))+
+  S2("หน้าที่ของร้านต่อข้อมูลลูกค้า",L(["ร้านเห็นชื่อและเบอร์โทรของลูกค้าเฉพาะการจองของร้านตัวเอง","ใช้เพื่อให้บริการและติดต่อเรื่องการจองนั้นเท่านั้น","ห้ามนำไปใช้ทำการตลาด เปิดเผยให้ผู้อื่น หรือคัดลอกเก็บไว้นอกระบบ","ร้านต้องแจ้งหมอนวดของร้านให้ทราบและปฏิบัติตามด้วย"]))+
   S2("เราเก็บนานแค่ไหน",L(["ชื่อและเบอร์โทรของลูกค้าในรายการจองถูกลบหลังการใช้บริการผ่านไป 12 เดือน","ข้อความแชตถูกลบอัตโนมัติหลัง 90 วัน ถ้ามีการกดรายงานแชต เจ้าหน้าที่จะเห็นสำเนาข้อความล่าสุดของห้องนั้น และเก็บรายงานไว้ 12 เดือน","รูปสลิปการโอนเก็บไม่เกิน 1 ปี แล้วถูกลบ","รายการเงิน (เติมเงิน ยอดกระเป๋าเงิน ค่า GP) เก็บไว้เพื่อการบัญชีตามที่"+esc(nm||"สมาคมวิทยากรฝึกอาชีพคนตาบอด")+"กำหนด","ข้อมูลอื่นเก็บไว้ตราบที่ร้านยังเปิดบัญชีอยู่"]))+
   S2("การปิดบัญชีร้าน",L(["ร้านลบบัญชีเองทันทีไม่ได้ เพราะเกี่ยวข้องกับกระเป๋าเงินและยอดค้างชำระ","ขอปิดบัญชีได้ที่ ตั้งค่าร้าน > ปิดบัญชีร้าน แล้วเจ้าหน้าที่จะตรวจสอบและอนุมัติ โดยต้องไม่มียอดค้างชำระและไม่มีการจองที่ยังไม่เสร็จสิ้น","เมื่อปิดบัญชี ร้านจะไม่แสดงให้ลูกค้าเห็น ข้อมูลทางการเงินเก็บตามที่ระบุข้างต้น"]))+
   S2("สิทธิ์ของร้าน",L(["ดูและแก้ไขข้อมูลร้านได้เองในหน้า &quot;ตั้งค่าร้าน&quot; ส่วนข้อมูลที่แก้เองไม่ได้ (เช่น เบอร์มือถือเข้าสู่ระบบ) ติดต่อเจ้าหน้าที่","ขอให้ลบหรือแก้ไขข้อมูลอื่นได้โดยติดต่อเจ้าหน้าที่"]))+
@@ -184,7 +184,7 @@ function insKind(){try{var ua=navigator.userAgent||"";if((window.matchMedia&&mat
 var INSIC={"share": "<path d=\"M8 10H6.5A1.5 1.5 0 0 0 5 11.5v7A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 17.5 10H16\"/><path d=\"M12 15V3.5M8.5 7 12 3.5 15.5 7\"/>", "add": "<rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"3.5\"/><path d=\"M12 8.5v7M8.5 12h7\"/>", "ok": "<path d=\"M5 12.5l4.5 4.5L19 7.5\"/>", "dots": "<circle class=\"f\" cx=\"12\" cy=\"5.5\" r=\"1.7\"/><circle class=\"f\" cx=\"12\" cy=\"12\" r=\"1.7\"/><circle class=\"f\" cx=\"12\" cy=\"18.5\" r=\"1.7\"/>", "inst": "<path d=\"M12 4v11M7.5 10.5 12 15l4.5-4.5\"/><path d=\"M5 19h14\"/>", "ext": "<path d=\"M13.5 4.5h6v6M19.5 4.5 11 13\"/><path d=\"M17 14v3.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 5 17.5v-9A1.5 1.5 0 0 1 6.5 7H10\"/>"};
 function insI(n){return '<span class="insi" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false">'+INSIC[n]+'</svg></span>'}
 function insSt(a){return '<ol class="insst">'+a.map(function(x,i){return '<li><span class="insn" aria-hidden="true">'+(i+1)+'</span>'+(x[0]?insI(x[0]):'')+'<span>'+x[1]+'</span></li>'}).join("")+'</ol>'}
-function insFt(){var a=[["📋", "จัดการคิวและการจองของร้าน"], ["🛠️", "ตั้งค่าบริการ พนักงาน และโปรโมชั่น"], ["💰", "เติมเงินกระเป๋า ดูรายงาน"], ["⭐", "ตอบรีวิวและแชตกับลูกค้า"], ["🔔", "แจ้งเตือนทันทีเมื่อมีการจองใหม่"]];return '<div class="insft"><h2>แอปนี้ทำอะไรได้</h2><ul>'+a.map(function(x){return '<li><span aria-hidden="true">'+x[0]+'</span><span>'+x[1]+'</span></li>'}).join("")+'</ul></div>'}
+function insFt(){var a=[["📋", "จัดการคิวและการจองของร้าน"], ["🛠️", "ตั้งค่าบริการ หมอนวด และโปรโมชั่น"], ["💰", "เติมเงินกระเป๋า ดูรายงาน"], ["⭐", "ตอบรีวิวและแชตกับลูกค้า"], ["🔔", "แจ้งเตือนทันทีเมื่อมีการจองใหม่"]];return '<div class="insft"><h2>แอปนี้ทำอะไรได้</h2><ul>'+a.map(function(x){return '<li><span aria-hidden="true">'+x[0]+'</span><span>'+x[1]+'</span></li>'}).join("")+'</ul></div>'}
 /* ข้อความชวนร้านนวด: ชื่อแอปจากการตั้งค่า (ว่าง = จองคิวนวด) เครดิตเริ่มต้น 500 บาทให้ตรงกับค่าเริ่มต้นตอนอนุมัติร้าน */
 function invText(app,ph,gp,link){return "ขอเชิญร้านนวดเข้าร่วม \""+(String(app||"").trim()||"จองคิวนวด")+"\" แอปจองนวดออนไลน์\n\n🎁 ร้านที่เข้าร่วมใหม่ รับเครดิต 500 บาท ไว้ใช้หักค่าบริการระบบ\n\nลูกค้าที่อยู่ใกล้ร้านค้นหาร้าน เลือกบริการ เลือกหมอนวด และจองคิวล่วงหน้าได้เอง ร้านได้รับแจ้งเตือนทุกการจองผ่านแอป\nคุณสมบัติ: เป็นร้านนวดที่ได้รับอนุญาตจัดตั้งสถานประกอบการเพื่อสุขภาพ (แนบรูปใบอนุญาตตอนลงทะเบียน)\nค่าบริการระบบ (GP) "+gp+"% ของราคาหลังหักโปรโมชัน หักจากกระเป๋าเงินของร้านเมื่อหมอนวดกดเสร็จสิ้นงาน\nลงทะเบียนที่นี่\n"+link+(ph?"\nสอบถามเจ้าหน้าที่: "+ph:"")}
 /* ในฟอร์มลงทะเบียน ลิงก์ที่เปิดในเบราว์เซอร์ของเครื่องคือลิงก์ชวนสมัคร (เปิดฟอร์มทันที) */
@@ -327,7 +327,7 @@ document.addEventListener("click",function(e){var el=e.target.closest&&e.target.
   .catch(function(e){G.busy=false;G.err=errTh(e,"ส่งคำขอไม่สำเร็จ");gRender()});return}
 });
 
-var DAYN=["อา","จ","อ","พ","พฤ","ศ","ส"],TABS=[["q","หน้าหลัก","🏠"],["wal","กระเป๋าเงิน","💰"],["rp","รายงาน","📊"],["nt","การแจ้งเตือน","🔔"],["mg","จัดการร้าน","⚙️"]],MGS=[["svc","เพิ่มบริการ"],["staff","เพิ่มพนักงาน"],["promo","โปรโมชั่น"],["share","ส่วนแบ่ง"],["rv","รีวิว"],["set","ตั้งค่าร้าน"],["cls","ปิดบัญชีร้าน"],["ct","ติดต่อเรา"]];
+var DAYN=["อา","จ","อ","พ","พฤ","ศ","ส"],TABS=[["q","หน้าหลัก","🏠"],["wal","กระเป๋าเงิน","💰"],["rp","รายงาน","📊"],["nt","แจ้งเตือน","🔔"],["mg","จัดการร้าน","⚙️"]],MGS=[["svc","เพิ่มบริการ"],["staff","เพิ่มหมอนวด"],["promo","โปรโมชั่น"],["share","ส่วนแบ่ง"],["rv","รีวิว"],["set","ตั้งค่าร้าน"],["cls","ปิดบัญชีร้าน"],["ct","ติดต่อเรา"]];
 function inMg(t){return MGS.some(function(x){return x[0]===t})}
 function mgBar(){return '<div class="nf" role="tablist" aria-label="หมวดจัดการร้าน">'+MGS.map(function(x){var on=x[0]===S.tab;return'<button type="button" role="tab" data-a="tab" data-id="'+x[0]+'" class="'+(on?"on":"")+'" aria-selected="'+on+'">'+x[1]+(x[0]==="cls"?clsTag():"")+'</button>'}).join("")+'</div>'}
 function clsTag(){try{if(D&&D.shop&&D.shop.closedAt)return" (ปิดแล้ว)";if(D&&D.cls&&D.cls.status==="pending")return" (รอตรวจ)"}catch(e){}return""}
@@ -426,11 +426,11 @@ function listSvc(){return '<div class="head"><h1>บริการทั้ง�
 function listPromo(){return '<div class="head"><h1>โปรโมชั่นทั้งหมด ('+D.promo.length+')</h1></div><div class="card">'+(D.promo.length?D.promo.map(function(m){var st=pst(m);return '<div class="row"><div style="display:flex;gap:10px;align-items:center">'+stImg(m.img,m.title,40)+'<div><b>'+esc(m.title)+'</b><small>'+discTxt(m)+', '+(m.all?"ทุกบริการ":esc(svcNames(m.svcs)))+'</small><small>'+shortD(m.start)+' - '+shortD(m.end)+(m.desc?', '+esc(m.desc):'')+'</small></div></div><div class="acts"><span class="tag '+st[1]+'">'+st[0]+'</span><button class="btn g" data-a="tog" data-t="promo" data-id="'+m.id+'">'+(m.on?"ปิด":"เปิด")+'</button><button class="btn g" data-a="edit" data-t="promo" data-id="'+m.id+'">แก้ไข</button>'+delBtn("promo",m.id)+'</div></div>'}).join(""):'<div class="empty">ยังไม่มีโปรโมชั่น</div>')+'</div>'}
 function fmtAt(a){var d=new Date(a);return d.toLocaleDateString("th-TH",{day:"numeric",month:"short"})+" "+d.toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"})+" น."}
 function ntAt(a){var d=new Date(a);return d.toLocaleDateString("th-TH",{day:"numeric",month:"short"})+" "+d.toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"})+" น."}
-function listNt(){var L=feed(),n=S.ntNew||[],CATS=[["admin","จากระบบ"],["user","จากผู้ใช้งาน"],["staff","จากพนักงาน"],["gp","ค่า GP"]],
+function listNt(){var L=feed(),n=S.ntNew||[],CATS=[["admin","จากระบบ"],["user","จากผู้ใช้งาน"],["staff","จากหมอนวด"],["gp","ค่า GP"]],
  cnt=function(k){return L.filter(function(x){return x.from===k}).length},nw=function(k){return L.filter(function(x){return x.from===k&&n.indexOf(x.id)>-1}).length};
  if(!S.ntf||S.ntf==="all"){var first=CATS.filter(function(c){return nw(c[0])>0})[0];S.ntf=first?first[0]:"admin"}
- var f=S.ntf,F=L.filter(function(x){return x.from===f}),lab=function(k){return k==="admin"?"ระบบ":k==="staff"?"พนักงาน":k==="gp"?"ค่า GP":"ผู้ใช้งาน"};
- return '<div class="head"><h1>การแจ้งเตือน</h1></div><p class="hint2">เลือกหมวดที่ต้องการดู: ข้อความจากระบบ (ประกาศ เครดิตวงเงิน ยอดกระเป๋าเงินต่ำ ร้านถูกปิด/เปิดอัตโนมัติ) จากผู้ใช้งานเมื่อมีการจอง ยกเลิก หรือเลื่อนคิว จากพนักงานเมื่อกดรับงาน เริ่มงาน หรือเสร็จสิ้นงาน และค่า GP ที่ระบบหักในแต่ละงาน</p><div class="nf" role="group" aria-label="เลือกหมวดการแจ้งเตือน">'+CATS.map(function(x){var w=nw(x[0]);return '<button data-a="ntf" data-id="'+x[0]+'" class="'+(f===x[0]?"on":"")+'" aria-pressed="'+(f===x[0])+'">'+x[1]+' ('+cnt(x[0])+')'+(w?', ใหม่ '+w:'')+'</button>'}).join("")+'</div>'+
+ var f=S.ntf,F=L.filter(function(x){return x.from===f}),lab=function(k){return k==="admin"?"ระบบ":k==="staff"?"หมอนวด":k==="gp"?"ค่า GP":"ผู้ใช้งาน"};
+ return '<div class="head"><h1>แจ้งเตือน</h1></div><p class="hint2">เลือกหมวดที่ต้องการดู: ข้อความจากระบบ (ประกาศ เครดิตวงเงิน ยอดกระเป๋าเงินต่ำ ร้านถูกปิด/เปิดอัตโนมัติ) จากผู้ใช้งานเมื่อมีการจอง ยกเลิก หรือเลื่อนคิว จากหมอนวดเมื่อกดรับงาน เริ่มงาน หรือเสร็จสิ้นงาน และค่า GP ที่ระบบหักในแต่ละงาน</p><div class="nf" role="group" aria-label="เลือกหมวดการแจ้งเตือน">'+CATS.map(function(x){var w=nw(x[0]);return '<button data-a="ntf" data-id="'+x[0]+'" class="'+(f===x[0]?"on":"")+'" aria-pressed="'+(f===x[0])+'">'+x[1]+' ('+cnt(x[0])+')'+(w?', ใหม่ '+w:'')+'</button>'}).join("")+'</div>'+
  (F.length?F.map(function(x){return '<div class="nti"><div class="qh"><b>'+esc(x.title)+'</b><span class="tag'+(x.from==="admin"?"":x.from==="staff"?" s":" w")+'">'+lab(x.from)+'</span>'+(n.indexOf(x.id)>-1?'<span class="tag w">ใหม่</span>':'')+'</div><small>'+ntAt(x.at)+'</small><pre>'+esc(x.text)+'</pre>'+(x.sup?'<div class="acts"><button type="button" class="btn g" data-supgo="1">เปิดแชตกับเจ้าหน้าที่</button></div>':'')+'</div>'}).join(""):'<div class="empty">ยังไม่มีการแจ้งเตือนในหมวดนี้</div>')+
  (f==="gp"?'<div class="acts" style="margin-top:10px"><button type="button" class="btn g" data-a="gprpt">ดูรายงานค่า GP</button></div><p class="hint2">การแจ้งเตือนถูกล้างทุกวัน ถ้าต้องการดูประวัติค่า GP ย้อนหลังให้ดูที่เมนูรายงาน</p>':'')}
 function crc16(s){var c=0xFFFF;for(var i=0;i<s.length;i++){c^=s.charCodeAt(i)<<8;for(var j=0;j<8;j++)c=(c&0x8000)?((c<<1)^0x1021):(c<<1);c&=0xFFFF}return c.toString(16).toUpperCase().padStart(4,"0")}
@@ -459,9 +459,9 @@ function gpView(){
  return '<div class="head"><h1>ค่า GP</h1></div><div class="card form"><b>ร้านของคุณถูกหักค่า GP '+g+'%</b><p class="hint2" style="margin:0">ค่า GP คือค่าบริการระบบจองคิว คิดเป็นเปอร์เซ็นต์ของราคาบริการ</p></div>'+
  '<div class="card form"><b>วิธีคิดและเวลาที่หัก</b><ol style="margin:0;padding-left:22px">'+
  li('คิดจากราคาบริการที่ลูกค้าจ่ายจริง หลังหักโปรโมชั่นของร้านแล้ว')+
- li('ระบบหักจากกระเป๋าเงินของร้านเมื่อการจองนั้นเสร็จสิ้น คือพนักงานกดเสร็จสิ้นงานครบทุกบริการในการจอง')+
- li('ถ้าพนักงานไม่กดเสร็จสิ้นงาน ระบบจะปิดงานให้เองหลังคิวจบ '+ac+' และคิดค่า GP ตามปกติ')+
- li('ไม่คิดค่า GP เมื่อการจองถูกยกเลิก และเมื่อกด "ลูกค้าไม่มา" ถ้าลูกค้าไม่มา ให้พนักงานกดปุ่มนี้ตั้งแต่เนิ่น ๆ')+'</ol></div>'+
+ li('ระบบหักจากกระเป๋าเงินของร้านเมื่อการจองนั้นเสร็จสิ้น คือหมอนวดกดเสร็จสิ้นงานครบทุกบริการในการจอง')+
+ li('ถ้าหมอนวดไม่กดเสร็จสิ้นงาน ระบบจะปิดงานให้เองหลังคิวจบ '+ac+' และคิดค่า GP ตามปกติ')+
+ li('ไม่คิดค่า GP เมื่อการจองถูกยกเลิก และเมื่อกด "ลูกค้าไม่มา" ถ้าลูกค้าไม่มา ให้หมอนวดกดปุ่มนี้ตั้งแต่เนิ่น ๆ')+'</ol></div>'+
  '<div class="card form"><b>เงินในกระเป๋าและการเติมเงิน</b><ol style="margin:0;padding-left:22px">'+
  li('ร้านต้องเติมเงินไว้ในกระเป๋าเงินล่วงหน้า กดปุ่ม "เติมเงิน" ในแถบ "ยอดและประวัติ" ระบบจะแสดง QR พร้อมเพย์ โอนแล้วรอเจ้าหน้าที่ตรวจสอบ ยอดจะเข้ากระเป๋าให้อัตโนมัติ')+
  li('เมื่อยอดต่ำกว่า '+baht(w[0])+' และต่ำกว่า '+baht(w[1])+' ระบบแจ้งเตือนถึงร้าน')+
@@ -473,14 +473,14 @@ function walView(){
  var wt=S.wt==="gp"||S.wt==="his"?S.wt:"bal",ow=D.tx.filter(function(t){return t.st==="ค้างชำระ"}).length;
  return '<div class="nf" role="tablist" aria-label="หมวดกระเป๋าเงิน">'+[["bal","ยอดเงิน"],["gp","ค่า GP"],["his","ประวัติ"+(ow>0?" ("+ow+")":"")]].map(function(x){return '<button type="button" role="tab" data-a="wt" data-id="'+x[0]+'" class="'+(x[0]===wt?"on":"")+'" aria-selected="'+(x[0]===wt)+'">'+x[1]+'</button>'}).join('')+'</div>'+(wt==="gp"?gpView():walMain(wt==="his"?"his":"bal"))}
 function walMain(part){
- if(S.wmode)return '<div class="head"><h1>เติมเงินเข้ากระเป๋าระบบ</h1></div><div class="card form"><p class="hint2" style="margin:0">ยอดคงเหลือ '+baht(balance())+', เงินในกระเป๋านี้ใช้ให้ระบบหักค่า GP เมื่อพนักงานกดนวดเสร็จ</p>'+num("wa","จำนวนเงิน (บาท) ขั้นต่ำ 100",null)+'<p class="hint2" style="margin:0">ระบบจะแสดง QR พร้อมเพย์ตามยอดที่ระบุ โอนแล้วรอเจ้าหน้าที่ตรวจสอบและยืนยัน ยอดจะเข้ากระเป๋าเงินอัตโนมัติ</p><div class="acts"><button class="btn" data-a="wsave">สร้างรายการเติมเงิน</button><button class="btn g" data-a="wcancel">ยกเลิก</button></div><div id="err" style="color:var(--bad)">'+esc(S.werr)+'</div></div>';
+ if(S.wmode)return '<div class="head"><h1>เติมเงินเข้ากระเป๋าระบบ</h1></div><div class="card form"><p class="hint2" style="margin:0">ยอดคงเหลือ '+baht(balance())+', เงินในกระเป๋านี้ใช้ให้ระบบหักค่า GP เมื่อหมอนวดกดนวดเสร็จ</p>'+num("wa","จำนวนเงิน (บาท) ขั้นต่ำ 100",null)+'<p class="hint2" style="margin:0">ระบบจะแสดง QR พร้อมเพย์ตามยอดที่ระบุ โอนแล้วรอเจ้าหน้าที่ตรวจสอบและยืนยัน ยอดจะเข้ากระเป๋าเงินอัตโนมัติ</p><div class="acts"><button class="btn" data-a="wsave">สร้างรายการเติมเงิน</button><button class="btn g" data-a="wcancel">ยกเลิก</button></div><div id="err" style="color:var(--bad)">'+esc(S.werr)+'</div></div>';
  var mo=iso(new Date()).slice(0,7),gpm=-D.tx.filter(function(t){return t.type==="gp"&&t.at.slice(0,7)===mo&&t.st==="สำเร็จ"}).reduce(function(a,t){return a+t.amt},0);
  var L=D.tx.filter(function(t){return!(t.type==="gp"&&t.st==="สำเร็จ")}).sort(function(a,b){return a.at<b.at?1:-1});
  var BAL='<div class="bal'+(balance()<warnLv()[0]||owed()>0?" low":"")+'"><small>ยอดคงเหลือสำหรับหักค่า GP</small><b>'+baht(balance())+'</b><small>ค่า GP '+GPR()+'% ของราคาบริการ, หักเดือนนี้ '+baht(gpm)+'</small><button type="button" class="btn g" data-a="tab" data-id="rp" style="margin-top:8px">ดูรายละเอียดค่า GP ในเมนูรายงาน</button>'+walletMsg()+'<div class="acts"><button class="btn" data-a="wnew">เติมเงิน</button></div></div>'+(S.tpshow&&byId(D.tx,S.tpshow)&&byId(D.tx,S.tpshow).st==="รอยืนยัน"?tpPanel(byId(D.tx,S.tpshow)):"");
  var HI=""+
  '<div class="head"><h1>ประวัติรายการ</h1></div><p class="hint2" style="margin:0 0 8px">แสดงการเติมเงิน เครดิต ปรับยอด และค่า GP ที่ค้างชำระ รายการหักค่า GP ที่ชำระแล้วดูได้ที่เมนูรายงาน</p><div class="card">'+(L.length?L.map(function(t){var tag=t.st==="สำเร็จ"?"":(t.st==="ยกเลิก"||t.st==="ปฏิเสธ"||t.st==="ค้างชำระ")?"b":"w";return '<div class="row"><div><b>'+esc(t.note)+'</b><small>'+fmtAt(t.at)+(t.reason?', '+esc(t.reason):'')+'</small></div><div class="acts"><span class="'+(t.amt>=0?"plus":"minus")+'">'+(t.amt>=0?"+":"-")+Math.abs(t.amt).toLocaleString("th-TH")+'</span>'+(t.slipAt&&t.st==="รอยืนยัน"?'<span class="tag">แนบสลิปแล้ว</span>':'')+'<span class="tag '+tag+'">'+t.st+'</span>'+(t.type==="topup"&&t.st==="รอยืนยัน"?'<button class="btn g" data-a="tpview" data-id="'+t.id+'">ดูวิธีโอน</button>':'')+'</div></div>'}).join(""):'<div class="empty">ยังไม่มีรายการ</div>')+'</div>';
  return part==="his"?HI:BAL}
-/* ===== ส่วนแบ่งพนักงาน + รายงานของร้าน ===== */
+/* ===== ส่วนแบ่งหมอนวด + รายงานของร้าน ===== */
 var RP={kind:"use",mode:"m",mon:"",from:"",to:"",staff:"",svc:"",busy:false,err:"",data:null};
 function rpMonths(){var o=[],n=new Date(Date.now()+H7Q),y=n.getUTCFullYear(),m=n.getUTCMonth();for(var i=0;i<12;i++){var v=y+"-"+String(m+1).padStart(2,"0");o.push({v:v,t:new Date(v+"-01T00:00:00Z").toLocaleDateString("th-TH",{month:"long",year:"numeric",timeZone:"UTC"})});m--;if(m<0){m=11;y--}}return o}
 function rpThD(d){return new Date(d+"T00:00:00Z").toLocaleDateString("th-TH",{day:"numeric",month:"long",year:"numeric",timeZone:"UTC"})}
@@ -490,13 +490,13 @@ function rpHr(m){return(m/60).toLocaleString("th-TH",{maximumFractionDigits:1})+
 function rpBar(v,mx){return '<span class="rbar" aria-hidden="true"><i style="width:'+(mx?Math.round(v*100/mx):0)+'%"></i></span>'}
 /* --- การ์ดตั้งค่าส่วนแบ่ง (ในหน้าตั้งค่าร้าน) --- */
 function shareCard(){
- var h='<div class="card form"><b>ส่วนแบ่งพนักงาน (สำหรับรายงาน)</b>';
+ var h='<div class="card form"><b>ส่วนแบ่งหมอนวด (สำหรับรายงาน)</b>';
  if(!D.rates)return h+'<p class="hint2" style="margin:6px 0 0">ฟีเจอร์นี้ยังไม่พร้อมใช้งาน ต้องให้ผู้ดูแลระบบอัปเดตฐานข้อมูลก่อน</p></div>';
- h+='<p class="hint2" style="margin:0">ตั้งเป็นเปอร์เซ็นต์ของราคาเต็มก่อนหักส่วนลดโปรโมชั่น ใช้แสดงในรายงานเท่านั้น ระบบไม่ได้จ่ายเงินให้พนักงาน ไม่ตั้ง = รายงานไม่แสดงส่วนแบ่ง</p>'+
- num("sh0","ส่วนแบ่งพนักงานทั้งร้าน (%)",D.rates.shop,"เช่น 50")+'<p class="hint2" style="margin:0" id="shex"></p>'+
+ h+='<p class="hint2" style="margin:0">ตั้งเป็นเปอร์เซ็นต์ของราคาเต็มก่อนหักส่วนลดโปรโมชั่น ใช้แสดงในรายงานเท่านั้น ระบบไม่ได้จ่ายเงินให้หมอนวด ไม่ตั้ง = รายงานไม่แสดงส่วนแบ่ง</p>'+
+ num("sh0","ส่วนแบ่งหมอนวดทั้งร้าน (%)",D.rates.shop,"เช่น 50")+'<p class="hint2" style="margin:0" id="shex"></p>'+
  (D.svc.length?'<div><label>เฉพาะบริการ (เว้นว่าง = ใช้ค่าทั้งร้าน)</label>'+D.svc.map(function(v){return '<div class="two" style="align-items:end;margin-top:6px"><div style="align-self:center">'+esc(v.name)+'<small style="display:block;color:var(--mute)">'+baht(v.price)+'</small></div>'+num("sh_"+v.id,"ส่วนแบ่ง (%) "+esc(v.name),D.rates.svc[v.id],"ใช้ค่าทั้งร้าน")+'</div>'}).join("")+'</div>':'');
  return h+'<div class="acts"><button class="btn" data-a="sharesave">บันทึกส่วนแบ่ง</button></div><div id="sherr" style="color:var(--bad)" role="alert"></div>'+(S.shareok?'<div class="saved" role="status">บันทึกส่วนแบ่งแล้ว ใช้กับงานที่เสร็จหลังจากนี้ งานเก่าไม่เปลี่ยน</div>':'')+'</div>'}
-function shareEx(){var el=document.getElementById("sh0"),o=document.getElementById("shex");if(!el||!o)return;var p=parseFloat(el.value);o.textContent=(p>=0&&p<=100)?"ตัวอย่าง: บริการ 200 บาท พนักงานได้ "+rpMoney(Math.round(200*p)/100)+" บาท":""}
+function shareEx(){var el=document.getElementById("sh0"),o=document.getElementById("shex");if(!el||!o)return;var p=parseFloat(el.value);o.textContent=(p>=0&&p<=100)?"ตัวอย่าง: บริการ 200 บาท หมอนวดได้ "+rpMoney(Math.round(200*p)/100)+" บาท":""}
 function shareSave(){var er=document.getElementById("sherr"),calls=[],bad=null;er.textContent="";
  var rd1=function(id){var el=document.getElementById(id);if(!el)return undefined;var s=el.value.trim();if(s==="")return null;var n=Number(s);if(!(n>=0&&n<=100)){bad=true;return undefined}return n};
  var w=rd1("sh0");if(bad){er.textContent="ส่วนแบ่งต้องเป็นตัวเลข 0-100";return}
@@ -514,16 +514,16 @@ function rpView(){var R=RP,mons=rpMonths();if(!R.mon)R.mon=mons[0].v;
  '<div class="nf" role="tablist" aria-label="ประเภทรายงาน">'+RPK.map(function(x){return '<button type="button" role="tab" data-a="rpkind" data-id="'+x[0]+'" class="'+(x[0]===R.kind?"on":"")+'" aria-selected="'+(x[0]===R.kind)+'">'+x[1]+'</button>'}).join("")+'</div>'+
  '<div class="nf" role="tablist" aria-label="รูปแบบช่วงเวลา">'+[["m","เลือกเดือน"],["d","ระบุวันที่"]].map(function(x){return '<button type="button" role="tab" data-a="rpmode" data-id="'+x[0]+'" class="'+(x[0]===R.mode?"on":"")+'" aria-selected="'+(x[0]===R.mode)+'">'+x[1]+'</button>'}).join("")+'</div>'+
  (R.mode==="m"?'<div><label for="rpm">เดือน</label><select class="in" id="rpm">'+mons.map(function(m){return '<option value="'+m.v+'"'+(m.v===R.mon?" selected":"")+'>'+m.t+'</option>'}).join("")+'</select></div>':'<div class="two"><div><label for="rpf">ตั้งแต่วันที่</label><input class="in" type="date" id="rpf" value="'+esc(R.from)+'"></div><div><label for="rpt">ถึงวันที่</label><input class="in" type="date" id="rpt" value="'+esc(R.to)+'"></div></div><p class="hint2" style="margin:0">เลือกได้สูงสุด 366 วัน</p>')+
- '<div class="two"><div><label for="rps">พนักงาน</label><select class="in" id="rps"><option value="">พนักงานทุกคน</option>'+D.staff.map(function(x){return '<option value="'+x.id+'"'+(x.id===R.staff?" selected":"")+'>'+esc(x.name)+'</option>'}).join("")+'</select></div>'+
+ '<div class="two"><div><label for="rps">หมอนวด</label><select class="in" id="rps"><option value="">หมอนวดทุกคน</option>'+D.staff.map(function(x){return '<option value="'+x.id+'"'+(x.id===R.staff?" selected":"")+'>'+esc(x.name)+'</option>'}).join("")+'</select></div>'+
  '<div><label for="rpv">บริการ</label><select class="in" id="rpv"><option value="">ทุกบริการ</option>'+D.svc.map(function(x){return '<option value="'+x.id+'"'+(x.id===R.svc?" selected":"")+'>'+esc(x.name)+'</option>'}).join("")+'</select></div></div>'+
  '<div class="acts"><button class="btn" data-a="rpgo"'+(R.busy?" disabled":"")+'>'+(R.busy?"กำลังสร้างรายงาน…":"สร้างรายงาน")+'</button></div>'+(R.err?'<div style="color:var(--bad)" role="alert">'+esc(R.err)+'</div>':'')+'</div>';
  if(!R.data)return h;
- var d=R.data,c=rpCalc(d),st=d.staff?(byId(D.staff,d.staff)||{}).name:"พนักงานทุกคน",sv=d.svc?(byId(D.svc,d.svc)||{}).name:"ทุกบริการ",
+ var d=R.data,c=rpCalc(d),st=d.staff?(byId(D.staff,d.staff)||{}).name:"หมอนวดทุกคน",sv=d.svc?(byId(D.svc,d.svc)||{}).name:"ทุกบริการ",
  issue=new Date().toLocaleDateString("th-TH",{day:"numeric",month:"long",year:"numeric",timeZone:"Asia/Bangkok"}),
- title=({use:"รายงานการใช้บริการ",inc:"รายงานรายได้และส่วนแบ่งพนักงาน",gp:"รายงานค่า GP"})[d.kind];
- h+='<div class="rp"><div class="card rph"><b>'+esc(D.shop.name)+'</b><h2 class="rpti">'+title+'</h2><div>ช่วงเวลา: '+esc(d.label)+'</div><div>พนักงาน: '+esc(st)+', บริการ: '+esc(sv)+'</div><div class="hint2">ออกรายงานวันที่ '+issue+'</div></div>'+
+ title=({use:"รายงานการใช้บริการ",inc:"รายงานรายได้และส่วนแบ่งหมอนวด",gp:"รายงานค่า GP"})[d.kind];
+ h+='<div class="rp"><div class="card rph"><b>'+esc(D.shop.name)+'</b><h2 class="rpti">'+title+'</h2><div>ช่วงเวลา: '+esc(d.label)+'</div><div>หมอนวด: '+esc(st)+', บริการ: '+esc(sv)+'</div><div class="hint2">ออกรายงานวันที่ '+issue+'</div></div>'+
  '<div class="acts noprint" style="margin:10px 0"><button class="btn" data-a="rpprint">พิมพ์ / บันทึกเป็น PDF</button><button class="btn" data-a="rppdf">ดาวน์โหลด PDF</button><button class="btn g" data-a="rpcsv">ดาวน์โหลด Excel (CSV)</button></div>'+
- (d.kind==="inc"&&!d.noShare&&D.rates&&D.rates.shop==null&&!Object.keys(D.rates.svc).length?'<p class="hint2" role="status">ยังไม่ได้ตั้งส่วนแบ่งพนักงาน ตัวเลขส่วนแบ่งและร้านสุทธิจึงไม่แสดง <button type="button" class="btn g noprint" data-a="tab" data-id="share">ไปตั้งส่วนแบ่ง</button></p>':'')+
+ (d.kind==="inc"&&!d.noShare&&D.rates&&D.rates.shop==null&&!Object.keys(D.rates.svc).length?'<p class="hint2" role="status">ยังไม่ได้ตั้งส่วนแบ่งหมอนวด ตัวเลขส่วนแบ่งและร้านสุทธิจึงไม่แสดง <button type="button" class="btn g noprint" data-a="tab" data-id="share">ไปตั้งส่วนแบ่ง</button></p>':'')+
  (d.noShare&&d.kind==="inc"?'<p class="hint2" role="status">ฐานข้อมูลยังไม่รองรับส่วนแบ่ง (รอผู้ดูแลระบบอัปเดต) ตัวเลขส่วนแบ่งจึงไม่แสดง</p>':'')+
  (c.est&&d.kind==="inc"&&!d.noShare?'<p class="hint2" role="status">มี '+c.est+' งานที่เสร็จก่อนเริ่มบันทึกส่วนแบ่ง ตัวเลขที่มีเครื่องหมาย * เป็นค่าประมาณจากอัตราปัจจุบัน</p>':'')+
  rpBody(d,c)+'</div>';
@@ -534,7 +534,7 @@ function rpCalc(d){var c={rows:[],tot:0,done:0,cx:0,mv:0,mins:0,full:0,disc:0,pa
   var sumP=its.reduce(function(a,i){return a+(+i.price)},0),gpb=d.gp[b.id]||0;
   its.forEach(function(i){
    if(d.staff&&i.staff_id!==d.staff)return;if(d.svc&&i.service_id!==d.svc)return;
-   var sn=i.service_name,sf=(byId(D.staff,i.staff_id)||{}).name||"พนักงาน";
+   var sn=i.service_name,sf=(byId(D.staff,i.staff_id)||{}).name||"หมอนวด";
    var so=c.svc[sn]=c.svc[sn]||{n:0,d:0,m:0,full:0,share:0,gp:0,paid:0},fo=c.stf[sf]=c.stf[sf]||{n:0,d:0,m:0,full:0,share:0,gp:0,paid:0};
    so.n++;fo.n++;c.tot++;
    if(i.job!=="done")return;
@@ -559,20 +559,20 @@ function rpBody(d,c){var k=d.kind,o='';
  if(k==="use"){
   o+='<div class="card"><b>สรุปภาพรวม</b>'+sums([[c.tot,"รายการคิว"],[c.done,"เสร็จสิ้น"],[d.bks.filter(function(b){return b.status==="cancelled"}).length,"ยกเลิก (การจอง)"],[d.bks.filter(function(b){return b.status==="rescheduled"}).length,"เลื่อนคิว (การจอง)"],[rpHr(c.mins),"เวลาที่ให้บริการ"]])+'</div>';
   o+=grp(c.svc,"แยกตามบริการ",["บริการ","รายการคิว","เสร็จสิ้น","เวลา"],function(n,x,mx){return [esc(n)+rpBar(x.d||x.n,mx),x.n,x.d,rpHr(x.m)]});
-  o+=grp(c.stf,"แยกตามพนักงาน",["พนักงาน","รายการคิว","เสร็จสิ้น","เวลา"],function(n,x,mx){return [esc(n)+rpBar(x.d||x.n,mx),x.n,x.d,rpHr(x.m)]});
-  o+='<div class="card"><b>รายการงานที่เสร็จสิ้น ('+c.rows.length+')</b><p class="hint2" style="margin:2px 0 8px">ชื่อลูกค้าแสดงแบบย่อ ไม่แสดงเบอร์โทร</p>'+(c.rows.length?rpTbl(["วันที่","เลขที่จอง","ลูกค้า","บริการ","พนักงาน","เวลา"],c.rows.map(function(r){return [rpTime(r.at),esc(r.ref),esc(r.cust),esc(r.svc),esc(r.staff),r.min+" นาที"]})):'<p class="hint2">ไม่มีข้อมูล</p>')+'</div>'}
+  o+=grp(c.stf,"แยกตามหมอนวด",["หมอนวด","รายการคิว","เสร็จสิ้น","เวลา"],function(n,x,mx){return [esc(n)+rpBar(x.d||x.n,mx),x.n,x.d,rpHr(x.m)]});
+  o+='<div class="card"><b>รายการงานที่เสร็จสิ้น ('+c.rows.length+')</b><p class="hint2" style="margin:2px 0 8px">ชื่อลูกค้าแสดงแบบย่อ ไม่แสดงเบอร์โทร</p>'+(c.rows.length?rpTbl(["วันที่","เลขที่จอง","ลูกค้า","บริการ","หมอนวด","เวลา"],c.rows.map(function(r){return [rpTime(r.at),esc(r.ref),esc(r.cust),esc(r.svc),esc(r.staff),r.min+" นาที"]})):'<p class="hint2">ไม่มีข้อมูล</p>')+'</div>'}
  else if(k==="inc"){
-  o+='<div class="card"><b>สรุปรายได้ ('+c.done+' งานที่เสร็จ)</b>'+sums([[rpMoney(c.full),"ราคาเต็ม (บาท)"],[rpMoney(c.disc),"ส่วนลดโปรโมชั่น"],[rpMoney(c.paid),"ลูกค้าจ่ายจริง"],[c.shareN?rpMoney(c.share):"-","ส่วนแบ่งพนักงาน"],[rpMoney(c.gp),"ค่า GP"],[c.shareN?rpMoney(c.net):"-","ร้านสุทธิ"]])+
-   '<p class="hint2" style="margin:8px 0 0">ร้านสุทธิ = ลูกค้าจ่ายจริง − ส่วนแบ่งพนักงาน − ค่า GP (ส่วนลดโปรโมชั่นเป็นภาระของร้าน)'+(c.shareN<c.done?', มี '+(c.done-c.shareN)+' งานที่ไม่มีข้อมูลส่วนแบ่ง ไม่ถูกนับในยอดส่วนแบ่งและร้านสุทธิ':'')+'</p></div>';
+  o+='<div class="card"><b>สรุปรายได้ ('+c.done+' งานที่เสร็จ)</b>'+sums([[rpMoney(c.full),"ราคาเต็ม (บาท)"],[rpMoney(c.disc),"ส่วนลดโปรโมชั่น"],[rpMoney(c.paid),"ลูกค้าจ่ายจริง"],[c.shareN?rpMoney(c.share):"-","ส่วนแบ่งหมอนวด"],[rpMoney(c.gp),"ค่า GP"],[c.shareN?rpMoney(c.net):"-","ร้านสุทธิ"]])+
+   '<p class="hint2" style="margin:8px 0 0">ร้านสุทธิ = ลูกค้าจ่ายจริง − ส่วนแบ่งหมอนวด − ค่า GP (ส่วนลดโปรโมชั่นเป็นภาระของร้าน)'+(c.shareN<c.done?', มี '+(c.done-c.shareN)+' งานที่ไม่มีข้อมูลส่วนแบ่ง ไม่ถูกนับในยอดส่วนแบ่งและร้านสุทธิ':'')+'</p></div>';
   var cols=["","งานที่เสร็จ","ราคาเต็ม","ส่วนแบ่ง","GP","ร้านสุทธิ"];
   var fn=function(n,x,mx){return [esc(n)+rpBar(x.d,mx),x.d,rpMoney(x.full),c.shareN?rpMoney(x.share):"-",rpMoney(x.gp),c.shareN?rpMoney(x.paid-x.share-x.gp):"-"]};
-  o+=grp(c.stf,"แยกตามพนักงาน",["พนักงาน"].concat(cols.slice(1)),fn);o+=grp(c.svc,"แยกตามบริการ",["บริการ"].concat(cols.slice(1)),fn);
-  o+='<div class="card"><b>รายการทีละงาน ('+c.rows.length+')</b>'+(c.rows.length?rpTbl(["วันที่","เลขที่จอง","บริการ","พนักงาน","ราคาเต็ม","ส่วนลด","จ่ายจริง","ส่วนแบ่ง","GP","ร้านสุทธิ"],c.rows.map(function(r){return [rpTime(r.at),esc(r.ref),esc(r.svc),esc(r.staff),rpMoney(r.full),rpMoney(r.disc),rpMoney(r.paid),r.share==null?"-":rpMoney(r.share)+(r.est?" *":""),rpMoney(r.gp),r.net==null?"-":rpMoney(r.net)]})):'<p class="hint2">ไม่มีข้อมูล</p>')+'</div>'}
+  o+=grp(c.stf,"แยกตามหมอนวด",["หมอนวด"].concat(cols.slice(1)),fn);o+=grp(c.svc,"แยกตามบริการ",["บริการ"].concat(cols.slice(1)),fn);
+  o+='<div class="card"><b>รายการทีละงาน ('+c.rows.length+')</b>'+(c.rows.length?rpTbl(["วันที่","เลขที่จอง","บริการ","หมอนวด","ราคาเต็ม","ส่วนลด","จ่ายจริง","ส่วนแบ่ง","GP","ร้านสุทธิ"],c.rows.map(function(r){return [rpTime(r.at),esc(r.ref),esc(r.svc),esc(r.staff),rpMoney(r.full),rpMoney(r.disc),rpMoney(r.paid),r.share==null?"-":rpMoney(r.share)+(r.est?" *":""),rpMoney(r.gp),r.net==null?"-":rpMoney(r.net)]})):'<p class="hint2">ไม่มีข้อมูล</p>')+'</div>'}
  else{
   o+='<div class="card"><b>สรุปค่า GP</b>'+sums([[c.done,"งานที่เสร็จ"],[rpMoney(c.paid),"ยอดที่คิด GP (บาท)"],[rpMoney(c.gp),"ค่า GP ที่หัก"],[GPR()+"%","อัตรา GP ปัจจุบัน"]])+'<p class="hint2" style="margin:8px 0 0">ค่า GP คิดจากยอดที่ลูกค้าจ่ายจริงหลังหักโปรโมชั่น ถ้างานมีหลายรายการ ระบบแบ่ง GP ตามสัดส่วนราคาของแต่ละรายการ</p></div>';
   var fn2=function(n,x,mx){return [esc(n)+rpBar(x.d,mx),x.d,rpMoney(x.paid),rpMoney(x.gp)]};
-  o+=grp(c.stf,"แยกตามพนักงาน",["พนักงาน","งานที่เสร็จ","ยอดที่คิด GP","ค่า GP"],fn2);o+=grp(c.svc,"แยกตามบริการ",["บริการ","งานที่เสร็จ","ยอดที่คิด GP","ค่า GP"],fn2);
-  o+='<div class="card"><b>รายการหักค่า GP ('+c.rows.length+')</b>'+(c.rows.length?rpTbl(["วันที่","เลขที่จอง","บริการ","พนักงาน","ยอดที่คิด GP","ค่า GP"],c.rows.map(function(r){return [rpTime(r.at),esc(r.ref),esc(r.svc),esc(r.staff),rpMoney(r.paid),rpMoney(r.gp)]})):'<p class="hint2">ไม่มีข้อมูล</p>')+'</div>'}
+  o+=grp(c.stf,"แยกตามหมอนวด",["หมอนวด","งานที่เสร็จ","ยอดที่คิด GP","ค่า GP"],fn2);o+=grp(c.svc,"แยกตามบริการ",["บริการ","งานที่เสร็จ","ยอดที่คิด GP","ค่า GP"],fn2);
+  o+='<div class="card"><b>รายการหักค่า GP ('+c.rows.length+')</b>'+(c.rows.length?rpTbl(["วันที่","เลขที่จอง","บริการ","หมอนวด","ยอดที่คิด GP","ค่า GP"],c.rows.map(function(r){return [rpTime(r.at),esc(r.ref),esc(r.svc),esc(r.staff),rpMoney(r.paid),rpMoney(r.gp)]})):'<p class="hint2">ไม่มีข้อมูล</p>')+'</div>'}
  return o}
 function rpSave(){var g=function(i){return document.getElementById(i)};if(g("rpm"))RP.mon=g("rpm").value;if(g("rpf"))RP.from=g("rpf").value;if(g("rpt"))RP.to=g("rpt").value;if(g("rps"))RP.staff=g("rps").value;if(g("rpv"))RP.svc=g("rpv").value}
 function rpPages(base,sel){var all=[],off=0;function next(){return sbApi("/rest/v1/"+base+"&limit=1000&offset="+off).then(function(a){a=a||[];all=all.concat(a);if(a.length===1000&&off<9000){off+=1000;return next()}return all})}return next()}
@@ -592,7 +592,7 @@ function rpGo(){rpSave();var R=RP,a,b,label;R.err="";
   var p=Promise.resolve();chunks.forEach(function(ch){p=p.then(function(){return g1("wallet_tx?select=booking_id,amount,status&place_id=eq."+WID+"&type=eq.gp&booking_id=in.("+ch.join(",")+")&limit=1000").then(function(t){(t||[]).forEach(function(x){if(x.status!=="cancelled")gp[x.booking_id]=(gp[x.booking_id]||0)-(+x.amount)})})})});
   return p.then(function(){R.data={kind:kind,label:label,bks:bks,gp:gp,staff:R.staff,svc:R.svc,noShare:noShare};R.busy=false;draw()})}).catch(function(e){R.busy=false;if(e&&e.status===401){doLogout();return}R.err=errTh(e,"สร้างรายงานไม่สำเร็จ ลองใหม่อีกครั้ง");draw()})}
 function rpCsv(){var d=RP.data;if(!d)return;var c=rpCalc(d),q=function(x){x=String(x==null?"":x);return /[",\n]/.test(x)?'"'+x.replace(/"/g,'""')+'"':x},rows;
- var cols=d.kind==="use"?["วันที่","เวลา","เลขที่จอง","ลูกค้า","บริการ","พนักงาน","นาที"]:d.kind==="inc"?["วันที่","เวลา","เลขที่จอง","บริการ","พนักงาน","ราคาเต็ม","ส่วนลด","จ่ายจริง","ส่วนแบ่งพนักงาน","ค่า GP","ร้านสุทธิ","หมายเหตุ"]:["วันที่","เวลา","เลขที่จอง","บริการ","พนักงาน","ยอดที่คิด GP","ค่า GP"];
+ var cols=d.kind==="use"?["วันที่","เวลา","เลขที่จอง","ลูกค้า","บริการ","หมอนวด","นาที"]:d.kind==="inc"?["วันที่","เวลา","เลขที่จอง","บริการ","หมอนวด","ราคาเต็ม","ส่วนลด","จ่ายจริง","ส่วนแบ่งหมอนวด","ค่า GP","ร้านสุทธิ","หมายเหตุ"]:["วันที่","เวลา","เลขที่จอง","บริการ","หมอนวด","ยอดที่คิด GP","ค่า GP"];
  rows=[cols].concat(c.rows.map(function(r){var dt=qDate(r.at),tm=qHM(r.at),f=function(n){return n==null?"":Math.round(n*100)/100};
   return d.kind==="use"?[dt,tm,r.ref,r.cust,r.svc,r.staff,r.min]:d.kind==="inc"?[dt,tm,r.ref,r.svc,r.staff,f(r.full),f(r.disc),f(r.paid),f(r.share),f(r.gp),f(r.net),r.est?"ส่วนแบ่งโดยประมาณ":""]:[dt,tm,r.ref,r.svc,r.staff,f(r.paid),f(r.gp)]}));
  var csv="﻿"+rows.map(function(r){return r.map(q).join(",")}).join("\r\n"),a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));a.download="report-"+d.kind+"-"+(RP.mode==="m"?RP.mon:RP.from+"_"+RP.to)+".csv";document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href)},2000)}
@@ -645,14 +645,14 @@ function rpPdf(){var d=RP.data,el=document.querySelector(".rp");if(!d||!el||RP.p
   "report-"+d.kind+"-"+(RP.mode==="m"?RP.mon:RP.from+"_"+RP.to)+".pdf","ดาวน์โหลดไฟล์ PDF "+title+" แล้ว",RP)}
 function view(){var t=S.tab,f=S.form&&S.form.t===t;
  if(t==="rp")return rpView();
- if(t==="share")return mgBar()+'<div class="head"><h1>ส่วนแบ่งพนักงาน</h1></div>'+shareCard();
+ if(t==="share")return mgBar()+'<div class="head"><h1>ส่วนแบ่งหมอนวด</h1></div>'+shareCard();
  if(t==="nt")return listNt();
  if(t==="q")return qView();
  if(t==="ct")return mgBar()+ctView();
  if(t==="cls")return mgBar()+clsCard();
  if(t==="rv")return mgBar()+rvView();
  if(t==="svc")return mgBar()+'<div class="head"><h1>เพิ่มบริการ</h1>'+addBtn("svc")+'</div>'+(f?svcForm():listSvc());
- if(t==="staff")return mgBar()+'<div class="head"><h1>เพิ่มพนักงาน</h1>'+addBtn("staff")+'</div>'+(f?staffForm():listStaff());
+ if(t==="staff")return mgBar()+'<div class="head"><h1>เพิ่มหมอนวด</h1>'+addBtn("staff")+'</div>'+(f?staffForm():listStaff());
  if(t==="promo")return mgBar()+'<div class="head"><h1>โปรโมชั่น</h1>'+addBtn("promo")+'</div>'+(f?promoForm():listPromo());
  if(t==="wal")return walView();
  return mgBar()+setView()}
@@ -661,8 +661,8 @@ var H7Q=7*36e5;
 function qDate(ts){return new Date(Date.parse(ts)+H7Q).toISOString().slice(0,10)}
 function qHM(ts){return new Date(ts).toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit",timeZone:"Asia/Bangkok"})}
 function qThD(d){return new Date(d+"T00:00:00Z").toLocaleDateString("th-TH",{weekday:"long",day:"numeric",month:"long",timeZone:"UTC"})}
-function qStaff(id){var x=byId(D.staff,id);return x?x.name:"พนักงาน"}
-var QJOB={pending:"รอพนักงานรับงาน",accepted:"พนักงานรับงานแล้ว",in_progress:"กำลังให้บริการ",done:"เสร็จสิ้น"};
+function qStaff(id){var x=byId(D.staff,id);return x?x.name:"หมอนวด"}
+var QJOB={pending:"รอหมอนวดรับงาน",accepted:"หมอนวดรับงานแล้ว",in_progress:"กำลังให้บริการ",done:"เสร็จสิ้น"};
 /* หมวดของการจอง: wait = ยังไม่จบ, done = เสร็จสิ้น, cx = ยกเลิก/เลื่อนคิว */
 function qCat(b){if(b.status==="cancelled"||b.status==="rescheduled"||b.status==="no_show")return"cx";
  if(b.status==="completed")return"done";
@@ -672,18 +672,18 @@ function qCat(b){if(b.status==="cancelled"||b.status==="rescheduled"||b.status==
 function qCard(b){var c=qCat(b),its=(b.booking_items||[]).slice().sort(function(a,z){return a.starts_at<z.starts_at?-1:1}),
  tg=b.status==="no_show"?'<span class="tag b">ลูกค้าไม่มา</span>':b.status==="cancelled"?'<span class="tag b">ยกเลิก</span>':b.status==="rescheduled"?'<span class="tag s">เลื่อนคิว'+(b.moved_to?' → '+esc(b.moved_to):'')+'</span>':c==="done"?'<span class="tag">เสร็จสิ้น</span>':'<span class="tag w">รอให้บริการ</span>';
  return'<div class="card" style="margin-bottom:10px"><div class="row" style="border:0;padding:0 0 6px"><b>'+qHM(b.starts_at)+'-'+qHM(b.ends_at)+' น.</b>'+tg+'</div><b>'+esc(b.customer_name)+'</b>'+(b.phone?'<small style="display:block">โทร <a href="tel:'+esc(b.phone)+'">'+esc(b.phone)+'</a></small>':'')+
- its.map(function(i){return'<small style="display:block">'+esc(i.service_name)+', '+i.minutes+' นาที, พนักงาน '+esc(qStaff(i.staff_id))+(c==="wait"&&i.active?', '+QJOB[i.job]:'')+'</small>'}).join("")+
+ its.map(function(i){return'<small style="display:block">'+esc(i.service_name)+', '+i.minutes+' นาที, หมอนวด '+esc(qStaff(i.staff_id))+(c==="wait"&&i.active?', '+QJOB[i.job]:'')+'</small>'}).join("")+
  '<small style="display:block">เลขที่ '+esc(b.ref)+', '+baht(b.total_price||0)+(b.promo_title?', '+esc(b.promo_title):'')+'</small>'+qCancelUi(b,c)+chatBtn(b.id,"shop",b.ref,b.customer_name,b.ends_at,b.status!=="rescheduled")+'</div>'}
-var QCR=["พนักงานไม่สะดวก","ร้านปิดทำการ","เหตุฉุกเฉิน","อื่นๆ (ระบุเหตุผล)"];
+var QCR=["หมอนวดไม่สะดวก","ร้านปิดทำการ","เหตุฉุกเฉิน","อื่นๆ (ระบุเหตุผล)"];
 function qCanCancel(b,c){return c==="wait"&&b.status==="confirmed"&&Date.parse(b.starts_at)>Date.now()&&!(b.booking_items||[]).some(function(i){return i.active&&(i.job==="in_progress"||i.job==="done")})}
 function qCanNoShow(b,c){return c==="wait"&&b.status==="confirmed"&&Date.parse(b.starts_at)<=Date.now()&&!(b.booking_items||[]).some(function(i){return i.active&&(i.job==="in_progress"||i.job==="done")})}
 function qNoShowUi(b){
  if(S.qn!==b.id)return'<div class="acts" style="margin-top:8px"><button type="button" class="btn g" data-a="qns" data-id="'+b.id+'" aria-label="บันทึกว่าลูกค้าไม่มา คิวเลขที่ '+esc(b.ref)+' ของ '+esc(b.customer_name)+'">ลูกค้าไม่มา</button></div>';
- return'<div class="pinbox" role="group" aria-labelledby="qnsh_'+b.id+'" style="margin-top:8px"><b id="qnsh_'+b.id+'" tabindex="-1">ยืนยันว่าลูกค้าไม่มา คิวเลขที่ '+esc(b.ref)+'</b><p class="hint2" style="margin:0">ใช้เมื่อลูกค้าไม่มารับบริการตามนัด ระบบจะปล่อยคิว แจ้งลูกค้า พนักงาน และเจ้าหน้าที่ พร้อมคืนแต้มที่ลูกค้าใช้ (ถ้ามี) ย้อนกลับไม่ได้</p>'+
+ return'<div class="pinbox" role="group" aria-labelledby="qnsh_'+b.id+'" style="margin-top:8px"><b id="qnsh_'+b.id+'" tabindex="-1">ยืนยันว่าลูกค้าไม่มา คิวเลขที่ '+esc(b.ref)+'</b><p class="hint2" style="margin:0">ใช้เมื่อลูกค้าไม่มารับบริการตามนัด ระบบจะปล่อยคิว แจ้งลูกค้า หมอนวด และเจ้าหน้าที่ พร้อมคืนแต้มที่ลูกค้าใช้ (ถ้ามี) ย้อนกลับไม่ได้</p>'+
   '<div class="acts"><button type="button" class="btn d" data-a="qnsok" data-id="'+b.id+'">ยืนยันลูกค้าไม่มา</button><button type="button" class="btn g" data-a="qnsno" data-id="'+b.id+'">ไม่ใช่</button></div></div>'}
 function qCancelUi(b,c){if(qCanNoShow(b,c))return qNoShowUi(b);if(!qCanCancel(b,c))return"";
  if(S.qx!==b.id)return'<div class="acts" style="margin-top:8px"><button type="button" class="btn g" data-a="qcx" data-id="'+b.id+'" aria-label="ยกเลิกคิว เลขที่ '+esc(b.ref)+' ของ '+esc(b.customer_name)+'">ยกเลิกคิวนี้</button></div>';
- return'<div class="pinbox" role="group" aria-labelledby="qcxh_'+b.id+'" style="margin-top:8px"><b id="qcxh_'+b.id+'" tabindex="-1">ยืนยันยกเลิกคิว เลขที่ '+esc(b.ref)+'</b><p class="hint2" style="margin:0">ระบบจะแจ้งลูกค้าและพนักงาน พร้อมคืนแต้มที่ลูกค้าใช้ (ถ้ามี) ยกเลิกแล้วย้อนกลับไม่ได้</p>'+
+ return'<div class="pinbox" role="group" aria-labelledby="qcxh_'+b.id+'" style="margin-top:8px"><b id="qcxh_'+b.id+'" tabindex="-1">ยืนยันยกเลิกคิว เลขที่ '+esc(b.ref)+'</b><p class="hint2" style="margin:0">ระบบจะแจ้งลูกค้าและหมอนวด พร้อมคืนแต้มที่ลูกค้าใช้ (ถ้ามี) ยกเลิกแล้วย้อนกลับไม่ได้</p>'+
   '<div><label for="qcr_'+b.id+'">เหตุผลที่ยกเลิก</label><select class="in" id="qcr_'+b.id+'">'+QCR.map(function(x,i){return'<option value="'+i+'">'+x+'</option>'}).join("")+'</select></div>'+
   '<div><label for="qco_'+b.id+'">รายละเอียดเพิ่มเติม (ไม่เกิน 100 ตัวอักษร)</label><input class="in" id="qco_'+b.id+'" maxlength="100"></div>'+
   '<div id="qce_'+b.id+'" role="alert" style="color:var(--bad)"></div>'+
@@ -771,7 +771,7 @@ function blkUnblock(id,btn){if(btn)btn.disabled=true;csCall("chat_unblock",{p_id
 function tmNeed(){return csCall("terms_status",{p_app:CSAPP}).then(function(j){return !!(j&&j.current&&!(j.accepted>=j.current))},function(){return false})}
 function tmAccept(){return csCall("accept_terms",{p_app:CSAPP})}
 function tmBody(nm){var S2=function(t,b){return'<h2 class="csh">'+t+'</h2>'+b},L=function(a){return'<ul class="pvl">'+a.map(function(x){return'<li>'+x+'</li>'}).join("")+'</ul>'};
- return'<div class="pv"><p>'+esc(nm||"สมาคมวิทยากรฝึกอาชีพคนตาบอด")+' เป็นผู้ดูแลระบบจองคิวนวดนี้ การสมัครและใช้งานแอปร้านนวดถือว่าคุณยอมรับเงื่อนไขต่อไปนี้</p>'+S2("1. บัญชีร้าน",L(["ข้อมูลร้าน บริการ ราคา และใบอนุญาตที่ส่งเข้าระบบต้องเป็นความจริง", "เจ้าของร้านรับผิดชอบการใช้งานทุกอย่างจากบัญชีร้าน รวมถึงพนักงานที่ร้านเพิ่มเข้าระบบ", "เก็บรหัสผ่านไว้เป็นความลับ"]))+S2("2. การรับจองและให้บริการ",L(["ให้บริการตามบริการ ราคา และเวลาที่แสดงในระบบ", "ถ้ารับงานไม่ได้ ให้ยกเลิกหรือแจ้งลูกค้าผ่านระบบโดยเร็ว", "ค่า GP และกระเป๋าเงินเป็นไปตามเงื่อนไขที่ยอมรับตอนลงทะเบียน"]))+S2("3. การนวดเพื่อสุขภาพเท่านั้น",L(["บริการในระบบนี้เป็นการนวดเพื่อสุขภาพ ไม่ใช่การรักษาโรค", "ห้ามเสนอหรือให้บริการทางเพศโดยเด็ดขาด"]))+S2("4. ข้อมูลลูกค้า",L(["ใช้ชื่อและเบอร์โทรของลูกค้าเพื่อการจองนั้นเท่านั้น ห้ามนำไปทำการตลาดหรือเปิดเผยให้ผู้อื่น", "ห้ามชวนลูกค้าจองหรือชำระเงินนอกระบบ"]))+S2("5. ความประพฤติ",L(["ให้เกียรติลูกค้าและหมอนวด", "ห้ามใช้ถ้อยคำหยาบคาย คุกคาม ข่มขู่ หรือเลือกปฏิบัติ ทั้งในแชตและการตอบรีวิว"]))+S2("6. แชต รายงาน และบล็อก",L(["ข้อความแชตเห็นเฉพาะร้านกับลูกค้าของการจองนั้น", "ถ้าเจอข้อความไม่เหมาะสม กดปุ่ม รายงาน ในห้องแชตได้ เจ้าหน้าที่จะเห็นข้อความในห้องที่ถูกรายงาน เพื่อตรวจสอบ", "กดปุ่ม บล็อกลูกค้า ได้ ทั้งสองฝ่ายจะส่งข้อความหากันไม่ได้ และลูกค้าคนนั้นจะจองร้านนี้ไม่ได้อีก", "ยกเลิกบล็อกได้ที่ จัดการร้าน &gt; ติดต่อเรา &gt; ลูกค้าที่บล็อกไว้"]))+S2("7. การตักเตือนและการปิดร้าน",L(["ถ้าทำผิดเงื่อนไข เจ้าหน้าที่อาจตักเตือน ปิดร้านชั่วคราว หรือยกเลิกการเป็นร้านในระบบ", "เจ้าหน้าที่เป็นผู้ตัดสินเสมอ ระบบไม่ลงโทษอัตโนมัติจากการถูกรายงาน"]))+S2("8. การเปลี่ยนแปลงเงื่อนไข",L([esc(nm||"สมาคมวิทยากรฝึกอาชีพคนตาบอด")+"อาจปรับเงื่อนไขนี้ ถ้ามีการเปลี่ยนแปลงสำคัญ จะขอให้คุณกดยอมรับอีกครั้ง"]))+S2("9. ติดต่อ",L(["สอบถามหรือร้องเรียน ติดต่อเจ้าหน้าที่ได้ที่ จัดการร้าน &gt; ติดต่อเรา"]))+'</div>'}
+ return'<div class="pv"><p>'+esc(nm||"สมาคมวิทยากรฝึกอาชีพคนตาบอด")+' เป็นผู้ดูแลระบบจองคิวนวดนี้ การสมัครและใช้งานแอปร้านนวดถือว่าคุณยอมรับเงื่อนไขต่อไปนี้</p>'+S2("1. บัญชีร้าน",L(["ข้อมูลร้าน บริการ ราคา และใบอนุญาตที่ส่งเข้าระบบต้องเป็นความจริง", "เจ้าของร้านรับผิดชอบการใช้งานทุกอย่างจากบัญชีร้าน รวมถึงหมอนวดที่ร้านเพิ่มเข้าระบบ", "เก็บรหัสผ่านไว้เป็นความลับ"]))+S2("2. การรับจองและให้บริการ",L(["ให้บริการตามบริการ ราคา และเวลาที่แสดงในระบบ", "ถ้ารับงานไม่ได้ ให้ยกเลิกหรือแจ้งลูกค้าผ่านระบบโดยเร็ว", "ค่า GP และกระเป๋าเงินเป็นไปตามเงื่อนไขที่ยอมรับตอนลงทะเบียน"]))+S2("3. การนวดเพื่อสุขภาพเท่านั้น",L(["บริการในระบบนี้เป็นการนวดเพื่อสุขภาพ ไม่ใช่การรักษาโรค", "ห้ามเสนอหรือให้บริการทางเพศโดยเด็ดขาด"]))+S2("4. ข้อมูลลูกค้า",L(["ใช้ชื่อและเบอร์โทรของลูกค้าเพื่อการจองนั้นเท่านั้น ห้ามนำไปทำการตลาดหรือเปิดเผยให้ผู้อื่น", "ห้ามชวนลูกค้าจองหรือชำระเงินนอกระบบ"]))+S2("5. ความประพฤติ",L(["ให้เกียรติลูกค้าและหมอนวด", "ห้ามใช้ถ้อยคำหยาบคาย คุกคาม ข่มขู่ หรือเลือกปฏิบัติ ทั้งในแชตและการตอบรีวิว"]))+S2("6. แชต รายงาน และบล็อก",L(["ข้อความแชตเห็นเฉพาะร้านกับลูกค้าของการจองนั้น", "ถ้าเจอข้อความไม่เหมาะสม กดปุ่ม รายงาน ในห้องแชตได้ เจ้าหน้าที่จะเห็นข้อความในห้องที่ถูกรายงาน เพื่อตรวจสอบ", "กดปุ่ม บล็อกลูกค้า ได้ ทั้งสองฝ่ายจะส่งข้อความหากันไม่ได้ และลูกค้าคนนั้นจะจองร้านนี้ไม่ได้อีก", "ยกเลิกบล็อกได้ที่ จัดการร้าน &gt; ติดต่อเรา &gt; ลูกค้าที่บล็อกไว้"]))+S2("7. การตักเตือนและการปิดร้าน",L(["ถ้าทำผิดเงื่อนไข เจ้าหน้าที่อาจตักเตือน ปิดร้านชั่วคราว หรือยกเลิกการเป็นร้านในระบบ", "เจ้าหน้าที่เป็นผู้ตัดสินเสมอ ระบบไม่ลงโทษอัตโนมัติจากการถูกรายงาน"]))+S2("8. การเปลี่ยนแปลงเงื่อนไข",L([esc(nm||"สมาคมวิทยากรฝึกอาชีพคนตาบอด")+"อาจปรับเงื่อนไขนี้ ถ้ามีการเปลี่ยนแปลงสำคัญ จะขอให้คุณกดยอมรับอีกครั้ง"]))+S2("9. ติดต่อ",L(["สอบถามหรือร้องเรียน ติดต่อเจ้าหน้าที่ได้ที่ จัดการร้าน &gt; ติดต่อเรา"]))+'</div>'}
 function qView(){var all=(D.bk||[]),L={wait:[],done:[],cx:[]},t0=qDate(new Date().toISOString()),t7=qDate(new Date(Date.now()-6*864e5).toISOString());all.forEach(function(b){var c=qCat(b),d=qDate(b.starts_at);if(c==="done"&&d!==t0)return;if(c==="cx"&&d<t7)return;L[c].push(b)});
  var TB=[["wait","งานที่รออยู่"],["done","งานที่เสร็จสิ้น"],["cx","งานถูกยกเลิก"]],qt=S.qt||"wait",cur=L[qt]?qt:"wait",
  list=L[cur].slice().sort(function(a,z){return cur==="wait"?(a.starts_at<z.starts_at?-1:1):(a.starts_at<z.starts_at?1:-1)}),
@@ -780,30 +780,30 @@ function qView(){var all=(D.bk||[]),L={wait:[],done:[],cx:[]},t0=qDate(new Date(
  list.forEach(function(b){var d=qDate(b.starts_at);if(d!==last){body+='<h3 style="margin:14px 0 8px;font-size:1rem">'+qThD(d)+'</h3>';last=d}body+=qCard(b)});
  return'<div class="head"><h1>คิวงาน</h1></div>'+tabs+(body||'<div class="card"><p class="hint2" style="margin:0">'+(cur==="wait"?"ยังไม่มีคิวงานที่รออยู่":cur==="done"?"ยังไม่มีงานที่เสร็จสิ้นวันนี้":"ไม่มีงานที่ถูกยกเลิกใน 7 วันล่าสุด")+'</p></div>')+(cur==="wait"?'':cur==="done"?'<p class="hint2">แสดงเฉพาะงานของวันนี้</p><button type="button" class="btn g" data-a="tab" data-id="rp">ดูงานย้อนหลังในเมนูรายงาน</button>':'<p class="hint2">แสดงย้อนหลัง 7 วัน</p>')}
 function staffForm(){var ed=!!S.form.id,p=ed?byId(D.staff,S.form.id):{name:"",phone:"",img:null,svcs:[]};S.imgTmp=p.img||null;
- return '<div class="card form"><b>'+(ed?"แก้ไขพนักงาน":"เพิ่มพนักงานใหม่")+'</b><div><label for="fn">ชื่อพนักงาน</label><input class="in" id="fn" value="'+esc(p.name)+'"></div>'+
- '<div><label for="fimg">รูปโปรไฟล์พนักงาน (ไม่บังคับ)</label><div class="pimgrow"><span id="imgprev">'+stImg(S.imgTmp,p.name,56)+'</span><input class="in" type="file" id="fimg" accept="image/*"></div><p class="hint2" style="margin:6px 0 0">ระบบครอปเป็นรูปสี่เหลี่ยมจัตุรัสและย่อขนาดให้อัตโนมัติ</p><div id="imgerr" style="color:var(--bad)"></div></div>'+
+ return '<div class="card form"><b>'+(ed?"แก้ไขหมอนวด":"เพิ่มหมอนวดใหม่")+'</b><div><label for="fn">ชื่อหมอนวด</label><input class="in" id="fn" value="'+esc(p.name)+'"></div>'+
+ '<div><label for="fimg">รูปโปรไฟล์หมอนวด (ไม่บังคับ)</label><div class="pimgrow"><span id="imgprev">'+stImg(S.imgTmp,p.name,56)+'</span><input class="in" type="file" id="fimg" accept="image/*"></div><p class="hint2" style="margin:6px 0 0">ระบบครอปเป็นรูปสี่เหลี่ยมจัตุรัสและย่อขนาดให้อัตโนมัติ</p><div id="imgerr" style="color:var(--bad)"></div></div>'+
  '<div><label>ให้บริการอะไรได้บ้าง (จากบริการของร้าน)</label>'+(D.svc.length?'<div class="dchk">'+D.svc.map(function(v){return '<label><input type="checkbox" class="ss" value="'+v.id+'"'+((p.svcs||[]).indexOf(v.id)>-1?" checked":"")+'> '+esc(v.name)+', '+v.min+' นาที'+(v.on?"":" (ปิดชั่วคราว)")+'</label>'}).join("")+'</div>':'<p class="hint2">ยังไม่มีบริการ เพิ่มได้ที่เมนู "เพิ่มบริการ" ก่อน</p>')+'</div>'+
- '<div class="pinbox"><b>เบอร์มือถือสำหรับเข้าสู่ระบบ</b><p class="hint2" style="margin:0">พนักงานสมัครสมาชิกและตั้งรหัสผ่านเองด้วยเบอร์มือถือนี้ ระบบเชื่อมบัญชีให้อัตโนมัติ ร้านไม่ต้องตั้งรหัสผ่านให้</p><div><label for="fph">เบอร์มือถือ</label><input class="in" id="fph" type="tel" inputmode="numeric" maxlength="10" value="'+esc(p.phone||"")+'" placeholder="0812345678" autocomplete="off"></div>'+(ed?'<p class="hint2" style="margin:0">'+(p.linked?'เชื่อมกับบัญชีพนักงานแล้ว':'ยังไม่ได้เชื่อมบัญชี รอพนักงานสมัครสมาชิกด้วยเบอร์นี้')+'</p>':'')+'</div>'+
+ '<div class="pinbox"><b>เบอร์มือถือสำหรับเข้าสู่ระบบ</b><p class="hint2" style="margin:0">หมอนวดสมัครสมาชิกและตั้งรหัสผ่านเองด้วยเบอร์มือถือนี้ ระบบเชื่อมบัญชีให้อัตโนมัติ ร้านไม่ต้องตั้งรหัสผ่านให้</p><div><label for="fph">เบอร์มือถือ</label><input class="in" id="fph" type="tel" inputmode="numeric" maxlength="10" value="'+esc(p.phone||"")+'" placeholder="0812345678" autocomplete="off"></div>'+(ed?'<p class="hint2" style="margin:0">'+(p.linked?'เชื่อมกับบัญชีหมอนวดแล้ว':'ยังไม่ได้เชื่อมบัญชี รอหมอนวดสมัครสมาชิกด้วยเบอร์นี้')+'</p>':'')+'</div>'+
  '<div class="acts"><button class="btn" data-a="save">บันทึก</button><button class="btn g" data-a="cancel">ยกเลิก</button></div><div id="err" style="color:var(--bad)"></div></div>'}
-/* ===== ส่งลิงก์ให้พนักงาน ===== */
+/* ===== ส่งลิงก์ให้หมอนวด ===== */
 function stLink(p){var b=CT.staff||"";if(!b||!p||!p.phone)return"";return b+(b.indexOf("?")>-1?"&":"?")+"join="+encodeURIComponent(p.phone)+"&openExternalBrowser=1"}
 function stMsg(p){return"สวัสดีค่ะ/ครับ คุณ"+p.name+" ร้าน"+D.shop.name+" เพิ่มคุณเข้าระบบรับงานแล้ว\nกดลิงก์ แล้วทำตามขั้นตอนติดตั้งในหน้านั้น: "+stLink(p)+"\nสมัครด้วยเบอร์ "+p.phone+" แล้วตั้งรหัสผ่านเอง"}
 function stShare(id){var p=byId(D.staff,id);if(!p)return;
- if(!CT.staff){S.stmsg="ยังไม่ได้ตั้งลิงก์แอปพนักงาน กรุณาติดต่อเจ้าหน้าที่"+(CT.phone?" โทร "+CT.phone:"");S.stok=false;draw();return}
- if(!p.phone){S.stmsg="ยังไม่ได้บันทึกเบอร์มือถือของพนักงานคนนี้";S.stok=false;draw();return}
+ if(!CT.staff){S.stmsg="ยังไม่ได้ตั้งลิงก์แอปหมอนวด กรุณาติดต่อเจ้าหน้าที่"+(CT.phone?" โทร "+CT.phone:"");S.stok=false;draw();return}
+ if(!p.phone){S.stmsg="ยังไม่ได้บันทึกเบอร์มือถือของหมอนวดคนนี้";S.stok=false;draw();return}
  var t=stMsg(p),done=function(m){S.stmsg=m;S.stok=true;draw()},copy=function(){
   if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){done("คัดลอกข้อความและลิงก์ของ "+p.name+" แล้ว นำไปวางส่งใน LINE หรือ SMS ได้เลย")},function(){S.stmsg="คัดลอกไม่สำเร็จ ลองกดอีกครั้ง";S.stok=false;draw()})}
   else{S.stmsg="เครื่องนี้คัดลอกอัตโนมัติไม่ได้ ลิงก์คือ "+stLink(p);S.stok=false;draw()}};
- if(navigator.share){navigator.share({title:"ลิงก์แอปรับงานพนักงาน",text:t}).then(function(){done("เปิดเมนูแชร์ให้แล้ว")},function(e){if(e&&e.name==="AbortError")return;copy()})}else copy()}
+ if(navigator.share){navigator.share({title:"ลิงก์แอปหมอนวด",text:t}).then(function(){done("เปิดเมนูแชร์ให้แล้ว")},function(e){if(e&&e.name==="AbortError")return;copy()})}else copy()}
 function sdrCard(){if(D.sdrOff||!(D.sdr||[]).length)return"";
- return '<div class="card" style="border:2px solid var(--bad)"><b>คำขอลบบัญชีพนักงาน ('+D.sdr.length+')</b><p class="hint2" style="margin:2px 0 8px">เมื่ออนุมัติ ระบบจะลบชื่อ เบอร์ รูป แชต และบัญชีเข้าสู่ระบบของพนักงาน คิวงานและรีวิวเก่ายังอยู่ในรายงานของร้านแต่ไม่ระบุตัวพนักงาน กู้คืนไม่ได้</p>'+D.sdr.map(function(r){
+ return '<div class="card" style="border:2px solid var(--bad)"><b>คำขอลบบัญชีหมอนวด ('+D.sdr.length+')</b><p class="hint2" style="margin:2px 0 8px">เมื่ออนุมัติ ระบบจะลบชื่อ เบอร์ รูป แชต และบัญชีเข้าสู่ระบบของหมอนวด คิวงานและรีวิวเก่ายังอยู่ในรายงานของร้านแต่ไม่ระบุตัวหมอนวด กู้คืนไม่ได้</p>'+D.sdr.map(function(r){
   return '<div class="item" style="padding:8px 0;border-top:1px solid var(--line)"><b>'+esc(r.name)+'</b><small style="display:block;color:var(--mute)">เบอร์ '+esc(r.phone||"-")+', ขอเมื่อ '+new Date(r.requested_at).toLocaleDateString("th-TH",{day:"numeric",month:"short",year:"numeric",timeZone:"Asia/Bangkok"})+'</small>'+
   (r.open_jobs>0?'<p style="color:var(--bad);margin:6px 0">ยังมีคิวที่ยังไม่เสร็จ '+r.open_jobs+' คิว อนุมัติไม่ได้จนกว่าจะเสร็จหรือยกเลิก</p>':'')+
-  (S.sdn===r.id?'<div style="margin-top:8px"><label for="sdn_'+r.id+'">เหตุผลที่ไม่อนุมัติ (พนักงานจะเห็นข้อความนี้)</label><input class="in" id="sdn_'+r.id+'" maxlength="200"></div>':'')+
+  (S.sdn===r.id?'<div style="margin-top:8px"><label for="sdn_'+r.id+'">เหตุผลที่ไม่อนุมัติ (หมอนวดจะเห็นข้อความนี้)</label><input class="in" id="sdn_'+r.id+'" maxlength="200"></div>':'')+
   '<div class="acts"><button type="button" class="btn d" data-a="sdrok" data-id="'+r.id+'"'+(r.open_jobs>0?" disabled":"")+'>'+(S.sdc===r.id?"กดอีกครั้งเพื่อยืนยันลบ":"อนุมัติ (ลบบัญชี)")+'</button><button type="button" class="btn g" data-a="sdrno" data-id="'+r.id+'">'+(S.sdn===r.id?"บันทึกการไม่อนุมัติ":"ไม่อนุมัติ")+'</button>'+(S.sdc===r.id||S.sdn===r.id?'<button type="button" class="btn g" data-a="sdrx">ยกเลิก</button>':'')+'</div></div>'}).join("")+'</div>'}
 function listStaff(){var nw=S.stnew?D.staff.filter(function(x){return x.phone===S.stnew})[0]:null;
- return sdrCard()+'<div class="head"><h1>พนักงานทั้งหมด ('+D.staff.length+')</h1></div>'+(S.stmsg?'<div class="'+(S.stok?"saved":"closed")+'" role="status">'+esc(S.stmsg)+'</div>':'')+
- (nw&&!nw.linked?'<div class="card"><b>เพิ่ม'+esc(nw.name)+'แล้ว</b><p class="hint2" style="margin:4px 0 8px">ส่งลิงก์ให้พนักงานสร้างบัญชีและติดตั้งแอปรับงานบนโทรศัพท์ได้เลย</p><div class="acts"><button type="button" class="btn" data-a="stshare" data-id="'+nw.id+'">ส่งลิงก์ให้'+esc(nw.name)+'</button><button type="button" class="btn g" data-a="stnewno">ไว้ทีหลัง</button></div></div>':'')+'<div class="card">'+(D.staff.length?D.staff.map(function(p){return '<div class="row"><div style="display:flex;gap:10px;align-items:center">'+stImg(p.img,p.name,40)+'<div><b>'+esc(p.name)+'</b><small>บริการที่รับ: '+esc(svcNames(p.svcs))+'</small><small>เบอร์มือถือ: '+(p.phone?esc(p.phone):"ยังไม่ตั้งเบอร์")+(p.linked?", เชื่อมบัญชีแล้ว":", รอพนักงานสมัครสมาชิกด้วยเบอร์นี้")+'</small>'+stAvail(p)+'</div></div><div class="acts">'+(p.linked||!p.on?"":'<button class="btn g" data-a="stshare" data-id="'+p.id+'" aria-label="ส่งลิงก์แอปรับงานให้'+esc(p.name)+'">ส่งลิงก์ให้พนักงาน</button>')+'<span class="tag '+(p.on?"":"o")+'">'+(p.on?"ใช้งาน":"ระงับ")+'</span><button class="btn g" data-a="tog" data-t="staff" data-id="'+p.id+'">'+(p.on?"ระงับ":"เปิดใช้งาน")+'</button><button class="btn g" data-a="edit" data-t="staff" data-id="'+p.id+'">แก้ไข</button>'+delBtn("staff",p.id)+'</div></div>'}).join(""):'<div class="empty">ยังไม่มีพนักงาน</div>')+'</div>'}
+ return sdrCard()+'<div class="head"><h1>หมอนวดทั้งหมด ('+D.staff.length+')</h1></div>'+(S.stmsg?'<div class="'+(S.stok?"saved":"closed")+'" role="status">'+esc(S.stmsg)+'</div>':'')+
+ (nw&&!nw.linked?'<div class="card"><b>เพิ่ม'+esc(nw.name)+'แล้ว</b><p class="hint2" style="margin:4px 0 8px">ส่งลิงก์ให้หมอนวดสร้างบัญชีและติดตั้งแอปรับงานบนโทรศัพท์ได้เลย</p><div class="acts"><button type="button" class="btn" data-a="stshare" data-id="'+nw.id+'">ส่งลิงก์ให้'+esc(nw.name)+'</button><button type="button" class="btn g" data-a="stnewno">ไว้ทีหลัง</button></div></div>':'')+'<div class="card">'+(D.staff.length?D.staff.map(function(p){return '<div class="row"><div style="display:flex;gap:10px;align-items:center">'+stImg(p.img,p.name,40)+'<div><b>'+esc(p.name)+'</b><small>บริการที่รับ: '+esc(svcNames(p.svcs))+'</small><small>เบอร์มือถือ: '+(p.phone?esc(p.phone):"ยังไม่ตั้งเบอร์")+(p.linked?", เชื่อมบัญชีแล้ว":", รอหมอนวดสมัครสมาชิกด้วยเบอร์นี้")+'</small>'+stAvail(p)+'</div></div><div class="acts">'+(p.linked||!p.on?"":'<button class="btn g" data-a="stshare" data-id="'+p.id+'" aria-label="ส่งลิงก์แอปรับงานให้'+esc(p.name)+'">ส่งลิงก์ให้หมอนวด</button>')+'<span class="tag '+(p.on?"":"o")+'">'+(p.on?"ใช้งาน":"ระงับ")+'</span><button class="btn g" data-a="tog" data-t="staff" data-id="'+p.id+'">'+(p.on?"ระงับ":"เปิดใช้งาน")+'</button><button class="btn g" data-a="edit" data-t="staff" data-id="'+p.id+'">แก้ไข</button>'+delBtn("staff",p.id)+'</div></div>'}).join(""):'<div class="empty">ยังไม่มีหมอนวด</div>')+'</div>'}
 function walletMsg(){var b=balance(),lv=warnLv(),o=owed(),m="";
  if(o>0)m='ค้างชำระค่า GP '+baht(o)+' ร้านถูกปิดชั่วคราว เติมเงินอย่างน้อย '+baht(Math.max(100,-b+1))+' เพื่อชำระและเปิดร้านอีกครั้ง';
  else if(b<lv[1])m='ยอดเหลือต่ำกว่า '+baht(lv[1])+' กรุณาเติมเงิน ถ้าหักค่า GP ไม่ได้ ระบบจะปิดร้านชั่วคราว';
@@ -847,12 +847,12 @@ function g1(path){return sbApi("/rest/v1/"+path)}
 function loadCatalog(){var pid=WID;
  return Promise.all([g1("places?select=*&id=eq."+pid),g1("services?select=*&place_id=eq."+pid+"&order=created_at"),g1("staff?select=*,staff_services(service_id)&place_id=eq."+pid+"&order=created_at"),g1("promotions?select=*,promotion_services(service_id)&place_id=eq."+pid+"&order=created_at")]).then(function(r){
   if(!r[0]||!r[0][0])throw new Error("ไม่พบข้อมูลร้าน");
-  D.shop=mapPlace(r[0][0]);D.svc=r[1].map(mapSvc);D.staff=r[2].filter(function(x){return !(x.phone==null&&!x.active&&x.name==="พนักงานที่ออกจากระบบ")}).map(mapStaff);D.promo=r[3].map(mapPromo)}).then(function(){return Promise.all([loadRates(),loadSdr(),loadOff()])})}
+  D.shop=mapPlace(r[0][0]);D.svc=r[1].map(mapSvc);D.staff=r[2].filter(function(x){return !(x.phone==null&&!x.active&&/^(พนักงาน|หมอนวด)ที่ออกจากระบบ$/.test(x.name||""))}).map(mapStaff);D.promo=r[3].map(mapPromo)}).then(function(){return Promise.all([loadRates(),loadSdr(),loadOff()])})}
 var SHM=["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
 function loadOff(){var ids=D.staff.map(function(x){return x.id});D.off={};if(!ids.length)return Promise.resolve();
  return g1("staff_days_off?select=staff_id,day&day=gte."+iso(new Date())+"&staff_id=in.("+ids.join(",")+")&order=day").then(function(a){(a||[]).forEach(function(x){(D.off[x.staff_id]=D.off[x.staff_id]||[]).push(x.day)})},function(){D.off={}})}
 function stAvail(p){var o=(D.off||{})[p.id]||[],h="",sd=function(d){return(+d.slice(8,10))+" "+SHM[+d.slice(5,7)-1]};
- if(!p.acc)h+='<small><b>ปิดรับงานชั่วคราว</b> (พนักงานปิดเอง ลูกค้าจะไม่เห็นในการจองใหม่)</small>';
+ if(!p.acc)h+='<small><b>ปิดรับงานชั่วคราว</b> (หมอนวดปิดเอง ลูกค้าจะไม่เห็นในการจองใหม่)</small>';
  if(o.length)h+='<small>วันลา/หยุด: '+o.slice(0,5).map(sd).join(", ")+(o.length>5?" และอีก "+(o.length-5)+" วัน":"")+'</small>';
  if(p.wd.length&&p.wd.length<7)h+='<small>วันทำงานประจำ: '+p.wd.slice().sort(function(a,b){return a-b}).map(function(d){return DAYN[d]}).join(" ")+'</small>';
  return h}
@@ -928,9 +928,9 @@ function rvView(){var h='<div class="head"><h1>รีวิว</h1></div>';
  var sa=rvAvg(RV.sh.map(function(x){return{hidden:x.hidden,r:x.shop_rating}})),nm={};D.staff.forEach(function(p){nm[p.id]=p.name});
  h+=(RV.msg?'<div class="flash" role="status">'+esc(RV.msg)+'</div>':'')+'<div class="card"><div class="row"><b>คะแนนเฉลี่ยร้าน</b><span>'+(sa?sa.avg.toFixed(1)+' จาก 5 ('+sa.n+' รีวิว)':'ยังไม่มีคะแนน')+'</span></div>';
  var ids=[];RV.st.forEach(function(x){if(ids.indexOf(x.staff_id)<0)ids.push(x.staff_id)});
- h+=ids.map(function(i){var a=rvAvg(RV.st.filter(function(x){return x.staff_id===i}).map(function(x){return{hidden:x.hidden,r:x.rating}}));return '<div class="row"><span>พนักงาน '+esc(nm[i]||"-")+'</span><span>'+(a?a.avg.toFixed(1)+' จาก 5 ('+a.n+' รีวิว)':'ยังไม่มีคะแนน')+'</span></div>'}).join("")+'</div>';
+ h+=ids.map(function(i){var a=rvAvg(RV.st.filter(function(x){return x.staff_id===i}).map(function(x){return{hidden:x.hidden,r:x.rating}}));return '<div class="row"><span>หมอนวด '+esc(nm[i]||"-")+'</span><span>'+(a?a.avg.toFixed(1)+' จาก 5 ('+a.n+' รีวิว)':'ยังไม่มีคะแนน')+'</span></div>'}).join("")+'</div>';
  var all=RV.sh.map(function(x){return{k:"shop",x:x}}).concat(RV.st.map(function(x){return{k:"staff",x:x}})).sort(function(a,b){return a.x.created_at<b.x.created_at?1:-1}),sl=all.slice(0,RV.show);
- h+='<h2 style="font-size:1.05rem;margin:14px 0 6px">รีวิวทั้งหมด ('+all.length+')</h2><div class="card">'+(sl.length?sl.map(function(o){return rvItem(o.k,o.x,o.k==="staff"?"พนักงาน "+(nm[o.x.staff_id]||"-"):"ร้าน")}).join(""):'<div class="empty">ยังไม่มีรีวิว</div>')+'</div>'+(all.length>RV.show?'<button type="button" class="btn ghost" data-a="rvmore">ดูรีวิวเพิ่ม</button>':'');
+ h+='<h2 style="font-size:1.05rem;margin:14px 0 6px">รีวิวทั้งหมด ('+all.length+')</h2><div class="card">'+(sl.length?sl.map(function(o){return rvItem(o.k,o.x,o.k==="staff"?"หมอนวด "+(nm[o.x.staff_id]||"-"):"ร้าน")}).join(""):'<div class="empty">ยังไม่มีรีวิว</div>')+'</div>'+(all.length>RV.show?'<button type="button" class="btn ghost" data-a="rvmore">ดูรีวิวเพิ่ม</button>':'');
  return h}
 function rvFind(key){var k=key.split(":"),id=k.slice(1).join(":");return{kind:k[0],id:id,row:(k[0]==="shop"?RV.sh:RV.st).filter(function(x){return x.id===id})[0]}}
 function rvSend(key){if(RV.busy)return;var f=rvFind(key),ta=document.getElementById("rvtxt"),t=ta?ta.value.trim():"";var er=document.getElementById("rverr");
@@ -998,13 +998,13 @@ document.addEventListener("click",function(e){
  if(a==="qt"){S.qt=id;draw();return}
  if(a==="qns"){S.qn=id;draw();var h2=g("qnsh_"+id);if(h2)h2.focus();return}
  if(a==="qnsno"){S.qn=null;draw();var b2=document.querySelector('[data-a="qns"][data-id="'+id+'"]');if(b2)b2.focus();return}
- if(a==="qnsok"){var bn=byId(D.bk,id);if(!bn)return;OKM="บันทึกว่าลูกค้าไม่มา คิวเลขที่ "+bn.ref+" แล้ว ระบบแจ้งลูกค้าและพนักงานแล้ว";act(function(){return rpc("shop_mark_no_show",{p_ref:bn.ref}).then(loadBk)},function(){S.qn=null});return}
+ if(a==="qnsok"){var bn=byId(D.bk,id);if(!bn)return;OKM="บันทึกว่าลูกค้าไม่มา คิวเลขที่ "+bn.ref+" แล้ว ระบบแจ้งลูกค้าและหมอนวดแล้ว";act(function(){return rpc("shop_mark_no_show",{p_ref:bn.ref}).then(loadBk)},function(){S.qn=null});return}
  if(a==="qcx"){S.qx=id;draw();var h=g("qcxh_"+id);if(h)h.focus();return}
  if(a==="qcxno"){S.qx=null;draw();var bb=document.querySelector('[data-a="qcx"][data-id="'+id+'"]');if(bb)bb.focus();return}
  if(a==="qcxok"){var bk=byId(D.bk,id);if(!bk)return;var ri=+val("qcr_"+id),ot=val("qco_"+id).trim(),qe=g("qce_"+id);
   if(ri===QCR.length-1&&!ot){if(qe)qe.textContent="กรุณาระบุเหตุผล";var oi=g("qco_"+id);if(oi)oi.focus();return}
   var why=(ri===QCR.length-1?"":QCR[ri])+(ri!==QCR.length-1&&ot?" - ":"")+ot;
-  OKM="ยกเลิกคิวเลขที่ "+bk.ref+" แล้ว ระบบแจ้งลูกค้าและพนักงานแล้ว";act(function(){return rpc("cancel_booking",{p_ref:bk.ref,p_reason:why}).then(loadBk)},function(){S.qx=null});return}
+  OKM="ยกเลิกคิวเลขที่ "+bk.ref+" แล้ว ระบบแจ้งลูกค้าและหมอนวดแล้ว";act(function(){return rpc("cancel_booking",{p_ref:bk.ref,p_reason:why}).then(loadBk)},function(){S.qx=null});return}
  if(a==="wt"){S.wt=id==="gp"||id==="his"?id:"bal";draw();return}
  if(a==="new"){S.form={t:t,id:null};draw();return}
  if(a==="edit"){S.form={t:t,id:id};draw();return}
@@ -1022,11 +1022,11 @@ document.addEventListener("click",function(e){
    OKM="บันทึกบริการแล้ว";act(function(){return imgPathFor(kind,tmp,cur&&cur.imgPath).then(function(ip){var body={name:sn,minutes:sm,price:Math.round(sp),description:sd,image_path:ip};
      return cur?patch("services",cur.id,body):sbApi("/rest/v1/services",{method:"POST",json:1,headers:{Prefer:"return=minimal"},body:JSON.stringify(Object.assign({place_id:WID},body))})}).then(loadCatalog)},function(){S.form=null});return}
   if(ft==="staff"){var n=g("fn").value.trim(),ss=[].slice.call(document.querySelectorAll(".ss:checked")).map(function(x){return x.value}),ph=g("fph").value.replace(/[\s-]/g,"");
-   if(!n){er.textContent="กรุณากรอกชื่อพนักงาน";return}
-   if(D.svc.length&&!ss.length){er.textContent="เลือกบริการที่พนักงานให้บริการได้อย่างน้อย 1 รายการ";return}
+   if(!n){er.textContent="กรุณากรอกชื่อหมอนวด";return}
+   if(D.svc.length&&!ss.length){er.textContent="เลือกบริการที่หมอนวดให้บริการได้อย่างน้อย 1 รายการ";return}
    if(!/^0\d{9}$/.test(ph)){er.textContent="เบอร์มือถือต้องเป็นตัวเลข 10 หลักขึ้นต้นด้วย 0";return}
-   if(D.staff.some(function(x){return x.phone===ph&&(!cur||x.id!==cur.id)})){er.textContent="เบอร์มือถือนี้ถูกใช้กับพนักงานคนอื่นแล้ว";return}
-   OKM=cur?"บันทึกการแก้ไขพนักงานแล้ว":"เพิ่ม "+n+" แล้ว ส่งลิงก์ให้พนักงานสร้างบัญชีได้เลย";act(function(){return imgPathFor(kind,tmp,cur&&cur.imgPath).then(function(ip){return rpc("shop_save_staff",{p_place:WID,p_id:cur?cur.id:null,p_name:n,p_phone:ph,p_photo:ip,p_services:ss})}).then(loadCatalog)},function(){S.form=null;S.stmsg="";S.stnew=cur?null:ph});return}
+   if(D.staff.some(function(x){return x.phone===ph&&(!cur||x.id!==cur.id)})){er.textContent="เบอร์มือถือนี้ถูกใช้กับหมอนวดคนอื่นแล้ว";return}
+   OKM=cur?"บันทึกการแก้ไขหมอนวดแล้ว":"เพิ่ม "+n+" แล้ว ส่งลิงก์ให้หมอนวดสร้างบัญชีได้เลย";act(function(){return imgPathFor(kind,tmp,cur&&cur.imgPath).then(function(ip){return rpc("shop_save_staff",{p_place:WID,p_id:cur?cur.id:null,p_name:n,p_phone:ph,p_photo:ip,p_services:ss})}).then(loadCatalog)},function(){S.form=null;S.stmsg="";S.stnew=cur?null:ph});return}
   if(ft==="promo"){var mt=g("mt").value.trim(),mv=+g("mv").value,ty=g("mty").value,all=g("mall").checked,ms=[].slice.call(document.querySelectorAll(".ms:checked")).map(function(x){return x.value}),s1=g("ms1").value,e1=g("me1").value;
    if(!mt){er.textContent="กรุณากรอกชื่อโปรโมชั่น";return}
    if(!(g("mv").value!==""&&mv>0)){er.textContent="มูลค่าส่วนลดต้องมากกว่า 0";return}
@@ -1067,7 +1067,7 @@ document.addEventListener("click",function(e){
  if(a==="clscancel"){OKM="ยกเลิกคำขอปิดบัญชีแล้ว";act(function(){return rpc("shop_cancel_close",{p_place:WID}).then(loadCls)},function(){S.clmsg="ยกเลิกคำขอปิดบัญชีแล้ว";S.clok=true});return}
  if(a==="sdrx"){S.sdc=null;S.sdn=null;draw();return}
  if(a==="sdrok"){if(S.sdc!==id){S.sdc=id;S.sdn=null;draw();return}
-  OKM="ลบบัญชีพนักงานแล้ว";act(function(){return rpc("shop_staff_delete_resolve",{p_place:WID,p_req:id,p_approve:true,p_note:null}).then(loadCatalog)},function(){S.sdc=null;S.sdn=null;S.stmsg="ลบบัญชีพนักงานแล้ว";S.stok=true});return}
+  OKM="ลบบัญชีหมอนวดแล้ว";act(function(){return rpc("shop_staff_delete_resolve",{p_place:WID,p_req:id,p_approve:true,p_note:null}).then(loadCatalog)},function(){S.sdc=null;S.sdn=null;S.stmsg="ลบบัญชีหมอนวดแล้ว";S.stok=true});return}
  if(a==="sdrno"){if(S.sdn!==id){S.sdn=id;S.sdc=null;draw();return}var sr=val("sdn_"+id).trim();
   OKM="บันทึกการไม่อนุมัติแล้ว";act(function(){return rpc("shop_staff_delete_resolve",{p_place:WID,p_req:id,p_approve:false,p_note:sr||null}).then(loadSdr)},function(){S.sdc=null;S.sdn=null;S.stmsg="บันทึกการไม่อนุมัติแล้ว";S.stok=true});return}
  if(a==="stshare"){stShare(id);return}

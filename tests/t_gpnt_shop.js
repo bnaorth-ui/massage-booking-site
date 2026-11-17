@@ -30,7 +30,7 @@ const T={
  reviews:[{id:'rv1',booking_id:'b3',customer_id:'c',place_id:'sh1',reviewer_first:'สมชาย',shop_rating:2,shop_comment:'รอนาน',shop_reply:null,hidden:false,reported:false,created_at:D1(-1)},{id:'rv2',booking_id:'b2',customer_id:'c',place_id:'sh1',reviewer_first:'มาลี',shop_rating:5,shop_comment:'ดีมาก',shop_reply:'ขอบคุณค่ะ',hidden:false,reported:false,created_at:D1(-2)},{id:'rv3',booking_id:'b8',customer_id:'c',place_id:'sh1',reviewer_first:'ผู้ซ่อน',shop_rating:1,shop_comment:'ไม่สุภาพ',hidden:true,reported:false,created_at:D1(-3)},{id:'rv9',booking_id:'b9',customer_id:'c',place_id:'sh9',reviewer_first:'ร้านอื่น',shop_rating:1,shop_comment:'ไม่ควรเห็น',hidden:false,reported:false,created_at:D1(-3)}],
  review_staff:[{id:'rs1',review_id:'rv1',booking_id:'b3',place_id:'sh1',staff_id:'p1',reviewer_first:'สมชาย',rating:4,comment:'สุภาพ',reply:null,hidden:false,reported:false,created_at:D1(-1)}],
  bookings:BK,
- notifications:[{id:'g1',audience:'shop',place_id:'sh1',kind:'gp',title:'หักค่า GP งาน MS2',body:'บริการ: นวดไทย\nราคา 400 บาท × 10% = 40 บาท',created_at:'2026-10-18T05:00:00Z'},{id:'g2',audience:'shop',place_id:'sh1',kind:'gp',title:'หักค่า GP งาน MS3',body:'ราคา 400 บาท',created_at:'2026-10-18T06:00:00Z'},{id:'n9',audience:'shop',place_id:'sh1',kind:'announce',title:'📢 ปิดปรับปรุงระบบ',body:'คืนนี้',created_at:'2026-10-16T01:00:01Z'},{id:'n10',audience:'shop',place_id:'sh1',kind:'cancel',title:'ระบบยกเลิกคิวอัตโนมัติ',body:'MS9',created_at:'2026-10-17T01:00:00Z'},{id:'n1',audience:'shop',place_id:'sh1',kind:'booking',title:'มีการจองใหม่',body:'MS000001',created_at:'2026-10-15T02:00:00Z'},{id:'n2',audience:'shop',place_id:'sh1',kind:'job',title:'พนักงานเริ่มงาน',body:'x',created_at:'2026-10-15T03:00:00Z'},{id:'n3',audience:'shop',place_id:'sh1',kind:'wallet_low',title:'ยอดต่ำ',body:'y',created_at:'2026-10-15T04:00:00Z'}],
+ notifications:[{id:'g1',audience:'shop',place_id:'sh1',kind:'gp',title:'หักค่า GP งาน MS2',body:'บริการ: นวดไทย\nราคา 400 บาท × 10% = 40 บาท',created_at:'2026-10-18T05:00:00Z'},{id:'g2',audience:'shop',place_id:'sh1',kind:'gp',title:'หักค่า GP งาน MS3',body:'ราคา 400 บาท',created_at:'2026-10-18T06:00:00Z'},{id:'n9',audience:'shop',place_id:'sh1',kind:'announce',title:'📢 ปิดปรับปรุงระบบ',body:'คืนนี้',created_at:'2026-10-16T01:00:01Z'},{id:'n10',audience:'shop',place_id:'sh1',kind:'cancel',title:'ระบบยกเลิกคิวอัตโนมัติ',body:'MS9',created_at:'2026-10-17T01:00:00Z'},{id:'n1',audience:'shop',place_id:'sh1',kind:'booking',title:'มีการจองใหม่',body:'MS000001',created_at:'2026-10-15T02:00:00Z'},{id:'n2',audience:'shop',place_id:'sh1',kind:'job',title:'หมอนวดเริ่มงาน',body:'x',created_at:'2026-10-15T03:00:00Z'},{id:'n3',audience:'shop',place_id:'sh1',kind:'wallet_low',title:'ยอดต่ำ',body:'y',created_at:'2026-10-15T04:00:00Z'}],
  notification_reads:process.env.ONLYGP?['n9','n10','n1','n2','n3'].map(x=>({notification_id:x,user_id:'u1'})):[],
  announcements:[{id:'a1',title:'ปิดปรับปรุงระบบ',body:'คืนนี้',audiences:['ร้านค้า'],active:true,day:'2026-10-16',created_at:'2026-10-16T01:00:00Z'},{id:'a2',title:'เฉพาะผู้ใช้',body:'x',audiences:['ผู้ใช้งาน'],active:true,day:'2026-10-16',created_at:'2026-10-16T01:00:00Z'}],
  app_settings:[{promptpay_on:true,promptpay_type:'mobile',promptpay_id:'0812345678',promptpay_name:'สมาคมฯ',association_name:'สมาคมทดสอบ',address:'1 ถนนทดสอบ',phone:'021234567',line_url:'https://line.me/R/ti/p/@x',hours_text:'จ-ศ 9-17',wallet_warn1:100,wallet_warn2:50}]};
@@ -54,7 +54,7 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
  if(!me&&path!=='/rest/v1/categories')return J(401,{message:'JWT required',code:'PGRST301'});
  const rm=path.match(/^\/rest\/v1\/rpc\/(\w+)/);
  if(rm){const f=rm[1];
-  if(f==='shop_save_staff'){if(T.staff.some(s=>s.phone===body.p_phone&&s.id!==body.p_id))return J(400,{code:'P0001',message:'เบอร์มือถือนี้ถูกใช้กับพนักงานคนอื่นแล้ว'});
+  if(f==='shop_save_staff'){if(T.staff.some(s=>s.phone===body.p_phone&&s.id!==body.p_id))return J(400,{code:'P0001',message:'เบอร์มือถือนี้ถูกใช้กับหมอนวดคนอื่นแล้ว'});
    let s=body.p_id&&T.staff.find(x=>x.id===body.p_id);if(!s){s={id:'p'+(++n),place_id:body.p_place,active:true,user_id:null,created_at:'9'};T.staff.push(s)}
    Object.assign(s,{name:body.p_name,phone:body.p_phone,photo_path:body.p_photo});T.staff_services=T.staff_services.filter(x=>x.staff_id!==s.id).concat(body.p_services.map(v=>({staff_id:s.id,service_id:v})));return J(200,s.id)}
   if(f==='shop_save_promotion'){let p=body.p_id&&T.promotions.find(x=>x.id===body.p_id);if(!p){p={id:'m'+(++n),place_id:body.p_place,active:true,created_at:'9'};T.promotions.push(p)}
@@ -100,7 +100,7 @@ const badge=await p.$eval('#tabs [data-id=nt]',e=>e.textContent);console.log('ba
 await p.click('#tabs [data-id=nt]');await sleep(500);
 const btns=await p.$$eval('[data-a=ntf]',b=>b.map(x=>x.textContent));console.log(btns.join(' | '));
 ok('no "ทั้งหมด" button',!btns.some(x=>x.includes('ทั้งหมด'))&&btns.length===4);
-ok('four cats in order',btns[0].startsWith('จากระบบ')&&btns[1].startsWith('จากผู้ใช้งาน')&&btns[2].startsWith('จากพนักงาน')&&btns[3].startsWith('ค่า GP'));
+ok('four cats in order',btns[0].startsWith('จากระบบ')&&btns[1].startsWith('จากผู้ใช้งาน')&&btns[2].startsWith('จากหมอนวด')&&btns[3].startsWith('ค่า GP'));
 ok('gp count 2',btns[3].includes('(2)'));
 console.log(JSON.stringify(btns));const on=await p.$eval('[data-a=ntf].on',e=>e.textContent);
 if(process.env.ONLYGP){ok('default = first with new (GP)',on.startsWith('ค่า GP')&&btns[3].includes('ใหม่ 2')&&!btns[0].includes('ใหม่'))}
@@ -110,7 +110,7 @@ let t=await p.textContent('#main');
 ok('gp items shown w/ tag',t.includes('หักค่า GP งาน MS2')&&t.includes('40 บาท')&&t.includes('หักค่า GP งาน MS3'));
 ok('gp not in admin',(await (async()=>{await p.click('[data-a=ntf][data-id=admin]');await sleep(150);return !(await p.textContent('#main')).includes('หักค่า GP งาน MS2')})()));
 await p.click('[data-a=ntf][data-id=user]');await sleep(150);ok('user cat',(await p.textContent('#main')).includes('มีการจองใหม่'));
-await p.click('[data-a=ntf][data-id=staff]');await sleep(150);ok('staff cat',(await p.textContent('#main')).includes('พนักงานเริ่มงาน'));
+await p.click('[data-a=ntf][data-id=staff]');await sleep(150);ok('staff cat',(await p.textContent('#main')).includes('หมอนวดเริ่มงาน'));
 await p.click('[data-a=ntf][data-id=gp]');await sleep(150);
 ok('link + history hint',!!(await p.$('[data-a=gprpt]'))&&(await p.textContent('#main')).includes('ล้างทุกวัน'));
 await p.click('[data-a=gprpt]');await sleep(400);

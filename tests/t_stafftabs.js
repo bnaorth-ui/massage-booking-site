@@ -70,7 +70,7 @@ await p.click('#onsw',{force:true});await sleep(300);ok('accept switch off',(awa
 await p.click('#onsw',{force:true});await sleep(300);ok('accept switch on',(await txt('#hdr')).includes('เปิดรับงาน'));}
 
 const labs=await p.$$eval('#nav button',b=>b.map(x=>x.textContent.replace(/\d+$/,'').trim()));
-ok('5 bottom tabs ('+labs.join('|')+')',labs.join('|')==='🏠หน้าหลัก|📅ตารางงาน|💰รายได้|🔔การแจ้งเตือน|👤บัญชี');
+ok('5 bottom tabs ('+labs.join('|')+')',labs.join('|')==='🏠หน้าหลัก|📅ตารางงาน|💰รายได้|🔔แจ้งเตือน|👤บัญชี');
 ok('no <nav> landmark, no aria-current',(await p.$$('nav')).length===0&&(await p.$$('#navb [aria-current]')).length===0);
 ok('first tab active, h1 still คิวงาน',(await txt('#nav button.on')).includes('หน้าหลัก')&&(await p.textContent('h1'))==='คิวงาน');
 const bd=await p.$$eval('#navb .bdg',b=>b.map(x=>x.getAttribute('aria-label')));console.log('badges',JSON.stringify(bd));

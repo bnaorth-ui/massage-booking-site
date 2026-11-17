@@ -63,7 +63,7 @@ let p=await mk(null,'');
 await p.fill('#lph','0844444444');await p.fill('#lpw','staffpass1');await p.click('#agf .btn');await sleep(700);
 let nav=await p.evaluate(()=>[...document.querySelectorAll('#nav button')].map(b=>b.innerText.replace(/\s+/g,' ').trim()));
 console.log(nav.join(' | '));
-ok('nav order: ... ตารางงาน, รายได้, การแจ้งเตือน, บัญชี',nav.length===5&&nav[2].includes('รายได้')&&nav[3].includes('การแจ้งเตือน'));
+ok('nav order: ... ตารางงาน, รายได้, แจ้งเตือน, บัญชี',nav.length===5&&nav[2].includes('รายได้')&&nav[3].includes('แจ้งเตือน'));
 await p.click('#nav button:nth-child(3)');await sleep(500);
 let t=await T0(p);
 ok('income header',t.includes('รายได้ของฉัน'));

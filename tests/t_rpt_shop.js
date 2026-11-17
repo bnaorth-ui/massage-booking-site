@@ -32,7 +32,7 @@ const T={
  reviews:[{id:'rv1',booking_id:'b3',customer_id:'c',place_id:'sh1',reviewer_first:'สมชาย',shop_rating:2,shop_comment:'รอนาน',shop_reply:null,hidden:false,reported:false,created_at:D1(-1)},{id:'rv2',booking_id:'b2',customer_id:'c',place_id:'sh1',reviewer_first:'มาลี',shop_rating:5,shop_comment:'ดีมาก',shop_reply:'ขอบคุณค่ะ',hidden:false,reported:false,created_at:D1(-2)},{id:'rv3',booking_id:'b8',customer_id:'c',place_id:'sh1',reviewer_first:'ผู้ซ่อน',shop_rating:1,shop_comment:'ไม่สุภาพ',hidden:true,reported:false,created_at:D1(-3)},{id:'rv9',booking_id:'b9',customer_id:'c',place_id:'sh9',reviewer_first:'ร้านอื่น',shop_rating:1,shop_comment:'ไม่ควรเห็น',hidden:false,reported:false,created_at:D1(-3)}],
  review_staff:[{id:'rs1',review_id:'rv1',booking_id:'b3',place_id:'sh1',staff_id:'p1',reviewer_first:'สมชาย',rating:4,comment:'สุภาพ',reply:null,hidden:false,reported:false,created_at:D1(-1)}],
  bookings:BK,
- notifications:[{id:'n9',audience:'shop',place_id:'sh1',kind:'announce',title:'📢 ปิดปรับปรุงระบบ',body:'คืนนี้',created_at:'2026-10-16T01:00:01Z'},{id:'n10',audience:'shop',place_id:'sh1',kind:'cancel',title:'ระบบยกเลิกคิวอัตโนมัติ',body:'MS9',created_at:'2026-10-17T01:00:00Z'},{id:'n1',audience:'shop',place_id:'sh1',kind:'booking',title:'มีการจองใหม่',body:'MS000001',created_at:'2026-10-15T02:00:00Z'},{id:'n2',audience:'shop',place_id:'sh1',kind:'job',title:'พนักงานเริ่มงาน',body:'x',created_at:'2026-10-15T03:00:00Z'},{id:'n3',audience:'shop',place_id:'sh1',kind:'wallet_low',title:'ยอดต่ำ',body:'y',created_at:'2026-10-15T04:00:00Z'}],
+ notifications:[{id:'n9',audience:'shop',place_id:'sh1',kind:'announce',title:'📢 ปิดปรับปรุงระบบ',body:'คืนนี้',created_at:'2026-10-16T01:00:01Z'},{id:'n10',audience:'shop',place_id:'sh1',kind:'cancel',title:'ระบบยกเลิกคิวอัตโนมัติ',body:'MS9',created_at:'2026-10-17T01:00:00Z'},{id:'n1',audience:'shop',place_id:'sh1',kind:'booking',title:'มีการจองใหม่',body:'MS000001',created_at:'2026-10-15T02:00:00Z'},{id:'n2',audience:'shop',place_id:'sh1',kind:'job',title:'หมอนวดเริ่มงาน',body:'x',created_at:'2026-10-15T03:00:00Z'},{id:'n3',audience:'shop',place_id:'sh1',kind:'wallet_low',title:'ยอดต่ำ',body:'y',created_at:'2026-10-15T04:00:00Z'}],
  notification_reads:[],
  announcements:[{id:'a1',title:'ปิดปรับปรุงระบบ',body:'คืนนี้',audiences:['ร้านค้า'],active:true,day:'2026-10-16',created_at:'2026-10-16T01:00:00Z'},{id:'a2',title:'เฉพาะผู้ใช้',body:'x',audiences:['ผู้ใช้งาน'],active:true,day:'2026-10-16',created_at:'2026-10-16T01:00:00Z'}],
  app_settings:[{promptpay_on:true,promptpay_type:'mobile',promptpay_id:'0812345678',promptpay_name:'สมาคมฯ',association_name:'สมาคมทดสอบ',address:'1 ถนนทดสอบ',phone:'021234567',line_url:'https://line.me/R/ti/p/@x',hours_text:'จ-ศ 9-17',wallet_warn1:100,wallet_warn2:50}]};
@@ -58,7 +58,7 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
  if(NOSHARE&&path==='/rest/v1/bookings'&&(u.search.includes('item_shares')))return J(400,{message:'no relation'});
  const rm=path.match(/^\/rest\/v1\/rpc\/(\w+)/);
  if(rm){const f=rm[1];
-  if(f==='shop_save_staff'){if(T.staff.some(s=>s.phone===body.p_phone&&s.id!==body.p_id))return J(400,{code:'P0001',message:'เบอร์มือถือนี้ถูกใช้กับพนักงานคนอื่นแล้ว'});
+  if(f==='shop_save_staff'){if(T.staff.some(s=>s.phone===body.p_phone&&s.id!==body.p_id))return J(400,{code:'P0001',message:'เบอร์มือถือนี้ถูกใช้กับหมอนวดคนอื่นแล้ว'});
    let s=body.p_id&&T.staff.find(x=>x.id===body.p_id);if(!s){s={id:'p'+(++n),place_id:body.p_place,active:true,user_id:null,created_at:'9'};T.staff.push(s)}
    Object.assign(s,{name:body.p_name,phone:body.p_phone,photo_path:body.p_photo});T.staff_services=T.staff_services.filter(x=>x.staff_id!==s.id).concat(body.p_services.map(v=>({staff_id:s.id,service_id:v})));return J(200,s.id)}
   if(f==='shop_save_promotion'){let p=body.p_id&&T.promotions.find(x=>x.id===body.p_id);if(!p){p={id:'m'+(++n),place_id:body.p_place,active:true,created_at:'9'};T.promotions.push(p)}
@@ -102,7 +102,7 @@ await until(()=>document.querySelector('#gph'));
 await p.fill('#gph','0811111111');await p.fill('#gpw','abc123');await p.click('[data-g=login]');
 ok('app opens',await until(()=>!document.getElementById('main').hidden&&document.getElementById('hdr').textContent.includes('สบายดี')));
 const tabs=await p.$$eval('#tabs button',b=>b.map(x=>x.textContent.replace(/[^ก-๙]/g,'')));
-ok('nav order wal,rp',tabs.join('|').includes('กระเป๋าเงิน|รายงาน|การแจ้งเตือน'));
+ok('nav order wal,rp',tabs.join('|').includes('กระเป๋าเงิน|รายงาน|แจ้งเตือน'));
 // wallet: GP success hidden, balance unchanged, link
 await p.click('#tabs [data-id=wal]');await sleep(400);
 let w0=await p.textContent('#main');
@@ -137,7 +137,7 @@ await p.click('[data-a=rpkind][data-id=inc]');await sleep(200);
 ok('dates kept after kind switch',(await p.inputValue('#rpf'))===iso(Date.now()-10*864e5));
 await p.click('[data-a=rpgo]');await sleep(900);
 let r=await p.textContent('#main');
-ok('inc title',r.includes('รายงานรายได้และส่วนแบ่งพนักงาน'));
+ok('inc title',r.includes('รายงานรายได้และส่วนแบ่งหมอนวด'));
 if(process.env.NOSHARE){ok('noShare note',r.includes('ฐานข้อมูลยังไม่รองรับส่วนแบ่ง')&&!r.includes('ค่าประมาณ'));ok('gp still shown',r.includes('80'))}
 else{
 const sums=await p.$$eval('.rps div',ds=>ds.map(d=>d.textContent));

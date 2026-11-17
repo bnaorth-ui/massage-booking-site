@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>แอดมิน - สมาคมวิทยากรฝึกอาชีพคนตาบอด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.32"><meta name="app-name" content="สำหรับแอดมิน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.33"><meta name="app-name" content="สำหรับแอดมิน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -205,7 +205,7 @@ function loadCore(){
   D=D||{};
   D.cats=r[1].map(function(c){return{id:c.id,name:c.name,kind:c.kind,desc:c.description||"",on:c.active?1:0}});
   D.svc=r[2].map(function(x){return{id:x.id,name:x.name,min:x.minutes,rest:x.rest_minutes||0,price:+x.price,desc:x.description||"",on:x.active?1:0,img:pubUrl(x.image_path),imgPath:x.image_path||null}});
-  D.staff=r[3].filter(function(x){return !(x.phone==null&&!x.active&&x.name==="พนักงานที่ออกจากระบบ")}).map(function(x){return{id:x.id,name:x.name,phone:x.phone||"",img:pubUrl(x.photo_path),imgPath:x.photo_path||null,on:x.active?1:0,linked:!!x.user_id,svcs:(x.staff_services||[]).map(function(q){return q.service_id})}});
+  D.staff=r[3].filter(function(x){return !(x.phone==null&&!x.active&&/^(พนักงาน|หมอนวด)ที่ออกจากระบบ$/.test(x.name||""))}).map(function(x){return{id:x.id,name:x.name,phone:x.phone||"",img:pubUrl(x.photo_path),imgPath:x.photo_path||null,on:x.active?1:0,linked:!!x.user_id,svcs:(x.staff_services||[]).map(function(q){return q.service_id})}});
   var pl=r[0].map(function(p){return mapPlace(p,r[4],r[5])});
   D.shops=pl.filter(function(p){return p.type==="shop"});D.orgs=pl.filter(function(p){return p.type==="org"});D.comp=pl.filter(function(p){return p.type==="company"});
   D.ann=r[6].map(function(a){return{id:a.id,title:a.title,body:a.body||"",auds:a.audiences||[],date:a.day,on:a.active?1:0}});
