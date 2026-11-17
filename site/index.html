@@ -97,6 +97,7 @@ article.post li{margin:0 0 6px}
 footer{background:var(--card);border-top:1px solid var(--line);padding:28px 0 calc(28px + env(safe-area-inset-bottom));color:var(--mute)}
 footer h2{font-size:20px;color:var(--ink)}
 footer p{margin:0 0 6px}
+footer .copy{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:15px}
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
 </style>
 </head>
@@ -121,7 +122,9 @@ footer p{margin:0 0 6px}
   <p id="cName">สมาคมวิทยากรฝึกอาชีพคนตาบอด</p>
   <p id="cPhone"></p>
   <p id="cHours"></p>
+  <p id="cEmail"></p>
   <p><a href="https://massage-customer-bna.pages.dev/privacy/">นโยบายความเป็นส่วนตัว</a></p>
+  <p class="copy" id="copy">© สมาคมวิทยากรฝึกอาชีพคนตาบอด สงวนลิขสิทธิ์</p>
  </div>
 </footer>
 <div class="sr" aria-live="polite" id="live"></div>
@@ -219,9 +222,7 @@ function companyView(){markNav("company");setHead("สำหรับบริ�
  '<div class="box"><h3>มาตรา 34: ส่งเงินเข้ากองทุน</h3><p>ถ้าไม่จ้างตามมาตรา 33 ต้องส่งเงินเข้ากองทุนส่งเสริมและพัฒนาคุณภาพชีวิตคนพิการ คำนวณจากอัตราค่าจ้างขั้นต่ำต่ำสุด คูณ 365 วัน คูณจำนวนคนพิการที่ไม่ได้จ้าง</p></div>'+
  '<div class="box"><h3>มาตรา 35: ให้สิทธิแทนการจ้าง</h3><p>ถ้าไม่จ้างตามมาตรา 33 และไม่ส่งเงินตามมาตรา 34 ให้สิทธิแก่คนพิการหรือผู้ดูแลคนพิการแทนได้ มูลค่าไม่น้อยกว่า '+LAW.s35Value+' บาทต่อคนต่อปี (ปีงบประมาณ '+LAW.s35Year+')</p></div></div>'+
  '<h3>การให้สิทธิตามมาตรา 35 มี 7 รูปแบบ</h3><ol><li>ให้สัมปทาน</li><li>จัดสถานที่จำหน่ายสินค้าหรือบริการ</li><li>จัดจ้างเหมาช่วงงานหรือจ้างเหมาบริการ (เช่น จ้างหมอนวดตาบอดมานวดให้พนักงาน)</li><li>ฝึกงาน</li><li>จัดให้มีอุปกรณ์หรือสิ่งอำนวยความสะดวก</li><li>จัดให้มีบริการล่ามภาษามือ</li><li>ให้ความช่วยเหลืออื่นใดแก่คนพิการหรือผู้ดูแลคนพิการ</li></ol>'+
- '<p>บริษัทยื่นแจ้งการให้สิทธิตามมาตรา 35 ได้ทุกปี ระหว่างวันที่ 1 ตุลาคม ถึง 31 ธันวาคม ที่สำนักงานจัดหางานจังหวัด หรือสำนักงานจัดหางานกรุงเทพมหานครพื้นที่ 1 ถึง 10 หรือทางเว็บไซต์ <a href="https://e-service.doe.go.th/" rel="noopener" target="_blank">e-service.doe.go.th<span class="sr"> (เปิดหน้าต่างใหม่)</span></a> สอบถามได้ที่สายด่วนกระทรวงแรงงาน <a href="tel:1506">1506</a> กด 2</p>'+
  '<div class="box"><h3>สมาคมช่วยบริษัทได้</h3><p>สมาคมจัดหาหมอนวดตาบอดให้บริษัทที่ต้องการจ้างตามมาตรา 33 หรือให้สิทธิตามมาตรา 35 แบบจ้างเหมาบริการ และช่วยประสานรายละเอียดกับบริษัท</p>'+cta+'</div>'+
- '<p class="note">ข้อมูลนี้เป็นข้อมูลเบื้องต้นจากกรมการจัดหางานและกรมส่งเสริมและพัฒนาคุณภาพชีวิตคนพิการ ปรับปรุงเมื่อ'+LAW.updated+' ตัวเลขและขั้นตอนอาจเปลี่ยนทุกปี กรุณาตรวจสอบกับหน่วยงานดังกล่าวก่อนดำเนินการ</p>'+
  '</section></article>';
  focusH1()}
 function route(){var p=location.pathname.replace(/\/index\.html$/,"/").replace(/\/+$/,"")||"/",m;
@@ -243,8 +244,10 @@ window.addEventListener("popstate",route);
 function loadContact(){api("/rest/v1/rpc/public_contact",{method:"POST",body:"{}"}).then(function(c){if(!c)return;
  if(c.name)$("cName").textContent=c.name;
  if(c.phone){var ph=String(c.phone).replace(/\D/g,""),show=ph.length===10?ph.slice(0,3)+"-"+ph.slice(3,6)+"-"+ph.slice(6):c.phone;$("cPhone").innerHTML='โทร <a href="tel:'+esc(ph)+'">'+esc(show)+'</a>'}
- if(c.hours)$("cHours").textContent=c.hours},function(){})}
-route();loadContact();
+ if(c.hours)$("cHours").textContent=c.hours;
+ if(c.email&&/^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/.test(c.email))$("cEmail").innerHTML='อีเมล <a href="mailto:'+esc(c.email)+'">'+esc(c.email)+'</a>'},function(){})}
+function setCopy(){var y=new Date().getFullYear()+543;$("copy").textContent="© "+y+" "+SITE_NAME+" สงวนลิขสิทธิ์"}
+route();loadContact();setCopy();
 </script>
 </body>
 </html>

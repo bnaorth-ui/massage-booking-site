@@ -27,7 +27,7 @@ const b=await chromium.launch(C.launch);const errs=[];
 const ctx=await b.newContext({locale:'th-TH'});
 await ctx.route(/^https?:/,r=>{const u=r.request().url();
  if(u.startsWith(BASE))return r.continue();
- if(/supabase\.co\/rest\/v1\/rpc\/public_contact/.test(u))return r.fulfill({status:200,contentType:'application/json',body:JSON.stringify({name:'สมาคมวิทยากรฝึกอาชีพคนตาบอด',phone:'0989983654',hours:'จันทร์ - ศุกร์ 09:00 - 17:00 น.'})});
+ if(/supabase\.co\/rest\/v1\/rpc\/public_contact/.test(u))return r.fulfill({status:200,contentType:'application/json',body:JSON.stringify({name:'สมาคมวิทยากรฝึกอาชีพคนตาบอด',phone:'0989983654',hours:'จันทร์ - ศุกร์ 09:00 - 17:00 น.',email:'info@example.org'})});
  if(/supabase\.co\/rest\/v1\/site_articles/.test(u)){REQ.push(u);if(FAIL)return r.fulfill({status:500,body:'{}'});return r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(q(u))})}
  if(/supabase\.co\/storage/.test(u))return r.fulfill({status:200,contentType:'image/png',body:fs.readFileSync(path.join(ROOT,'icon-192.png'))});
  return r.abort()});
@@ -43,6 +43,8 @@ ok('home: list query only asks for published items',REQ.every(u=>u.includes('act
 ok('home: book / shop / staff links go to the existing apps',await p.evaluate(()=>['massage-customer-bna.pages.dev/','massage-shop-bna.pages.dev/reg/','massage-staff-bna.pages.dev/apply/'].every(u=>!!document.querySelector('a[href="https://'+u+'"]'))));
 ok('home: contact phone from public_contact is a tel: link',await W(()=>true)&&await p.evaluate(()=>{const a=document.querySelector('#cPhone a');return !!a&&a.getAttribute('href')==='tel:0989983654'&&a.textContent==='098-998-3654'}));
 ok('home: hours shown',(await p.textContent('#cHours')).includes('09:00'));
+ok('home: email from public_contact is a mailto link',await p.evaluate(()=>{const a=document.querySelector('#cEmail a');return !!a&&a.getAttribute('href')==='mailto:info@example.org'&&a.textContent==='info@example.org'}));
+ok('footer: copyright with Thai year and association name',(await p.textContent('#copy'))==='© '+(new Date().getFullYear()+543)+' สมาคมวิทยากรฝึกอาชีพคนตาบอด สงวนลิขสิทธิ์');
 ok('a11y: skip link and labelled main nav',await p.evaluate(()=>!!document.querySelector('a.skip[href="#main"]')&&document.querySelector('nav.main').getAttribute('aria-label')==='เมนูหลัก'&&document.querySelector('nav.main a[aria-current="page"]').textContent==='หน้าแรก'));
 ok('a11y: every image has an alt attribute',await p.evaluate(()=>[].every.call(document.images,i=>i.hasAttribute('alt'))));
 ok('xss: title with html shown as text',await p.evaluate(()=>!window.XSS&&!document.querySelector('#latest img[src="x"]')));
@@ -97,8 +99,8 @@ H=await h1();ok('company: url, h1 focused, nav current',p.url()===BASE+'/company
 const ct=await p.textContent('#view');
 ok('company: office massage invite + steps + register button',ct.includes('จ้างหมอนวดตาบอดไปนวดที่บริษัท')&&ct.includes('ขั้นตอน')&&await p.$$eval('#view a[href="https://massage-customer-bna.pages.dev/?company=1"]',a=>a.length)>=2);
 ok('company: law facts (100:1, เศษเกิน 50, ม.33/34/35, 365 วัน)',['ทุก 100 คน ต่อคนพิการ 1 คน','เศษเกิน 50 คน','มาตรา 33','มาตรา 34','มาตรา 35','365 วัน','พ.ศ. 2550'].every(t=>ct.includes(t)));
-ok('company: s35 has 7 forms, value, filing period, where, hotline',await p.evaluate(()=>{const o=[...document.querySelectorAll('#view ol')].find(x=>x.textContent.includes('สัมปทาน'));return !!o&&o.children.length===7})&&ct.includes('123,005 บาท')&&ct.includes('1 ตุลาคม ถึง 31 ธันวาคม')&&ct.includes('e-service.doe.go.th')&&!!await p.$('#view a[href="tel:1506"]'));
-ok('company: headings in order (h1 > h2 > h3), source/date note',await p.evaluate(()=>{const hs=[...document.querySelectorAll('#view h1,#view h2,#view h3')].map(h=>+h.tagName[1]);return hs[0]===1&&hs.every((v,i)=>i===0||v<=hs[i-1]+1)})&&ct.includes('ปรับปรุงเมื่อพฤศจิกายน 2569'));
+ok('company: s35 has 7 forms and value; filing period paragraph removed',await p.evaluate(()=>{const o=[...document.querySelectorAll('#view ol')].find(x=>x.textContent.includes('สัมปทาน'));return !!o&&o.children.length===7})&&ct.includes('123,005 บาท')&&!ct.includes('1 ตุลาคม ถึง 31 ธันวาคม')&&!ct.includes('e-service.doe.go.th')&&!await p.$('#view a[href="tel:1506"]'));
+ok('company: headings in order (h1 > h2 > h3), no source/date note',await p.evaluate(()=>{const hs=[...document.querySelectorAll('#view h1,#view h2,#view h3')].map(h=>+h.tagName[1]);return hs[0]===1&&hs.every((v,i)=>i===0||v<=hs[i-1]+1)})&&!ct.includes('ข้อมูลนี้เป็นข้อมูลเบื้องต้น'));
 ok('company: tab title',(await p.title()).startsWith('สำหรับบริษัทและองค์กร | '));
 await p.goto(BASE+'/company/');await p.waitForSelector('#hLaw');ok('company: direct link works',(await h1()).t==='สำหรับบริษัทและองค์กร');
 
@@ -110,6 +112,7 @@ FAIL=false;await p.click('#list button[data-retry]');ok('retry loads the list',a
 // มือถือ: ไม่ล้นจอ
 const m=await b.newContext({locale:'th-TH',viewport:{width:360,height:740},isMobile:true});await m.route(/^https?:/,r=>{const u=r.request().url();if(u.startsWith(BASE))return r.continue();if(/site_articles/.test(u))return r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(q(u))});return r.fulfill({status:200,contentType:'application/json',body:'null'})});
 const mp=await m.newPage();mp.on('pageerror',e=>errs.push('mobile: '+e.message));await mp.goto(BASE+'/news/1');await mp.waitForSelector('article.post h1');
+ok('no email from server: email line stays empty',(await mp.textContent('#cEmail'))==='');
 ok('mobile 360px: no sideways scroll',await mp.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1));
 await mp.goto(BASE+'/');await mp.waitForSelector('#latest .card');
 ok('mobile home: no sideways scroll',await mp.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1));
