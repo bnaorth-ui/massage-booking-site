@@ -123,7 +123,7 @@ const navIds=()=>p.$$eval('#tabs button',b=>b.map(x=>x.dataset.id));
 const subIds=()=>p.$$eval('#main .subtabs button',b=>b.map(x=>x.dataset.id));
 ok('owner sees all 6 bottom menus',JSON.stringify(await navIds())===JSON.stringify(['q','pl','fin','nt','sup','sys']));
 await p.click('#tabs [data-id=sys]');await p.waitForTimeout(300);
-ok('owner sees all system sub-menus',(await subIds()).length===10);
+ok('owner sees all system sub-menus',(await subIds()).length===11);
 await p.click('#main .subtabs [data-id=set]');await p.waitForTimeout(300);await p.click('[data-a=sub][data-id=a]');
 ok('admin list shows perms (แอดมินหลัก)',await W(async()=>(await p.textContent('[data-sg=a]')).includes('สิทธิ์: แอดมินหลัก (ทำได้ทุกอย่าง)')));
 ok('add-admin form has perm picker, default = ผู้ช่วยทั่วไป',await p.$$eval('.pm_adp:checked',c=>c.map(x=>x.value).join())==='chat,queue,shop,staff'&&!(await p.$eval('#adp_owner',e=>e.checked)));

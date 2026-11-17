@@ -32,6 +32,12 @@
 5. ไฟล์ที่ใช้ร่วมกัน (`update.js`, `push.js`, `sw.js`) มีสำเนาในทุกแอป ต้องแก้ให้เหมือนกัน ทั้ง 4 แอปแล้วขึ้นเลขเวอร์ชันทั้ง 4 แอป
 6. ถ้าเปลี่ยน `sw.js` ให้พิจารณาเลข `PAGE_CACHE` (ใช้ล้างแคชหน้าเว็บของทุกเครื่อง)
 
+### เว็บประชาสัมพันธ์ (`site/`, เว็บที่ 5)
+- หน้าแรก ข่าวและบทความ สำหรับคนทั่วไป ไม่ต้องล็อกอิน ไม่ใช่แอป (ไม่มี version.json, sw.js, หน้า "มีเวอร์ชันใหม่") Cloudflare Pages ชื่อ `massage-home-bna` (ผู้ใช้ต้องสร้างเอง คู่มือ `site/README.md`) ถ้าเปลี่ยนชื่อ แก้ `SITE_URL` ในแอปแอดมินด้วย
+- ข้อมูลจากตาราง `site_articles` (แยกจาก `announcements` ซึ่งเป็นประกาศภายใน) แอดมินเขียนที่เมนู ระบบ > บทความและข่าว (สิทธิ์ `users`) SQL: `supabase/sql/2026-11-17_site_articles.sql`
+- `site/functions/` ทำงานบน Cloudflare: ใส่หัวข้อ/รูปของบทความในแท็ก meta (ให้ LINE/Facebook แสดงถูก) แผนผังเว็บ และ robots.txt ไฟล์ร่วม `site/shared/meta.js`
+- ผู้อ่านส่วนหนึ่งใช้โปรแกรมอ่านหน้าจอ: ทุกรูปต้องมีคำบรรยาย หัวข้อเรียงลำดับ ปุ่มสูงอย่างน้อย 44px ข้อสอบ `t_site.js`, `t_site_fn.js`, `t_site_admin.js`
+
 ### หน้าสาธารณะและแอปในร้านค้า
 - `customer/privacy/` และ `customer/delete-account/` สร้างจาก `tools/gen-legal.js` ห้ามแก้ไฟล์ตรงๆ แก้นโยบาย (`pvHtml`) ในแอปแล้วรัน `node tools/gen-legal.js` (ข้อสอบ `t_legal_pages.js` เตือน)
 - ตัวห่อแอป Google Play / App Store อยู่ใน `app-shell/` (คู่มือ `app-shell/README.md`) และ `codemagic.yaml` ที่ราก รหัสประจำแอป `th.or.bna.massage`

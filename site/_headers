@@ -1,0 +1,16 @@
+# Cloudflare Pages: ไฟล์นี้วางไว้ข้าง index.html (ชื่อไฟล์ต้องเป็น _headers พอดี)
+/
+  Cache-Control: public, max-age=0, must-revalidate
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+/news/*
+  Cache-Control: public, max-age=0, must-revalidate
+/og-share.png
+  Cache-Control: public, max-age=86400
+/icon-*.png
+  Cache-Control: public, max-age=2592000, immutable
+
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
