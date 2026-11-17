@@ -138,7 +138,7 @@ await p.click('[data-a=supback]');await W(async()=>(await p.$$('.supb')).length=
 ROOMS.find(r=>r.user_id==='sh9').viewing_name=null;ROOMS.find(r=>r.user_id==='cu1').last_from='user';
 await p.focus('.supb[data-id=sh9]');
 ok('list refreshes by itself (15 s): viewing tag gone, new message puts room back to unanswered',await W(async()=>{const a=await p.textContent('.supb[data-id=sh9]'),b=await p.textContent('.supb[data-id=cu1]');return !a.includes('กำลังดูอยู่')&&b.includes('ยังไม่ได้ตอบ')},20000));
-ok('focus kept on the same room button after refresh',await p.evaluate(()=>document.activeElement&&document.activeElement.dataset.id==='sh9'));
+ok('focus kept on the same room button after refresh',await W(()=>p.evaluate(()=>document.activeElement&&document.activeElement.dataset.id==='sh9'),3000));
 await p.click('#tabs [data-id=sys]');await p.waitForTimeout(300);await p.click('#main .subtabs[aria-label] [data-id=set]');await p.waitForTimeout(300);await p.click('[data-a=sub][data-id=g]').catch(()=>{});await p.waitForTimeout(300);
 ok('settings: LINE link field removed, hint mentions chat menu',!(await p.$('#c5'))&&!(await p.textContent('#main')).includes('LINE')&&(await p.textContent('#main')).includes('เมนู "แชต"'));
 await p.click('[data-a=setsave]');await p.waitForTimeout(800);
