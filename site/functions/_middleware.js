@@ -49,6 +49,7 @@ export async function onRequest(ctx) {
   if (contact && contact.phone) org.telephone = String(contact.phone);
   if (contact && contact.email) org.email = String(contact.email);
   const jsonld = [org];
+  if (r.name === 'company') jsonld.push(V.faqLD(info));
   let image = null;
   if (art) {
     image = imgUrl(art.cover_path);

@@ -112,6 +112,35 @@
   function baht(n) { n = Number(n); if (!(n > 0)) return ""; var s = String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ","); return s + " บาท"; }
   function telHref(phone) { var ph = String(phone || "").replace(/\D/g, ""); return ph ? "tel:" + ph : "#contact"; }
 
+  /* คำถามที่พบบ่อย หน้าบริษัทและหน่วยงาน (ผู้ใช้ยืนยันคำตอบ 18 พ.ย. 2569: จองล่วงหน้า 10 วัน ชำระก่อน 3 วัน ใบเสร็จเฉพาะแบบครั้งคราว ลดหย่อนภาษีไม่ได้ เก้าอี้ 2 ตัวต่อหมอนวด 1 คน)
+     ใช้ทั้งในหน้าเว็บ และข้อมูลโครงสร้าง FAQPage สำหรับ Google (ข้อความธรรมดา) */
+  function faqList(info) {
+    var pr = baht(info && info.rate);
+    return [
+      { g: "แบบครั้งคราว (นวดออฟฟิศซินโดรมให้พนักงาน)", items: [
+        ["ต้องจองล่วงหน้ากี่วัน", "ต้องส่งคำขอล่วงหน้าอย่างน้อย 10 วันก่อนวันใช้บริการ เพื่อให้สมาคมจัดหาหมอนวดได้ทัน"],
+        ["ค่าบริการเท่าไร", (pr ? pr + " ต่อหมอนวด 1 คน ต่อชั่วโมง ไม่รวมช่วงพักเที่ยง" : "ดูอัตราค่าบริการในแอปก่อนส่งคำขอ") + " สมาคมจะแจ้งยอดรวมหลังจากหมอนวดตอบรับงานแล้ว"],
+        ["ชำระเงินอย่างไร และเมื่อไร", "โอนผ่าน PromptPay อย่างน้อย 3 วันก่อนวันใช้บริการ แล้วแนบสลิปในแอป เจ้าหน้าที่จะตรวจสอบและยืนยันงานให้"],
+        ["ออกใบเสร็จได้ไหม นำไปลดหย่อนภาษีได้ไหม", "สมาคมออกใบเสร็จรับเงินให้ แต่ใบเสร็จนี้ไม่สามารถนำไปลดหย่อนภาษีได้"],
+        ["ต้องเตรียมสถานที่อย่างไร", "เตรียมเก้าอี้ให้หมอนวด 1 ตัว และให้พนักงานที่มารับบริการ 1 ตัว ต่อหมอนวด 1 คน เช่น ใช้หมอนวด 5 คน ให้เตรียมเก้าอี้ 10 ตัว (สำหรับพนักงาน 5 ตัว และหมอนวด 5 ตัว)"],
+        ["ให้บริการพื้นที่ไหนบ้าง", "ตอนนี้รับเฉพาะหน่วยงานในกรุงเทพมหานคร"]
+      ] },
+      { g: "แบบประจำ (จ้างตามมาตรา 33 หรือ 35)", items: [
+        ["เริ่มต้นอย่างไร", "กด \"ลงทะเบียนบริษัท\" กรอกข้อมูลบริษัท จำนวนหมอนวด และเลือกจ้างตามมาตรา 33 หรือ 35 จากนั้นเจ้าหน้าที่สมาคมจะติดต่อกลับเพื่อคุยรายละเอียดและทำสัญญา"]
+      ] }
+    ];
+  }
+  function faqHTML(info) {
+    var n = 0;
+    return '<section aria-labelledby="hFaq" id="faq"><h2 id="hFaq">คำถามที่พบบ่อย</h2>' + faqList(info).map(function (grp) {
+      return '<h3>' + esc(grp.g) + '</h3>' + grp.items.map(function (x) { n++; return '<details class="faq"><summary>' + n + '. ' + esc(x[0]) + '</summary><p>' + esc(x[1]) + '</p></details>'; }).join("");
+    }).join("") + '</section>';
+  }
+  function faqLD(info) {
+    var all = []; faqList(info).forEach(function (g) { g.items.forEach(function (x) { all.push({ "@type": "Question", name: x[0], acceptedAnswer: { "@type": "Answer", text: x[1] } }); }); });
+    return { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: all };
+  }
+
   /* หน้า "บริษัทและหน่วยงาน" (ชุดเดียว กระชับ): การ์ด 2 แบบ -> ผลงานบริการ -> ขั้นตอน 2 คอลัมน์ -> กฎหมาย (7 รูปแบบมาตรา 35 พับไว้) -> แถบติดต่อท้ายหน้า
      ปุ่มหลักอยู่ในการ์ดที่เดียว ปุ่มโทรอยู่ในการ์ดและท้ายหน้า
      info: { rate: อัตราต่อชั่วโมงจาก public_contact, phone, email, works: ผลงานบริการล่าสุด (null = ให้หน้าเว็บโหลดเอง, [] = ซ่อนส่วนผลงาน) } */
@@ -146,7 +175,7 @@
       '<div class="box"><h3>มาตรา 34: ส่งเงินเข้ากองทุน</h3><p>ถ้าไม่จ้างตามมาตรา 33 ต้องส่งเงินเข้ากองทุนส่งเสริมและพัฒนาคุณภาพชีวิตคนพิการ คำนวณจากอัตราค่าจ้างขั้นต่ำต่ำสุด คูณ 365 วัน คูณจำนวนคนพิการที่ไม่ได้จ้าง</p></div>' +
       '<div class="box"><h3>มาตรา 35: ให้สิทธิแทนการจ้าง</h3><p>ถ้าไม่จ้างตามมาตรา 33 และไม่ส่งเงินตามมาตรา 34 ให้สิทธิแก่คนพิการหรือผู้ดูแลคนพิการแทนได้ มูลค่าไม่น้อยกว่า ' + LAW.s35Value + ' บาทต่อคนต่อปี (ปีงบประมาณ ' + LAW.s35Year + ') สมาคมรับจ้างเหมาบริการนวดได้</p></div></div>' +
       '<details class="more7"><summary>ดูการให้สิทธิตามมาตรา 35 ทั้ง 7 รูปแบบ</summary><ol><li>ให้สัมปทาน</li><li>จัดสถานที่จำหน่ายสินค้าหรือบริการ</li><li>จัดจ้างเหมาช่วงงานหรือจ้างเหมาบริการ (เช่น จ้างหมอนวดตาบอดมานวดให้พนักงาน)</li><li>ฝึกงาน</li><li>จัดให้มีอุปกรณ์หรือสิ่งอำนวยความสะดวก</li><li>จัดให้มีบริการล่ามภาษามือ</li><li>ให้ความช่วยเหลืออื่นใดแก่คนพิการหรือผู้ดูแลคนพิการ</li></ol></details>' +
-      '</section>' +
+      '</section>' + faqHTML(info) +
       '<section aria-labelledby="hAsk" class="askband"><h2 id="hAsk">มีคำถามก่อนตัดสินใจ</h2><p>คุยกับเจ้าหน้าที่สมาคมได้ในเวลาทำการ</p><div class="btns"><a class="btn js-tel" href="' + esc(tel) + '">โทร&nbsp;<span class="js-phone">' + esc(phShow || "สมาคม") + '</span></a>' +
       '<a class="btn ghost js-mail" href="' + (okMail ? "mailto:" + esc(info.email) : "#contact") + '"' + (okMail ? '' : ' hidden') + '>ส่งอีเมล</a></div></section>' +
       '</article>';
@@ -170,6 +199,6 @@
     SB: SB, APP: APP, KIND: KIND, SITE_NAME: SITE_NAME, LAW: LAW, PAGE: PAGE, POST_GONE: POST_GONE, LOADING: LOADING,
     esc: esc, imgUrl: imgUrl, thDate: thDate, renderBody: renderBody, card: card, errBox: errBox, listQ: listQ, postQ: postQ,
     parse: parse, canonPath: canonPath, meta: meta, homeHTML: homeHTML, latestHTML: latestHTML, listHTML: listHTML, listBody: listBody, moreBtn: moreBtn,
-    postHTML: postHTML, notFoundHTML: notFoundHTML, companyHTML: companyHTML, baht: baht, telHref: telHref, contactParts: contactParts, copyText: copyText
+    postHTML: postHTML, notFoundHTML: notFoundHTML, companyHTML: companyHTML, faqLD: faqLD, baht: baht, telHref: telHref, contactParts: contactParts, copyText: copyText
   };
 })(typeof globalThis !== "undefined" ? globalThis : this);

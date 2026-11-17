@@ -103,6 +103,10 @@ section[id],.offers{scroll-margin-top:96px}
 details.more7{margin:16px 0 0;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:0 16px}
 details.more7 summary{cursor:pointer;min-height:48px;display:flex;align-items:center;font-weight:700;color:var(--brand)}
 details.more7[open]{padding-bottom:12px}
+details.faq{background:var(--card);border:1px solid var(--line);border-radius:12px;margin:0 0 10px;padding:0 16px}
+details.faq summary{cursor:pointer;min-height:48px;display:flex;align-items:center;font-weight:600}
+details.faq p{margin:0 0 14px;color:var(--ink)}
+#faq h3{margin-top:18px}
 .askband{background:var(--soft);border-radius:var(--r);padding:20px;margin-top:32px}
 .askband h2{margin-bottom:4px}
 .askband p{margin:0 0 14px}
@@ -128,8 +132,8 @@ footer .copy{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);f
    <li><a href="/" data-nav data-k="home">หน้าแรก</a></li>
    <li><a href="/news/" data-nav data-k="news">ข่าวและบทความ</a></li>
    <li><a href="/company/" data-nav data-k="company">บริษัทและหน่วยงาน</a></li>
-   <li><a href="#contact">ติดต่อเรา</a></li>
    <li><a class="cta" href="https://massage-customer-bna.pages.dev/">จองนวด</a></li>
+   <li><a href="#contact">ติดต่อเรา</a></li>
   </ul></nav>
  </div>
 </header>
@@ -179,6 +183,7 @@ function fillCompany(){if(!CONTACT||!document.querySelector("#view .offers"))ret
  [].forEach.call(document.querySelectorAll("#view .js-tel"),function(a){a.setAttribute("href",tel)});
  var pp=V.contactParts(CONTACT),ph=String(CONTACT.phone||"").replace(/\D/g,"");if(ph)[].forEach.call(document.querySelectorAll("#view .js-phone"),function(x){x.textContent=ph.length===10?ph.slice(0,3)+"-"+ph.slice(3,6)+"-"+ph.slice(6):CONTACT.phone});
  if(pp.email)[].forEach.call(document.querySelectorAll("#view .js-mail"),function(a){a.setAttribute("href","mailto:"+CONTACT.email);a.hidden=false});
+ var fq=$("faq");if(fq&&pr){var open=[].map.call(fq.querySelectorAll("details"),function(d){return d.open});fq.outerHTML=V.companyHTML(companyInfo()).match(/<section aria-labelledby="hFaq"[\s\S]*?<\/section>/)[0];[].forEach.call($("faq").querySelectorAll("details"),function(d,i){d.open=!!open[i]})}
  if(V.parse(location.pathname,location.search).name==="company")setHead({name:"company"},null,companyInfo())}
 function loadWorks(){var el=$("works");if(!el)return;el.removeAttribute("data-pending");
  api(V.listQ("work",3)).then(function(a){if($("works")!==el)return;if(!a.length){var s=$("worksSec");if(s)s.remove();return}el.innerHTML='<ul class="grid">'+a.map(function(x){return V.card(x,3)}).join("")+'</ul>'},
