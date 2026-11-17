@@ -89,6 +89,19 @@ ok('back button returns to all items',await p.waitForFunction(()=>document.query
 await p.goto(BASE+'/news/?k=bogus');await p.waitForSelector('#list .card');
 ok('unknown filter treated as all',await p.$$eval('#list .card',a=>a.length)===12);
 
+// หน้าสำหรับบริษัท
+await p.goto(BASE+'/');await p.waitForSelector('#latest .card');
+ok('home: company box links to /company/ and to company registration',await p.evaluate(()=>!!document.querySelector('#view a[href="/company/"]')&&!!document.querySelector('#view a[href="https://massage-customer-bna.pages.dev/?company=1"]')));
+await p.click('nav.main a[href="/company/"]');await p.waitForSelector('#hLaw');
+H=await h1();ok('company: url, h1 focused, nav current',p.url()===BASE+'/company/'&&H.focus&&H.t==='สำหรับบริษัทและองค์กร'&&await p.evaluate(()=>document.querySelector('nav.main a[aria-current="page"]').textContent==='สำหรับบริษัท'));
+const ct=await p.textContent('#view');
+ok('company: office massage invite + steps + register button',ct.includes('จ้างหมอนวดตาบอดไปนวดที่บริษัท')&&ct.includes('ขั้นตอน')&&await p.$$eval('#view a[href="https://massage-customer-bna.pages.dev/?company=1"]',a=>a.length)>=2);
+ok('company: law facts (100:1, เศษเกิน 50, ม.33/34/35, 365 วัน)',['ทุก 100 คน ต่อคนพิการ 1 คน','เศษเกิน 50 คน','มาตรา 33','มาตรา 34','มาตรา 35','365 วัน','พ.ศ. 2550'].every(t=>ct.includes(t)));
+ok('company: s35 has 7 forms, value, filing period, where, hotline',await p.evaluate(()=>{const o=[...document.querySelectorAll('#view ol')].find(x=>x.textContent.includes('สัมปทาน'));return !!o&&o.children.length===7})&&ct.includes('123,005 บาท')&&ct.includes('1 ตุลาคม ถึง 31 ธันวาคม')&&ct.includes('e-service.doe.go.th')&&!!await p.$('#view a[href="tel:1506"]'));
+ok('company: headings in order (h1 > h2 > h3), source/date note',await p.evaluate(()=>{const hs=[...document.querySelectorAll('#view h1,#view h2,#view h3')].map(h=>+h.tagName[1]);return hs[0]===1&&hs.every((v,i)=>i===0||v<=hs[i-1]+1)})&&ct.includes('ปรับปรุงเมื่อพฤศจิกายน 2569'));
+ok('company: tab title',(await p.title()).startsWith('สำหรับบริษัทและองค์กร | '));
+await p.goto(BASE+'/company/');await p.waitForSelector('#hLaw');ok('company: direct link works',(await h1()).t==='สำหรับบริษัทและองค์กร');
+
 // ว่าง / โหลดไม่สำเร็จแล้วลองใหม่
 DB=[];await p.goto(BASE+'/');await p.waitForSelector('#latest .empty');ok('home: empty message when no news',(await p.textContent('#latest')).includes('ยังไม่มีข่าว'));
 DB=mk();FAIL=true;await p.goto(BASE+'/news/');await p.waitForSelector('#list [role="alert"]');ok('list: error box with retry',!!await p.$('#list button[data-retry]'));
@@ -100,6 +113,7 @@ const mp=await m.newPage();mp.on('pageerror',e=>errs.push('mobile: '+e.message))
 ok('mobile 360px: no sideways scroll',await mp.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1));
 await mp.goto(BASE+'/');await mp.waitForSelector('#latest .card');
 ok('mobile home: no sideways scroll',await mp.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1));
+await mp.goto(BASE+'/company/');await mp.waitForSelector('#hLaw');ok('mobile company: no sideways scroll',await mp.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1));
 ok('mobile: buttons and nav links at least 44px tall',await mp.evaluate(()=>[].every.call(document.querySelectorAll('nav.main a, .btn'),a=>a.getBoundingClientRect().height>=44)));
 
 console.log('errors:',errs.join('|')||'none');ok('no page errors',errs.length===0);await b.close();srv.close();process.exit(0)})();

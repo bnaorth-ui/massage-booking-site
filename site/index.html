@@ -82,6 +82,12 @@ article.post figcaption{color:var(--mute);font-size:15px}
 .body h2{margin:1.4em 0 .5em;font-size:23px}
 .body ul{margin:0 0 1em;padding-left:1.3em}
 .lead{font-size:20px;color:var(--mute)}
+article.post.wide{max-width:820px}
+article.post section{margin-top:28px}
+article.post h3{font-size:20px;margin:1.2em 0 .4em}
+article.post ol,article.post ul{padding-left:1.4em}
+article.post li{margin:0 0 6px}
+.note{color:var(--mute);font-size:15px;margin-top:20px}
 .crumb{font-size:16px}
 .share{margin-top:28px;border-top:1px solid var(--line);padding-top:18px}
 .share .btns .btn{min-height:44px}
@@ -102,6 +108,7 @@ footer p{margin:0 0 6px}
   <nav class="main" aria-label="เมนูหลัก"><ul>
    <li><a href="/" data-nav data-k="home">หน้าแรก</a></li>
    <li><a href="/news/" data-nav data-k="news">ข่าวและบทความ</a></li>
+   <li><a href="/company/" data-nav data-k="company">สำหรับบริษัท</a></li>
    <li><a href="#contact">ติดต่อเรา</a></li>
    <li><a class="cta" href="https://massage-customer-bna.pages.dev/">จองนวด</a></li>
   </ul></nav>
@@ -121,7 +128,7 @@ footer p{margin:0 0 6px}
 <script>
 "use strict";
 var SB={url:"https://dwdnmfwepydyweeqfdxn.supabase.co",key:"sb_publishable_4xaAEuN8jFIxGjyhtzABow_FsbGcoI3"};
-var APP={book:"https://massage-customer-bna.pages.dev/",shop:"https://massage-shop-bna.pages.dev/reg/",staff:"https://massage-staff-bna.pages.dev/apply/"};
+var APP={book:"https://massage-customer-bna.pages.dev/",shop:"https://massage-shop-bna.pages.dev/reg/",staff:"https://massage-staff-bna.pages.dev/apply/",company:"https://massage-customer-bna.pages.dev/?company=1"};
 var KIND={news:"ข่าวและกิจกรรม",article:"บทความ"};
 var SITE_NAME="สมาคมวิทยากรฝึกอาชีพคนตาบอด";
 var LIST_COLS="no,kind,title,summary,cover_path,cover_alt,day,pinned";
@@ -159,6 +166,7 @@ function focusH1(){var h=document.querySelector("#view h1");if(h){h.setAttribute
 function homeView(){markNav("home");setHead("","");
  $("view").innerHTML='<div class="hero"><h1>นวดไทยโดยหมอนวดตาบอด ที่ขึ้นทะเบียนถูกต้อง</h1><p>หมอนวดของเราเป็นคนพิการทางการเห็นที่ขึ้นทะเบียนกับกรมสนับสนุนบริการสุขภาพ กระทรวงสาธารณสุข จองคิวกับร้านนวดใกล้บ้านได้ทันที</p><div class="btns"><a class="btn" href="'+APP.book+'">จองนวดออนไลน์</a><a class="btn ghost" href="/news/" data-nav>อ่านข่าวและบทความ</a></div></div>'+
  '<section aria-labelledby="hLatest"><div class="secHead"><h2 id="hLatest">ข่าวและบทความล่าสุด</h2><a href="/news/" data-nav>ดูทั้งหมด</a></div><div id="latest"><p>กำลังโหลด...</p></div></section>'+
+ '<section aria-labelledby="hBiz"><h2 id="hBiz">สำหรับบริษัทและองค์กร</h2><div class="box"><h3>จ้างหมอนวดตาบอดไปนวดที่บริษัท</h3><p>ดูแลพนักงานที่นั่งทำงานนาน พร้อมสร้างอาชีพให้คนตาบอด และใช้เป็นการจ้างงานคนพิการตามมาตรา 33 หรือมาตรา 35 ได้</p><div class="btns"><a class="btn" href="/company/" data-nav>ดูรายละเอียด</a><a class="btn ghost" href="'+APP.company+'">ลงทะเบียนบริษัท</a></div></div></section>'+
  '<section aria-labelledby="hJoin"><h2 id="hJoin">ร่วมงานกับเรา</h2><div class="cols"><div class="box"><h3>สมัครเปิดร้านนวด</h3><p>ร้านนวดที่จดทะเบียนถูกต้อง สมัครเข้าระบบเพื่อรับคิวจากลูกค้าออนไลน์</p><a class="btn" href="'+APP.shop+'">สมัครเปิดร้าน</a></div><div class="box"><h3>สมัครเป็นหมอนวด</h3><p>หมอนวดที่ขึ้นทะเบียนแล้ว สมัครเพื่อรับงานจากร้านและหน่วยงานในระบบ</p><a class="btn" href="'+APP.staff+'">สมัครเป็นหมอนวด</a></div></div></section>'+
  '<section aria-labelledby="hHow"><h2 id="hHow">จองนวดง่ายๆ 3 ขั้นตอน</h2><div class="box"><ol class="steps"><li>เลือกร้านนวดใกล้คุณ และเลือกบริการที่ต้องการ</li><li>เลือกวัน เวลา และหมอนวด</li><li>เข้าสู่ระบบด้วยเบอร์โทร แล้วยืนยันการจอง เลื่อนหรือยกเลิกเองได้ภายหลัง</li></ol><p style="margin:14px 0 0"><a class="btn" href="'+APP.book+'">เริ่มจองนวด</a></p></div></section>';
  loadLatest();focusH1()}
@@ -194,8 +202,31 @@ function postView(no){markNav("news");$("view").innerHTML='<p>กำลังโ
   focusH1()},function(){$("view").innerHTML='<h1>ข่าวและบทความ</h1>'+errBox();focusH1()})}
 function notFound(msg){markNav("");setHead("ไม่พบหน้านี้","");$("view").innerHTML='<h1>ไม่พบหน้านี้</h1><p>'+esc(msg||"ลิงก์อาจไม่ถูกต้อง หรือหน้านี้ถูกย้ายไปแล้ว")+'</p><div class="btns"><a class="btn" href="/" data-nav>ไปหน้าแรก</a><a class="btn ghost" href="/news/" data-nav>ข่าวและบทความ</a></div>';focusH1()}
 
+/* หน้า "สำหรับบริษัท": ชวนจ้างหมอนวดตาบอดไปนวดที่บริษัท และอธิบายการจ้างงานคนพิการตามมาตรา 33 34 35
+   ข้อมูลกฎหมายตรวจเมื่อ พ.ย. 2569 (กรมการจัดหางาน, กรมส่งเสริมและพัฒนาคุณภาพชีวิตคนพิการ) ตัวเลขมูลค่าเปลี่ยนทุกปี ปรับที่ LAW */
+var LAW={updated:"พฤศจิกายน 2569",s35Value:"123,005",s35Year:"2570"};
+function companyView(){markNav("company");setHead("สำหรับบริษัทและองค์กร","จ้างหมอนวดตาบอดที่ขึ้นทะเบียนถูกต้องไปนวดให้พนักงานที่บริษัท และข้อมูลการจ้างงานคนพิการตามมาตรา 33 มาตรา 34 และมาตรา 35");
+ var cta='<div class="btns"><a class="btn" href="'+APP.company+'">ลงทะเบียนบริษัท</a><a class="btn ghost" href="#contact">ติดต่อสมาคม</a></div>';
+ $("view").innerHTML='<article class="post wide"><h1>สำหรับบริษัทและองค์กร</h1><p class="lead">ดูแลสุขภาพพนักงาน พร้อมสร้างอาชีพที่มั่นคงให้คนตาบอด</p>'+
+ '<section aria-labelledby="hOffice"><h2 id="hOffice">จ้างหมอนวดตาบอดไปนวดที่บริษัท</h2>'+
+ '<p>บริษัท ร้านค้า หรือหน่วยงานที่อยากให้พนักงานได้ผ่อนคลายจากการนั่งทำงานนาน (ออฟฟิศซินโดรม) จ้างหมอนวดของสมาคมไปนวดที่บริษัทได้ หมอนวดทุกคนเป็นคนพิการทางการเห็นที่ขึ้นทะเบียนกับกรมสนับสนุนบริการสุขภาพ กระทรวงสาธารณสุข</p>'+
+ '<ul><li>เลือกจำนวนหมอนวด วันในสัปดาห์ และเวลาที่ต้องการได้</li><li>เจ้าหน้าที่สมาคมจัดหมอนวดประจำให้ตามวันที่ตกลงกัน</li><li>ใช้เป็นการจ้างงานคนพิการตามกฎหมายได้ เลือกจ้างตามมาตรา 33 หรือมาตรา 35 ได้ในใบลงทะเบียน</li><li>ถ้าไม่ต้องการให้มานวดที่บริษัท ให้หมอนวดไปทำงานที่องค์กรสาธารณประโยชน์แทนก็ได้</li></ul>'+
+ '<h3>ขั้นตอน</h3><ol class="steps"><li>กด "ลงทะเบียนบริษัท" เข้าสู่ระบบหรือสมัครสมาชิกด้วยเบอร์โทร แล้วกรอกข้อมูลบริษัท จำนวนหมอนวด และรูปแบบการจ้าง</li><li>เจ้าหน้าที่สมาคมติดต่อกลับเพื่อคุยรายละเอียดและทำสัญญา</li><li>หมอนวดเริ่มงานตามวันที่ตกลง ดูสถานะใบสมัครและตารางงานได้ในแอป</li></ol>'+cta+'</section>'+
+ '<section aria-labelledby="hLaw"><h2 id="hLaw">การจ้างงานคนพิการตามกฎหมาย (มาตรา 33, 34, 35)</h2>'+
+ '<p>พระราชบัญญัติส่งเสริมและพัฒนาคุณภาพชีวิตคนพิการ พ.ศ. 2550 และที่แก้ไขเพิ่มเติม กำหนดให้นายจ้าง เจ้าของสถานประกอบการ และหน่วยงานของรัฐ ที่มีลูกจ้างตั้งแต่ 100 คนขึ้นไป รับคนพิการเข้าทำงานในอัตรา <b>ลูกจ้างที่ไม่ใช่คนพิการทุก 100 คน ต่อคนพิการ 1 คน</b> ถ้ามีเศษเกิน 50 คน ให้จ้างเพิ่มอีก 1 คน</p>'+
+ '<p>ตัวอย่าง: ลูกจ้าง 140 คน ต้องจ้างคนพิการ 1 คน, ลูกจ้าง 160 คน ต้องจ้าง 2 คน</p>'+
+ '<div class="cols"><div class="box"><h3>มาตรา 33: จ้างคนพิการเข้าทำงาน</h3><p>รับคนพิการเป็นลูกจ้างของบริษัทโดยตรง เช่น จ้างหมอนวดตาบอดเป็นพนักงานประจำเพื่อนวดให้พนักงานในบริษัท</p></div>'+
+ '<div class="box"><h3>มาตรา 34: ส่งเงินเข้ากองทุน</h3><p>ถ้าไม่จ้างตามมาตรา 33 ต้องส่งเงินเข้ากองทุนส่งเสริมและพัฒนาคุณภาพชีวิตคนพิการ คำนวณจากอัตราค่าจ้างขั้นต่ำต่ำสุด คูณ 365 วัน คูณจำนวนคนพิการที่ไม่ได้จ้าง</p></div>'+
+ '<div class="box"><h3>มาตรา 35: ให้สิทธิแทนการจ้าง</h3><p>ถ้าไม่จ้างตามมาตรา 33 และไม่ส่งเงินตามมาตรา 34 ให้สิทธิแก่คนพิการหรือผู้ดูแลคนพิการแทนได้ มูลค่าไม่น้อยกว่า '+LAW.s35Value+' บาทต่อคนต่อปี (ปีงบประมาณ '+LAW.s35Year+')</p></div></div>'+
+ '<h3>การให้สิทธิตามมาตรา 35 มี 7 รูปแบบ</h3><ol><li>ให้สัมปทาน</li><li>จัดสถานที่จำหน่ายสินค้าหรือบริการ</li><li>จัดจ้างเหมาช่วงงานหรือจ้างเหมาบริการ (เช่น จ้างหมอนวดตาบอดมานวดให้พนักงาน)</li><li>ฝึกงาน</li><li>จัดให้มีอุปกรณ์หรือสิ่งอำนวยความสะดวก</li><li>จัดให้มีบริการล่ามภาษามือ</li><li>ให้ความช่วยเหลืออื่นใดแก่คนพิการหรือผู้ดูแลคนพิการ</li></ol>'+
+ '<p>บริษัทยื่นแจ้งการให้สิทธิตามมาตรา 35 ได้ทุกปี ระหว่างวันที่ 1 ตุลาคม ถึง 31 ธันวาคม ที่สำนักงานจัดหางานจังหวัด หรือสำนักงานจัดหางานกรุงเทพมหานครพื้นที่ 1 ถึง 10 หรือทางเว็บไซต์ <a href="https://e-service.doe.go.th/" rel="noopener" target="_blank">e-service.doe.go.th<span class="sr"> (เปิดหน้าต่างใหม่)</span></a> สอบถามได้ที่สายด่วนกระทรวงแรงงาน <a href="tel:1506">1506</a> กด 2</p>'+
+ '<div class="box"><h3>สมาคมช่วยบริษัทได้</h3><p>สมาคมจัดหาหมอนวดตาบอดให้บริษัทที่ต้องการจ้างตามมาตรา 33 หรือให้สิทธิตามมาตรา 35 แบบจ้างเหมาบริการ และช่วยประสานรายละเอียดกับบริษัท</p>'+cta+'</div>'+
+ '<p class="note">ข้อมูลนี้เป็นข้อมูลเบื้องต้นจากกรมการจัดหางานและกรมส่งเสริมและพัฒนาคุณภาพชีวิตคนพิการ ปรับปรุงเมื่อ'+LAW.updated+' ตัวเลขและขั้นตอนอาจเปลี่ยนทุกปี กรุณาตรวจสอบกับหน่วยงานดังกล่าวก่อนดำเนินการ</p>'+
+ '</section></article>';
+ focusH1()}
 function route(){var p=location.pathname.replace(/\/index\.html$/,"/").replace(/\/+$/,"")||"/",m;
  if(p==="/")return homeView();
+ if(p==="/company")return companyView();
  if(p==="/news")return listView(new URLSearchParams(location.search).get("k")||"");
  if((m=p.match(/^\/news\/(\d{1,9})$/)))return postView(+m[1]);
  notFound()}

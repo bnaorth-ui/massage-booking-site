@@ -42,7 +42,7 @@ ok('bad number: plain page, no database call',ASKED.length===0&&(await r.text())
 
 ROWS=[{no:2,day:'2026-11-01',updated_at:'2026-11-05T10:00:00Z'},{no:1,day:'2026-10-01'}];
 r=await sm.onRequestGet({request:new Request('https://massage-home-bna.pages.dev/sitemap.xml')});h=await r.text();
-ok('sitemap: xml with home, list and each published article',/application\/xml/.test(r.headers.get('Content-Type'))&&h.includes('<loc>https://massage-home-bna.pages.dev/</loc>')&&h.includes('<loc>https://massage-home-bna.pages.dev/news/</loc>')&&h.includes('<loc>https://massage-home-bna.pages.dev/news/2</loc><lastmod>2026-11-05</lastmod>')&&h.includes('/news/1</loc><lastmod>2026-10-01</lastmod>'));
+ok('sitemap: xml with home, list and each published article',/application\/xml/.test(r.headers.get('Content-Type'))&&h.includes('<loc>https://massage-home-bna.pages.dev/</loc>')&&h.includes('<loc>https://massage-home-bna.pages.dev/company/</loc>')&&h.includes('<loc>https://massage-home-bna.pages.dev/news/</loc>')&&h.includes('<loc>https://massage-home-bna.pages.dev/news/2</loc><lastmod>2026-11-05</lastmod>')&&h.includes('/news/1</loc><lastmod>2026-10-01</lastmod>'));
 ok('sitemap: asks only for published',ASKED.pop().u.includes('active=eq.true'));
 FAIL=true;h=await (await sm.onRequestGet({request:new Request('https://a.b/sitemap.xml')})).text();FAIL=false;
 ok('sitemap: database down still gives home + list',h.includes('<loc>https://a.b/</loc>')&&!h.includes('/news/1'));
@@ -54,6 +54,8 @@ h=await (await mw.onRequest({request:new Request('https://massage-home-bna.pages
 ok('home: canonical, og:url and full share image added',h.includes('<link rel="canonical" href="https://massage-home-bna.pages.dev/">')&&h.includes('<meta property="og:url" content="https://massage-home-bna.pages.dev/">')&&h.includes('content="https://massage-home-bna.pages.dev/og-share.png"')&&h.includes('<title>สมาคมวิทยากรฝึกอาชีพคนตาบอด | ข่าวสารและบทความ'));
 h=await (await mw.onRequest({request:new Request('https://massage-home-bna.pages.dev/news/?k=article'),next})).text();
 ok('list page: canonical keeps the filter',h.includes('<link rel="canonical" href="https://massage-home-bna.pages.dev/news/?k=article">'));
+h=await (await mw.onRequest({request:new Request('https://massage-home-bna.pages.dev/company/'),next})).text();
+ok('company page: canonical /company/',h.includes('<link rel="canonical" href="https://massage-home-bna.pages.dev/company/">'));
 const png=new Response('PNG',{headers:{'Content-Type':'image/png'}});
 r=await mw.onRequest({request:new Request('https://massage-home-bna.pages.dev/icon-192.png'),next:async()=>png});
 ok('other files passed through untouched',r===png);
