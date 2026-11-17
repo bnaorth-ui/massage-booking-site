@@ -23,9 +23,13 @@ export async function onRequest(ctx) {
 
   let r = V.parse(u.pathname, u.search);
   const contactP = sbRpc('public_contact').catch(() => null);
-  let view = null, status = 200, art = null;
+  let view = null, status = 200, art = null, info = null;
   if (r.name === 'home') view = V.homeHTML(await sbGet(V.listQ(null, 6)).catch(() => null));
-  else if (r.name === 'company') view = V.companyHTML();
+  else if (r.name === 'company') {
+    const [c, w] = await Promise.all([contactP, sbGet(V.listQ('work', 3)).catch(() => null)]);
+    info = { rate: c && c.org_rate, phone: c && c.phone, works: w };
+    view = V.companyHTML(info);
+  }
   else if (r.name === 'list') view = V.listHTML(r.kind, await sbGet(V.listQ(r.kind, V.PAGE + 1, 0)).catch(() => null));
   else if (r.name === 'post') {
     let rows;
@@ -40,7 +44,7 @@ export async function onRequest(ctx) {
   if (!html.includes('<div class="wrap" id="view">')) return new Response(html, { status: res.status, headers: res.headers }); // ไม่ใช่หน้าเว็บหลัก ส่งต่อตามเดิม
   const cp = V.canonPath(r);
   const url = cp ? u.origin + cp : null;
-  const m = V.meta(r, art);
+  const m = V.meta(r, art, info);
   const org = { '@context': 'https://schema.org', '@type': 'Organization', name: V.SITE_NAME, url: u.origin + '/', logo: u.origin + '/icon-512.png' };
   if (contact && contact.phone) org.telephone = String(contact.phone);
   if (contact && contact.email) org.email = String(contact.email);

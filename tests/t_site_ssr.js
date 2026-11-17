@@ -26,7 +26,7 @@ const b=await chromium.launch(C.launch);const errs=[];
 // ปิดสคริปต์: เห็นเนื้อหาครบ
 const nj=await b.newContext({javaScriptEnabled:false,locale:'th-TH'});const np=await nj.newPage();
 await np.goto(BASE+'/company/');
-ok('no-JS: company content visible',(await np.textContent('#view')).includes('มาตรา 35: ให้สิทธิแทนการจ้าง')&&(await np.textContent('h1'))==='สำหรับบริษัทและองค์กร');
+ok('no-JS: company content visible',(await np.textContent('#view')).includes('มาตรา 35: ให้สิทธิแทนการจ้าง')&&(await np.textContent('h1'))==='สำหรับบริษัทและหน่วยงาน');
 await np.goto(BASE+'/');ok('no-JS: home shows latest news and contact',await np.$$eval('#latest .card',a=>a.length)===6&&(await np.textContent('#cEmail')).includes('info@example.org'));
 await np.goto(BASE+'/news/4');ok('no-JS: article body visible',(await np.textContent('.body'))==='เนื้อหา 4');
 await nj.close();

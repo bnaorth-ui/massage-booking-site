@@ -13,8 +13,9 @@ const mw=await imp('functions/_middleware.js'),sm=await imp('functions/sitemap.x
 const INDEX=fs.readFileSync(path.join(SITE,'index.html'),'utf8');
 const next=async()=>new Response(INDEX,{headers:{'Content-Type':'text/html; charset=utf-8'}});
 const ROWS=[{no:7,kind:'news',title:'อบรม "หมอนวด" <รุ่น 2>',summary:'สรุปข่าว & กิจกรรม',body:'ย่อหน้าแรก\n\n## หัวข้อย่อย\n- ข้อหนึ่ง',cover_path:'place-images/00000000-0000-0000-0000-000000000000/site-x.jpg',cover_alt:'ภาพการอบรม',day:'2026-11-17',updated_at:'2026-11-18T01:00:00Z',pinned:true,active:true},
+ {no:9,kind:'work',title:'นวดให้พนักงานบริษัท ก',summary:'',body:'x',cover_path:'place-images/x/site-w.jpg',cover_alt:'หมอนวดกำลังนวด',day:'2026-11-01',pinned:false,active:true},
  {no:8,kind:'article',title:'ประโยชน์ของการนวด',summary:'',body:'เนื้อหา',cover_path:null,cover_alt:'',day:'2026-11-10',pinned:false,active:true}];
-let FAIL=false,ASKED=[],CONTACT={name:'สมาคมวิทยากรฝึกอาชีพคนตาบอด',phone:'0989983654',email:'info@example.org',hours:'จันทร์ - ศุกร์ 09:00 - 17:00 น.'};
+let FAIL=false,ASKED=[],CONTACT={name:'สมาคมวิทยากรฝึกอาชีพคนตาบอด',phone:'0989983654',email:'info@example.org',hours:'จันทร์ - ศุกร์ 09:00 - 17:00 น.',org_rate:400};
 global.fetch=async(u,o)=>{u=String(u);ASKED.push({u,h:o&&o.headers});if(FAIL)return new Response('x',{status:500});
  const J=x=>new Response(JSON.stringify(x),{headers:{'Content-Type':'application/json'}});
  if(u.includes('/rpc/public_contact'))return J(CONTACT);
@@ -30,7 +31,7 @@ const titleOf=h=>(h.match(/<title>([^<]*)<\/title>/)||[])[1];
 // หน้าแรก
 let {r,h}=await get('/');
 ok('home: 200 html, short cache',r.status===200&&/text\/html/.test(r.headers.get('Content-Type'))&&r.headers.get('Cache-Control')==='public, max-age=60');
-ok('home: content in page without script (h1, sections, latest news)',view(h).includes('<h1>นวดไทยโดยหมอนวดตาบอด ที่ขึ้นทะเบียนถูกต้อง</h1>')&&view(h).includes('สำหรับบริษัทและองค์กร')&&view(h).includes('href="/news/7"')&&!view(h).includes('data-pending')&&h.includes('data-ssr="/"'));
+ok('home: content in page without script (h1, sections, latest news)',view(h).includes('<h1>นวดไทยโดยหมอนวดตาบอด ที่ขึ้นทะเบียนถูกต้อง</h1>')&&view(h).includes('สำหรับบริษัทและหน่วยงาน')&&view(h).includes('href="https://massage-customer-bna.pages.dev/?orgreq=1"')&&view(h).includes('href="/news/7"')&&!view(h).includes('data-pending')&&h.includes('data-ssr="/"'));
 ok('home: title and description for home',titleOf(h)==='นวดไทยโดยหมอนวดตาบอดที่ขึ้นทะเบียนถูกต้อง | สมาคมวิทยากรฝึกอาชีพคนตาบอด'&&h.includes('<meta name="description" content="นวดแผนไทยโดยหมอนวดตาบอด'));
 ok('home: canonical, og:url, full share image, og:type website',h.includes('<link rel="canonical" href="'+B+'/">')&&h.includes('<meta property="og:url" content="'+B+'/">')&&h.includes('<meta property="og:image" content="'+B+'/og-share.png">')&&h.includes('<meta property="og:type" content="website">'));
 let L=ld(h);ok('home: Organization data uses this site (no unverified domain), phone and email',L.length===1&&L[0].j['@type']==='Organization'&&L[0].j.url===B+'/'&&L[0].j.logo===B+'/icon-512.png'&&L[0].j.telephone==='0989983654'&&L[0].j.email==='info@example.org'&&!h.includes('bna.or.th'));
@@ -41,8 +42,12 @@ ok('page script still there',h.includes('function start()')&&h.includes('<script
 
 // หน้าสำหรับบริษัท
 ({r,h}=await get('/company/'));
-ok('company: law content in page without script',view(h).includes('<h1>สำหรับบริษัทและองค์กร</h1>')&&view(h).includes('มาตรา 35: ให้สิทธิแทนการจ้าง')&&view(h).includes('123,005')&&h.includes('data-ssr="/company/"'));
-ok('company: own title, description, canonical',titleOf(h)==='จ้างหมอนวดตาบอดไปนวดที่บริษัท และจ้างงานคนพิการ มาตรา 33, 35 | สมาคมวิทยากรฝึกอาชีพคนตาบอด'&&h.includes('<meta name="description" content="จ้างหมอนวดตาบอดที่ขึ้นทะเบียนถูกต้องไปนวดให้พนักงาน')&&h.includes('<meta property="og:title" content="จ้างหมอนวดตาบอดไปนวดที่บริษัท')&&h.includes('<link rel="canonical" href="'+B+'/company/">')&&h.includes('data-k="company" aria-current="page">'));
+ok('company: law content in page without script',view(h).includes('<h1>สำหรับบริษัทและหน่วยงาน</h1>')&&view(h).includes('มาตรา 35: ให้สิทธิแทนการจ้าง')&&view(h).includes('123,005')&&h.includes('data-ssr="/company/"'));
+ok('company: own title, description with price, canonical',titleOf(h)==='นวดออฟฟิศซินโดรมให้พนักงาน และจ้างงานคนพิการ มาตรา 33, 35 | สมาคมวิทยากรฝึกอาชีพคนตาบอด'&&h.includes('<meta name="description" content="จ้างหมอนวดตาบอดที่ขึ้นทะเบียนถูกต้องไปนวดออฟฟิศซินโดรมให้พนักงานที่บริษัท 400 บาท ต่อหมอนวด 1 คน ต่อชั่วโมง (กรุงเทพฯ)')&&h.includes('<meta property="og:title" content="นวดออฟฟิศซินโดรมให้พนักงาน')&&h.includes('<link rel="canonical" href="'+B+'/company/">')&&h.includes('data-k="company" aria-current="page">'));
+ok('company: price, phone links and works in page without script',view(h).includes('<b class="js-rate">400 บาท</b> <span class="js-rate-unit">ต่อหมอนวด 1 คน ต่อชั่วโมง</span>')&&(view(h).match(/<a class="btn ghost js-tel" href="tel:0989983654">โทรสอบถาม<\/a>/g)||[]).length>=4&&view(h).includes('id="worksSec"')&&view(h).includes('href="/news/9"')&&!view(h).includes('data-pending'));
+ROWS.find(x=>x.no===9).active=false;({h}=await get('/company/'));ok('company: no published works -> works section left out',!view(h).includes('worksSec')&&!view(h).includes('data-pending'));ROWS.find(x=>x.no===9).active=true;
+CONTACT.org_rate=null;({h}=await get('/company/'));ok('company: no rate set -> "ดูราคาในแอป", unit hidden, no price in description',view(h).includes('<b class="js-rate">ดูราคาในแอป</b> <span class="js-rate-unit" hidden>')&&!h.includes('บาท ต่อหมอนวด 1 คน ต่อชั่วโมง (กรุงเทพฯ)'));CONTACT.org_rate=400;
+({h}=await get('/news/?k=work'));ok('list ผลงานบริการ: own title/description, only work items',titleOf(h)==='ผลงานบริการ | สมาคมวิทยากรฝึกอาชีพคนตาบอด'&&h.includes('<meta name="description" content="หน่วยงานและบริษัทที่')&&view(h).includes('href="/news/9"')&&!view(h).includes('href="/news/7"'));
 ({h}=await get('/company'));ok('company without slash: canonical still /company/',h.includes('<link rel="canonical" href="'+B+'/company/">'));
 
 // หน้ารวม

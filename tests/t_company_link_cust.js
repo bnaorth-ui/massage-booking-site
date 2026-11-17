@@ -102,8 +102,20 @@ ok('after login opens company registration form',await p.waitForSelector('#capf'
 const p2=await ctx.newPage();p2.on('pageerror',e=>errs.push('p2: '+e.message));
 await p2.goto(require('./config').page('customer-booking.html')+'?company=1');
 ok('logged-in via link: form opens directly (no login screen)',await p2.waitForSelector('#capf',{timeout:6000}).then(()=>true,()=>false)&&!(await p2.$('#lph')));
+// ?orgreq=1 (ปุ่ม "ขอบริการสำหรับหน่วยงาน" บนเว็บ) ตอนล็อกอินอยู่: เปิดหน้าขอบริการสำหรับหน่วยงานทันที
+const p4=await ctx.newPage();p4.on('pageerror',e=>errs.push('p4: '+e.message));
+await p4.goto(require('./config').page('customer-booking.html')+'?orgreq=1');
+ok('logged-in via orgreq link: org service request form opens',await p4.waitForFunction(()=>document.getElementById('app').textContent.includes('ขอบริการสำหรับหน่วยงาน')&&document.getElementById('app').textContent.includes('ขั้นตอนง่าย ๆ 4 ข้อ'),null,{timeout:6000}).then(()=>true,()=>false)&&!p4.url().includes('orgreq'));
 // ไม่มีลิงก์: หน้าแรกปกติ ไม่เปิดฟอร์มเอง
 const p3=await ctx.newPage();await p3.goto(require('./config').page('customer-booking.html'));await p3.waitForTimeout(1500);
 ok('without link: form not opened by itself',!(await p3.$('#capf')));
+// ?orgreq=1 ตอนยังไม่ล็อกอิน (ล้างการล็อกอินของเครื่องนี้ก่อน): ขึ้นหน้าเข้าสู่ระบบพร้อมข้อความ แล้วพาไปหน้าขอบริการหลังล็อกอิน
+const p5=await ctx.newPage();p5.on('pageerror',e=>errs.push('p5: '+e.message));
+await p5.goto(require('./config').page('customer-booking.html'));await p5.evaluate(()=>{localStorage.clear();sessionStorage.clear()});
+await p5.goto(require('./config').page('customer-booking.html')+'?orgreq=1');
+ok('guest via orgreq link: login form with org-request message',await p5.waitForSelector('#rph,#lph',{timeout:6000}).then(()=>true,()=>false)&&(await p5.textContent('#app')).includes('ก่อนส่งคำขอสำหรับหน่วยงาน'));
+if(await p5.$('[data-ag=login]'))await p5.click('[data-ag=login]');
+await p5.waitForSelector('#lph');await p5.fill('#lph','0811111111');await p5.fill('#lpw','abc123');await p5.click('button[type=submit]');
+ok('after login opens org service request form',await p5.waitForFunction(()=>document.getElementById('app').textContent.includes('ขั้นตอนง่าย ๆ 4 ข้อ'),null,{timeout:6000}).then(()=>true,()=>false));
 console.log('errors:',errs.join('|')||'none');ok('no page errors',errs.length===0);await b.close();process.exit(0)
 })()

@@ -87,6 +87,19 @@ article.post h3{font-size:20px;margin:1.2em 0 .4em}
 article.post ol,article.post ul{padding-left:1.4em}
 article.post li{margin:0 0 6px}
 .note{color:var(--mute);font-size:15px;margin-top:20px}
+section[id],.offers{scroll-margin-top:96px}
+.offers{margin:20px 0 8px;align-items:stretch}
+.offer{display:flex;flex-direction:column;border-width:2px}
+.offer h2{font-size:22px;margin:6px 0 4px}
+.offer ul{margin:4px 0 16px;padding-left:1.2em;color:var(--ink)}
+.offer .btns{margin-top:auto}
+.offer .sub{margin:10px 0 0;font-size:16px}
+.badge{align-self:flex-start;display:inline-block;border-radius:999px;padding:2px 14px;font-size:15px;font-weight:700;color:#fff}
+.badge.once{background:#1b7f4d}.badge.regular{background:#1d5fa8}
+@media (prefers-color-scheme:dark){.badge.once{background:#5fd1a8;color:#08201a}.badge.regular{background:#8ab8f0;color:#0b1d33}}
+.price{margin:2px 0 10px;color:var(--ink)}
+.price b{font-size:24px;color:var(--brand)}
+.tagline{margin:2px 0 10px;font-weight:700;color:var(--brand)}
 .crumb{font-size:16px}
 .share{margin-top:28px;border-top:1px solid var(--line);padding-top:18px}
 .share .btns .btn{min-height:44px}
@@ -108,7 +121,7 @@ footer .copy{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);f
   <nav class="main" aria-label="เมนูหลัก"><ul>
    <li><a href="/" data-nav data-k="home">หน้าแรก</a></li>
    <li><a href="/news/" data-nav data-k="news">ข่าวและบทความ</a></li>
-   <li><a href="/company/" data-nav data-k="company">สำหรับบริษัท</a></li>
+   <li><a href="/company/" data-nav data-k="company">บริษัทและหน่วยงาน</a></li>
    <li><a href="#contact">ติดต่อเรา</a></li>
    <li><a class="cta" href="https://massage-customer-bna.pages.dev/">จองนวด</a></li>
   </ul></nav>
@@ -131,14 +144,14 @@ footer .copy{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);f
 <script>
 "use strict";
 /* ข้อความและหน้าตาเนื้อหาอยู่ใน /shared/views.js (ใช้ร่วมกับ Cloudflare ที่ใส่เนื้อหาลงหน้าตั้งแต่ตอนส่ง) ไฟล์นี้จัดการการกดเปลี่ยนหน้า โหลดข้อมูล และปุ่มต่างๆ */
-var V=window.SV,cache={};
+var V=window.SV,cache={},CONTACT=null;
 function $(id){return document.getElementById(id)}
 function api(path,opt){opt=opt||{};var h={apikey:V.SB.key,Authorization:"Bearer "+V.SB.key};if(opt.body)h["Content-Type"]="application/json";
  return fetch(V.SB.url+path,{method:opt.method||"GET",headers:h,body:opt.body}).then(function(r){if(!r.ok)throw r;return r.json()})}
 function canShare(){return !!navigator.share&&/Android|iPhone|iPad/i.test(navigator.userAgent)}
 function shareLabel(){return canShare()?"แชร์ทางอื่น":"คัดลอกลิงก์"}
 function say(t){var l=$("live");l.textContent="";setTimeout(function(){l.textContent=t},50)}
-function setHead(r,a){var m=V.meta(r,a);document.title=m.title;var d=document.querySelector('meta[name="description"]');if(d&&m.desc)d.setAttribute("content",m.desc)}
+function setHead(r,a,info){var m=V.meta(r,a,info);document.title=m.title;var d=document.querySelector('meta[name="description"]');if(d&&m.desc)d.setAttribute("content",m.desc)}
 function markNav(k){[].forEach.call(document.querySelectorAll("nav.main a[data-k]"),function(a){if(a.dataset.k===k)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")})}
 function navKey(r){return r.name==="home"?"home":r.name==="company"?"company":(r.name==="list"||r.name==="post")?"news":""}
 function focusH1(){var h=document.querySelector("#view h1");if(h){h.setAttribute("tabindex","-1");h.focus({preventScroll:true})}window.scrollTo(0,0)}
@@ -153,16 +166,25 @@ function loadList(kind,offset){var el=$("list");el.removeAttribute("data-pending
   el.insertAdjacentHTML("beforeend",V.moreBtn(kind,offset,more));
   say("โหลดเพิ่มอีก "+a.length+" เรื่อง");var first=el.querySelectorAll("ul.grid > li")[offset];if(first){var l=first.querySelector("h2 a");if(l)l.focus()}},
   function(){if($("list")!==el)return;if(offset){var b=el.querySelector(".more");if(b)b.innerHTML=V.errBox("โหลดเพิ่มไม่สำเร็จ")}else el.innerHTML=V.errBox()})}
+function companyInfo(){return{rate:CONTACT&&CONTACT.org_rate,phone:CONTACT&&CONTACT.phone,works:null}}
+/* หน้าบริษัทและหน่วยงาน: ใส่ราคาและเบอร์โทรเมื่อได้ข้อมูลติดต่อ, โหลดผลงานบริการ 3 งานล่าสุด (ไม่มีผลงาน = ซ่อนส่วนนี้) */
+function fillCompany(){if(!CONTACT||!document.querySelector("#view .offers"))return;var pr=V.baht(CONTACT.org_rate),tel=V.telHref(CONTACT.phone);
+ if(pr){[].forEach.call(document.querySelectorAll("#view .js-rate"),function(x){x.textContent=pr});[].forEach.call(document.querySelectorAll("#view .js-rate-unit"),function(x){x.hidden=false})}
+ [].forEach.call(document.querySelectorAll("#view .js-tel"),function(a){a.setAttribute("href",tel)});
+ if(V.parse(location.pathname,location.search).name==="company")setHead({name:"company"},null,companyInfo())}
+function loadWorks(){var el=$("works");if(!el)return;el.removeAttribute("data-pending");
+ api(V.listQ("work",3)).then(function(a){if($("works")!==el)return;if(!a.length){var s=$("worksSec");if(s)s.remove();return}el.innerHTML='<ul class="grid">'+a.map(function(x){return V.card(x,3)}).join("")+'</ul>'},
+  function(){if($("works")===el)el.innerHTML=V.errBox("โหลดผลงานไม่สำเร็จ")})}
 function showPost(r){$("view").innerHTML=V.LOADING;
  var p=cache[r.no]?Promise.resolve([cache[r.no]]):api(V.postQ(r.no));
  p.then(function(x){var a=x&&x[0];if(!a){show({name:"notfound"},V.POST_GONE);return}cache[r.no]=a;
   setHead(r,a);$("view").innerHTML=V.postHTML(a,location.origin+"/news/"+a.no,shareLabel());focusH1()},
   function(){$("view").innerHTML='<h1>ข่าวและบทความ</h1>'+V.errBox();focusH1()})}
-function show(r,msg){markNav(navKey(r));setHead(r);
+function show(r,msg){markNav(navKey(r));setHead(r,null,r.name==="company"?companyInfo():null);
  if(r.name==="post")return showPost(r);
- $("view").innerHTML=r.name==="home"?V.homeHTML(null):r.name==="company"?V.companyHTML():r.name==="list"?V.listHTML(r.kind,null):V.notFoundHTML(msg);
+ $("view").innerHTML=r.name==="home"?V.homeHTML(null):r.name==="company"?V.companyHTML(companyInfo()):r.name==="list"?V.listHTML(r.kind,null):V.notFoundHTML(msg);
  focusH1();
- if(r.name==="home")loadLatest();if(r.name==="list")loadList(r.kind,0)}
+ if(r.name==="home")loadLatest();if(r.name==="list")loadList(r.kind,0);if(r.name==="company")loadWorks()}
 function route(){show(V.parse(location.pathname,location.search))}
 /* เปิดหน้าครั้งแรก: ถ้า Cloudflare ใส่เนื้อหาของหน้านี้มาแล้ว (data-ssr) ใช้ของเดิม ไม่สร้างใหม่ (ไม่ย้ายโฟกัส) โหลดเฉพาะส่วนที่ยังขาด */
 function start(){var v=$("view"),r=V.parse(location.pathname,location.search);
@@ -170,6 +192,7 @@ function start(){var v=$("view"),r=V.parse(location.pathname,location.search);
  markNav(navKey(r));
  if($("latest")&&$("latest").hasAttribute("data-pending"))loadLatest();
  if($("list")&&$("list").hasAttribute("data-pending"))loadList(r.kind,0);
+ if($("works")&&$("works").hasAttribute("data-pending"))loadWorks();
  var c=v.querySelector("button[data-copy]");if(c)c.textContent=shareLabel()}
 function go(href){var u=new URL(href,location.href);if(u.origin!==location.origin){location.href=href;return}
  if(u.pathname+u.search!==location.pathname+location.search)history.pushState(null,"",u.pathname+u.search+u.hash);route()}
@@ -181,7 +204,7 @@ document.addEventListener("click",function(e){var a=e.target.closest("a[data-nav
   if(canShare()){navigator.share({title:document.title,url:t}).catch(function(){})}
   else if(navigator.clipboard)navigator.clipboard.writeText(t).then(done,function(){prompt("คัดลอกลิงก์นี้",t)});else prompt("คัดลอกลิงก์นี้",t)}});
 window.addEventListener("popstate",route);
-function loadContact(){api("/rest/v1/rpc/public_contact",{method:"POST",body:"{}"}).then(function(c){if(!c)return;var p=V.contactParts(c);
+function loadContact(){api("/rest/v1/rpc/public_contact",{method:"POST",body:"{}"}).then(function(c){if(!c)return;CONTACT=c;fillCompany();var p=V.contactParts(c);
  $("cName").innerHTML=p.name;if(p.phone)$("cPhone").innerHTML=p.phone;if(p.email)$("cEmail").innerHTML=p.email;if(p.hours)$("cHours").innerHTML=p.hours},function(){})}
 $("copy").textContent=V.copyText(new Date().getFullYear()+543);
 start();loadContact();

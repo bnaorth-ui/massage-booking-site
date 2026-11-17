@@ -136,6 +136,19 @@ ok('delete asks to press again',await has('กดอีกครั้งเพ�
 await p.click('[data-a=del][data-t=art][data-id=sa2]');
 ok('second press deletes',await W(()=>calls.some(x=>x.m==='DELETE'&&x.path==='/rest/v1/site_articles'&&x.q.includes('id=eq.sa2')))&&await until(()=>!document.body.innerText.includes('บทความร่าง')));
 
+// ประเภทใหม่ "ผลงานบริการ" ต้องมีรูปปก
+await p.click('[data-a=new][data-t=art]');await p.waitForSelector('#arT');
+ok('kind select has ผลงานบริการ',await p.evaluate(()=>[...document.querySelectorAll('#arK option')].map(o=>o.value).join()==='news,work,article'));
+await p.selectOption('#arK','work');await p.fill('#arT','นวดให้พนักงานบริษัท ก');await p.fill('#arB','วันสุขภาพพนักงาน');
+const nW=saCalls().length;await p.click('[data-a=save][data-pub="1"]');
+ok('work without cover: blocked with reason, focus on file input',await has('ผลงานบริการต้องมีรูปปก')&&saCalls().length===nW&&await p.evaluate(()=>document.activeElement.id==='artimg'));
+const img2=await p.evaluate(()=>{const c=document.createElement('canvas');c.width=800;c.height=450;c.getContext('2d').fillRect(0,0,800,450);return c.toDataURL('image/png').split(',')[1]});
+await p.setInputFiles('#artimg',{name:'w.png',mimeType:'image/png',buffer:Buffer.from(img2,'base64')});
+await until(()=>{const i=document.querySelector('#artprev img');return !!i&&i.src.startsWith('data:image/jpeg')});
+await p.fill('#arA','หมอนวดกำลังนวดพนักงาน');await p.click('[data-a=save][data-pub="1"]');
+ok('work with cover: POST kind=work published',await W(()=>{const x=saCalls()[nW];return !!x&&x.m==='POST'&&x.body.kind==='work'&&x.body.active===true&&/site-/.test(x.body.cover_path||'')}));
+ok('list shows ผลงานบริการ label',await until(()=>document.body.innerText.includes('ผลงานบริการ,')));
+
 // ยังไม่ได้สร้างตารางในฐานข้อมูล: เมนูอื่นใช้ได้ เมนูนี้บอกว่าต้องเพิ่มตาราง
 MISSING=true;await p.reload();await until(()=>document.getElementById('tabs')&&document.getElementById('tabs').textContent.includes('หน้าหลัก'));
 await p.click('#tabs [data-id=sys]');await p.click('#main .subtabs [data-id=ann]');
