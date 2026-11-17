@@ -27,7 +27,7 @@ export async function onRequest(ctx) {
   if (r.name === 'home') view = V.homeHTML(await sbGet(V.listQ(null, 6)).catch(() => null));
   else if (r.name === 'company') {
     const [c, w] = await Promise.all([contactP, sbGet(V.listQ('work', 3)).catch(() => null)]);
-    info = { rate: c && c.org_rate, phone: c && c.phone, works: w };
+    info = { rate: c && c.org_rate, phone: c && c.phone, email: c && c.email, works: w };
     view = V.companyHTML(info);
   }
   else if (r.name === 'list') view = V.listHTML(r.kind, await sbGet(V.listQ(r.kind, V.PAGE + 1, 0)).catch(() => null));

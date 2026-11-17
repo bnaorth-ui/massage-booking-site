@@ -100,6 +100,18 @@ section[id],.offers{scroll-margin-top:96px}
 .price{margin:2px 0 10px;color:var(--ink)}
 .price b{font-size:24px;color:var(--brand)}
 .tagline{margin:2px 0 10px;font-weight:700;color:var(--brand)}
+.tbl-wrap{overflow-x:auto;margin:20px 0 4px}
+table.cmp{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:var(--r);font-size:17px}
+table.cmp caption{text-align:left;font-weight:700;font-size:20px;padding:0 0 8px}
+table.cmp th,table.cmp td{padding:10px 12px;border-top:1px solid var(--line);text-align:left;vertical-align:top}
+table.cmp thead th{background:var(--soft);border-top:0}
+table.cmp tbody th{font-weight:600;color:var(--mute);width:28%}
+details.more7{margin:16px 0 0;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:0 16px}
+details.more7 summary{cursor:pointer;min-height:48px;display:flex;align-items:center;font-weight:700;color:var(--brand)}
+details.more7[open]{padding-bottom:12px}
+.askband{background:var(--soft);border-radius:var(--r);padding:20px;margin-top:32px}
+.askband h2{margin-bottom:4px}
+.askband p{margin:0 0 14px}
 .crumb{font-size:16px}
 .share{margin-top:28px;border-top:1px solid var(--line);padding-top:18px}
 .share .btns .btn{min-height:44px}
@@ -166,11 +178,13 @@ function loadList(kind,offset){var el=$("list");el.removeAttribute("data-pending
   el.insertAdjacentHTML("beforeend",V.moreBtn(kind,offset,more));
   say("โหลดเพิ่มอีก "+a.length+" เรื่อง");var first=el.querySelectorAll("ul.grid > li")[offset];if(first){var l=first.querySelector("h2 a");if(l)l.focus()}},
   function(){if($("list")!==el)return;if(offset){var b=el.querySelector(".more");if(b)b.innerHTML=V.errBox("โหลดเพิ่มไม่สำเร็จ")}else el.innerHTML=V.errBox()})}
-function companyInfo(){return{rate:CONTACT&&CONTACT.org_rate,phone:CONTACT&&CONTACT.phone,works:null}}
+function companyInfo(){return{rate:CONTACT&&CONTACT.org_rate,phone:CONTACT&&CONTACT.phone,email:CONTACT&&CONTACT.email,works:null}}
 /* หน้าบริษัทและหน่วยงาน: ใส่ราคาและเบอร์โทรเมื่อได้ข้อมูลติดต่อ, โหลดผลงานบริการ 3 งานล่าสุด (ไม่มีผลงาน = ซ่อนส่วนนี้) */
 function fillCompany(){if(!CONTACT||!document.querySelector("#view .offers"))return;var pr=V.baht(CONTACT.org_rate),tel=V.telHref(CONTACT.phone);
  if(pr){[].forEach.call(document.querySelectorAll("#view .js-rate"),function(x){x.textContent=pr});[].forEach.call(document.querySelectorAll("#view .js-rate-unit"),function(x){x.hidden=false})}
  [].forEach.call(document.querySelectorAll("#view .js-tel"),function(a){a.setAttribute("href",tel)});
+ var pp=V.contactParts(CONTACT),ph=String(CONTACT.phone||"").replace(/\D/g,"");if(ph)[].forEach.call(document.querySelectorAll("#view .js-phone"),function(x){x.textContent=ph.length===10?ph.slice(0,3)+"-"+ph.slice(3,6)+"-"+ph.slice(6):CONTACT.phone});
+ if(pp.email)[].forEach.call(document.querySelectorAll("#view .js-mail"),function(a){a.setAttribute("href","mailto:"+CONTACT.email);a.hidden=false});
  if(V.parse(location.pathname,location.search).name==="company")setHead({name:"company"},null,companyInfo())}
 function loadWorks(){var el=$("works");if(!el)return;el.removeAttribute("data-pending");
  api(V.listQ("work",3)).then(function(a){if($("works")!==el)return;if(!a.length){var s=$("worksSec");if(s)s.remove();return}el.innerHTML='<ul class="grid">'+a.map(function(x){return V.card(x,3)}).join("")+'</ul>'},
