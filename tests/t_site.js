@@ -17,11 +17,12 @@ function mk(){const A=[];
  for(let i=4;i<=18;i++)A.push({no:i,kind:'news',title:'ข่าวลำดับ '+i,summary:'สรุป '+i,body:'เนื้อหา '+i,cover_path:null,cover_alt:'',day:day(10+i),pinned:false,active:true});
  return A}
 let DB=mk(),FAIL=false,REQ=[];
+const adjF=(r,p)=>{const o=p.get('or');if(!o)return r;const m=/^\(day\.(lt|gt)\.([\d-]+),and\(day\.eq\.[\d-]+,no\.(?:lt|gt)\.(\d+)\)\)$/.exec(o);if(!m)throw new Error('bad or '+o);const lt=m[1]==='lt',d=m[2],n=+m[3];r=r.filter(a=>lt?(a.day<d||(a.day===d&&a.no<n)):(a.day>d||(a.day===d&&a.no>n)));const asc=(p.get('order')||'').startsWith('day.asc');return r.sort((a,b)=>(asc?1:-1)*((a.day<b.day?-1:a.day>b.day?1:0)||(a.no-b.no)))};
 function q(u){const x=new URL(u),p=x.searchParams;let r=DB.slice();
  if(p.get('active')==='eq.true')r=r.filter(a=>a.active);
  if(p.get('kind'))r=r.filter(a=>a.kind===p.get('kind').slice(3));
  if(p.get('no'))r=r.filter(a=>a.no===+p.get('no').slice(3));
- r.sort((a,b)=>(b.pinned-a.pinned)||(b.day<a.day?-1:b.day>a.day?1:0)||(b.no-a.no));
+ if(p.get('or'))r=adjF(r,p);else r.sort((a,b)=>(b.pinned-a.pinned)||(b.day<a.day?-1:b.day>a.day?1:0)||(b.no-a.no));
  const off=+(p.get('offset')||0),lim=+(p.get('limit')||1000);return r.slice(off,off+lim)}
 (async()=>{await new Promise(r=>srv.listen(0,'127.0.0.1',r));const BASE='http://127.0.0.1:'+srv.address().port;
 const b=await chromium.launch(C.launch);const errs=[];
@@ -69,6 +70,13 @@ ok('post: share links to LINE and Facebook carry the page url',await p.evaluate(
 await ctx.grantPermissions(['clipboard-read','clipboard-write'],{origin:BASE});
 await p.click('button[data-copy]');
 ok('post: copy link button copies and announces',await W(async()=>true)&&await p.waitForFunction(()=>document.getElementById('live').textContent==='คัดลอกลิงก์แล้ว',null,{timeout:4000}).then(()=>true,()=>false)&&(await p.evaluate(()=>navigator.clipboard.readText()))===BASE+'/news/1');
+ok('post: breadcrumb starts with หน้าแรก',await p.evaluate(()=>[...document.querySelectorAll('.crumb a')].map(a=>a.textContent+'>'+a.getAttribute('href')).join('|')==='หน้าแรก>/|ข่าวและบทความ>/news/|ข่าวและกิจกรรม>/news/?k=news'));
+ok('post: prev/next in same type (news): older = ข่าวลำดับ 4, no newer news',await p.waitForFunction(()=>{const n=document.getElementById('pn');if(!n||n.hasAttribute('data-pending'))return false;const pv=n.querySelector('a.pn-prev'),nx=n.querySelector('a.pn-next');return !!pv&&pv.getAttribute('href')==='/news/4'&&pv.textContent==='← เรื่องก่อนหน้าข่าวลำดับ 4'&&!nx&&n.getAttribute('aria-label')==='เรื่องอื่นในข่าวและกิจกรรม'},null,{timeout:4000}).then(()=>true,()=>false));
+ok('post: back links to news list and home',await p.evaluate(()=>[...document.querySelectorAll('.backs a')].map(a=>a.textContent+'>'+a.getAttribute('href')).join('|')==='กลับไปหน้าข่าวและบทความ>/news/|กลับหน้าแรก>/'));
+await p.click('#pn a.pn-prev');await p.waitForFunction(()=>document.querySelector('#view h1')&&document.querySelector('#view h1').textContent==='ข่าวลำดับ 4',null,{timeout:4000});
+ok('prev link opens older story in page; it now has next = the first story',p.url()===BASE+'/news/4'&&await p.waitForFunction(()=>{const nx=document.querySelector('#pn a.pn-next');return !!nx&&nx.getAttribute('href')==='/news/1'},null,{timeout:4000}).then(()=>true,()=>false));
+await p.click('.backs a[href="/"]');ok('กลับหน้าแรก goes home',await p.waitForSelector('#latest .card',{timeout:5000}).then(()=>true,()=>false)&&p.url()===BASE+'/');
+await p.goto(BASE+'/news/1');await p.waitForSelector('article.post h1');
 ok('post: nav marks ข่าวและบทความ',await p.evaluate(()=>document.querySelector('nav.main a[aria-current="page"]').textContent==='ข่าวและบทความ'));
 
 // หน้าบทความ html ในเนื้อหาไม่ทำงาน

@@ -35,7 +35,12 @@ export async function onRequest(ctx) {
     let rows;
     try { rows = await sbGet(V.postQ(r.no)); } catch (e) { rows = undefined; }
     if (rows === undefined) view = null; // ฐานข้อมูลไม่ตอบ: ส่งหน้าเปล่า ให้หน้าเว็บโหลดเอง
-    else if (rows[0]) { art = rows[0]; view = V.postHTML(art, u.origin + '/news/' + art.no); }
+    else if (rows[0]) {
+      art = rows[0];
+      const one = q => sbGet(q).then(x => (x && x[0]) || null);
+      const adj = await Promise.all([one(V.adjQ(art, 'prev')), one(V.adjQ(art, 'next'))]).then(x => ({ prev: x[0], next: x[1] }), () => null);
+      view = V.postHTML(art, u.origin + '/news/' + art.no, null, adj);
+    }
     else { status = 404; view = V.notFoundHTML(V.POST_GONE); r = { name: 'notfound' }; }
   } else { status = 404; view = V.notFoundHTML(); }
 

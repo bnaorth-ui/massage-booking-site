@@ -16,11 +16,12 @@ const ROWS=[{no:7,kind:'news',title:'อบรม "หมอนวด" <รุ�
  {no:9,kind:'work',title:'นวดให้พนักงานบริษัท ก',summary:'',body:'x',cover_path:'place-images/x/site-w.jpg',cover_alt:'หมอนวดกำลังนวด',day:'2026-11-01',pinned:false,active:true},
  {no:8,kind:'article',title:'ประโยชน์ของการนวด',summary:'',body:'เนื้อหา',cover_path:null,cover_alt:'',day:'2026-11-10',pinned:false,active:true}];
 let FAIL=false,ASKED=[],CONTACT={name:'สมาคมวิทยากรฝึกอาชีพคนตาบอด',phone:'0989983654',email:'info@example.org',hours:'จันทร์ - ศุกร์ 09:00 - 17:00 น.',org_rate:400};
+const adjF=(r,p)=>{const o=p.get('or');if(!o)return r;const m=/^\(day\.(lt|gt)\.([\d-]+),and\(day\.eq\.[\d-]+,no\.(?:lt|gt)\.(\d+)\)\)$/.exec(o);if(!m)throw new Error('bad or '+o);const lt=m[1]==='lt',d=m[2],n=+m[3];r=r.filter(a=>lt?(a.day<d||(a.day===d&&a.no<n)):(a.day>d||(a.day===d&&a.no>n)));const asc=(p.get('order')||'').startsWith('day.asc');return r.sort((a,b)=>(asc?1:-1)*((a.day<b.day?-1:a.day>b.day?1:0)||(a.no-b.no)))};
 global.fetch=async(u,o)=>{u=String(u);ASKED.push({u,h:o&&o.headers});if(FAIL)return new Response('x',{status:500});
  const J=x=>new Response(JSON.stringify(x),{headers:{'Content-Type':'application/json'}});
  if(u.includes('/rpc/public_contact'))return J(CONTACT);
  const q=new URL(u).searchParams;let r=ROWS.filter(a=>a.active);
- if(q.get('kind'))r=r.filter(a=>a.kind===q.get('kind').slice(3));if(q.get('no'))r=r.filter(a=>a.no===+q.get('no').slice(3));
+ if(q.get('kind'))r=r.filter(a=>a.kind===q.get('kind').slice(3));if(q.get('no'))r=r.filter(a=>a.no===+q.get('no').slice(3));if(q.get('or'))r=adjF(r,q);
  return J(r.slice(0,+(q.get('limit')||100)))};
 const B='https://massage-home-bna.pages.dev';
 const get=async p=>{const r=await mw.onRequest({request:new Request(B+p),next});return{r,h:await r.text()}};
@@ -65,6 +66,7 @@ ok('post: title/og escaped, description from summary',titleOf(h)==='อบรม
 ok('post: canonical, og:image = cover with alt, size tags removed',h.includes('<link rel="canonical" href="'+B+'/news/7">')&&h.includes('<meta property="og:image" content="https://dwdnmfwepydyweeqfdxn.supabase.co/storage/v1/object/public/place-images/00000000-0000-0000-0000-000000000000/site-x.jpg">')&&h.includes('<meta property="og:image:alt" content="ภาพการอบรม">')&&!h.includes('og:image:width'));
 L=ld(h);const na=L.find(x=>x.j['@type']==='NewsArticle');
 ok('post: NewsArticle data (dates, image) + Organization, no raw "<"',!!na&&na.j.datePublished==='2026-11-17'&&na.j.dateModified==='2026-11-18T01:00:00Z'&&na.j.image[0].endsWith('site-x.jpg')&&na.j.headline.includes('<รุ่น 2>')&&!na.raw.includes('<')&&L.some(x=>x.j['@type']==='Organization'));
+ok('post: prev/next of same type in page (news 7: no other news -> nav empty but present)',view(h).includes('<nav class="pn" id="pn" aria-label="เรื่องอื่นในข่าวและกิจกรรม" data-no="7" data-day="2026-11-17" data-kind="news"></nav>')&&view(h).includes('<a href="/" data-nav>กลับหน้าแรก</a>')&&view(h).includes('<nav class="crumb" aria-label="ตำแหน่งหน้า"><a href="/" data-nav>หน้าแรก</a>'));
 ok('post: share links with full url',view(h).includes('https://social-plugins.line.me/lineit/share?url='+encodeURIComponent(B+'/news/7')));
 ({h}=await get('/news/8'));ok('post without cover: default share image (full url), Article type, description = title',h.includes('<meta property="og:image" content="'+B+'/og-share.png">')&&ld(h).some(x=>x.j['@type']==='Article')&&h.includes('<meta name="description" content="ประโยชน์ของการนวด">'));
 

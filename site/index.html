@@ -113,6 +113,15 @@ details.faq p{margin:0 0 14px;color:var(--ink)}
 .crumb{font-size:16px}
 .share{margin-top:28px;border-top:1px solid var(--line);padding-top:18px}
 .share .btns .btn{min-height:44px}
+.pn{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:24px}
+.pn:empty{display:none}
+.pn a{display:flex;flex-direction:column;gap:2px;min-height:44px;padding:12px 16px;border:1px solid var(--line);border-radius:12px;background:var(--card);text-decoration:none;color:var(--ink)}
+.pn a.pn-next{grid-column:2;text-align:right}
+.pn-l{font-size:15px;color:var(--brand);font-weight:700}
+.pn-t{font-weight:600}
+@media (max-width:560px){.pn{grid-template-columns:1fr}.pn a.pn-next{grid-column:1;text-align:left}}
+.backs{display:flex;gap:20px;flex-wrap:wrap;margin-top:24px}
+.backs a{display:inline-flex;align-items:center;min-height:44px}
 .empty,.err{background:var(--card);border:1px dashed var(--line);border-radius:var(--r);padding:24px;text-align:center;color:var(--mute)}
 .more{margin-top:20px;text-align:center}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
@@ -188,10 +197,14 @@ function fillCompany(){if(!CONTACT||!document.querySelector("#view .offers"))ret
 function loadWorks(){var el=$("works");if(!el)return;el.removeAttribute("data-pending");
  api(V.listQ("work",3)).then(function(a){if($("works")!==el)return;if(!a.length){var s=$("worksSec");if(s)s.remove();return}el.innerHTML='<ul class="grid">'+a.map(function(x){return V.card(x,3)}).join("")+'</ul>'},
   function(){if($("works")===el)el.innerHTML=V.errBox("โหลดผลงานไม่สำเร็จ")})}
+/* เรื่องก่อนหน้า / ถัดไป ในประเภทเดียวกัน (โหลดไม่ได้ = ไม่แสดง) */
+function loadAdj(){var el=$("pn");if(!el||!el.hasAttribute("data-pending"))return;el.removeAttribute("data-pending");
+ var a={no:+el.dataset.no,day:el.dataset.day,kind:el.dataset.kind},pick=function(x){return x&&x[0]||null};
+ Promise.all([api(V.adjQ(a,"prev")).then(pick,function(){return null}),api(V.adjQ(a,"next")).then(pick,function(){return null})]).then(function(x){if($("pn")===el)el.innerHTML=V.adjHTML({prev:x[0],next:x[1]})})}
 function showPost(r){$("view").innerHTML=V.LOADING;
  var p=cache[r.no]?Promise.resolve([cache[r.no]]):api(V.postQ(r.no));
  p.then(function(x){var a=x&&x[0];if(!a){show({name:"notfound"},V.POST_GONE);return}cache[r.no]=a;
-  setHead(r,a);$("view").innerHTML=V.postHTML(a,location.origin+"/news/"+a.no,shareLabel());focusH1()},
+  setHead(r,a);$("view").innerHTML=V.postHTML(a,location.origin+"/news/"+a.no,shareLabel(),null);loadAdj();focusH1()},
   function(){$("view").innerHTML='<h1>ข่าวและบทความ</h1>'+V.errBox();focusH1()})}
 function show(r,msg){markNav(navKey(r));setHead(r,null,r.name==="company"?companyInfo():null);
  if(r.name==="post")return showPost(r);
@@ -206,6 +219,7 @@ function start(){var v=$("view"),r=V.parse(location.pathname,location.search);
  if($("latest")&&$("latest").hasAttribute("data-pending"))loadLatest();
  if($("list")&&$("list").hasAttribute("data-pending"))loadList(r.kind,0);
  if($("works")&&$("works").hasAttribute("data-pending"))loadWorks();
+ loadAdj();
  var c=v.querySelector("button[data-copy]");if(c)c.textContent=shareLabel()}
 function go(href){var u=new URL(href,location.href);if(u.origin!==location.origin){location.href=href;return}
  if(u.pathname+u.search!==location.pathname+location.search)history.pushState(null,"",u.pathname+u.search+u.hash);route()}

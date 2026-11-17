@@ -96,14 +96,26 @@
   }
   function moreBtn(kind, offset, more) { return more ? '<div class="more"><button class="btn ghost" type="button" data-more="' + (offset + PAGE) + '" data-kind="' + esc(kind) + '">ดูเพิ่มเติม</button></div>' : ''; }
 
-  function postHTML(a, link, shareLabel) {
+  /* เรื่องก่อนหน้า (เก่ากว่า) / เรื่องถัดไป (ใหม่กว่า) ในประเภทเดียวกัน เรียงตามวันที่แสดงบนเว็บ แล้วตามเลขเรื่อง */
+  function adjQ(a, dir) {
+    var d = String(a.day || "").slice(0, 10), op = dir === "prev" ? "lt" : "gt", ord = dir === "prev" ? "desc" : "asc";
+    return "/rest/v1/site_articles?select=no,title,kind&active=eq.true&kind=eq." + a.kind + "&or=(day." + op + "." + d + ",and(day.eq." + d + ",no." + op + "." + a.no + "))&order=day." + ord + ",no." + ord + "&limit=1";
+  }
+  /* adj: { prev, next } (แถวหรือ null) หรือ null = ยังไม่โหลด (ให้หน้าเว็บโหลดเอง) */
+  function adjHTML(adj) {
+    if (!adj || (!adj.prev && !adj.next)) return "";
+    function one(x, lbl, cls) { return x ? '<a class="pn-' + cls + '" href="/news/' + x.no + '" data-nav><span class="pn-l">' + lbl + '</span><span class="pn-t">' + esc(x.title) + '</span></a>' : ''; }
+    return one(adj.prev, "← เรื่องก่อนหน้า", "prev") + one(adj.next, "เรื่องถัดไป →", "next");
+  }
+  function postHTML(a, link, shareLabel, adj) {
     var u = imgUrl(a.cover_path);
-    return '<article class="post"><nav class="crumb" aria-label="ตำแหน่งหน้า"><a href="/news/" data-nav>ข่าวและบทความ</a> / <a href="/news/?k=' + esc(a.kind) + '" data-nav>' + esc(KIND[a.kind] || "ข่าว") + '</a></nav>' +
+    return '<article class="post"><nav class="crumb" aria-label="ตำแหน่งหน้า"><a href="/" data-nav>หน้าแรก</a> / <a href="/news/" data-nav>ข่าวและบทความ</a> / <a href="/news/?k=' + esc(a.kind) + '" data-nav>' + esc(KIND[a.kind] || "ข่าว") + '</a></nav>' +
       '<h1>' + esc(a.title) + '</h1><div class="meta"><span>' + esc(KIND[a.kind] || "ข่าว") + '</span><span aria-hidden="true">·</span><span>วันที่ ' + esc(thDate(a.day)) + '</span></div>' +
       (u ? '<figure><img class="cover" src="' + esc(u) + '" alt="' + esc(a.cover_alt || "") + '">' + (a.cover_alt ? '<figcaption>' + esc(a.cover_alt) + '</figcaption>' : '') + '</figure>' : '') +
       (a.summary ? '<p class="lead">' + esc(a.summary) + '</p>' : '') + '<div class="body">' + renderBody(a.body) + '</div>' +
       '<div class="share"><h2>แชร์เรื่องนี้</h2><div class="btns"><a class="btn" href="https://social-plugins.line.me/lineit/share?url=' + encodeURIComponent(link) + '" target="_blank" rel="noopener">แชร์ไป LINE<span class="sr"> (เปิดหน้าต่างใหม่)</span></a><a class="btn" href="https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(link) + '" target="_blank" rel="noopener">แชร์ไป Facebook<span class="sr"> (เปิดหน้าต่างใหม่)</span></a><button class="btn ghost" type="button" data-copy="' + esc(link) + '">' + esc(shareLabel || "คัดลอกลิงก์") + '</button></div></div>' +
-      '<p style="margin-top:28px"><a href="/news/" data-nav>← กลับไปหน้าข่าวและบทความ</a></p></article>';
+      '<nav class="pn" id="pn" aria-label="เรื่องอื่นใน' + esc(KIND[a.kind] || "ข่าว") + '" data-no="' + a.no + '" data-day="' + esc(String(a.day || "").slice(0, 10)) + '" data-kind="' + esc(a.kind) + '"' + (adj ? '' : ' data-pending') + '>' + adjHTML(adj) + '</nav>' +
+      '<p class="backs"><a href="/news/" data-nav>กลับไปหน้าข่าวและบทความ</a><a href="/" data-nav>กลับหน้าแรก</a></p></article>';
   }
   function notFoundHTML(msg) { return '<h1>ไม่พบหน้านี้</h1><p>' + esc(msg || "ลิงก์อาจไม่ถูกต้อง หรือหน้านี้ถูกย้ายไปแล้ว") + '</p><div class="btns"><a class="btn" href="/" data-nav>ไปหน้าแรก</a><a class="btn ghost" href="/news/" data-nav>ข่าวและบทความ</a></div>'; }
   var POST_GONE = "ไม่พบข่าวหรือบทความนี้ อาจถูกลบหรือซ่อนไปแล้ว";
@@ -199,6 +211,6 @@
     SB: SB, APP: APP, KIND: KIND, SITE_NAME: SITE_NAME, LAW: LAW, PAGE: PAGE, POST_GONE: POST_GONE, LOADING: LOADING,
     esc: esc, imgUrl: imgUrl, thDate: thDate, renderBody: renderBody, card: card, errBox: errBox, listQ: listQ, postQ: postQ,
     parse: parse, canonPath: canonPath, meta: meta, homeHTML: homeHTML, latestHTML: latestHTML, listHTML: listHTML, listBody: listBody, moreBtn: moreBtn,
-    postHTML: postHTML, notFoundHTML: notFoundHTML, companyHTML: companyHTML, faqLD: faqLD, baht: baht, telHref: telHref, contactParts: contactParts, copyText: copyText
+    postHTML: postHTML, adjQ: adjQ, adjHTML: adjHTML, notFoundHTML: notFoundHTML, companyHTML: companyHTML, faqLD: faqLD, baht: baht, telHref: telHref, contactParts: contactParts, copyText: copyText
   };
 })(typeof globalThis !== "undefined" ? globalThis : this);

@@ -6,7 +6,8 @@ const ok=(n,c)=>console.log((c?'PASS ':'FAIL ')+n);
 const ROOT=path.resolve(__dirname,'..','site');
 const day=i=>new Date(Date.UTC(2026,10,17-i)).toISOString().slice(0,10);
 const DB=[];for(let i=1;i<=15;i++)DB.push({no:i,kind:i%3?'news':'article',title:'เรื่องที่ '+i,summary:'สรุป '+i,body:'เนื้อหา '+i,cover_path:null,cover_alt:'',day:day(i),pinned:false,active:true});
-function q(u){const x=new URL(u),p=x.searchParams;let r=DB.filter(a=>a.active);if(p.get('kind'))r=r.filter(a=>a.kind===p.get('kind').slice(3));if(p.get('no'))r=r.filter(a=>a.no===+p.get('no').slice(3));
+const adjF=(r,p)=>{const o=p.get('or');if(!o)return r;const m=/^\(day\.(lt|gt)\.([\d-]+),and\(day\.eq\.[\d-]+,no\.(?:lt|gt)\.(\d+)\)\)$/.exec(o);if(!m)throw new Error('bad or '+o);const lt=m[1]==='lt',d=m[2],n=+m[3];r=r.filter(a=>lt?(a.day<d||(a.day===d&&a.no<n)):(a.day>d||(a.day===d&&a.no>n)));const asc=(p.get('order')||'').startsWith('day.asc');return r.sort((a,b)=>(asc?1:-1)*((a.day<b.day?-1:a.day>b.day?1:0)||(a.no-b.no)))};
+function q(u){const x=new URL(u),p=x.searchParams;let r=DB.filter(a=>a.active);if(p.get('kind'))r=r.filter(a=>a.kind===p.get('kind').slice(3));if(p.get('no'))r=r.filter(a=>a.no===+p.get('no').slice(3));if(p.get('or'))r=adjF(r,p);
  const off=+(p.get('offset')||0),lim=+(p.get('limit')||1000);return r.slice(off,off+lim)}
 const CONTACT={name:'สมาคมวิทยากรฝึกอาชีพคนตาบอด',phone:'0989983654',email:'info@example.org',hours:'จันทร์ - ศุกร์ 09:00 - 17:00 น.'};
 // fetch ฝั่งเซิร์ฟเวอร์ (middleware) ใช้ข้อมูลจำลอง
@@ -48,6 +49,7 @@ await p.click('button[data-more]');
 ok('load more works on server page (15 total)',await p.waitForFunction(()=>document.querySelectorAll('#list .card').length===15&&!document.querySelector('button[data-more]'),null,{timeout:5000}).then(()=>true,()=>false));
 // หน้าบทความจากเซิร์ฟเวอร์
 await p.goto(BASE+'/news/3');await p.waitForLoadState('networkidle');
+ok('article from server: prev/next already in page (same type), no extra request',await p.evaluate(()=>{const n=document.getElementById('pn');return !n.hasAttribute('data-pending')&&n.querySelector('a.pn-prev').getAttribute('href')==='/news/6'&&n.querySelector('a.pn-next')===null})&&!REQ.some(u=>u.includes('or=')));
 ok('article from server: tab title, copy button works',(await p.title())==='เรื่องที่ 3 | สมาคมวิทยากรฝึกอาชีพคนตาบอด'&&(await p.textContent('button[data-copy]'))==='คัดลอกลิงก์');
 await p.goto(BASE+'/news/999');ok('missing article from server: not found shown',(await p.textContent('#view h1'))==='ไม่พบหน้านี้');
 await p.goto(BASE+'/company/');await p.click('nav.main a[href="/news/"]');
