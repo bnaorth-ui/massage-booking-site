@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>สมาคมวิทยากรฝึกอาชีพคนตาบอด | ข่าวสารและบทความ นวดโดยหมอนวดตาบอด</title>
+<title>นวดไทยโดยหมอนวดตาบอดที่ขึ้นทะเบียนถูกต้อง | สมาคมวิทยากรฝึกอาชีพคนตาบอด</title>
 <meta name="description" content="ข่าวสาร กิจกรรม และบทความจากสมาคมวิทยากรฝึกอาชีพคนตาบอด นวดโดยหมอนวดตาบอดที่ขึ้นทะเบียนกับกรมสนับสนุนบริการสุขภาพ จองนวดออนไลน์ สมัครเปิดร้าน และสมัครเป็นหมอนวด">
 <meta property="og:type" content="website"><meta property="og:locale" content="th_TH"><meta property="og:site_name" content="สมาคมวิทยากรฝึกอาชีพคนตาบอด">
 <meta property="og:title" content="สมาคมวิทยากรฝึกอาชีพคนตาบอด ข่าวสารและบทความ">
@@ -15,7 +15,6 @@
 <link rel="icon" href="/icon-192.png">
 <link rel="apple-touch-icon" href="/icon-192.png">
 <meta name="theme-color" content="#0f6e56">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"สมาคมวิทยากรฝึกอาชีพคนตาบอด","url":"https://bna.or.th","logo":"/icon-512.png"}</script>
 <style>
 :root{--bg:#f6faf8;--card:#fff;--ink:#14302a;--mute:#4d635c;--brand:#0f6e56;--brand2:#0b5442;--soft:#e3f1ec;--line:#cfe0da;--focus:#b35c00;--r:14px}
 @media (prefers-color-scheme:dark){:root{--bg:#10201b;--card:#172b25;--ink:#e6f2ee;--mute:#a9c2ba;--brand:#5fd1a8;--brand2:#8fe3c4;--soft:#1f3a32;--line:#2c4a41;--focus:#ffb347}}
@@ -121,116 +120,57 @@ footer .copy{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);f
   <h2>ติดต่อเรา</h2>
   <p id="cName">สมาคมวิทยากรฝึกอาชีพคนตาบอด</p>
   <p id="cPhone"></p>
-  <p id="cHours"></p>
   <p id="cEmail"></p>
+  <p id="cHours"></p>
   <p><a href="https://massage-customer-bna.pages.dev/privacy/">นโยบายความเป็นส่วนตัว</a></p>
   <p class="copy" id="copy">© สมาคมวิทยากรฝึกอาชีพคนตาบอด สงวนลิขสิทธิ์</p>
  </div>
 </footer>
 <div class="sr" aria-live="polite" id="live"></div>
+<script src="/shared/views.js"></script>
 <script>
 "use strict";
-var SB={url:"https://dwdnmfwepydyweeqfdxn.supabase.co",key:"sb_publishable_4xaAEuN8jFIxGjyhtzABow_FsbGcoI3"};
-var APP={book:"https://massage-customer-bna.pages.dev/",shop:"https://massage-shop-bna.pages.dev/reg/",staff:"https://massage-staff-bna.pages.dev/apply/",company:"https://massage-customer-bna.pages.dev/?company=1"};
-var KIND={news:"ข่าวและกิจกรรม",article:"บทความ"};
-var SITE_NAME="สมาคมวิทยากรฝึกอาชีพคนตาบอด";
-var LIST_COLS="no,kind,title,summary,cover_path,cover_alt,day,pinned";
-var PAGE=12,cache={};
+/* ข้อความและหน้าตาเนื้อหาอยู่ใน /shared/views.js (ใช้ร่วมกับ Cloudflare ที่ใส่เนื้อหาลงหน้าตั้งแต่ตอนส่ง) ไฟล์นี้จัดการการกดเปลี่ยนหน้า โหลดข้อมูล และปุ่มต่างๆ */
+var V=window.SV,cache={};
 function $(id){return document.getElementById(id)}
-function esc(x){return String(x==null?"":x).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
-function api(path,opt){opt=opt||{};var h={apikey:SB.key,Authorization:"Bearer "+SB.key};if(opt.body)h["Content-Type"]="application/json";
- return fetch(SB.url+path,{method:opt.method||"GET",headers:h,body:opt.body}).then(function(r){if(!r.ok)throw r;return r.json()})}
-function imgUrl(p){if(!p)return null;if(/^https?:\/\//.test(p))return p;return SB.url+"/storage/v1/object/public/"+(/^place-images\//.test(p)?p:"place-images/"+p)}
-function thDate(s){if(!s)return"";var p=String(s).slice(0,10).split("-");var d=new Date(+p[0],+p[1]-1,+p[2]);return isNaN(d)?"":d.toLocaleDateString("th-TH",{day:"numeric",month:"long",year:"numeric"})}
+function api(path,opt){opt=opt||{};var h={apikey:V.SB.key,Authorization:"Bearer "+V.SB.key};if(opt.body)h["Content-Type"]="application/json";
+ return fetch(V.SB.url+path,{method:opt.method||"GET",headers:h,body:opt.body}).then(function(r){if(!r.ok)throw r;return r.json()})}
 function canShare(){return !!navigator.share&&/Android|iPhone|iPad/i.test(navigator.userAgent)}
+function shareLabel(){return canShare()?"แชร์ทางอื่น":"คัดลอกลิงก์"}
 function say(t){var l=$("live");l.textContent="";setTimeout(function(){l.textContent=t},50)}
-/* เนื้อหาบทความ: ข้อความธรรมดา บรรทัดว่างคั่นย่อหน้า, "## " = หัวข้อย่อย, "- " = รายการ, ลิงก์ http(s) กดได้ (ไม่รับ HTML) */
-function linkify(s){return esc(s).replace(/https?:\/\/[^\s<]+[^\s<.,;:!?)"'\]]/g,function(u){return '<a href="'+u+'" rel="noopener nofollow" target="_blank">'+u+'<span class="sr"> (เปิดหน้าต่างใหม่)</span></a>'})}
-function renderBody(t){var out=[],blocks=String(t||"").replace(/\r/g,"").split(/\n\s*\n/);
- blocks.forEach(function(b){var lines=b.split("\n").filter(function(l){return l.trim()!==""});if(!lines.length)return;
-  var buf=[],list=[];function flushP(){if(buf.length){out.push("<p>"+buf.map(linkify).join("<br>")+"</p>");buf=[]}}function flushL(){if(list.length){out.push("<ul>"+list.map(function(x){return"<li>"+linkify(x)+"</li>"}).join("")+"</ul>");list=[]}}
-  lines.forEach(function(l){var s=l.trim();
-   if(/^#{2,3}\s+/.test(s)){flushP();flushL();out.push("<h2>"+linkify(s.replace(/^#{2,3}\s+/,""))+"</h2>")}
-   else if(/^[-•*]\s+/.test(s)){flushP();list.push(s.replace(/^[-•*]\s+/,""))}
-   else{flushL();buf.push(s)}});
-  flushP();flushL()});
- return out.join("")}
-function card(a,lvl){var u=imgUrl(a.cover_path),h=lvl||3;
- return '<li class="card">'+(u?'<img loading="lazy" decoding="async" src="'+esc(u)+'" alt="">':'<div class="ph" aria-hidden="true">'+(a.kind==="article"?"📖":"📣")+'</div>')+
-  '<div class="in"><div class="meta"><span class="tag">'+esc(KIND[a.kind]||"ข่าว")+'</span>'+(a.pinned?'<span class="tag">ปักหมุด</span>':'')+'<span>'+esc(thDate(a.day))+'</span></div>'+
-  '<h'+h+'><a href="/news/'+a.no+'" data-nav>'+esc(a.title)+'</a></h'+h+'>'+(a.summary?'<p>'+esc(a.summary)+'</p>':'')+'</div></li>'}
-function listQ(kind,limit,offset){return "/rest/v1/site_articles?select="+LIST_COLS+"&active=eq.true"+(kind?"&kind=eq."+kind:"")+"&order=pinned.desc,day.desc,no.desc&limit="+limit+(offset?"&offset="+offset:"")}
-function errBox(msg){return '<div class="err" role="alert"><p>'+esc(msg||"โหลดข้อมูลไม่สำเร็จ")+'</p><button class="btn ghost" type="button" data-retry>ลองอีกครั้ง</button></div>'}
-function setHead(title,desc){document.title=title?title+" | "+SITE_NAME:SITE_NAME+" | ข่าวสารและบทความ นวดโดยหมอนวดตาบอด";
- var m=document.querySelector('meta[name="description"]');if(m&&desc)m.setAttribute("content",desc)}
+function setHead(r,a){var m=V.meta(r,a);document.title=m.title;var d=document.querySelector('meta[name="description"]');if(d&&m.desc)d.setAttribute("content",m.desc)}
 function markNav(k){[].forEach.call(document.querySelectorAll("nav.main a[data-k]"),function(a){if(a.dataset.k===k)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")})}
+function navKey(r){return r.name==="home"?"home":r.name==="company"?"company":(r.name==="list"||r.name==="post")?"news":""}
 function focusH1(){var h=document.querySelector("#view h1");if(h){h.setAttribute("tabindex","-1");h.focus({preventScroll:true})}window.scrollTo(0,0)}
 
-function homeView(){markNav("home");setHead("","");
- $("view").innerHTML='<div class="hero"><h1>นวดไทยโดยหมอนวดตาบอด ที่ขึ้นทะเบียนถูกต้อง</h1><p>หมอนวดของเราเป็นคนพิการทางการเห็นที่ขึ้นทะเบียนกับกรมสนับสนุนบริการสุขภาพ กระทรวงสาธารณสุข จองคิวกับร้านนวดใกล้บ้านได้ทันที</p><div class="btns"><a class="btn" href="'+APP.book+'">จองนวดออนไลน์</a><a class="btn ghost" href="/news/" data-nav>อ่านข่าวและบทความ</a></div></div>'+
- '<section aria-labelledby="hLatest"><div class="secHead"><h2 id="hLatest">ข่าวและบทความล่าสุด</h2><a href="/news/" data-nav>ดูทั้งหมด</a></div><div id="latest"><p>กำลังโหลด...</p></div></section>'+
- '<section aria-labelledby="hBiz"><h2 id="hBiz">สำหรับบริษัทและองค์กร</h2><div class="box"><h3>จ้างหมอนวดตาบอดไปนวดที่บริษัท</h3><p>ดูแลพนักงานที่นั่งทำงานนาน พร้อมสร้างอาชีพให้คนตาบอด และใช้เป็นการจ้างงานคนพิการตามมาตรา 33 หรือมาตรา 35 ได้</p><div class="btns"><a class="btn" href="/company/" data-nav>ดูรายละเอียด</a><a class="btn ghost" href="'+APP.company+'">ลงทะเบียนบริษัท</a></div></div></section>'+
- '<section aria-labelledby="hJoin"><h2 id="hJoin">ร่วมงานกับเรา</h2><div class="cols"><div class="box"><h3>สมัครเปิดร้านนวด</h3><p>ร้านนวดที่จดทะเบียนถูกต้อง สมัครเข้าระบบเพื่อรับคิวจากลูกค้าออนไลน์</p><a class="btn" href="'+APP.shop+'">สมัครเปิดร้าน</a></div><div class="box"><h3>สมัครเป็นหมอนวด</h3><p>หมอนวดที่ขึ้นทะเบียนแล้ว สมัครเพื่อรับงานจากร้านและหน่วยงานในระบบ</p><a class="btn" href="'+APP.staff+'">สมัครเป็นหมอนวด</a></div></div></section>'+
- '<section aria-labelledby="hHow"><h2 id="hHow">จองนวดง่ายๆ 3 ขั้นตอน</h2><div class="box"><ol class="steps"><li>เลือกร้านนวดใกล้คุณ และเลือกบริการที่ต้องการ</li><li>เลือกวัน เวลา และหมอนวด</li><li>เข้าสู่ระบบด้วยเบอร์โทร แล้วยืนยันการจอง เลื่อนหรือยกเลิกเองได้ภายหลัง</li></ol><p style="margin:14px 0 0"><a class="btn" href="'+APP.book+'">เริ่มจองนวด</a></p></div></section>';
- loadLatest();focusH1()}
-function loadLatest(){var el=$("latest");
- api(listQ(null,6)).then(function(a){if(!$("latest"))return;el.innerHTML=a.length?'<ul class="grid">'+a.map(function(x){return card(x,3)}).join("")+'</ul>':'<div class="empty">ยังไม่มีข่าวในตอนนี้ ติดตามได้เร็วๆ นี้</div>'},
-  function(){if($("latest"))el.innerHTML=errBox("โหลดข่าวไม่สำเร็จ")})}
-
-function listView(kind){markNav("news");if(!KIND[kind])kind="";
- var ttl=kind?KIND[kind]:"ข่าวและบทความ";setHead(ttl,"รวม"+ttl+"จากสมาคมวิทยากรฝึกอาชีพคนตาบอด");
- var f=[["","ทั้งหมด"],["news","ข่าวและกิจกรรม"],["article","บทความ"]].map(function(x){return '<li><a href="/news/'+(x[0]?"?k="+x[0]:"")+'" data-nav'+(x[0]===kind?' aria-current="page"':'')+'>'+x[1]+'</a></li>'}).join("");
- $("view").innerHTML='<h1>'+esc(ttl)+'</h1><nav aria-label="เลือกประเภท"><ul class="filters">'+f+'</ul></nav><div id="list"><p>กำลังโหลด...</p></div>';
- focusH1();loadList(kind,0)}
-function loadList(kind,offset){var el=$("list");
- api(listQ(kind,PAGE+1,offset)).then(function(a){if(!$("list"))return;var more=a.length>PAGE;a=a.slice(0,PAGE);
-  var old=el.querySelector("ul.grid"),btn=el.querySelector(".more");if(btn)btn.remove();
-  if(!a.length&&!offset){el.innerHTML='<div class="empty">ยังไม่มี'+(kind?KIND[kind]:"ข่าวหรือบทความ")+'ในตอนนี้</div>';return}
-  var html=a.map(function(x){return card(x,2)}).join("");
-  if(old)old.insertAdjacentHTML("beforeend",html);else el.innerHTML='<ul class="grid">'+html+'</ul>';
-  if(more)el.insertAdjacentHTML("beforeend",'<div class="more"><button class="btn ghost" type="button" data-more="'+(offset+PAGE)+'" data-kind="'+kind+'">ดูเพิ่มเติม</button></div>');
-  if(offset){say("โหลดเพิ่มอีก "+a.length+" เรื่อง");var first=el.querySelectorAll("ul.grid > li")[offset];if(first){var l=first.querySelector("h2 a");if(l)l.focus()}}},
-  function(){if(!$("list"))return;if(offset){var b=el.querySelector(".more");if(b)b.innerHTML=errBox("โหลดเพิ่มไม่สำเร็จ")}else el.innerHTML=errBox()})}
-
-function postView(no){markNav("news");$("view").innerHTML='<p>กำลังโหลด...</p>';
- var p=cache[no]?Promise.resolve([cache[no]]):api("/rest/v1/site_articles?select=*&active=eq.true&no=eq."+no+"&limit=1");
- p.then(function(r){var a=r&&r[0];if(!a){notFound("ไม่พบข่าวหรือบทความนี้ อาจถูกลบหรือซ่อนไปแล้ว");return}cache[no]=a;
-  setHead(a.title,a.summary||a.title);var u=imgUrl(a.cover_path),link=location.origin+"/news/"+a.no;
-  $("view").innerHTML='<article class="post"><nav class="crumb" aria-label="ตำแหน่งหน้า"><a href="/news/" data-nav>ข่าวและบทความ</a> / <a href="/news/?k='+esc(a.kind)+'" data-nav>'+esc(KIND[a.kind]||"ข่าว")+'</a></nav>'+
-   '<h1>'+esc(a.title)+'</h1><div class="meta"><span>'+esc(KIND[a.kind]||"ข่าว")+'</span><span aria-hidden="true">·</span><span>วันที่ '+esc(thDate(a.day))+'</span></div>'+
-   (u?'<figure><img class="cover" src="'+esc(u)+'" alt="'+esc(a.cover_alt||"")+'">'+(a.cover_alt?'<figcaption>'+esc(a.cover_alt)+'</figcaption>':'')+'</figure>':'')+
-   (a.summary?'<p class="lead">'+esc(a.summary)+'</p>':'')+'<div class="body">'+renderBody(a.body)+'</div>'+
-   '<div class="share"><h2>แชร์เรื่องนี้</h2><div class="btns"><a class="btn" href="https://social-plugins.line.me/lineit/share?url='+encodeURIComponent(link)+'" target="_blank" rel="noopener">แชร์ไป LINE<span class="sr"> (เปิดหน้าต่างใหม่)</span></a><a class="btn" href="https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(link)+'" target="_blank" rel="noopener">แชร์ไป Facebook<span class="sr"> (เปิดหน้าต่างใหม่)</span></a><button class="btn ghost" type="button" data-copy="'+esc(link)+'">'+(canShare()?"แชร์ทางอื่น":"คัดลอกลิงก์")+'</button></div></div>'+
-   '<p style="margin-top:28px"><a href="/news/" data-nav>← กลับไปหน้าข่าวและบทความ</a></p></article>';
-  focusH1()},function(){$("view").innerHTML='<h1>ข่าวและบทความ</h1>'+errBox();focusH1()})}
-function notFound(msg){markNav("");setHead("ไม่พบหน้านี้","");$("view").innerHTML='<h1>ไม่พบหน้านี้</h1><p>'+esc(msg||"ลิงก์อาจไม่ถูกต้อง หรือหน้านี้ถูกย้ายไปแล้ว")+'</p><div class="btns"><a class="btn" href="/" data-nav>ไปหน้าแรก</a><a class="btn ghost" href="/news/" data-nav>ข่าวและบทความ</a></div>';focusH1()}
-
-/* หน้า "สำหรับบริษัท": ชวนจ้างหมอนวดตาบอดไปนวดที่บริษัท และอธิบายการจ้างงานคนพิการตามมาตรา 33 34 35
-   ข้อมูลกฎหมายตรวจเมื่อ พ.ย. 2569 (กรมการจัดหางาน, กรมส่งเสริมและพัฒนาคุณภาพชีวิตคนพิการ) ตัวเลขมูลค่าเปลี่ยนทุกปี ปรับที่ LAW */
-var LAW={updated:"พฤศจิกายน 2569",s35Value:"123,005",s35Year:"2570"};
-function companyView(){markNav("company");setHead("สำหรับบริษัทและองค์กร","จ้างหมอนวดตาบอดที่ขึ้นทะเบียนถูกต้องไปนวดให้พนักงานที่บริษัท และข้อมูลการจ้างงานคนพิการตามมาตรา 33 มาตรา 34 และมาตรา 35");
- var cta='<div class="btns"><a class="btn" href="'+APP.company+'">ลงทะเบียนบริษัท</a><a class="btn ghost" href="#contact">ติดต่อสมาคม</a></div>';
- $("view").innerHTML='<article class="post wide"><h1>สำหรับบริษัทและองค์กร</h1><p class="lead">ดูแลสุขภาพพนักงาน พร้อมสร้างอาชีพที่มั่นคงให้คนตาบอด</p>'+
- '<section aria-labelledby="hOffice"><h2 id="hOffice">จ้างหมอนวดตาบอดไปนวดที่บริษัท</h2>'+
- '<p>บริษัท ร้านค้า หรือหน่วยงานที่อยากให้พนักงานได้ผ่อนคลายจากการนั่งทำงานนาน (ออฟฟิศซินโดรม) จ้างหมอนวดของสมาคมไปนวดที่บริษัทได้ หมอนวดทุกคนเป็นคนพิการทางการเห็นที่ขึ้นทะเบียนกับกรมสนับสนุนบริการสุขภาพ กระทรวงสาธารณสุข</p>'+
- '<ul><li>เลือกจำนวนหมอนวด วันในสัปดาห์ และเวลาที่ต้องการได้</li><li>เจ้าหน้าที่สมาคมจัดหมอนวดประจำให้ตามวันที่ตกลงกัน</li><li>ใช้เป็นการจ้างงานคนพิการตามกฎหมายได้ เลือกจ้างตามมาตรา 33 หรือมาตรา 35 ได้ในใบลงทะเบียน</li><li>ถ้าไม่ต้องการให้มานวดที่บริษัท ให้หมอนวดไปทำงานที่องค์กรสาธารณประโยชน์แทนก็ได้</li></ul>'+
- '<h3>ขั้นตอน</h3><ol class="steps"><li>กด "ลงทะเบียนบริษัท" เข้าสู่ระบบหรือสมัครสมาชิกด้วยเบอร์โทร แล้วกรอกข้อมูลบริษัท จำนวนหมอนวด และรูปแบบการจ้าง</li><li>เจ้าหน้าที่สมาคมติดต่อกลับเพื่อคุยรายละเอียดและทำสัญญา</li><li>หมอนวดเริ่มงานตามวันที่ตกลง ดูสถานะใบสมัครและตารางงานได้ในแอป</li></ol>'+cta+'</section>'+
- '<section aria-labelledby="hLaw"><h2 id="hLaw">การจ้างงานคนพิการตามกฎหมาย (มาตรา 33, 34, 35)</h2>'+
- '<p>พระราชบัญญัติส่งเสริมและพัฒนาคุณภาพชีวิตคนพิการ พ.ศ. 2550 และที่แก้ไขเพิ่มเติม กำหนดให้นายจ้าง เจ้าของสถานประกอบการ และหน่วยงานของรัฐ ที่มีลูกจ้างตั้งแต่ 100 คนขึ้นไป รับคนพิการเข้าทำงานในอัตรา <b>ลูกจ้างที่ไม่ใช่คนพิการทุก 100 คน ต่อคนพิการ 1 คน</b> ถ้ามีเศษเกิน 50 คน ให้จ้างเพิ่มอีก 1 คน</p>'+
- '<p>ตัวอย่าง: ลูกจ้าง 140 คน ต้องจ้างคนพิการ 1 คน, ลูกจ้าง 160 คน ต้องจ้าง 2 คน</p>'+
- '<div class="cols"><div class="box"><h3>มาตรา 33: จ้างคนพิการเข้าทำงาน</h3><p>รับคนพิการเป็นลูกจ้างของบริษัทโดยตรง เช่น จ้างหมอนวดตาบอดเป็นพนักงานประจำเพื่อนวดให้พนักงานในบริษัท</p></div>'+
- '<div class="box"><h3>มาตรา 34: ส่งเงินเข้ากองทุน</h3><p>ถ้าไม่จ้างตามมาตรา 33 ต้องส่งเงินเข้ากองทุนส่งเสริมและพัฒนาคุณภาพชีวิตคนพิการ คำนวณจากอัตราค่าจ้างขั้นต่ำต่ำสุด คูณ 365 วัน คูณจำนวนคนพิการที่ไม่ได้จ้าง</p></div>'+
- '<div class="box"><h3>มาตรา 35: ให้สิทธิแทนการจ้าง</h3><p>ถ้าไม่จ้างตามมาตรา 33 และไม่ส่งเงินตามมาตรา 34 ให้สิทธิแก่คนพิการหรือผู้ดูแลคนพิการแทนได้ มูลค่าไม่น้อยกว่า '+LAW.s35Value+' บาทต่อคนต่อปี (ปีงบประมาณ '+LAW.s35Year+')</p></div></div>'+
- '<h3>การให้สิทธิตามมาตรา 35 มี 7 รูปแบบ</h3><ol><li>ให้สัมปทาน</li><li>จัดสถานที่จำหน่ายสินค้าหรือบริการ</li><li>จัดจ้างเหมาช่วงงานหรือจ้างเหมาบริการ (เช่น จ้างหมอนวดตาบอดมานวดให้พนักงาน)</li><li>ฝึกงาน</li><li>จัดให้มีอุปกรณ์หรือสิ่งอำนวยความสะดวก</li><li>จัดให้มีบริการล่ามภาษามือ</li><li>ให้ความช่วยเหลืออื่นใดแก่คนพิการหรือผู้ดูแลคนพิการ</li></ol>'+
- '<div class="box"><h3>สมาคมช่วยบริษัทได้</h3><p>สมาคมจัดหาหมอนวดตาบอดให้บริษัทที่ต้องการจ้างตามมาตรา 33 หรือให้สิทธิตามมาตรา 35 แบบจ้างเหมาบริการ และช่วยประสานรายละเอียดกับบริษัท</p>'+cta+'</div>'+
- '</section></article>';
- focusH1()}
-function route(){var p=location.pathname.replace(/\/index\.html$/,"/").replace(/\/+$/,"")||"/",m;
- if(p==="/")return homeView();
- if(p==="/company")return companyView();
- if(p==="/news")return listView(new URLSearchParams(location.search).get("k")||"");
- if((m=p.match(/^\/news\/(\d{1,9})$/)))return postView(+m[1]);
- notFound()}
+function loadLatest(){var el=$("latest");el.removeAttribute("data-pending");
+ api(V.listQ(null,6)).then(function(a){if($("latest")===el)el.innerHTML=V.latestHTML(a)},function(){if($("latest")===el)el.innerHTML=V.errBox("โหลดข่าวไม่สำเร็จ")})}
+function loadList(kind,offset){var el=$("list");el.removeAttribute("data-pending");
+ api(V.listQ(kind,V.PAGE+1,offset)).then(function(a){if($("list")!==el)return;var btn=el.querySelector(".more");if(btn)btn.remove();
+  if(!offset){el.innerHTML=V.listBody(kind,a,0);return}
+  var more=a.length>V.PAGE;a=a.slice(0,V.PAGE);
+  el.querySelector("ul.grid").insertAdjacentHTML("beforeend",a.map(function(x){return V.card(x,2)}).join(""));
+  el.insertAdjacentHTML("beforeend",V.moreBtn(kind,offset,more));
+  say("โหลดเพิ่มอีก "+a.length+" เรื่อง");var first=el.querySelectorAll("ul.grid > li")[offset];if(first){var l=first.querySelector("h2 a");if(l)l.focus()}},
+  function(){if($("list")!==el)return;if(offset){var b=el.querySelector(".more");if(b)b.innerHTML=V.errBox("โหลดเพิ่มไม่สำเร็จ")}else el.innerHTML=V.errBox()})}
+function showPost(r){$("view").innerHTML=V.LOADING;
+ var p=cache[r.no]?Promise.resolve([cache[r.no]]):api(V.postQ(r.no));
+ p.then(function(x){var a=x&&x[0];if(!a){show({name:"notfound"},V.POST_GONE);return}cache[r.no]=a;
+  setHead(r,a);$("view").innerHTML=V.postHTML(a,location.origin+"/news/"+a.no,shareLabel());focusH1()},
+  function(){$("view").innerHTML='<h1>ข่าวและบทความ</h1>'+V.errBox();focusH1()})}
+function show(r,msg){markNav(navKey(r));setHead(r);
+ if(r.name==="post")return showPost(r);
+ $("view").innerHTML=r.name==="home"?V.homeHTML(null):r.name==="company"?V.companyHTML():r.name==="list"?V.listHTML(r.kind,null):V.notFoundHTML(msg);
+ focusH1();
+ if(r.name==="home")loadLatest();if(r.name==="list")loadList(r.kind,0)}
+function route(){show(V.parse(location.pathname,location.search))}
+/* เปิดหน้าครั้งแรก: ถ้า Cloudflare ใส่เนื้อหาของหน้านี้มาแล้ว (data-ssr) ใช้ของเดิม ไม่สร้างใหม่ (ไม่ย้ายโฟกัส) โหลดเฉพาะส่วนที่ยังขาด */
+function start(){var v=$("view"),r=V.parse(location.pathname,location.search);
+ if(v.getAttribute("data-ssr")!==location.pathname+location.search){route();return}
+ markNav(navKey(r));
+ if($("latest")&&$("latest").hasAttribute("data-pending"))loadLatest();
+ if($("list")&&$("list").hasAttribute("data-pending"))loadList(r.kind,0);
+ var c=v.querySelector("button[data-copy]");if(c)c.textContent=shareLabel()}
 function go(href){var u=new URL(href,location.href);if(u.origin!==location.origin){location.href=href;return}
  if(u.pathname+u.search!==location.pathname+location.search)history.pushState(null,"",u.pathname+u.search+u.hash);route()}
 document.addEventListener("click",function(e){var a=e.target.closest("a[data-nav]");
@@ -241,13 +181,12 @@ document.addEventListener("click",function(e){var a=e.target.closest("a[data-nav
   if(canShare()){navigator.share({title:document.title,url:t}).catch(function(){})}
   else if(navigator.clipboard)navigator.clipboard.writeText(t).then(done,function(){prompt("คัดลอกลิงก์นี้",t)});else prompt("คัดลอกลิงก์นี้",t)}});
 window.addEventListener("popstate",route);
-function loadContact(){api("/rest/v1/rpc/public_contact",{method:"POST",body:"{}"}).then(function(c){if(!c)return;
- if(c.name)$("cName").textContent=c.name;
- if(c.phone){var ph=String(c.phone).replace(/\D/g,""),show=ph.length===10?ph.slice(0,3)+"-"+ph.slice(3,6)+"-"+ph.slice(6):c.phone;$("cPhone").innerHTML='โทร <a href="tel:'+esc(ph)+'">'+esc(show)+'</a>'}
- if(c.hours)$("cHours").textContent=c.hours;
- if(c.email&&/^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/.test(c.email))$("cEmail").innerHTML='อีเมล <a href="mailto:'+esc(c.email)+'">'+esc(c.email)+'</a>'},function(){})}
-function setCopy(){var y=new Date().getFullYear()+543;$("copy").textContent="© "+y+" "+SITE_NAME+" สงวนลิขสิทธิ์"}
-route();loadContact();setCopy();
+function loadContact(){api("/rest/v1/rpc/public_contact",{method:"POST",body:"{}"}).then(function(c){if(!c)return;var p=V.contactParts(c);
+ $("cName").innerHTML=p.name;if(p.phone)$("cPhone").innerHTML=p.phone;if(p.email)$("cEmail").innerHTML=p.email;if(p.hours)$("cHours").innerHTML=p.hours},function(){})}
+$("copy").textContent=V.copyText(new Date().getFullYear()+543);
+start();loadContact();
 </script>
+<!-- สถิติผู้เข้าชม Cloudflare Web Analytics (ไม่ใช้คุกกี้ ไม่เก็บข้อมูลส่วนตัว) ดูที่ Cloudflare > Analytics & Logs > Web Analytics; token นี้เปิดเผยได้ spa = นับการกดเปลี่ยนหน้าในเว็บด้วย -->
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "84e868c35fa94960abe34feda073bcaf", "spa": true}'></script>
 </body>
 </html>

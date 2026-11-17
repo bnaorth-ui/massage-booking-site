@@ -43,6 +43,10 @@ ok('home: list query only asks for published items',REQ.every(u=>u.includes('act
 ok('home: book / shop / staff links go to the existing apps',await p.evaluate(()=>['massage-customer-bna.pages.dev/','massage-shop-bna.pages.dev/reg/','massage-staff-bna.pages.dev/apply/'].every(u=>!!document.querySelector('a[href="https://'+u+'"]'))));
 ok('home: contact phone from public_contact is a tel: link',await W(()=>true)&&await p.evaluate(()=>{const a=document.querySelector('#cPhone a');return !!a&&a.getAttribute('href')==='tel:0989983654'&&a.textContent==='098-998-3654'}));
 ok('home: hours shown',(await p.textContent('#cHours')).includes('09:00'));
+ok('home: tab title',(await p.title())==='นวดไทยโดยหมอนวดตาบอดที่ขึ้นทะเบียนถูกต้อง | สมาคมวิทยากรฝึกอาชีพคนตาบอด');
+ok('contact order: name, phone, email, hours',await p.evaluate(()=>[...document.querySelectorAll('#contact p[id]:not(#copy)')].map(x=>x.id).join(',')==='cName,cPhone,cEmail,cHours'));
+ok('visitor stats: Cloudflare Web Analytics beacon with token and spa on',await p.evaluate(()=>{const x=document.querySelector('script[src="https://static.cloudflareinsights.com/beacon.min.js"]');if(!x)return false;const c=JSON.parse(x.getAttribute('data-cf-beacon'));return x.defer&&c.token==='84e868c35fa94960abe34feda073bcaf'&&c.spa===true}));
+ok('no unverified organisation link in page',!(await p.content()).includes('bna.or.th'));
 ok('home: email from public_contact is a mailto link',await p.evaluate(()=>{const a=document.querySelector('#cEmail a');return !!a&&a.getAttribute('href')==='mailto:info@example.org'&&a.textContent==='info@example.org'}));
 ok('footer: copyright with Thai year and association name',(await p.textContent('#copy'))==='© '+(new Date().getFullYear()+543)+' สมาคมวิทยากรฝึกอาชีพคนตาบอด สงวนลิขสิทธิ์');
 ok('a11y: skip link and labelled main nav',await p.evaluate(()=>!!document.querySelector('a.skip[href="#main"]')&&document.querySelector('nav.main').getAttribute('aria-label')==='เมนูหลัก'&&document.querySelector('nav.main a[aria-current="page"]').textContent==='หน้าแรก'));
@@ -101,7 +105,7 @@ ok('company: office massage invite + steps + register button',ct.includes('จ�
 ok('company: law facts (100:1, เศษเกิน 50, ม.33/34/35, 365 วัน)',['ทุก 100 คน ต่อคนพิการ 1 คน','เศษเกิน 50 คน','มาตรา 33','มาตรา 34','มาตรา 35','365 วัน','พ.ศ. 2550'].every(t=>ct.includes(t)));
 ok('company: s35 has 7 forms and value; filing period paragraph removed',await p.evaluate(()=>{const o=[...document.querySelectorAll('#view ol')].find(x=>x.textContent.includes('สัมปทาน'));return !!o&&o.children.length===7})&&ct.includes('123,005 บาท')&&!ct.includes('1 ตุลาคม ถึง 31 ธันวาคม')&&!ct.includes('e-service.doe.go.th')&&!await p.$('#view a[href="tel:1506"]'));
 ok('company: headings in order (h1 > h2 > h3), no source/date note',await p.evaluate(()=>{const hs=[...document.querySelectorAll('#view h1,#view h2,#view h3')].map(h=>+h.tagName[1]);return hs[0]===1&&hs.every((v,i)=>i===0||v<=hs[i-1]+1)})&&!ct.includes('ข้อมูลนี้เป็นข้อมูลเบื้องต้น'));
-ok('company: tab title',(await p.title()).startsWith('สำหรับบริษัทและองค์กร | '));
+ok('company: tab title has keywords',(await p.title())==='จ้างหมอนวดตาบอดไปนวดที่บริษัท และจ้างงานคนพิการ มาตรา 33, 35 | สมาคมวิทยากรฝึกอาชีพคนตาบอด');
 await p.goto(BASE+'/company/');await p.waitForSelector('#hLaw');ok('company: direct link works',(await h1()).t==='สำหรับบริษัทและองค์กร');
 
 // ว่าง / โหลดไม่สำเร็จแล้วลองใหม่

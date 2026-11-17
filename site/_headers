@@ -5,6 +5,8 @@
   Cache-Control: public, max-age=0, must-revalidate
 /news/*
   Cache-Control: public, max-age=0, must-revalidate
+/shared/*
+  Cache-Control: public, max-age=0, must-revalidate
 /og-share.png
   Cache-Control: public, max-age=86400
 /icon-*.png
