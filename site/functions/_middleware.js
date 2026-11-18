@@ -3,7 +3,7 @@
 // ให้ Google / Bing / LINE / Facebook เห็นเนื้อหาครบโดยไม่ต้องรันสคริปต์ หน้าเว็บในเบราว์เซอร์ใช้เนื้อหาที่ใส่มาเลย (ดู start() ใน index.html)
 // เนื้อหาเดียวกับหน้าเว็บ มาจาก ../shared/views.js  ไฟล์อื่น (รูป ไอคอน .js) ส่งต่อไปตามปกติ
 import '../shared/views.js';
-import { sbGet, sbRpc, imgUrl, withMeta } from '../shared/meta.js';
+import { sbGet, sbRpc, withMeta } from '../shared/meta.js';
 
 const V = globalThis.SV;
 const GOOGLE_VERIFY = 'google388ba24f989c9ab1.html';
@@ -60,11 +60,12 @@ export async function onRequest(ctx) {
   if (r.name === 'company') jsonld.push(V.faqLD(info));
   let image = null;
   if (art) {
-    image = imgUrl(art.cover_path);
+    image = V.imgUrl(art.cover_path);
     jsonld.push({
       '@context': 'https://schema.org', '@type': art.kind === 'news' ? 'NewsArticle' : 'Article',
       headline: String(art.title).slice(0, 110), description: m.desc, datePublished: art.day, dateModified: art.updated_at || art.day,
       image: image ? [image] : undefined, mainEntityOfPage: url,
+      author: { '@type': 'Organization', name: V.SITE_NAME, url: V.ORG_SITE },
       publisher: { '@type': 'Organization', name: V.SITE_NAME, logo: { '@type': 'ImageObject', url: u.origin + '/icon-512.png' } }
     });
   }

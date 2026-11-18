@@ -18,11 +18,6 @@ export function esc(x) {
   return String(x == null ? '' : x).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
-export function imgUrl(p) {
-  if (!p) return null;
-  if (/^https?:\/\//.test(p)) return p;
-  return SB.url + '/storage/v1/object/public/' + (/^place-images\//.test(p) ? p : 'place-images/' + p);
-}
 
 // แทนค่าแท็ก meta ในหน้า index.html ให้ตรงกับหน้านั้น ให้ Google / LINE / Facebook เห็นชื่อหน้า คำอธิบาย และรูปที่ถูกต้อง
 // (โปรแกรมพวกนี้มักไม่รันสคริปต์ในหน้าเว็บ) m: { title, desc, url, ogType, image, imageAlt, jsonld: [..], noindex }

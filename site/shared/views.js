@@ -183,7 +183,7 @@
       '<div class="btns"><a class="btn" href="' + APP.orgreq + '">ขอบริการสำหรับหน่วยงาน</a>' + call + '</div><p class="sub"><a href="#steps">ดูขั้นตอน</a></p></div>' +
       '<div class="box offer"><span class="badge regular">ประจำ</span><h2>จ้างประจำตามมาตรา 33 หรือ 35</h2>' +
       '<p class="tagline">ใช้แทนการส่งเงินเข้ากองทุนตามมาตรา 34</p>' +
-      '<ul><li>หมอนวดประจำที่บริษัทตามวันและเวลาที่ตกลง</li><li>นับเป็นการจ้างงานคนพิการตามกฎหมาย</li><li>หมอนวดประจำลา สมาคมจัดหมอนวดแทนให้</li></ul>' +
+      '<ul><li>หมอนวดประจำที่บริษัทตามวันและเวลาที่ตกลง</li><li>นับเป็นการจ้างงานคนพิการตามกฎหมาย</li></ul>' +
       '<div class="btns"><a class="btn" href="' + APP.company + '">ลงทะเบียนบริษัท</a>' + call + '</div><p class="sub"><a href="#law">ดูข้อกฎหมาย</a></p></div>' +
       '</div>' +
       works +
@@ -218,8 +218,8 @@
   function copyText(year) { return "© " + year + " " + SITE_NAME + " สงวนลิขสิทธิ์"; }
 
   G.SV = {
-    SB: SB, APP: APP, ORG_SITE: ORG_SITE, KIND: KIND, SITE_NAME: SITE_NAME, LAW: LAW, PAGE: PAGE, POST_GONE: POST_GONE, LOADING: LOADING,
-    esc: esc, imgUrl: imgUrl, thDate: thDate, renderBody: renderBody, card: card, errBox: errBox, listQ: listQ, postQ: postQ,
+    SB: SB, ORG_SITE: ORG_SITE, SITE_NAME: SITE_NAME, PAGE: PAGE, POST_GONE: POST_GONE, LOADING: LOADING,
+    esc: esc, imgUrl: imgUrl, card: card, errBox: errBox, listQ: listQ, postQ: postQ,
     parse: parse, canonPath: canonPath, meta: meta, homeHTML: homeHTML, latestHTML: latestHTML, listHTML: listHTML, listBody: listBody, moreBtn: moreBtn,
     postHTML: postHTML, adjQ: adjQ, adjHTML: adjHTML, notFoundHTML: notFoundHTML, companyHTML: companyHTML, faqLD: faqLD, baht: baht, telHref: telHref, contactParts: contactParts, copyText: copyText
   };
