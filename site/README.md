@@ -15,7 +15,7 @@
 
 1. **ฐานข้อมูล:** รัน `supabase/sql/2026-11-17_site_articles.sql` แล้ว (17 พ.ย. 2569)
 2. **เว็บใน Cloudflare Pages:** สร้างแล้ว (17 พ.ย. 2569 ผ่านตัวเชื่อมต่อ Cloudflare) ชื่อ `massage-home-bna` ผูกกับ GitHub สาขา `main` ตั้งค่าเหมือนอีก 4 เว็บ: Build command `exit 0`, Root directory `site`, Build output directory `.` (ต้องมี `exit 0` เพื่อให้ `functions/` ทำงาน) Cloudflare ผูกได้สูงสุด 5 เว็บต่อ repository เว็บนี้เป็นเว็บที่ 5
-3. **ถ้าใช้ชื่ออื่นหรือโดเมนของสมาคม:** แจ้ง Claude ให้แก้ `SITE_URL` ในแอปแอดมิน (ปุ่ม "ดูบนเว็บ")
+3. **ถ้าใช้ชื่ออื่นหรือโดเมนของสมาคม:** แจ้ง Claude ให้แก้ `SITE_URL` ในแอปแอดมิน (ปุ่ม "ดูบนเว็บ") และ `SITE_HOST` ใน `shared/views.js`
 4. **Google:** ใน Google Search Console เพิ่มเว็บนี้ แล้วส่งแผนผังเว็บ `/sitemap.xml`
 
 ## ไฟล์

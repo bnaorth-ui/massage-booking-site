@@ -33,7 +33,7 @@
 6. ถ้าเปลี่ยน `sw.js` ให้พิจารณาเลข `PAGE_CACHE` (ใช้ล้างแคชหน้าเว็บของทุกเครื่อง)
 
 ### เว็บประชาสัมพันธ์ (`site/`, เว็บที่ 5)
-- หน้าแรก ข่าวและบทความ สำหรับคนทั่วไป ไม่ต้องล็อกอิน ไม่ใช่แอป (ไม่มี version.json, sw.js, หน้า "มีเวอร์ชันใหม่") Cloudflare Pages ชื่อ `massage-home-bna` (สร้างแล้ว คู่มือ `site/README.md`) ถ้าเปลี่ยนชื่อ แก้ `SITE_URL` ในแอปแอดมินด้วย
+- หน้าแรก ข่าวและบทความ สำหรับคนทั่วไป ไม่ต้องล็อกอิน ไม่ใช่แอป (ไม่มี version.json, sw.js, หน้า "มีเวอร์ชันใหม่") Cloudflare Pages ชื่อ `massage-home-bna` (สร้างแล้ว คู่มือ `site/README.md`) ถ้าเปลี่ยนชื่อ แก้ `SITE_URL` ในแอปแอดมิน และ `SITE_HOST` ใน `site/shared/views.js` ด้วย
 - ข้อมูลจากตาราง `site_articles` (แยกจาก `announcements` ซึ่งเป็นประกาศภายใน) แอดมินเขียนที่เมนู ระบบ > บทความและข่าว (สิทธิ์ `users`) SQL: `supabase/sql/2026-11-17_site_articles.sql`
 - เนื้อหาทุกหน้าอยู่ใน `site/shared/views.js` ที่เดียว (ใช้ทั้งหน้าเว็บและ Cloudflare) `site/functions/_middleware.js` ใส่เนื้อหา ชื่อหน้า คำอธิบาย canonical รูปแชร์ ข้อมูลโครงสร้าง และกล่องติดต่อลงหน้าเว็บตั้งแต่ตอนส่ง (ให้ Google/Bing/LINE เห็นโดยไม่รันสคริปต์) หน้าเว็บเห็น `data-ssr` แล้วใช้ของเดิม แผนผังเว็บและ robots.txt อยู่ใน functions ด้วย ไฟล์ร่วม `site/shared/meta.js`
 - สถิติผู้เข้าชม: Cloudflare Web Analytics (สคริปต์ beacon ท้าย `site/index.html` token เปิดเผยได้) ดูใน Cloudflare > Analytics & Logs > Web Analytics ยังไม่ได้เปิดกับ 4 แอป

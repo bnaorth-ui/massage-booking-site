@@ -33,7 +33,10 @@ export async function onRequest(ctx) {
     info = { rate: c && c.org_rate, phone: c && c.phone, email: c && c.email, works: w };
     view = V.companyHTML(info);
   }
-  else if (r.name === 'list') view = V.listHTML(r.kind, await sbGet(V.listQ(r.kind, V.PAGE + 1, 0)).catch(() => null));
+  else if (r.name === 'list') {
+    const [l, k] = await Promise.all([sbGet(V.listQ(r.kind, V.PAGE + 1, 0)).catch(() => null), sbGet(V.KINDS_Q).catch(() => null)]);
+    view = V.listHTML(r.kind, l, k && V.kindsOf(k));
+  }
   else if (r.name === 'post') {
     let rows;
     try { rows = await sbGet(V.postQ(r.no)); } catch (e) { rows = undefined; }

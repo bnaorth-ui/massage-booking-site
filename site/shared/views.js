@@ -8,6 +8,8 @@
   var APP = { book: "https://massage-customer-bna.pages.dev/", shop: "https://massage-shop-bna.pages.dev/reg/", staff: "https://massage-staff-bna.pages.dev/apply/", company: "https://massage-customer-bna.pages.dev/?company=1", orgreq: "https://massage-customer-bna.pages.dev/?orgreq=1", privacy: "https://massage-customer-bna.pages.dev/privacy/" };
   var KIND = { news: "ข่าวและกิจกรรม", article: "บทความ", work: "ผลงานบริการ" };
   var SITE_NAME = "สมาคมวิทยากรฝึกอาชีพคนตาบอด";
+  /* ที่อยู่ของเว็บนี้ ลิงก์ในเนื้อหาที่ชี้มาเว็บนี้เปิดในหน้าเดิม (ถ้าเปลี่ยนชื่อเว็บใน Cloudflare แก้ที่นี่ด้วย) */
+  var SITE_HOST = "massage-home-bna.pages.dev";
   /* เว็บไซต์หลักของสมาคม (ผู้ใช้ยืนยัน 18 พ.ย. 2569) เว็บนี้เน้นการจ้างงานคนตาบอด ข่าว ผลงาน การสมัคร และจองนวด */
   var ORG_SITE = "https://bna.or.th/";
   /* ข้อมูลกฎหมายหน้า "สำหรับบริษัท" ตรวจเมื่อ พ.ย. 2569 (กรมการจัดหางาน, กรมส่งเสริมและพัฒนาคุณภาพชีวิตคนพิการ) มูลค่ามาตรา 35 เปลี่ยนทุกปี ปรับที่นี่ */
@@ -24,8 +26,19 @@
   function listQ(kind, limit, offset) { return "/rest/v1/site_articles?select=" + LIST_COLS + "&active=eq.true" + (kind === "!work" ? "&kind=neq.work" : kind ? "&kind=eq." + kind : "") + "&order=pinned.desc,day.desc,no.desc&limit=" + limit + (offset ? "&offset=" + offset : ""); }
   function postQ(no) { return "/rest/v1/site_articles?select=*&active=eq.true&no=eq." + no + "&limit=1"; }
 
-  /* เนื้อหาบทความ: ข้อความธรรมดา บรรทัดว่างคั่นย่อหน้า, "## " = หัวข้อย่อย, "- " = รายการ, ลิงก์ http(s) กดได้ (ไม่รับ HTML) */
-  function linkify(s) { return esc(s).replace(/https?:\/\/[^\s<]+[^\s<.,;:!?)"'\]]/g, function (u) { return '<a href="' + u + '" rel="noopener nofollow" target="_blank">' + u + '<span class="sr"> (เปิดหน้าต่างใหม่)</span></a>'; }); }
+  /* ประเภทที่มีเรื่องเผยแพร่แล้ว (ใช้ซ่อนตัวกรองที่ยังว่าง) */
+  var KINDS_Q = "/rest/v1/site_articles?select=kind&active=eq.true";
+  function kindsOf(rows) { var o = {}; (rows || []).forEach(function (x) { if (KIND[x.kind]) o[x.kind] = 1; }); return Object.keys(o); }
+
+  /* เนื้อหาบทความ: ข้อความธรรมดา บรรทัดว่างคั่นย่อหน้า, "## " = หัวข้อย่อย, "- " = รายการ, ลิงก์ http(s) กดได้ (ไม่รับ HTML)
+     ลิงก์มาเว็บนี้เปิดในหน้าเดิม (กดย้อนกลับได้) ลิงก์ไปเว็บอื่นเปิดหน้าต่างใหม่ */
+  function linkify(s) {
+    return esc(s).replace(/https?:\/\/[^\s<]+[^\s<.,;:!?)"'\]]/g, function (u) {
+      var m = /^https?:\/\/([^\/?#]+)(.*)$/.exec(u);
+      if (m && m[1].toLowerCase() === SITE_HOST) return '<a href="' + (m[2] || "/") + '" data-nav>' + u + '</a>';
+      return '<a href="' + u + '" rel="noopener nofollow" target="_blank">' + u + '<span class="sr"> (เปิดหน้าต่างใหม่)</span></a>';
+    });
+  }
   function renderBody(t) {
     var out = [], blocks = String(t || "").replace(/\r/g, "").split(/\n\s*\n/);
     blocks.forEach(function (b) {
@@ -91,15 +104,18 @@
   }
   function latestHTML(a) { return a.length ? '<ul class="grid">' + a.map(function (x) { return card(x, 3); }).join("") + '</ul>' : '<div class="empty">ยังไม่มีข่าวในตอนนี้ ติดตามได้เร็วๆ นี้</div>'; }
 
-  function listHead(kind) {
-    var ttl = kind ? KIND[kind] : "ข่าวและบทความ";
-    var f = [["", "ทั้งหมด"], ["news", "ข่าวและกิจกรรม"], ["work", "ผลงานบริการ"], ["article", "บทความ"]].map(function (x) { return '<li><a href="/news/' + (x[0] ? "?k=" + x[0] : "") + '" data-nav' + (x[0] === kind ? ' aria-current="page"' : '') + '>' + x[1] + '</a></li>'; }).join("");
-    return '<h1>' + esc(ttl) + '</h1><nav aria-label="เลือกประเภท"><ul class="filters">' + f + '</ul></nav>';
+  /* ตัวกรองประเภท แสดงเฉพาะประเภทที่มีเรื่องแล้ว (และประเภทที่กำลังเปิดอยู่) ถ้ามีประเภทเดียว ไม่ต้องมีตัวกรอง
+     kinds: รายชื่อประเภทที่มีเรื่อง หรือ null = ยังไม่รู้ (แสดงทุกประเภท) */
+  function filtersHTML(kind, kinds) {
+    var show = ["news", "work", "article"].filter(function (k) { return !kinds || kinds.indexOf(k) >= 0 || k === kind; });
+    if (show.length < 2 && !kind) return "";
+    return '<nav aria-label="เลือกประเภท"><ul class="filters">' + [""].concat(show).map(function (k) { return '<li><a href="/news/' + (k ? "?k=" + k : "") + '" data-nav' + (k === kind ? ' aria-current="page"' : '') + '>' + (k ? KIND[k] : "ทั้งหมด") + '</a></li>'; }).join("") + '</ul></nav>';
   }
   /* items: แถวที่ได้จากฐานข้อมูล (ขอมา PAGE+1 แถว เพื่อรู้ว่ามีหน้าต่อไหม) หรือ null = ให้หน้าเว็บโหลดเอง */
-  function listHTML(kind, items) {
-    if (!items) return listHead(kind) + '<div id="list" data-pending>' + LOADING + '</div>';
-    return listHead(kind) + '<div id="list">' + listBody(kind, items, 0) + '</div>';
+  function listHTML(kind, items, kinds) {
+    var head = '<h1>' + esc(kind ? KIND[kind] : "ข่าวและบทความ") + '</h1><div id="filt"' + (kinds ? '' : ' data-pending') + '>' + filtersHTML(kind, kinds) + '</div>';
+    if (!items) return head + '<div id="list" data-pending>' + LOADING + '</div>';
+    return head + '<div id="list">' + listBody(kind, items, 0) + '</div>';
   }
   function listBody(kind, items, offset) {
     var more = items.length > PAGE; items = items.slice(0, PAGE);
@@ -218,8 +234,8 @@
   function copyText(year) { return "© " + year + " " + SITE_NAME + " สงวนลิขสิทธิ์"; }
 
   G.SV = {
-    SB: SB, ORG_SITE: ORG_SITE, SITE_NAME: SITE_NAME, PAGE: PAGE, POST_GONE: POST_GONE, LOADING: LOADING,
-    esc: esc, imgUrl: imgUrl, card: card, errBox: errBox, listQ: listQ, postQ: postQ,
+    SB: SB, ORG_SITE: ORG_SITE, SITE_NAME: SITE_NAME, PAGE: PAGE, POST_GONE: POST_GONE, LOADING: LOADING, KINDS_Q: KINDS_Q,
+    esc: esc, imgUrl: imgUrl, card: card, errBox: errBox, listQ: listQ, postQ: postQ, kindsOf: kindsOf, filtersHTML: filtersHTML,
     parse: parse, canonPath: canonPath, meta: meta, homeHTML: homeHTML, latestHTML: latestHTML, listHTML: listHTML, listBody: listBody, moreBtn: moreBtn,
     postHTML: postHTML, adjQ: adjQ, adjHTML: adjHTML, notFoundHTML: notFoundHTML, companyHTML: companyHTML, faqLD: faqLD, baht: baht, telHref: telHref, contactParts: contactParts, copyText: copyText
   };

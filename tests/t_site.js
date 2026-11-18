@@ -10,7 +10,7 @@ const srv=http.createServer((q,s)=>{const u=decodeURIComponent(q.url.split('?')[
  s.writeHead(200,{'Content-Type':MIME[path.extname(f)]||'application/octet-stream'});fs.createReadStream(f).pipe(s)});
 const day=i=>{const d=new Date(Date.UTC(2026,10,17-i));return d.toISOString().slice(0,10)};
 function mk(){const A=[];
- A.push({no:1,kind:'news',title:'อบรมหมอนวดรุ่นใหม่',summary:'เปิดรับสมัครแล้ววันนี้',body:'ย่อหน้าแรก\nบรรทัดที่สอง\n\n## หัวข้อย่อย\n- ข้อหนึ่ง\n- ข้อสอง\n\nอ่านเพิ่มที่ https://bna.or.th/info.',cover_path:'place-images/00000000-0000-0000-0000-000000000000/site-a.jpg',cover_alt:'ภาพหมอนวดกำลังอบรม',day:day(3),pinned:false,active:true});
+ A.push({no:1,kind:'news',title:'อบรมหมอนวดรุ่นใหม่',summary:'เปิดรับสมัครแล้ววันนี้',body:'ย่อหน้าแรก\nบรรทัดที่สอง\n\n## หัวข้อย่อย\n- ข้อหนึ่ง\n- ข้อสอง\n\nอ่านเพิ่มที่ https://bna.or.th/info.\n\nสำหรับบริษัท ดูที่ https://massage-home-bna.pages.dev/company/',cover_path:'place-images/00000000-0000-0000-0000-000000000000/site-a.jpg',cover_alt:'ภาพหมอนวดกำลังอบรม',day:day(3),pinned:false,active:true});
  A.push({no:2,kind:'article',title:'ประโยชน์ของการนวดไทย <img src=x onerror=window.XSS=1>',summary:'',body:'<script>window.XSS=2</script>ข้อความ',cover_path:null,cover_alt:'',day:day(5),pinned:true,active:true});
  A.push({no:3,kind:'news',title:'ร่างที่ยังไม่เผยแพร่',summary:'',body:'',cover_path:null,cover_alt:'',day:day(0),pinned:false,active:false});
  A.push({no:19,kind:'work',title:'นวดให้พนักงานบริษัท ก',summary:'วันสุขภาพพนักงาน',body:'x',cover_path:'place-images/00000000-0000-0000-0000-000000000000/site-w.jpg',cover_alt:'หมอนวดกำลังนวดพนักงาน',day:day(40),pinned:false,active:true});
@@ -81,6 +81,10 @@ await p.click('.backs a[href="/"]');ok('กลับหน้าแรก goes h
 await p.goto(BASE+'/news/1');await p.waitForSelector('article.post h1');
 ok('post: nav marks ข่าวและบทความ',await p.evaluate(()=>document.querySelector('nav.main a[aria-current="page"]').textContent==='ข่าวและบทความ'));
 
+ok('post: link to this site opens in the same tab (no new-window notice), link to other sites opens new window',await p.evaluate(()=>{const a=[...document.querySelectorAll('.body a')];const own=a.find(x=>x.textContent==='https://massage-home-bna.pages.dev/company/'),ext=a.find(x=>x.getAttribute('href')==='https://bna.or.th/info');return !!own&&own.getAttribute('href')==='/company/'&&!own.target&&own.hasAttribute('data-nav')&&!/หน้าต่างใหม่/.test(own.textContent)&&!!ext&&ext.target==='_blank'}));
+await p.click('.body a[href="/company/"]');
+ok('own-site link in article goes to company page in the same tab; back returns to the article',await p.waitForSelector('#hLaw',{timeout:5000}).then(()=>true,()=>false)&&p.url()===BASE+'/company/'&&(await p.context().pages()).length===1&&await p.goBack().then(()=>p.waitForFunction(()=>document.querySelector('#view h1')&&document.querySelector('#view h1').textContent==='อบรมหมอนวดรุ่นใหม่',null,{timeout:5000})).then(()=>true,()=>false));
+
 // หน้าบทความ html ในเนื้อหาไม่ทำงาน
 await p.goto(BASE+'/news/2');await p.waitForSelector('article.post h1');
 ok('xss: script in body/title shown as text',await p.evaluate(()=>!window.XSS&&document.querySelector('.body').textContent.includes('<script>')&&document.querySelector('article h1').textContent.includes('<img')));
@@ -109,6 +113,15 @@ await p.goBack();
 ok('back button returns to all items',await p.waitForFunction(()=>document.querySelectorAll('#list .card').length===12&&document.querySelector('#view h1').textContent==='ข่าวและบทความ',null,{timeout:5000}).then(()=>true,()=>false));
 await p.goto(BASE+'/news/?k=bogus');await p.waitForSelector('#list .card');
 ok('unknown filter treated as all',await p.$$eval('#list .card',a=>a.length)===12);
+ok('filters: all 3 types have stories, so all filters shown',await p.waitForFunction(()=>{const f=document.getElementById('filt');return f&&!f.hasAttribute('data-pending')&&[...f.querySelectorAll('a')].map(a=>a.textContent).join()==='ทั้งหมด,ข่าวและกิจกรรม,ผลงานบริการ,บทความ'},null,{timeout:4000}).then(()=>true,()=>false));
+DB=mk().filter(a=>a.kind==='article'||!a.active);
+await p.goto(BASE+'/news/');await p.waitForSelector('#list .card');
+ok('filters: only one type has stories -> no filter bar (empty types hidden)',await p.waitForFunction(()=>{const f=document.getElementById('filt');return f&&!f.hasAttribute('data-pending')&&!f.querySelector('.filters')},null,{timeout:4000}).then(()=>true,()=>false));
+await p.goto(BASE+'/news/?k=work');await p.waitForSelector('#list .empty');
+ok('filters: opening an empty type by link keeps that filter (current) + ทั้งหมด + types with stories',await p.waitForFunction(()=>{const f=document.getElementById('filt');return f&&!f.hasAttribute('data-pending')&&[...f.querySelectorAll('a')].map(a=>a.textContent+(a.getAttribute('aria-current')?'*':'')).join()==='ทั้งหมด,ผลงานบริการ*,บทความ'},null,{timeout:4000}).then(()=>true,()=>false));
+await p.click('.filters a[href="/news/"]');
+ok('filters: going back to all in page uses the loaded types (no filter bar)',await p.waitForFunction(()=>document.querySelectorAll('#list .card').length===1&&!document.querySelector('#filt .filters'),null,{timeout:4000}).then(()=>true,()=>false));
+DB=mk();
 
 // หน้าสำหรับบริษัท
 await p.goto(BASE+'/');await p.waitForSelector('#latest .card');
