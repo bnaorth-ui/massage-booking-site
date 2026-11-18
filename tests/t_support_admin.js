@@ -37,7 +37,7 @@ const T={bookings:BKX.filter(b=>b.place_id!=='og1').concat(RPT),admins:[],
  notifications:[{id:'n1',audience:'admin',kind:'topup',title:'ร้านขอเติมเงิน 500 บาท',body:'อ้างอิง TP000001\nร้านปิดอัตโนมัติ',created_at:'2026-10-17T04:30:00Z'},{id:'n2',audience:'admin',kind:'status',title:'ร้านปิดรับจองชั่วคราว',body:'x',created_at:'2026-10-17T05:30:00Z'},{id:'n3',audience:'admin',kind:'approval',title:'มีคำขอลงทะเบียน',body:'y',created_at:'2026-10-17T06:30:00Z'}],
  notification_reads:[]};
 const bal={sh1:{balance:960,owner_phone:'0899111111',owner_name:'สมหมาย ใจดี'},sh2:{balance:-600,owner_phone:'0898',owner_name:''},og1:null};
-let mode={netDown:false};const SQ=[],VW=[];let REPERR=null;const T0=Date.now();const iso=m=>new Date(T0-m*60000).toISOString();
+let mode={netDown:false};const SQ=[],VW=[];let REPERR=null,RDELAY=0;const T0=Date.now();const iso=m=>new Date(T0-m*60000).toISOString();
 const ROOMS=[{user_id:'cu1',app:'user',name:'สมชาย ใจดี',phone:'0812345678',last_at:iso(5),last_from:'user',last_body:'สอบถามการจอง MS1',unread:2},{user_id:'sh9',app:'shop',name:'ร้านสบายดี สปา',phone:'0899111111',last_at:iso(60),last_from:'admin',last_body:'เรียบร้อยครับ',unread:0,last_admin_name:'เจ้าหน้าที่ สมหญิง',last_admin_at:iso(60),viewing_name:'สมศักดิ์'}];
 const MS={'cu1|user':[{id:'m1',sender_id:'cu1',sender_role:'user',sender_name:'สมชาย ใจดี',body:'สอบถามการจอง MS1',created_at:iso(6)},{id:'m2',sender_id:null,sender_role:'auto',sender_name:'ระบบ',body:'ได้รับข้อความแล้ว',created_at:iso(5.9)},{id:'m3',sender_id:'cu1',sender_role:'user',sender_name:'สมชาย ใจดี',body:'<b>ด่วน</b>',created_at:iso(5)}]};
 await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.protocol==='file:')return r.continue();if(!u.host.endsWith('supabase.co'))return r.abort();
@@ -79,7 +79,7 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
    Object.assign(p,{name:body.p_name,category_id:body.p_category,lat:body.p_lat,lng:body.p_lng,open_time:body.p_open+':00',close_time:body.p_close+':00',fixed_date:body.p_type==='org'?body.p_fixed_date:null,advance_days:body.p_adv,cancel_hours:body.p_cancel,lunch_start:body.p_lunch_start?body.p_lunch_start+':00':null,lunch_end:body.p_lunch_end?body.p_lunch_end+':00':null});
    T.service_places=T.service_places.filter(x=>x.place_id!==p.id).concat(body.p_services.map(v=>({service_id:v,place_id:p.id})));T.place_staff=T.place_staff.filter(x=>x.place_id!==p.id).concat(body.p_staff.map(s=>({place_id:p.id,staff_id:s.staff_id,weekdays:s.weekdays})));return J(200,p.id)}
   if(f==='admin_hide_review'){hides.push(body);const row=(body.p_kind==='shop'?T.reviews:T.review_staff).find(x=>x.id===body.p_id);row.hidden=body.p_hidden;row.reported=false;return J(204,null)}
-  if(f==='admin_support_rooms'){SQ.push([f,body]);return J(200,ROOMS)}
+  if(f==='admin_support_rooms'){SQ.push([f,body]);if(RDELAY)await new Promise(z=>setTimeout(z,RDELAY));return J(200,ROOMS)}
   if(f==='admin_support_messages'){SQ.push([f,body]);const L=(MS[body.p_user+'|'+body.p_app]||[]);return J(200,body.p_after?L.filter(m=>m.created_at>body.p_after):L)}
   if(f==='admin_support_viewing'){VW.push(body);return J(200,body.p_on&&body.p_user==='sh9'?'สมศักดิ์':null)}
   if(f==='admin_support_mark_read'){SQ.push([f,body]);const r=ROOMS.find(x=>x.user_id===body.p_user&&x.app===body.p_app);if(r)r.unread=0;return J(204,null)}
@@ -139,6 +139,16 @@ ROOMS.find(r=>r.user_id==='sh9').viewing_name=null;ROOMS.find(r=>r.user_id==='cu
 await p.focus('.supb[data-id=sh9]');
 ok('list refreshes by itself (15 s): viewing tag gone, new message puts room back to unanswered',await W(async()=>{const a=await p.textContent('.supb[data-id=sh9]'),b=await p.textContent('.supb[data-id=cu1]');return !a.includes('กำลังดูอยู่')&&b.includes('ยังไม่ได้ตอบ')},20000));
 ok('focus kept on the same room button after refresh',await W(()=>p.evaluate(()=>document.activeElement&&document.activeElement.dataset.id==='sh9'),3000));
+// เครื่องช้า: หลังกดกลับจากห้องแชต รายการโหลดใหม่ช้า การวาดรอบสองต้องไม่ทำโฟกัสหาย (เคยล้มบน GitHub)
+RDELAY=1200;await p.click('.supb[data-id=sh9]');await W(async()=>!!(await p.$('[data-a=supback]')));
+let nq=SQ.filter(x=>x[0]==='admin_support_rooms').length;await p.click('[data-a=supback]');await W(async()=>(await p.$$('.supb')).length===2);
+ok('slow reload: focus on the page heading after going back',await p.evaluate(()=>document.activeElement&&document.activeElement.tagName==='H1'));
+await W(()=>SQ.filter(x=>x[0]==='admin_support_rooms').length>nq,4000);await p.waitForTimeout(1600);
+ok('slow reload: heading keeps focus after the list redraws',await p.evaluate(()=>document.activeElement&&document.activeElement.tagName==='H1'));
+await p.click('.supb[data-id=sh9]');await W(async()=>!!(await p.$('[data-a=supback]')));
+nq=SQ.filter(x=>x[0]==='admin_support_rooms').length;await p.click('[data-a=supback]');await W(async()=>(await p.$$('.supb')).length===2);await p.focus('.supb[data-id=sh9]');
+await W(()=>SQ.filter(x=>x[0]==='admin_support_rooms').length>nq,4000);await p.waitForTimeout(1600);
+ok('slow reload: room button moved to before the redraw keeps focus',await p.evaluate(()=>document.activeElement&&document.activeElement.dataset.id==='sh9'));RDELAY=0;
 await p.click('#tabs [data-id=sys]');await p.waitForTimeout(300);await p.click('#main .subtabs[aria-label] [data-id=set]');await p.waitForTimeout(300);await p.click('[data-a=sub][data-id=g]').catch(()=>{});await p.waitForTimeout(300);
 ok('settings: LINE link field removed, hint mentions chat menu',!(await p.$('#c5'))&&!(await p.textContent('#main')).includes('LINE')&&(await p.textContent('#main')).includes('เมนู "แชต"'));
 await p.click('[data-a=setsave]');await p.waitForTimeout(800);

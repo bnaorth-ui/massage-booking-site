@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>แอดมิน - สมาคมวิทยากรฝึกอาชีพคนตาบอด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.35"><meta name="app-name" content="สำหรับแอดมิน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.36"><meta name="app-name" content="สำหรับแอดมิน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1042,7 +1042,7 @@ function supOpen(u,a){var r=(SUP.rooms||[]).filter(function(x){return x.user_id=
 function supVwHtml(){return SUP.warn?'<div class="closed" role="status">'+esc(SUP.warn)+' กำลังดูห้องนี้อยู่ ระวังตอบซ้ำ</div>':''}
 function supView1(on){var c=SUP.cur;if(!c)return Promise.resolve();return rpc("admin_support_viewing",{p_user:c.u,p_app:c.a,p_on:on}).then(function(nm){if(!on||SUP.cur!==c)return;var w=nm||"";if(w!==SUP.warn){SUP.warn=w;var el=document.getElementById("supvw");if(el)el.innerHTML=supVwHtml()}}).catch(function(){})}
 /* รายชื่อห้อง: อัปเดตป้ายทุก 15 วินาทีขณะเปิดอยู่ วาดใหม่เฉพาะเมื่อข้อมูลเปลี่ยน และคืนโฟกัสปุ่มเดิม */
-setInterval(function(){if(!D||S.tab!=="sup"||SUP.cur||SR.open||document.hidden)return;var o=JSON.stringify(SUP.rooms);supLoad().then(function(){if(S.tab!=="sup"||SUP.cur||SR.open||JSON.stringify(SUP.rooms)===o)return;var a=document.activeElement,k=a&&a.dataset&&a.dataset.a==="supopen"?[a.dataset.id,a.dataset.t]:null;draw();if(k){var b=document.querySelector('.supb[data-id="'+k[0]+'"][data-t="'+k[1]+'"]');if(b)b.focus()}})},15000);
+setInterval(function(){if(!D||S.tab!=="sup"||SUP.cur||SR.open||document.hidden)return;var o=JSON.stringify(SUP.rooms);supLoad().then(function(){if(S.tab!=="sup"||SUP.cur||SR.open||JSON.stringify(SUP.rooms)===o)return;supRedraw()})},15000);
 function supClose(){if(SUP.cur){supView1(false)}clearInterval(SUP.hb);SUP.hb=null;SUP.warn="";clearInterval(SUP.t);SUP.t=null;SUP.cur=null;SUP.msgs=[];SUP.ids={};SUP.last=null;SUP.serr=""}
 function supSend(){var c=SUP.cur,ta=document.getElementById("supi"),tx=ta?ta.value.trim():"";if(!c||SUP.sending)return;if(!tx){if(ta)ta.focus();return}
  SUP.sending=true;var bt=document.getElementById("supsend"),er=document.getElementById("supe");if(bt)bt.disabled=true;if(er)er.textContent="";SUP.serr="";
@@ -1085,6 +1085,8 @@ document.addEventListener("keydown",function(e){var t=e.target,typing=t&&(t.tagN
 /* บัญชีของฉัน (ระบบ > บัญชีของฉัน): ปุ่มออกจากระบบย้ายจากแถบหัวมาไว้ที่นี่ เหมือนหน้าบัญชีของอีก 3 แอป */
 function meView(){var tel=String(WHO.phone||"");return '<div class="head"><h1>บัญชีของฉัน</h1></div><div class="card"><p><b>ชื่อ:</b> '+esc(WHO.name)+'</p>'+(tel?'<p><b>เบอร์:</b> '+esc(tel)+'</p>':'')+'<p class="hint2" style="margin:0">เข้าสู่ระบบในฐานะแอดมิน</p></div><div class="acts"><button type="button" class="btn d" data-a="logout">ออกจากระบบ</button></div>'}
 function draw(){navDraw();document.getElementById("main").innerHTML=view();post()}
+/* วาดรายการห้องแชตใหม่โดยโฟกัสไม่หาย (ปุ่มห้องเดิม หรือหัวข้อหน้า) */
+function supRedraw(){var a=document.activeElement,k=a&&a.dataset&&a.dataset.a==="supopen"?[a.dataset.id,a.dataset.t]:null,hf=!!(a&&a.tagName==="H1"&&a.closest&&a.closest("#main"));draw();var e=k?document.querySelector('.supb[data-id="'+k[0]+'"][data-t="'+k[1]+'"]'):hf?document.querySelector("#main h1"):null;if(e){if(hf)e.tabIndex=-1;e.focus()}}
 function softDraw(){navDraw();var a=document.activeElement;if(S.form||S.busy||(a&&/INPUT|SELECT|TEXTAREA/.test(a.tagName)&&a.id!=="")||S.tab==="set"||S.tab==="usr"||S.tab==="hl"||S.tab==="ce"||S.tab==="au"||S.tab==="fm"||SR.open||(S.tab==="sup"&&SUP.cur))return;document.getElementById("main").innerHTML=view();post()}
 function refresh(){if(!D||S.busy)return Promise.resolve();if(S.tab==="rvw"||RW.loaded)rvwLoad();return Promise.all([apLoad(),loadLive(),loadBk(),supLoad(),prLoad()]).then(function(r){if(r[0]){S.form=null;draw()}else softDraw()},function(e){if(e&&e.status===401)doLogout()})}
 
@@ -1406,7 +1408,7 @@ document.addEventListener("click",function(e){
  if(a==="srplace"){var fx=SR.sel&&SR.sel.x,lk2={shop:"shop",org:"org",company:"comp"}[fx.place_type];srLeaveTo(function(){S.tab=lk2;S.form=null;var o=byId(listOf(lk2),fx.place_id);if(o)S.form={t:lk2,id:fx.place_id,sel:(o.staff?o.staff.slice():[]),sd:JSON.parse(JSON.stringify(o.sd||{})),date:o.date||"",spq:""};draw()});return}
  if(a==="srgo"){var gx=SR.sel&&SR.sel.x;srLeaveTo(function(){S.tab="staff";S.form={t:"staff",id:gx.id,sel:[],sd:{},date:"",spq:""};draw()});return}
  if(a==="supopen"){supOpen(id,t);return}
- if(a==="supback"){supClose();draw();supLoad().then(function(){if(S.tab==="sup"&&!SUP.cur)draw()});var h=document.querySelector("#main h1");if(h){h.tabIndex=-1;h.focus()}return}
+ if(a==="supback"){supClose();draw();supLoad().then(function(){if(S.tab==="sup"&&!SUP.cur)supRedraw()});var h=document.querySelector("#main h1");if(h){h.tabIndex=-1;h.focus()}return}
  if(a==="setsave"){var er4=g("err"),bad=function(m,f){var el=g(f),gp=el&&el.closest("[data-sg]");if(gp&&gp.hidden)subTo(gp.dataset.sg);er4.textContent=m;if(el)el.focus()},c1v=g("c1").value.trim(),sr=+g("d9").value,or=+g("d10").value,w1=+g("d19").value,w2=+g("d20").value;er4.textContent="";
   if(!c1v){return bad("กรุณากรอกชื่อสมาคม","c1")}
   if(!(sr>=0.5&&sr<=100)||!(or>=0.5&&or<=100)){return bad("รัศมีต้องอยู่ระหว่าง 0.5-100 กิโลเมตร","d9")}
