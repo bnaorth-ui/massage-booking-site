@@ -8,6 +8,8 @@
   var APP = { book: "https://massage-customer-bna.pages.dev/", shop: "https://massage-shop-bna.pages.dev/reg/", staff: "https://massage-staff-bna.pages.dev/apply/", company: "https://massage-customer-bna.pages.dev/?company=1", orgreq: "https://massage-customer-bna.pages.dev/?orgreq=1", privacy: "https://massage-customer-bna.pages.dev/privacy/" };
   var KIND = { news: "ข่าวและกิจกรรม", article: "บทความ", work: "ผลงานบริการ" };
   var SITE_NAME = "สมาคมวิทยากรฝึกอาชีพคนตาบอด";
+  /* สถานะทางกฎหมายของสมาคม (หัวเว็บ ท้ายเว็บ และข้อมูลสำหรับ Google) ผู้ใช้ยืนยัน 19 พ.ย. 2569 ไม่ใส่เลขหนังสือรับรอง */
+  var ORG_STATUS = "องค์กรสาธารณประโยชน์";
   /* ที่อยู่ของเว็บนี้ ลิงก์ในเนื้อหาที่ชี้มาเว็บนี้เปิดในหน้าเดิม (ถ้าเปลี่ยนชื่อเว็บใน Cloudflare แก้ที่นี่ด้วย) */
   var SITE_HOST = "massage-home-bna.pages.dev";
   /* เว็บไซต์หลักของสมาคม (ผู้ใช้ยืนยัน 18 พ.ย. 2569) เว็บนี้เน้นการจ้างงานคนตาบอด ข่าว ผลงาน การสมัคร และจองนวด */
@@ -234,7 +236,7 @@
   function copyText(year) { return "© " + year + " " + SITE_NAME + " สงวนลิขสิทธิ์"; }
 
   G.SV = {
-    SB: SB, ORG_SITE: ORG_SITE, SITE_NAME: SITE_NAME, PAGE: PAGE, POST_GONE: POST_GONE, LOADING: LOADING, KINDS_Q: KINDS_Q,
+    SB: SB, ORG_SITE: ORG_SITE, SITE_NAME: SITE_NAME, ORG_STATUS: ORG_STATUS, PAGE: PAGE, POST_GONE: POST_GONE, LOADING: LOADING, KINDS_Q: KINDS_Q,
     esc: esc, imgUrl: imgUrl, card: card, errBox: errBox, listQ: listQ, postQ: postQ, kindsOf: kindsOf, filtersHTML: filtersHTML,
     parse: parse, canonPath: canonPath, meta: meta, homeHTML: homeHTML, latestHTML: latestHTML, listHTML: listHTML, listBody: listBody, moreBtn: moreBtn,
     postHTML: postHTML, adjQ: adjQ, adjHTML: adjHTML, notFoundHTML: notFoundHTML, companyHTML: companyHTML, faqLD: faqLD, baht: baht, telHref: telHref, contactParts: contactParts, copyText: copyText
