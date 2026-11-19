@@ -87,7 +87,7 @@ await p.click('#tabs [data-id=sys]');
 ok('sys sub-menu has บทความและข่าว next to ประกาศ',await until(()=>{const s=[].map.call(document.querySelectorAll('#main .subtabs [data-id]'),x=>x.dataset.id);return s.indexOf('art')===s.indexOf('ann')+1}));
 await p.click('#main .subtabs [data-id=art]');
 ok('list shows both, published has link to the public site',await has('บทความร่าง')&&await p.evaluate(()=>{const a=document.querySelector('a[href="https://massage-home-bna.pages.dev/news/1"]');return !!a&&a.target==='_blank'}));
-ok('draft row: no web link, warns that cover has no description, says pinned',await p.evaluate(()=>!document.querySelector('a[href$="/news/2"]')&&document.body.innerText.includes('รูปยังไม่มีคำบรรยาย')&&document.body.innerText.includes('ปักหมุด')));
+ok('draft row: no web link, gently suggests a cover description, says pinned',await p.evaluate(()=>!document.querySelector('a[href$="/news/2"]')&&document.body.innerText.includes('รูปปกยังไม่มีคำบรรยาย (แนะนำให้ใส่)')&&document.body.innerText.includes('ปักหมุด')));
 ok('hint links to the public site and counts published (1)',await has('ตอนนี้ 1 เรื่อง'));
 
 // เขียนใหม่
@@ -100,13 +100,30 @@ await p.fill('#arT','เปิดอบรมหมอนวด');await p.fill('
 const big=await p.evaluate(()=>{const c=document.createElement('canvas');c.width=2400;c.height=1000;const x=c.getContext('2d');x.fillStyle='#0a6';x.fillRect(0,0,2400,1000);return c.toDataURL('image/png').split(',')[1]});
 await p.setInputFiles('#artimg',{name:'cover.png',mimeType:'image/png',buffer:Buffer.from(big,'base64')});
 ok('big image resized to 1200 wide (keeps ratio), preview shown, focus to description',await until(()=>{const i=document.querySelector('#artprev img');return !!i&&i.src.startsWith('data:image/jpeg')})&&await p.evaluate(()=>new Promise(r=>{const i=new Image();i.onload=()=>r(i.width===1200&&i.height===500&&document.activeElement.id==='arA');i.src=document.querySelector('#artprev img').src})));
-await p.click('[data-a=save][data-pub="1"]');
-ok('image without description: blocked with reason',await has('กรุณาใส่คำบรรยายรูป')&&saCalls().length===0);
+ok('cover description label says optional (not required)',await p.evaluate(()=>/ไม่บังคับ/.test(document.querySelector('label[for="arA"]').textContent)));
+// แทรกรูปในเนื้อหา: วางเคอร์เซอร์หลัง "ย่อหน้า 1" แล้วแทรกรูปพร้อมคำบรรยาย
+await p.evaluate(()=>{const t=document.getElementById('arB');t.focus();t.setSelectionRange(9,9)});
+const upN=()=>stor.filter(x=>!x.path.startsWith('public/')).length,nIn=upN();
+let [fc]=await Promise.all([p.waitForEvent('filechooser'),p.click('[data-a=artinimg]')]);await fc.setFiles({name:'in1.png',mimeType:'image/png',buffer:Buffer.from(big,'base64')});
+ok('inline image: preview + optional caption field (labelled), focus on caption, body text kept',await until(()=>!!document.querySelector('#artinbox img')&&document.activeElement.id==='arIC')&&await p.evaluate(()=>/ไม่บังคับ/.test(document.querySelector('label[for="arIC"]').textContent)&&document.getElementById('arT').value==='เปิดอบรมหมอนวด'));
+await p.fill('#arIC','ห้อง [อบรม]\nชั้น 2');await p.click('[data-a=artinins]');
+const IMGP='place-images\\/00000000-0000-0000-0000-000000000000\\/site-[a-z0-9]+\\.jpg';
+ok('inline image: uploaded, line inserted at cursor on its own paragraph, caption cleaned, focus back in body',await until(()=>/แทรกรูปแล้ว/.test(document.getElementById('artinmsg').textContent))&&upN()===nIn+1&&await p.evaluate(P=>new RegExp('^ย่อหน้า 1\\n\\n\\[รูป: ห้อง อบรม ชั้น 2\\]\\('+P+'\\)\\n\\n## รายละเอียด\\n- ฟรี$').test(document.getElementById('arB').value)&&document.activeElement.id==='arB'&&!document.querySelector('#artinbox img'),IMGP));
+// แทรกรูปที่ 2 ท้ายเรื่อง ไม่ใส่คำบรรยาย
+await p.evaluate(()=>{const t=document.getElementById('arB');t.setSelectionRange(t.value.length,t.value.length)});
+[fc]=await Promise.all([p.waitForEvent('filechooser'),p.click('[data-a=artinimg]')]);await fc.setFiles({name:'in2.png',mimeType:'image/png',buffer:Buffer.from(big,'base64')});
+await until(()=>!!document.querySelector('#artinbox img'));await p.click('[data-a=artinins]');
+ok('inline image without caption: [รูป](path) added as last paragraph, message says no caption',await until(()=>/ไม่มีคำบรรยาย/.test(document.getElementById('artinmsg').textContent))&&await p.evaluate(P=>new RegExp('- ฟรี\\n\\n\\[รูป\\]\\('+P+'\\)$').test(document.getElementById('arB').value),IMGP));
+// ยกเลิก: ไม่อัปโหลด ไม่แตะเนื้อหา
+const bodyNow=await p.inputValue('#arB'),nIn2=upN();
+[fc]=await Promise.all([p.waitForEvent('filechooser'),p.click('[data-a=artinimg]')]);await fc.setFiles({name:'in3.png',mimeType:'image/png',buffer:Buffer.from(big,'base64')});
+await until(()=>!!document.querySelector('#artinbox img'));await p.click('[data-a=artincan]');
+ok('inline image cancel: no upload, body unchanged, focus back on the insert button',await p.evaluate(()=>!document.querySelector('#artinbox img')&&document.activeElement.dataset.a==='artinimg')&&upN()===nIn2&&await p.inputValue('#arB')===bodyNow);
 await p.fill('#arA','ภาพห้องอบรม');
 await p.click('[data-a=save][data-pub="1"]');
 ok('published message',await has('เผยแพร่บนเว็บแล้ว'));
 await W(()=>saCalls().length>0);let c=saCalls()[0]||{};
-ok('POST body: fields, published, pinned, cover in association folder',c.m==='POST'&&c.body.title==='เปิดอบรมหมอนวด'&&c.body.summary==='รับสมัคร 30 คน'&&c.body.body==='ย่อหน้า 1\n\n## รายละเอียด\n- ฟรี'&&c.body.kind==='news'&&c.body.active===true&&c.body.pinned===true&&c.body.cover_alt==='ภาพห้องอบรม'&&/^place-images\/00000000-0000-0000-0000-000000000000\/site-[a-z0-9]+\.jpg$/.test(c.body.cover_path)&&!!c.body.updated_at);
+ok('POST body: fields (with 2 inline image lines), published, pinned, cover in association folder',c.m==='POST'&&c.body.title==='เปิดอบรมหมอนวด'&&c.body.summary==='รับสมัคร 30 คน'&&new RegExp('^ย่อหน้า 1\\n\\n\\[รูป: ห้อง อบรม ชั้น 2\\]\\('+IMGP+'\\)\\n\\n## รายละเอียด\\n- ฟรี\\n\\n\\[รูป\\]\\('+IMGP+'\\)$').test(c.body.body)&&c.body.kind==='news'&&c.body.active===true&&c.body.pinned===true&&c.body.cover_alt==='ภาพห้องอบรม'&&/^place-images\/00000000-0000-0000-0000-000000000000\/site-[a-z0-9]+\.jpg$/.test(c.body.cover_path)&&!!c.body.updated_at);
 ok('image uploaded to place-images/<NIL>/site-*.jpg',stor.some(x=>/^place-images\/00000000-0000-0000-0000-000000000000\/site-[a-z0-9]+\.jpg$/.test(x.path)&&x.len>0));
 ok('form closed, new item in list',await until(()=>!document.getElementById('arT')&&document.body.innerText.includes('เปิดอบรมหมอนวด')));
 
@@ -145,9 +162,18 @@ ok('work without cover: blocked with reason, focus on file input',await has('ผ
 const img2=await p.evaluate(()=>{const c=document.createElement('canvas');c.width=800;c.height=450;c.getContext('2d').fillRect(0,0,800,450);return c.toDataURL('image/png').split(',')[1]});
 await p.setInputFiles('#artimg',{name:'w.png',mimeType:'image/png',buffer:Buffer.from(img2,'base64')});
 await until(()=>{const i=document.querySelector('#artprev img');return !!i&&i.src.startsWith('data:image/jpeg')});
-await p.fill('#arA','หมอนวดกำลังนวดพนักงาน');await p.click('[data-a=save][data-pub="1"]');
-ok('work with cover: POST kind=work published',await W(()=>{const x=saCalls()[nW];return !!x&&x.m==='POST'&&x.body.kind==='work'&&x.body.active===true&&/site-/.test(x.body.cover_path||'')}));
+await p.click('[data-a=save][data-pub="1"]');
+ok('work with cover but no description: saves (description optional), cover_alt empty',await W(()=>{const x=saCalls()[nW];return !!x&&x.m==='POST'&&x.body.kind==='work'&&x.body.active===true&&/site-/.test(x.body.cover_path||'')&&x.body.cover_alt===''}));
 ok('list shows ผลงานบริการ label',await until(()=>document.body.innerText.includes('ผลงานบริการ,')));
+// เกิน 10 รูปในเนื้อหา: ปุ่มแทรกรูปบอกเหตุผล, บันทึกไม่ได้
+await p.click('[data-a=new][data-t=art]');await p.waitForSelector('#arT');await p.fill('#arT','รูปเยอะ');
+await p.fill('#arB',Array.from({length:10},(_,i)=>'[รูป](place-images/x/site-'+i+'.jpg)').join('\n\n'));
+await p.click('[data-a=artinimg]');
+ok('10 inline images: insert button explains the limit',await until(()=>/ไม่เกิน 10 รูป/.test(document.getElementById('artinmsg').textContent)));
+await p.fill('#arB',Array.from({length:11},(_,i)=>'[รูป](place-images/x/site-'+i+'.jpg)').join('\n\n'));
+const nL=saCalls().length;await p.click('[data-a=save][data-pub="0"]');
+ok('11 inline images: save blocked with reason, focus on body',await has('รูปในเนื้อหาเกิน 10 รูป')&&saCalls().length===nL&&await p.evaluate(()=>document.activeElement.id==='arB'));
+await p.click('[data-a=cancel]');
 
 // ยังไม่ได้สร้างตารางในฐานข้อมูล: เมนูอื่นใช้ได้ เมนูนี้บอกว่าต้องเพิ่มตาราง
 MISSING=true;await p.reload();await until(()=>document.getElementById('tabs')&&document.getElementById('tabs').textContent.includes('หน้าหลัก'));

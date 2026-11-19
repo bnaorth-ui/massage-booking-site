@@ -3,7 +3,7 @@ import { sbGet, esc } from '../shared/meta.js';
 
 export async function onRequestGet({ request }) {
   const base = new URL('/', request.url).origin;
-  const urls = [{ loc: base + '/' }, { loc: base + '/company/' }, { loc: base + '/news/' }];
+  const urls = [{ loc: base + '/' }, { loc: base + '/company/' }, { loc: base + '/company/calc/' }, { loc: base + '/news/' }];
   try {
     const rows = await sbGet('/rest/v1/site_articles?select=no,day,updated_at&active=eq.true&order=no.desc&limit=5000');
     for (const r of rows) urls.push({ loc: base + '/news/' + r.no, mod: String(r.updated_at || r.day || '').slice(0, 10) });

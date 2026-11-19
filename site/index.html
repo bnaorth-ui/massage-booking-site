@@ -78,6 +78,16 @@ article.post h1{font-size:clamp(26px,5vw,34px);line-height:1.4;margin:6px 0 8px}
 article.post .cover{width:100%;border-radius:var(--r);margin:16px 0 4px;display:block}
 article.post figure{margin:0}
 article.post figcaption{color:var(--mute);font-size:15px}
+.calcf label{display:block;font-weight:600;margin:14px 0 6px}
+.calcf input{font:inherit;min-height:48px;width:100%;max-width:300px;padding:0 12px;border:2px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+.calcf input:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.calcout:not(:empty){margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+.calcout .big{font-size:24px;font-weight:700;margin:0 0 6px}
+.calcerr{color:#b00020;font-weight:600}
+@media (prefers-color-scheme:dark){.calcerr{color:#ff8a80}}
+.calcbox{margin-top:16px}
+.body figure.inimg{margin:22px 0}
+.body figure.inimg img{width:100%;height:auto;border-radius:var(--r);display:block;margin-bottom:6px}
 .body p{margin:0 0 1em}
 .body h2{margin:1.4em 0 .5em;font-size:23px}
 .body ul{margin:0 0 1em;padding-left:1.3em}
@@ -155,7 +165,7 @@ footer .copy{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);f
   <p id="cPhone"></p>
   <p id="cEmail"></p>
   <p id="cHours"></p>
-  <p>เว็บไซต์สมาคม <a href="https://bna.or.th/">bna.or.th</a></p>
+  <p><a href="https://bna.or.th/">เว็บไซต์หลักของสมาคม</a></p>
   <p><a href="https://massage-customer-bna.pages.dev/privacy/">นโยบายความเป็นส่วนตัว</a></p>
   <p class="copy" id="copy">© สมาคมวิทยากรฝึกอาชีพคนตาบอด สงวนลิขสิทธิ์</p>
  </div>
@@ -174,7 +184,7 @@ function shareLabel(){return canShare()?"แชร์ทางอื่น":"ค
 function say(t){var l=$("live");l.textContent="";setTimeout(function(){l.textContent=t},50)}
 function setHead(r,a,info){var m=V.meta(r,a,info);document.title=m.title;var d=document.querySelector('meta[name="description"]');if(d&&m.desc)d.setAttribute("content",m.desc)}
 function markNav(k){[].forEach.call(document.querySelectorAll("nav.main a[data-k]"),function(a){if(a.dataset.k===k)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")})}
-function navKey(r){return r.name==="home"?"home":r.name==="company"?"company":(r.name==="list"||r.name==="post")?"news":""}
+function navKey(r){return r.name==="home"?"home":(r.name==="company"||r.name==="calc")?"company":(r.name==="list"||r.name==="post")?"news":""}
 function focusH1(){var h=document.querySelector("#view h1");if(h){h.setAttribute("tabindex","-1");h.focus({preventScroll:true})}window.scrollTo(0,0)}
 
 function loadLatest(){var el=$("latest");el.removeAttribute("data-pending");
@@ -211,14 +221,21 @@ function loadAdj(){var el=$("pn");if(!el||!el.hasAttribute("data-pending"))retur
 function showPost(r){$("view").innerHTML=V.LOADING;
  var p=cache[r.no]?Promise.resolve([cache[r.no]]):api(V.postQ(r.no));
  p.then(function(x){var a=x&&x[0];if(!a){show({name:"notfound"},V.POST_GONE);return}cache[r.no]=a;
-  setHead(r,a);$("view").innerHTML=V.postHTML(a,location.origin+"/news/"+a.no,shareLabel(),null);loadAdj();focusH1()},
+  /* ลิงก์ไปบทความเรื่องอื่นในเนื้อหา: ถามชื่อเรื่องก่อน ไม่ได้ก็ใช้ที่อยู่ลิงก์แทน */
+  var nos=V.linkedNos(a.body),tq=!nos.length||a._t?Promise.resolve():api(V.titlesQ(nos)).then(function(t){a._t=V.titleMap(t)},function(){});
+  return tq.then(function(){if(V.parse(location.pathname).no!==a.no)return;setHead(r,a);$("view").innerHTML=V.postHTML(a,location.origin+"/news/"+a.no,shareLabel(),null,a._t);loadAdj();focusH1()})},
   function(){$("view").innerHTML='<h1>ข่าวและบทความ</h1>'+V.errBox();focusH1()})}
 function show(r,msg){markNav(navKey(r));setHead(r,null,r.name==="company"?companyInfo():null);
  if(r.name==="post")return showPost(r);
- $("view").innerHTML=r.name==="home"?V.homeHTML(null,null):r.name==="company"?V.companyHTML(companyInfo()):r.name==="list"?V.listHTML(r.kind,null,KINDS):V.notFoundHTML(msg);
+ $("view").innerHTML=r.name==="home"?V.homeHTML(null,null):r.name==="company"?V.companyHTML(companyInfo()):r.name==="calc"?V.calcHTML(companyInfo()):r.name==="list"?V.listHTML(r.kind,null,KINDS):V.notFoundHTML(msg);
  focusH1();
  if(r.name==="home"){loadLatest();loadWorks()}if(r.name==="list"){loadKinds(r.kind);loadList(r.kind,0)}if(r.name==="company")loadWorks()}
 function route(){show(V.parse(location.pathname,location.search))}
+/* เครื่องคิดเลขจ้างงานคนพิการ: คำนวณในหน้าเลย (ไม่โหลดใหม่) ผลอ่านออกเสียงจากกล่อง role=status, ใส่ตัวเลขในลิงก์ให้แชร์ได้ ถ้ากรอกผิด โฟกัสไปช่องนั้น */
+document.addEventListener("submit",function(e){var f=e.target;if(f.id!=="calcF")return;e.preventDefault();
+ var n=$("cN").value.trim(),h=$("cH").value.trim();$("calcOut").innerHTML=V.calcResult(n,h,companyInfo());
+ if(!/^\d{1,7}$/.test(n)){$("cN").focus();return}if(h&&!/^\d{1,7}$/.test(h)){$("cH").focus();return}
+ try{history.replaceState(null,"","/company/calc/?n="+n+(h?"&h="+h:""))}catch(x){}});
 /* เปิดหน้าครั้งแรก: ถ้า Cloudflare ใส่เนื้อหาของหน้านี้มาแล้ว (data-ssr) ใช้ของเดิม ไม่สร้างใหม่ (ไม่ย้ายโฟกัส) โหลดเฉพาะส่วนที่ยังขาด */
 function start(){var v=$("view"),r=V.parse(location.pathname,location.search);
  if(v.getAttribute("data-ssr")!==location.pathname+location.search){route();return}

@@ -7,7 +7,7 @@ import { sbGet, sbRpc, withMeta } from '../shared/meta.js';
 
 const V = globalThis.SV;
 const GOOGLE_VERIFY = 'google388ba24f989c9ab1.html';
-const NAV = { home: 'home', company: 'company', list: 'news', post: 'news' };
+const NAV = { home: 'home', company: 'company', calc: 'company', list: 'news', post: 'news' };
 
 export async function onRequest(ctx) {
   const req = ctx.request;
@@ -33,6 +33,10 @@ export async function onRequest(ctx) {
     info = { rate: c && c.org_rate, phone: c && c.phone, email: c && c.email, works: w };
     view = V.companyHTML(info);
   }
+  else if (r.name === 'calc') {
+    const c = await contactP, q = u.searchParams;
+    view = V.calcHTML({ phone: c && c.phone }, q.get('n'), q.get('h'));
+  }
   else if (r.name === 'list') {
     const [l, k] = await Promise.all([sbGet(V.listQ(r.kind, V.PAGE + 1, 0)).catch(() => null), sbGet(V.KINDS_Q).catch(() => null)]);
     view = V.listHTML(r.kind, l, k && V.kindsOf(k));
@@ -45,7 +49,8 @@ export async function onRequest(ctx) {
       art = rows[0];
       const one = q => sbGet(q).then(x => (x && x[0]) || null);
       const adj = await Promise.all([one(V.adjQ(art, 'prev')), one(V.adjQ(art, 'next'))]).then(x => ({ prev: x[0], next: x[1] }), () => null);
-      view = V.postHTML(art, u.origin + '/news/' + art.no, null, adj);
+      const nos = V.linkedNos(art.body), titles = nos.length ? V.titleMap(await sbGet(V.titlesQ(nos)).catch(() => null)) : null;
+      view = V.postHTML(art, u.origin + '/news/' + art.no, null, adj, titles);
     }
     else { status = 404; view = V.notFoundHTML(V.POST_GONE); r = { name: 'notfound' }; }
   } else { status = 404; view = V.notFoundHTML(); }
@@ -72,7 +77,7 @@ export async function onRequest(ctx) {
       publisher: { '@type': 'Organization', name: V.SITE_NAME, logo: { '@type': 'ImageObject', url: u.origin + '/icon-512.png' } }
     });
   }
-  html = withMeta(html, { title: m.title, desc: m.desc, url, ogType: art ? 'article' : 'website', image, imageAlt: art && art.cover_alt, jsonld, noindex: status === 404 });
+  html = withMeta(html, { title: m.title, desc: m.desc, url, ogType: art ? 'article' : 'website', image, imageAlt: art && (art.cover_alt || V.altFor(art.title)), jsonld, noindex: status === 404 });
 
   if (view !== null) html = html.replace(/<div class="wrap" id="view">[\s\S]*?<\/div><\/main>/, () => '<div class="wrap" id="view" data-ssr="' + V.esc(u.pathname + u.search) + '">' + view + '</div></main>');
   const key = NAV[r.name];

@@ -14,15 +14,16 @@ const INDEX=fs.readFileSync(path.join(SITE,'index.html'),'utf8');
 const next=async()=>new Response(INDEX,{headers:{'Content-Type':'text/html; charset=utf-8'}});
 const ROWS=[{no:7,kind:'news',title:'อบรม "หมอนวด" <รุ่น 2>',summary:'สรุปข่าว & กิจกรรม',body:'ย่อหน้าแรก\n\n## หัวข้อย่อย\n- ข้อหนึ่ง',cover_path:'place-images/00000000-0000-0000-0000-000000000000/site-x.jpg',cover_alt:'ภาพการอบรม',day:'2026-11-17',updated_at:'2026-11-18T01:00:00Z',pinned:true,active:true},
  {no:9,kind:'work',title:'นวดให้พนักงานบริษัท ก',summary:'',body:'x',cover_path:'place-images/x/site-w.jpg',cover_alt:'หมอนวดกำลังนวด',day:'2026-11-01',pinned:false,active:true},
- {no:8,kind:'article',title:'ประโยชน์ของการนวด',summary:'',body:'เนื้อหา\n\nดูต่อ https://massage-home-bna.pages.dev/company/ และ https://bna.or.th/',cover_path:null,cover_alt:'',day:'2026-11-10',pinned:false,active:true}];
+ {no:8,kind:'article',title:'ประโยชน์ของการนวด',summary:'',body:'เนื้อหา\n\nดูต่อ https://massage-home-bna.pages.dev/company/ และ https://bna.or.th/ เรื่อง https://massage-home-bna.pages.dev/news/7 กับ https://massage-home-bna.pages.dev/news/555\n\n[รูป: ภาพหมอนวด](place-images/x/site-i.jpg)',cover_path:null,cover_alt:'',day:'2026-11-10',pinned:false,active:true}];
 let FAIL=false,ASKED=[],CONTACT={name:'สมาคมวิทยากรฝึกอาชีพคนตาบอด',phone:'0989983654',email:'info@example.org',hours:'จันทร์ - ศุกร์ 09:00 - 17:00 น.',org_rate:400};
+const noF=(r,v)=>v.startsWith('in.(')?(L=>r.filter(a=>L.includes(a.no)))(v.slice(4,-1).split(',').map(Number)):r.filter(a=>a.no===+v.slice(3));
 const kindF=(r,v)=>v.startsWith('neq.')?r.filter(a=>a.kind!==v.slice(4)):r.filter(a=>a.kind===v.slice(3));
 const adjF=(r,p)=>{const o=p.get('or');if(!o)return r;const m=/^\(day\.(lt|gt)\.([\d-]+),and\(day\.eq\.[\d-]+,no\.(?:lt|gt)\.(\d+)\)\)$/.exec(o);if(!m)throw new Error('bad or '+o);const lt=m[1]==='lt',d=m[2],n=+m[3];r=r.filter(a=>lt?(a.day<d||(a.day===d&&a.no<n)):(a.day>d||(a.day===d&&a.no>n)));const asc=(p.get('order')||'').startsWith('day.asc');return r.sort((a,b)=>(asc?1:-1)*((a.day<b.day?-1:a.day>b.day?1:0)||(a.no-b.no)))};
 global.fetch=async(u,o)=>{u=String(u);ASKED.push({u,h:o&&o.headers});if(FAIL)return new Response('x',{status:500});
  const J=x=>new Response(JSON.stringify(x),{headers:{'Content-Type':'application/json'}});
  if(u.includes('/rpc/public_contact'))return J(CONTACT);
  const q=new URL(u).searchParams;let r=ROWS.filter(a=>a.active);
- if(q.get('kind'))r=kindF(r,q.get('kind'));if(q.get('no'))r=r.filter(a=>a.no===+q.get('no').slice(3));if(q.get('or'))r=adjF(r,q);
+ if(q.get('kind'))r=kindF(r,q.get('kind'));if(q.get('no'))r=noF(r,q.get('no'));if(q.get('or'))r=adjF(r,q);
  return J(r.slice(0,+(q.get('limit')||100)))};
 const B='https://massage-home-bna.pages.dev';
 const get=async p=>{const r=await mw.onRequest({request:new Request(B+p),next});return{r,h:await r.text()}};
@@ -35,7 +36,7 @@ let {r,h}=await get('/');
 ok('home: 200 html, short cache',r.status===200&&/text\/html/.test(r.headers.get('Content-Type'))&&r.headers.get('Cache-Control')==='public, max-age=60');
 ok('home: content in page without script (h1, sections, latest news)',view(h).includes('<h1>จ้างงานคนตาบอดผ่านงานนวด ที่ขึ้นทะเบียนถูกต้อง</h1>')&&view(h).includes('สำหรับบริษัทและหน่วยงาน')&&view(h).includes('href="https://massage-customer-bna.pages.dev/?orgreq=1"')&&view(h).includes('href="/news/7"')&&!view(h).includes('data-pending')&&h.includes('data-ssr="/"'));
 ok('home: title and description for home (employment focus, differs from bna.or.th)',titleOf(h)==='จ้างงานคนตาบอด มาตรา 33, 35 และบริการนวดโดยหมอนวดตาบอด | สมาคมวิทยากรฝึกอาชีพคนตาบอด'&&h.includes('<meta name="description" content="จ้างหมอนวดผู้พิการทางการเห็น'));
-ok('home: works section first, latest news excludes works, footer links bna.or.th',view(h).indexOf('id="worksSec"')>-1&&view(h).indexOf('id="worksSec"')<view(h).indexOf('id="hLatest"')&&view(h).indexOf('id="hBiz"')<view(h).indexOf('id="worksSec"')&&!(view(h).split('id="hLatest"')[1].split('</section>')[0]).includes('href="/news/9"')&&h.includes('เว็บไซต์สมาคม <a href="https://bna.or.th/">bna.or.th</a>'));
+ok('home: works section first, latest news excludes works, footer links bna.or.th',view(h).indexOf('id="worksSec"')>-1&&view(h).indexOf('id="worksSec"')<view(h).indexOf('id="hLatest"')&&view(h).indexOf('id="hBiz"')<view(h).indexOf('id="worksSec"')&&!(view(h).split('id="hLatest"')[1].split('</section>')[0]).includes('href="/news/9"')&&h.includes('<a href="https://bna.or.th/">เว็บไซต์หลักของสมาคม</a>'));
 ok('home: canonical, og:url, full share image, og:type website',h.includes('<link rel="canonical" href="'+B+'/">')&&h.includes('<meta property="og:url" content="'+B+'/">')&&h.includes('<meta property="og:image" content="'+B+'/og-share.png">')&&h.includes('<meta property="og:type" content="website">'));
 let L=ld(h);ok('home: Organization (NGO, องค์กรสาธารณประโยชน์) data = association site bna.or.th (sameAs this site), phone and email',L.length===1&&L[0].j['@type']==='NGO'&&L[0].j.description.includes('องค์กรสาธารณประโยชน์')&&L[0].j.url==='https://bna.or.th/'&&L[0].j.sameAs.join()==='https://bna.or.th/,'+B+'/'&&L[0].j.logo===B+'/icon-512.png'&&L[0].j.telephone==='0989983654'&&L[0].j.email==='info@example.org');
 ok('home: nav marks หน้าแรก',h.includes('data-k="home" aria-current="page">'));
@@ -68,6 +69,10 @@ ROWS[0].active=false;ROWS[1].active=false;
 ({h}=await get('/news/'));ok('list: only articles published -> no filter bar from server',view(h).includes('<div id="filt"></div>')&&!view(h).includes('class="filters"'));
 ({h}=await get('/news/?k=news'));ok('list: empty type opened by link keeps its filter + ทั้งหมด + บทความ only',view(h).includes('aria-current="page">ข่าวและกิจกรรม</a>')&&view(h).includes('href="/news/?k=article"')&&!view(h).includes('href="/news/?k=work"'));
 ROWS[0].active=true;ROWS[1].active=true;
+ROWS.find(x=>x.no===9).cover_alt='';({h}=await get('/news/9'));
+ok('post: cover without description -> alt from story title, no caption, og:image:alt too',view(h).includes('alt="รูปประกอบเรื่อง นวดให้พนักงานบริษัท ก">')&&!view(h).includes('<figcaption>')&&h.includes('<meta property="og:image:alt" content="รูปประกอบเรื่อง นวดให้พนักงานบริษัท ก">'));
+ROWS.find(x=>x.no===9).cover_alt='หมอนวดกำลังนวด';
+({h}=await get('/'));ok('footer (server): link named เว็บไซต์หลักของสมาคม, no bare address',h.includes('<a href="https://bna.or.th/">เว็บไซต์หลักของสมาคม</a>')&&!h.includes('>bna.or.th<'));
 ({h}=await get('/news/?k=bogus'));ok('list: unknown filter = all, canonical /news/',view(h).includes('href="/news/7"')&&h.includes('<link rel="canonical" href="'+B+'/news/">'));
 
 // หน้าบทความ
@@ -82,7 +87,7 @@ ok('post: author = association (Organization, url bna.or.th)',!!na&&na.j.author&
 ok('post: prev/next of same type in page (news 7: no other news -> nav empty but present)',view(h).includes('<nav class="pn" id="pn" aria-label="เรื่องอื่นในข่าวและกิจกรรม" data-no="7" data-day="2026-11-17" data-kind="news"></nav>')&&view(h).includes('<a href="/" data-nav>กลับหน้าแรก</a>')&&view(h).includes('<nav class="crumb" aria-label="ตำแหน่งหน้า"><a href="/" data-nav>หน้าแรก</a>'));
 ok('post: share links with full url',view(h).includes('https://social-plugins.line.me/lineit/share?url='+encodeURIComponent(B+'/news/7')));
 ({h}=await get('/news/8'));
-ok('post: link to this site in body opens in same tab, other site in new window',view(h).includes('<a href="/company/" data-nav>https://massage-home-bna.pages.dev/company/</a>')&&view(h).includes('<a href="https://bna.or.th/" rel="noopener nofollow" target="_blank">'));ok('post without cover: default share image (full url), Article type, description = title',h.includes('<meta property="og:image" content="'+B+'/og-share.png">')&&ld(h).some(x=>x.j['@type']==='Article')&&h.includes('<meta name="description" content="ประโยชน์ของการนวด">'));
+ok('post (server): own-site links named (page name / story title; unknown story keeps address), other site new window, inline image',view(h).includes('<a href="/company/" data-nav>หน้าบริษัทและหน่วยงาน</a>')&&view(h).includes('<a href="/news/7" data-nav>อบรม &quot;หมอนวด&quot; &lt;รุ่น 2&gt;</a>')&&view(h).includes('<a href="/news/555" data-nav>https://massage-home-bna.pages.dev/news/555</a>')&&view(h).includes('<figure class="inimg"><img loading="lazy" decoding="async" src="https://dwdnmfwepydyweeqfdxn.supabase.co/storage/v1/object/public/place-images/x/site-i.jpg" alt="ภาพหมอนวด"><figcaption>ภาพหมอนวด</figcaption></figure>')&&view(h).includes('<a href="https://bna.or.th/" rel="noopener nofollow" target="_blank">'));ok('post without cover: default share image (full url), Article type, description = title',h.includes('<meta property="og:image" content="'+B+'/og-share.png">')&&ld(h).some(x=>x.j['@type']==='Article')&&h.includes('<meta name="description" content="ประโยชน์ของการนวด">'));
 
 // ไม่พบ
 ({r,h}=await get('/news/99'));
@@ -109,8 +114,16 @@ r=await mw.onRequest({request:new Request(B+'/',{method:'POST'}),next:async()=>p
 
 // แผนผังเว็บ / robots
 ROWS[0].updated_at='2026-11-05T10:00:00Z';
+({h}=await get('/company/calc/'));
+ok('calc (server): own title, canonical, nav on บริษัทและหน่วยงาน, labelled form, no result yet',titleOf(h).startsWith('คำนวณจำนวนคนพิการที่บริษัทต้องจ้าง')&&h.includes('<link rel="canonical" href="'+B+'/company/calc/">')&&/href="\/company\/"[^>]*aria-current="page"/.test(h)&&view(h).includes('<label for="cN">')&&view(h).includes('<label for="cH">')&&view(h).includes('role="status" aria-live="polite"></div>')&&view(h).includes('<h2 id="hHow">วิธีคิด</h2>'));
+({h}=await get('/company/calc/?n=251&h=1'));
+ok('calc (server, works without script): ?n=251&h=1 -> need 3, lack 2, 246,010 baht/year, register + call buttons, fields filled',view(h).includes('ต้องจ้างคนพิการ 3 คน')&&view(h).includes('ยังขาดอีก 2 คน')&&view(h).includes('246,010 บาท ต่อปี')&&view(h).includes('href="tel:0989983654"')&&view(h).includes('?company=1')&&view(h).includes('id="cN" name="n"')&&/id="cN"[^>]*value="251"/.test(view(h))&&h.includes('<link rel="canonical" href="'+B+'/company/calc/">'));
+({h}=await get('/company/calc/?n=99'));ok('calc (server): 99 staff -> not required, suggests occasional service',view(h).includes('ยังไม่ต้องจ้างคนพิการตามกฎหมาย')&&view(h).includes('?orgreq=1'));
+({h}=await get('/company/calc/?n=abc'));ok('calc (server): bad number -> error message, no numbers',view(h).includes('กรอกจำนวนพนักงานเป็นตัวเลข')&&!view(h).includes('ต้องจ้างคนพิการ '));
+({h}=await get('/company/'));ok('company: law section has box with button to calculator',view(h).includes('href="/company/calc/" data-nav>คำนวณจำนวนคนพิการที่ต้องจ้าง</a>')&&view(h).indexOf('calcbox')>view(h).indexOf('id="hLaw"'));
+({h}=await get('/'));ok('home: บริษัทและหน่วยงาน section has calculator button',view(h).split('id="hBiz"')[1].split('</section>')[0].includes('href="/company/calc/"'));
 r=await sm.onRequestGet({request:new Request(B+'/sitemap.xml')});h=await r.text();
-ok('sitemap: home, company, list and each published article',/application\/xml/.test(r.headers.get('Content-Type'))&&['/','/company/','/news/'].every(p=>h.includes('<loc>'+B+p+'</loc>'))&&h.includes('<loc>'+B+'/news/7</loc><lastmod>2026-11-05</lastmod>')&&h.includes('/news/8</loc><lastmod>2026-11-10</lastmod>'));
+ok('sitemap: home, company, list and each published article',/application\/xml/.test(r.headers.get('Content-Type'))&&['/','/company/','/company/calc/','/news/'].every(p=>h.includes('<loc>'+B+p+'</loc>'))&&h.includes('<loc>'+B+'/news/7</loc><lastmod>2026-11-05</lastmod>')&&h.includes('/news/8</loc><lastmod>2026-11-10</lastmod>'));
 FAIL=true;h=await (await sm.onRequestGet({request:new Request('https://a.b/sitemap.xml')})).text();FAIL=false;
 ok('sitemap: database down still gives main pages',h.includes('<loc>https://a.b/</loc>')&&!h.includes('/news/7'));
 h=await (await rb.onRequestGet({request:new Request('https://x.org/robots.txt')})).text();

@@ -10,19 +10,20 @@ const srv=http.createServer((q,s)=>{const u=decodeURIComponent(q.url.split('?')[
  s.writeHead(200,{'Content-Type':MIME[path.extname(f)]||'application/octet-stream'});fs.createReadStream(f).pipe(s)});
 const day=i=>{const d=new Date(Date.UTC(2026,10,17-i));return d.toISOString().slice(0,10)};
 function mk(){const A=[];
- A.push({no:1,kind:'news',title:'อบรมหมอนวดรุ่นใหม่',summary:'เปิดรับสมัครแล้ววันนี้',body:'ย่อหน้าแรก\nบรรทัดที่สอง\n\n## หัวข้อย่อย\n- ข้อหนึ่ง\n- ข้อสอง\n\nอ่านเพิ่มที่ https://bna.or.th/info.\n\nสำหรับบริษัท ดูที่ https://massage-home-bna.pages.dev/company/',cover_path:'place-images/00000000-0000-0000-0000-000000000000/site-a.jpg',cover_alt:'ภาพหมอนวดกำลังอบรม',day:day(3),pinned:false,active:true});
+ A.push({no:1,kind:'news',title:'อบรมหมอนวดรุ่นใหม่',summary:'เปิดรับสมัครแล้ววันนี้',body:'ย่อหน้าแรก\nบรรทัดที่สอง\n\n## หัวข้อย่อย\n- ข้อหนึ่ง\n- ข้อสอง\n\nอ่านเพิ่มที่ https://bna.or.th/info.\n\nสำหรับบริษัท ดูที่ https://massage-home-bna.pages.dev/company/\n\nเกี่ยวกับ [กรมการจัดหางาน](https://www.doe.go.th/) และเรื่อง https://massage-home-bna.pages.dev/news/19\n\n[รูป: ภาพหมอนวดในห้องอบรม](place-images/x/site-a.jpg)\n[รูป](place-images/x/site-b.jpg)',cover_path:'place-images/00000000-0000-0000-0000-000000000000/site-a.jpg',cover_alt:'ภาพหมอนวดกำลังอบรม',day:day(3),pinned:false,active:true});
  A.push({no:2,kind:'article',title:'ประโยชน์ของการนวดไทย <img src=x onerror=window.XSS=1>',summary:'',body:'<script>window.XSS=2</script>ข้อความ',cover_path:null,cover_alt:'',day:day(5),pinned:true,active:true});
  A.push({no:3,kind:'news',title:'ร่างที่ยังไม่เผยแพร่',summary:'',body:'',cover_path:null,cover_alt:'',day:day(0),pinned:false,active:false});
  A.push({no:19,kind:'work',title:'นวดให้พนักงานบริษัท ก',summary:'วันสุขภาพพนักงาน',body:'x',cover_path:'place-images/00000000-0000-0000-0000-000000000000/site-w.jpg',cover_alt:'หมอนวดกำลังนวดพนักงาน',day:day(40),pinned:false,active:true});
  for(let i=4;i<=18;i++)A.push({no:i,kind:'news',title:'ข่าวลำดับ '+i,summary:'สรุป '+i,body:'เนื้อหา '+i,cover_path:null,cover_alt:'',day:day(10+i),pinned:false,active:true});
  return A}
 let DB=mk(),FAIL=false,REQ=[];
+const noF=(r,v)=>v.startsWith('in.(')?(L=>r.filter(a=>L.includes(a.no)))(v.slice(4,-1).split(',').map(Number)):r.filter(a=>a.no===+v.slice(3));
 const kindF=(r,v)=>v.startsWith('neq.')?r.filter(a=>a.kind!==v.slice(4)):r.filter(a=>a.kind===v.slice(3));
 const adjF=(r,p)=>{const o=p.get('or');if(!o)return r;const m=/^\(day\.(lt|gt)\.([\d-]+),and\(day\.eq\.[\d-]+,no\.(?:lt|gt)\.(\d+)\)\)$/.exec(o);if(!m)throw new Error('bad or '+o);const lt=m[1]==='lt',d=m[2],n=+m[3];r=r.filter(a=>lt?(a.day<d||(a.day===d&&a.no<n)):(a.day>d||(a.day===d&&a.no>n)));const asc=(p.get('order')||'').startsWith('day.asc');return r.sort((a,b)=>(asc?1:-1)*((a.day<b.day?-1:a.day>b.day?1:0)||(a.no-b.no)))};
 function q(u){const x=new URL(u),p=x.searchParams;let r=DB.slice();
  if(p.get('active')==='eq.true')r=r.filter(a=>a.active);
  if(p.get('kind'))r=kindF(r,p.get('kind'));
- if(p.get('no'))r=r.filter(a=>a.no===+p.get('no').slice(3));
+ if(p.get('no'))r=noF(r,p.get('no'));
  if(p.get('or'))r=adjF(r,p);else r.sort((a,b)=>(b.pinned-a.pinned)||(b.day<a.day?-1:b.day>a.day?1:0)||(b.no-a.no));
  const off=+(p.get('offset')||0),lim=+(p.get('limit')||1000);return r.slice(off,off+lim)}
 (async()=>{await new Promise(r=>srv.listen(0,'127.0.0.1',r));const BASE='http://127.0.0.1:'+srv.address().port;
@@ -49,7 +50,7 @@ ok('home: hours shown',(await p.textContent('#cHours')).includes('09:00'));
 ok('home: tab title',(await p.title())==='จ้างงานคนตาบอด มาตรา 33, 35 และบริการนวดโดยหมอนวดตาบอด | สมาคมวิทยากรฝึกอาชีพคนตาบอด');
 ok('contact order: name, phone, email, hours',await p.evaluate(()=>[...document.querySelectorAll('#contact p[id]:not(#copy)')].map(x=>x.id).join(',')==='cName,cPhone,cEmail,cHours'));
 ok('visitor stats: Cloudflare Web Analytics beacon with token and spa on',await p.evaluate(()=>{const x=document.querySelector('script[src="https://static.cloudflareinsights.com/beacon.min.js"]');if(!x)return false;const c=JSON.parse(x.getAttribute('data-cf-beacon'));return x.defer&&c.token==='84e868c35fa94960abe34feda073bcaf'&&c.spa===true}));
-ok('footer links to association site bna.or.th',await p.evaluate(()=>{const a=document.querySelector('#contact a[href="https://bna.or.th/"]');return !!a&&a.textContent==='bna.or.th'}));
+ok('footer: link named เว็บไซต์หลักของสมาคม goes to bna.or.th (address not shown)',await p.evaluate(()=>{const a=document.querySelector('#contact a[href="https://bna.or.th/"]');return !!a&&a.textContent==='เว็บไซต์หลักของสมาคม'&&!document.getElementById('contact').textContent.includes('bna.or.th')}));
 ok('home: order hero > company > works > latest; works section shows work item, latest has no work items',await p.waitForFunction(()=>{const ids=[...document.querySelectorAll('#view section h2')].map(h=>h.id);const w=document.querySelectorAll('#works .card').length;const lw=[...document.querySelectorAll('#latest .card .tag')].some(t=>t.textContent==='ผลงานบริการ');return ids.slice(0,3).join()==='hBiz,hWorks,hLatest'&&w===1&&!lw},null,{timeout:4000}).then(()=>true,()=>false));
 ok('home: email from public_contact is a mailto link',await p.evaluate(()=>{const a=document.querySelector('#cEmail a');return !!a&&a.getAttribute('href')==='mailto:info@example.org'&&a.textContent==='info@example.org'}));
 ok('footer: copyright with Thai year and association name',(await p.textContent('#copy'))==='© '+(new Date().getFullYear()+543)+' สมาคมวิทยากรฝึกอาชีพคนตาบอด สงวนลิขสิทธิ์');
@@ -81,9 +82,12 @@ await p.click('.backs a[href="/"]');ok('กลับหน้าแรก goes h
 await p.goto(BASE+'/news/1');await p.waitForSelector('article.post h1');
 ok('post: nav marks ข่าวและบทความ',await p.evaluate(()=>document.querySelector('nav.main a[aria-current="page"]').textContent==='ข่าวและบทความ'));
 
-ok('post: link to this site opens in the same tab (no new-window notice), link to other sites opens new window',await p.evaluate(()=>{const a=[...document.querySelectorAll('.body a')];const own=a.find(x=>x.textContent==='https://massage-home-bna.pages.dev/company/'),ext=a.find(x=>x.getAttribute('href')==='https://bna.or.th/info');return !!own&&own.getAttribute('href')==='/company/'&&!own.target&&own.hasAttribute('data-nav')&&!/หน้าต่างใหม่/.test(own.textContent)&&!!ext&&ext.target==='_blank'}));
+ok('post: link to this site opens in the same tab (no new-window notice), link to other sites opens new window',await p.evaluate(()=>{const a=[...document.querySelectorAll('.body a')];const own=a.find(x=>x.textContent==='หน้าบริษัทและหน่วยงาน'),ext=a.find(x=>x.getAttribute('href')==='https://bna.or.th/info');return !!own&&own.getAttribute('href')==='/company/'&&!own.target&&own.hasAttribute('data-nav')&&!/หน้าต่างใหม่/.test(own.textContent)&&!!ext&&ext.target==='_blank'}));
 await p.click('.body a[href="/company/"]');
 ok('own-site link in article goes to company page in the same tab; back returns to the article',await p.waitForSelector('#hLaw',{timeout:5000}).then(()=>true,()=>false)&&p.url()===BASE+'/company/'&&(await p.context().pages()).length===1&&await p.goBack().then(()=>p.waitForFunction(()=>document.querySelector('#view h1')&&document.querySelector('#view h1').textContent==='อบรมหมอนวดรุ่นใหม่',null,{timeout:5000})).then(()=>true,()=>false));
+
+ok('post: [text](url) shows the name, link to another story shows its title (asked by number), no raw addresses for these',await p.waitForFunction(()=>{const a=[...document.querySelectorAll('.body a')],d=a.find(x=>x.getAttribute('href')==='https://www.doe.go.th/'),s=a.find(x=>x.getAttribute('href')==='/news/19');return !!d&&d.firstChild.textContent==='กรมการจัดหางาน'&&d.target==='_blank'&&!!s&&s.textContent==='นวดให้พนักงานบริษัท ก'&&!s.target},null,{timeout:4000}).then(()=>true,()=>false)&&REQ.some(u=>/no=in\.\(19\)/.test(u)));
+ok('post: inline images in body: caption under image + as alt; no caption -> alt from story title, no caption text',await p.evaluate(()=>{const f=[...document.querySelectorAll('.body figure.inimg')];if(f.length!==2)return false;const i0=f[0].querySelector('img'),i1=f[1].querySelector('img');return i0.src.endsWith('/storage/v1/object/public/place-images/x/site-a.jpg')&&i0.alt==='ภาพหมอนวดในห้องอบรม'&&f[0].querySelector('figcaption').textContent==='ภาพหมอนวดในห้องอบรม'&&i1.alt==='รูปประกอบเรื่อง อบรมหมอนวดรุ่นใหม่'&&!f[1].querySelector('figcaption')&&i0.loading==='lazy'}));
 
 // หน้าบทความ html ในเนื้อหาไม่ทำงาน
 await p.goto(BASE+'/news/2');await p.waitForSelector('article.post h1');
@@ -158,6 +162,19 @@ const m=await b.newContext({locale:'th-TH',viewport:{width:360,height:740},isMob
 const mp=await m.newPage();mp.on('pageerror',e=>errs.push('mobile: '+e.message));await mp.goto(BASE+'/news/1');await mp.waitForSelector('article.post h1');
 ok('no email from server: email line stays empty',(await mp.textContent('#cEmail'))==='');
 ok('mobile 360px: no sideways scroll',await mp.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1));
+// เครื่องคิดเลขจ้างงานคนพิการ
+await p.goto(BASE+'/company/');await p.waitForSelector('#hLaw');await p.click('.calcbox a[href="/company/calc/"]');
+ok('calc: opened from company page in same page, focus on h1, nav still on company',await p.waitForFunction(()=>document.querySelector('#view h1')&&document.querySelector('#view h1').textContent==='คำนวณจำนวนคนพิการที่บริษัทต้องจ้าง'&&document.activeElement===document.querySelector('#view h1'),null,{timeout:5000}).then(()=>true,()=>false)&&await p.evaluate(()=>document.querySelector('nav.main a[aria-current="page"]').getAttribute('href')==='/company/'&&document.title.startsWith('คำนวณจำนวนคนพิการ')));
+await p.fill('#cN','251');await p.fill('#cH','1');await p.click('#calcF button[type=submit]');
+ok('calc: result in status box (need 3, lack 2, 246,010 baht), no reload, link holds the numbers',await p.waitForFunction(()=>/ต้องจ้างคนพิการ 3 คน/.test(document.getElementById('calcOut').textContent),null,{timeout:4000}).then(()=>true,()=>false)&&await p.evaluate(()=>{const o=document.getElementById('calcOut');return o.getAttribute('role')==='status'&&/ยังขาดอีก 2 คน/.test(o.textContent)&&/246,010 บาท ต่อปี/.test(o.textContent)&&location.search==='?n=251&h=1'&&!!o.querySelector('a[href*="?company=1"]')}));
+await p.fill('#cN','12x');await p.click('#calcF button[type=submit]');
+ok('calc: bad number -> error and focus back on the field',await p.waitForFunction(()=>/กรอกจำนวนพนักงานเป็นตัวเลข/.test(document.getElementById('calcOut').textContent)&&document.activeElement.id==='cN',null,{timeout:4000}).then(()=>true,()=>false));
+await p.fill('#cN','80');await p.press('#cN','Enter');
+ok('calc: Enter key works, 80 staff -> not required + occasional service button',await p.waitForFunction(()=>/ยังไม่ต้องจ้างคนพิการ/.test(document.getElementById('calcOut').textContent)&&!!document.querySelector('#calcOut a[href*="?orgreq=1"]'),null,{timeout:4000}).then(()=>true,()=>false));
+await p.fill('#cN','300');await p.fill('#cH','5');await p.click('#calcF button[type=submit]');
+ok('calc: already hired enough -> says complete, no fund amount',await p.waitForFunction(()=>/จ้างครบตามกฎหมายแล้ว/.test(document.getElementById('calcOut').textContent)&&!/ต่อปี/.test(document.getElementById('calcOut').textContent),null,{timeout:4000}).then(()=>true,()=>false));
+await mp.goto(BASE+'/company/calc/');await mp.waitForSelector('#cN');
+ok('mobile calc: no sideways scroll, fields and button at least 44px',await mp.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1&&['cN','cH'].every(i=>document.getElementById(i).getBoundingClientRect().height>=44)&&document.querySelector('#calcF button').getBoundingClientRect().height>=44));
 await mp.goto(BASE+'/');await mp.waitForSelector('#latest .card');
 ok('mobile home: no sideways scroll',await mp.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1));
 await mp.goto(BASE+'/company/');await mp.waitForSelector('#hLaw');ok('mobile company: no sideways scroll',await mp.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1));
