@@ -33,7 +33,9 @@ await np.goto(BASE+'/');ok('no-JS: home shows latest news and contact',await np.
 await np.goto(BASE+'/news/4');ok('no-JS: article body visible',(await np.textContent('.body'))==='เนื้อหา 4');
 await nj.close();
 
-const ctx=await b.newContext({locale:'th-TH'});const REQ=[];
+const ctx=await b.newContext({locale:'th-TH'});const REQ=[],BEACON=[];
+// ไม่ส่งสถิติผู้เข้าชมจริงไป Cloudflare จากข้อสอบ (เคยทำให้ตัวเลขใน Web Analytics สูงเกินจริง)
+await ctx.route(/cloudflareinsights\.com/,r=>{BEACON.push(r.request().url());return r.abort()});
 await ctx.route(/supabase\.co/,r=>{const u=r.request().url();REQ.push(u);if(u.includes('public_contact'))return r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(CONTACT)});return r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(q(u))})});
 const p=await ctx.newPage();p.on('pageerror',e=>errs.push(e.message));
 await p.goto(BASE+'/');await p.waitForLoadState('networkidle');
@@ -55,5 +57,6 @@ ok('article from server: tab title, copy button works',(await p.title())==='เ�
 await p.goto(BASE+'/news/999');ok('missing article from server: not found shown',(await p.textContent('#view h1'))==='ไม่พบหน้านี้');
 await p.goto(BASE+'/company/');await p.click('nav.main a[href="/news/"]');
 ok('nav from company page to news works',await p.waitForSelector('#list .card',{timeout:5000}).then(()=>true,()=>false)&&p.url()===BASE+'/news/');
+ok('test does not send visitor stats to Cloudflare (beacon blocked)',BEACON.length>0);
 console.log('errors:',errs.join('|')||'none');ok('no page errors',errs.length===0);
 await b.close();srv.close();fs.rmSync(tmp,{recursive:true,force:true});process.exit(0)})().catch(e=>{console.log('FAIL crash '+e.stack);process.exit(1)});

@@ -158,7 +158,7 @@ DB=mk();FAIL=true;await p.goto(BASE+'/news/');await p.waitForSelector('#list [ro
 FAIL=false;await p.click('#list button[data-retry]');ok('retry loads the list',await p.waitForSelector('#list .card',{timeout:5000}).then(()=>true,()=>false));
 
 // มือถือ: ไม่ล้นจอ
-const m=await b.newContext({locale:'th-TH',viewport:{width:360,height:740},isMobile:true});await m.route(/^https?:/,r=>{const u=r.request().url();if(u.startsWith(BASE))return r.continue();if(/site_articles/.test(u))return r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(q(u))});return r.fulfill({status:200,contentType:'application/json',body:'null'})});
+const m=await b.newContext({locale:'th-TH',viewport:{width:360,height:740},isMobile:true});await m.route(/^https?:/,r=>{const u=r.request().url();if(u.startsWith(BASE))return r.continue();if(/cloudflareinsights\.com/.test(u))return r.abort();if(/site_articles/.test(u))return r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(q(u))});return r.fulfill({status:200,contentType:'application/json',body:'null'})});
 const mp=await m.newPage();mp.on('pageerror',e=>errs.push('mobile: '+e.message));await mp.goto(BASE+'/news/1');await mp.waitForSelector('article.post h1');
 ok('no email from server: email line stays empty',(await mp.textContent('#cEmail'))==='');
 ok('mobile 360px: no sideways scroll',await mp.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1));
