@@ -10,6 +10,9 @@
   var SITE_NAME = "สมาคมวิทยากรฝึกอาชีพคนตาบอด";
   /* สถานะทางกฎหมายของสมาคม (หัวเว็บ ท้ายเว็บ และข้อมูลสำหรับ Google) ผู้ใช้ยืนยัน 19 พ.ย. 2569 ไม่ใส่เลขหนังสือรับรอง */
   var ORG_STATUS = "องค์กรสาธารณประโยชน์";
+  /* เพจ Facebook ของสมาคม (ผู้ใช้ยืนยัน 20 พ.ย. 2569) ถ้าเปลี่ยน แก้ที่นี่และท้ายเว็บใน index.html */
+  var FB_PAGE = "https://www.facebook.com/Bna2559";
+  function fbLink() { return '<a href="' + FB_PAGE + '" rel="noopener" target="_blank">เพจ Facebook ของสมาคม<span class="sr"> (เปิดหน้าต่างใหม่)</span></a>'; }
   /* ที่อยู่ของเว็บนี้ ลิงก์ในเนื้อหาที่ชี้มาเว็บนี้เปิดในหน้าเดิม (ถ้าเปลี่ยนชื่อเว็บใน Cloudflare แก้ที่นี่ด้วย) */
   var SITE_HOST = "massage-home-bna.pages.dev";
   /* เว็บไซต์หลักของสมาคม (ผู้ใช้ยืนยัน 18 พ.ย. 2569) เว็บนี้เน้นการจ้างงานคนตาบอด ข่าว ผลงาน การสมัคร และจองนวด */
@@ -179,6 +182,7 @@
       '<h1>' + esc(a.title) + '</h1><div class="meta"><span>' + esc(KIND[a.kind] || "ข่าว") + '</span><span aria-hidden="true">·</span><span>วันที่ ' + esc(thDate(a.day)) + '</span></div>' +
       (u ? '<figure><img class="cover" src="' + esc(u) + '" alt="' + esc(a.cover_alt || altFor(a.title)) + '">' + (a.cover_alt ? '<figcaption>' + esc(a.cover_alt) + '</figcaption>' : '') + '</figure>' : '') +
       (a.summary ? '<p class="lead">' + esc(a.summary) + '</p>' : '') + '<div class="body">' + renderBody(a.body, { title: a.title, titles: titles }) + '</div>' +
+      (a.kind === "news" || a.kind === "work" ? '<p class="fbmore">ดูรูปและข่าวกิจกรรมเพิ่มเติมที่ ' + fbLink() + '</p>' : '') +
       '<div class="share"><h2>แชร์เรื่องนี้</h2><div class="btns"><a class="btn" href="https://social-plugins.line.me/lineit/share?url=' + encodeURIComponent(link) + '" target="_blank" rel="noopener">แชร์ไป LINE<span class="sr"> (เปิดหน้าต่างใหม่)</span></a><a class="btn" href="https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(link) + '" target="_blank" rel="noopener">แชร์ไป Facebook<span class="sr"> (เปิดหน้าต่างใหม่)</span></a><button class="btn ghost" type="button" data-copy="' + esc(link) + '">' + esc(shareLabel || "คัดลอกลิงก์") + '</button></div></div>' +
       '<nav class="pn" id="pn" aria-label="เรื่องอื่นใน' + esc(KIND[a.kind] || "ข่าว") + '" data-no="' + a.no + '" data-day="' + esc(String(a.day || "").slice(0, 10)) + '" data-kind="' + esc(a.kind) + '"' + (adj ? '' : ' data-pending') + '>' + adjHTML(adj) + '</nav>' +
       '<p class="backs"><a href="/news/" data-nav>กลับไปหน้าข่าวและบทความ</a><a href="/" data-nav>กลับหน้าแรก</a></p></article>';
@@ -312,7 +316,7 @@
   function copyText(year) { return "© " + year + " " + SITE_NAME + " สงวนลิขสิทธิ์"; }
 
   G.SV = {
-    SB: SB, ORG_SITE: ORG_SITE, SITE_NAME: SITE_NAME, ORG_STATUS: ORG_STATUS, PAGE: PAGE, POST_GONE: POST_GONE, LOADING: LOADING, KINDS_Q: KINDS_Q,
+    SB: SB, ORG_SITE: ORG_SITE, SITE_NAME: SITE_NAME, ORG_STATUS: ORG_STATUS, FB_PAGE: FB_PAGE, PAGE: PAGE, POST_GONE: POST_GONE, LOADING: LOADING, KINDS_Q: KINDS_Q,
     esc: esc, imgUrl: imgUrl, card: card, errBox: errBox, listQ: listQ, postQ: postQ, kindsOf: kindsOf, filtersHTML: filtersHTML, renderBody: renderBody, altFor: altFor, linkedNos: linkedNos, titlesQ: titlesQ, titleMap: titleMap,
     parse: parse, canonPath: canonPath, meta: meta, homeHTML: homeHTML, latestHTML: latestHTML, listHTML: listHTML, listBody: listBody, moreBtn: moreBtn,
     postHTML: postHTML, adjQ: adjQ, adjHTML: adjHTML, notFoundHTML: notFoundHTML, companyHTML: companyHTML, faqLD: faqLD, calcHTML: calcHTML, calcResult: calcResult, calcNeed: calcNeed, baht: baht, telHref: telHref, contactParts: contactParts, copyText: copyText

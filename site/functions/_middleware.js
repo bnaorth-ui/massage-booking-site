@@ -61,7 +61,7 @@ export async function onRequest(ctx) {
   const cp = V.canonPath(r);
   const url = cp ? u.origin + cp : null;
   const m = V.meta(r, art, info);
-  const org = { '@context': 'https://schema.org', '@type': 'NGO', name: V.SITE_NAME, description: V.SITE_NAME + ' ' + V.ORG_STATUS + ' ส่งเสริมการจ้างงานคนตาบอดผ่านงานนวด', url: V.ORG_SITE, sameAs: [V.ORG_SITE, u.origin + '/'], logo: u.origin + '/icon-512.png' };
+  const org = { '@context': 'https://schema.org', '@type': 'NGO', name: V.SITE_NAME, description: V.SITE_NAME + ' ' + V.ORG_STATUS + ' ส่งเสริมการจ้างงานคนตาบอดผ่านงานนวด', url: V.ORG_SITE, sameAs: [V.ORG_SITE, u.origin + '/', V.FB_PAGE], logo: u.origin + '/icon-512.png' };
   if (contact && contact.phone) org.telephone = String(contact.phone);
   if (contact && contact.email) org.email = String(contact.email);
   const jsonld = [org];
