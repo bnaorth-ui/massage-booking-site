@@ -70,11 +70,11 @@ ROWS[0].active=false;ROWS[1].active=false;
 ({h}=await get('/news/?k=news'));ok('list: empty type opened by link keeps its filter + ทั้งหมด + บทความ only',view(h).includes('aria-current="page">ข่าวและกิจกรรม</a>')&&view(h).includes('href="/news/?k=article"')&&!view(h).includes('href="/news/?k=work"'));
 ROWS[0].active=true;ROWS[1].active=true;
 ROWS.find(x=>x.no===9).cover_alt='';({h}=await get('/news/9'));
-ok('work post: "more photos and news" line with Facebook page link (new window)',view(h).includes('<p class="fbmore">ดูรูปและข่าวกิจกรรมเพิ่มเติมที่ <a href="https://www.facebook.com/Bna2559" rel="noopener" target="_blank">เพจ Facebook ของสมาคม<span class="sr"> (เปิดหน้าต่างใหม่)</span></a></p>'));
+ok('work post: "more photos and news" line with Facebook page link (new window, no extra notice)',view(h).includes('<p class="fbmore">ดูรูปและข่าวกิจกรรมเพิ่มเติมที่ <a href="https://www.facebook.com/Bna2559" rel="noopener" target="_blank">เพจ Facebook ของสมาคม</a></p>'));
 ok('post: cover without description -> alt from story title, no caption, og:image:alt too',view(h).includes('alt="รูปประกอบเรื่อง นวดให้พนักงานบริษัท ก">')&&!view(h).includes('<figcaption>')&&h.includes('<meta property="og:image:alt" content="รูปประกอบเรื่อง นวดให้พนักงานบริษัท ก">'));
 ROWS.find(x=>x.no===9).cover_alt='หมอนวดกำลังนวด';
 ({h}=await get('/news/8'));ok('article post: no Facebook "more news" line (keeps HR readers on site)',!view(h).includes('fbmore'));
-({h}=await get('/'));ok('footer: Facebook page link (same address as FB_PAGE), new window, right before เว็บไซต์หลักของสมาคม',/<p><a href="https:\/\/www\.facebook\.com\/Bna2559" rel="noopener" target="_blank">เพจ Facebook ของสมาคม<span class="sr"> \(เปิดหน้าต่างใหม่\)<\/span><\/a><\/p>\s*<p><a href="https:\/\/bna\.or\.th\/">เว็บไซต์หลักของสมาคม/.test(h)&&ld(h)[0].j.sameAs.includes('https://www.facebook.com/Bna2559'));
+({h}=await get('/'));ok('footer: Facebook page link (same address as FB_PAGE), new window, right before เว็บไซต์หลักของสมาคม',/<p><a href="https:\/\/www\.facebook\.com\/Bna2559" rel="noopener" target="_blank">เพจ Facebook ของสมาคม<\/a><\/p>\s*<p><a href="https:\/\/bna\.or\.th\/">เว็บไซต์หลักของสมาคม/.test(h)&&ld(h)[0].j.sameAs.includes('https://www.facebook.com/Bna2559'));
 ({h}=await get('/'));ok('footer (server): link named เว็บไซต์หลักของสมาคม, no bare address',h.includes('<a href="https://bna.or.th/">เว็บไซต์หลักของสมาคม</a>')&&!h.includes('>bna.or.th<'));
 ({h}=await get('/news/?k=bogus'));ok('list: unknown filter = all, canonical /news/',view(h).includes('href="/news/7"')&&h.includes('<link rel="canonical" href="'+B+'/news/">'));
 
