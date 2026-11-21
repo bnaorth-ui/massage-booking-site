@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "th.or.bna.massage",
+      "sha256_cert_fingerprints": [
+        "78:13:8F:92:93:B0:5B:E2:A0:6F:DC:DB:6A:AB:ED:96:DA:03:CC:26:40:0D:03:A8:41:E3:54:2B:FD:CF:2A:6C"
+      ]
+    }
+  }
+]
