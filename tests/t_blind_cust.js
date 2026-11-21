@@ -80,6 +80,11 @@ ok('choice saved on this device',JSON.parse(await p.evaluate(()=>localStorage.ge
 await p.click('[data-sf=b]');await p.waitForTimeout(300);ok('filter off: 4 shops back',(await order()).length===4);
 await p.click('[data-pl=sh2]');await p.waitForTimeout(400);
 ok('shop page (choose service) shows the badge',(await p.textContent('#app h1'))==='เลือกบริการ'&&!!(await p.$('#app .tag.bl')));
+// จอมือถือ: ชื่อบริการต้องไม่ถูกตัดทีละคำ (เดิมช่องชื่อแคบจน "นวด/ไทย" แยกบรรทัด) ปุ่ม +/- ลงบรรทัดใหม่แทน
+for(const w of [320,384]){await p.setViewportSize({width:w,height:800});await p.waitForTimeout(200);
+ const r=await p.$$eval('.svr',a=>a.map(c=>{const b=c.querySelector('b'),lh=parseFloat(getComputedStyle(b).lineHeight)||20,q=c.querySelector('.qs').getBoundingClientRect(),cr=c.getBoundingClientRect();return {one:b.getBoundingClientRect().height<lh*1.6,name:b.textContent,inside:q.right<=cr.right+1&&q.left>=cr.left-1}}));
+ ok('width '+w+': service names on one line ('+r.map(x=>x.name).join(', ')+')',r.length>0&&r.every(x=>x.one));ok('width '+w+': +/- buttons inside the card',r.every(x=>x.inside))}
+await p.setViewportSize({width:1280,height:900});
 await home();await p.waitForTimeout(300);
 await p.evaluate(()=>{PLACES.forEach(function(x){x.blind=false});SF.b=false;render()});await p.waitForTimeout(300);
 ok('no blind shops: no filter button, no badges',!(await p.$('[data-sf=b]'))&&!(await p.$('#app .tag.bl')));
