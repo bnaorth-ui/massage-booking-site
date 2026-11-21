@@ -15,3 +15,7 @@ const h=fs.readFileSync(path.join(R,'customer','_headers'),'utf8');
 ok('_headers serves it as application/json',/\/\.well-known\/assetlinks\.json\s*\n\s+Content-Type: application\/json/.test(h));
 const bad=[];(function walk(d){for(const n of fs.readdirSync(d)){const p=path.join(d,n);if(fs.statSync(p).isDirectory()){if(n!=='node_modules'&&n!=='.git')walk(p)}else if(/\.(keystore|jks|p8|p12)$/i.test(n)||/^signing-key-info/i.test(n))bad.push(path.relative(R,p))}})(R);
 ok('no signing keys or key passwords committed in the repo'+(bad.length?' ('+bad.join(', ')+')':''),bad.length===0);
+// ไฟล์ .apk ทดสอบบนเว็บประชาสัมพันธ์: กฎใน site/_headers ต้องชี้โฟลเดอร์ที่มีไฟล์จริง (เดิมเขียนผิดเป็น /news/android/* จึงไม่มีผล)
+const sh=fs.readFileSync(path.join(R,'site','_headers'),'utf8'),apkDir=path.join(R,'site','android');
+if(fs.existsSync(apkDir)){ok('site/_headers rule /android/* matches the folder of the test .apk (download, noindex)',/^\/android\/\*\s*\n\s+Content-Type: application\/vnd\.android\.package-archive[\s\S]*?X-Robots-Tag: noindex/m.test(sh)&&!/news\/android/.test(sh))}
+else ok('no leftover .apk rule after the test file is removed',!/android/.test(sh));

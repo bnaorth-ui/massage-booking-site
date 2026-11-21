@@ -125,5 +125,5 @@ ok('declining restores focus to button',await until(()=>document.activeElement&&
 await p.click('[data-a=qns][data-id=b10]');await p.click('[data-a=qnsok][data-id=b10]');
 await until(()=>!document.querySelector('[data-a=qns][data-id=b10]'));
 ok('rpc shop_mark_no_show sent',await W(()=>calls.some(c=>c.path.endsWith('/rpc/shop_mark_no_show')&&c.body.p_ref==='MS10')));
-await p.click('[data-a=qt][data-id=cx]');ok('no-show card in cancelled tab',(await p.textContent('#main')).includes('ลูกค้าJ')&&(await p.textContent('#main')).includes('ลูกค้าไม่มา'));
+await p.click('[data-a=qt][data-id=cx]');ok('no-show card in cancelled tab',await until(()=>{const t=document.getElementById('main').textContent;return t.includes('ลูกค้าJ')&&t.includes('ลูกค้าไม่มา')}));
 console.log('errors:',errs.join('|')||'none');await b.close()})();
