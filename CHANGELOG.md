@@ -3,6 +3,11 @@
 สรุปจากประวัติ commit ของ repository นี้ (เว็บ 4 ตัว: ผู้ใช้ `customer/`, ร้านนวด `shop/`, พนักงาน `staff/`, แอดมิน `admin/`)
 รายละเอียดเต็มดูที่ `git log` ตัวเลขในวงเล็บคือรหัส commit
 
+## 2026-11-21 (ลิงก์ดาวน์โหลดแอป Android ตัวทดสอบ)
+- ผู้ใช้ใช้ iPhone ส่งไฟล์ .apk ทาง Messenger/LINE ไม่ได้ จึงวาง `site/android/jongkiewnuad.apk` (ไฟล์เดียวกับในแพ็กเกจ PWABuilder ไม่มีกุญแจ) ที่เว็บประชาสัมพันธ์ ลิงก์ https://massage-home-bna.pages.dev/android/jongkiewnuad.apk เลือกเว็บนี้เพราะไม่มี service worker (4 แอปมี sw.js ที่ดักการเปิดหน้าและอาจตอบด้วยหน้าแอปแทนไฟล์)
+- `site/_headers`: ส่งเป็นไฟล์ติดตั้ง Android, ดาวน์โหลดเป็นไฟล์, noindex (ไม่ขึ้น Google) ไม่มีลิงก์จากหน้าใดในเว็บ
+- ใช้ทดสอบเท่านั้น ลบโฟลเดอร์ `site/android/` เมื่อแอปขึ้น Play Store แล้ว
+
 ## 2026-11-21 (แอปผู้ใช้งานบน Google Play: ไฟล์ยืนยัน assetlinks.json)
 - ผู้ใช้สร้างแพ็กเกจ Android ด้วย PWABuilder บนมือถือแล้ว (Package ID `th.or.bna.massage`, Start URL `/?src=twa`, แจ้งเตือนและตำแหน่งทำงานในนามแอป, ไม่ใส่ไอคอนสีเดียว) ตรวจไฟล์ .aab แล้วค่าถูกต้อง ไฟล์กุญแจและรหัสผ่านไม่ได้เปิดและไม่ได้เก็บในที่เก็บโค้ด
 - เพิ่ม `customer/.well-known/assetlinks.json` ด้วยรหัส SHA-256 ของกุญแจที่ PWABuilder สร้าง (แอป .apk ที่ลงทดสอบในเครื่องจะเปิดเต็มจอ) และ `_headers` ส่งเป็น application/json รอรหัสของ Google (App signing) หลังอัปโหลดขึ้น Play Console มาเพิ่มอีกตัว
