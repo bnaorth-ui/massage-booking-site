@@ -93,7 +93,7 @@ let tabs=await p.evaluate(()=>[...document.querySelectorAll('.nf button')].map(b
 console.log(tabs.join(' | '));
 ok('no ทั้งหมด tab',tabs.length===2&&!tabs.some(x=>x.startsWith('ทั้งหมด')));
 ok('default = first category with new (สมาคม)',tabs[0].includes('ใหม่')&&await p.$eval('.nf button:nth-child(1)',e=>e.classList.contains('on')));
-t=await T0(p);ok('shows คิวใหม่ item',t.includes('คิวใหม่'));
+ok('queue item is in the feed (queue tab)',await (async()=>{await p.click('.nf button:nth-child(2)');await sleep(250);const ok2=(await p.textContent('#app')).includes('คิวใหม่');await p.click('.nf button:nth-child(1)');await sleep(250);return ok2})());
 await p.click('.nf button:nth-child(1)');await sleep(200);t=await T0(p);ok('switch to สมาคม shows announcement',t.includes('ประชุมพนักงาน')&&!t.includes('เลขที่ MS100002'));
 await p.click('#nav button:nth-child(1)');await p.click('#nav button:nth-child(4)');await sleep(300);
 ok('re-enter nt: defaults (no new now) -> สมาคม',await p.$eval('.nf button:nth-child(1)',e=>e.classList.contains('on')));
