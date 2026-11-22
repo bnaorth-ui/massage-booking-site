@@ -103,7 +103,7 @@ const lab=await p.$eval('#main .subtabs[aria-label] [data-id=rvw]',e=>e.textCont
 await p.click('#main .subtabs[aria-label] [data-id=rvw]');await p.waitForTimeout(600);
 let t=await p.textContent('#main');
 ok('default filter = reported (2 items)',t.includes('แจ้งตรวจสอบ (2)')&&t.includes('แย่มาก')&&t.includes('ไม่สุภาพ')&&!t.includes('ช้า'));
-ok('staff review labelled',t.includes('รีวิวพนักงาน คุณกลาง')||t.includes('รีวิวพนักงาน'));
+ok('staff review labelled',t.includes('รีวิวหมอนวด คุณกลาง')||t.includes('รีวิวหมอนวด'));
 await p.click('[data-a=rvwf][data-id=low]');await p.waitForTimeout(200);t=await p.textContent('#main');
 ok('low filter shows rv1,rv2,rs1 not hidden',t.includes('แย่มาก')&&t.includes('ช้า')&&!t.includes('หยาบคาย'));
 await p.click('[data-a=rvwf][data-id=hid]');await p.waitForTimeout(200);t=await p.textContent('#main');

@@ -102,9 +102,9 @@ await p.click('#tabs [data-id=pl]');await p.waitForTimeout(300);
 await p.click('[data-a=tab][data-id=staff]').catch(async()=>{await p.click('#main .subtabs [data-id=staff]')});await p.waitForTimeout(500);
 let t=await p.evaluate(()=>document.body.innerText);
 if(process.env.NOSQL){ok('sql missing -> no card, list still ok',!t.includes('คำขอลบบัญชีพนักงานส่วนกลาง')&&t.includes('คุณกลาง'));console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)}
-ok('request card with 2',t.includes('คำขอลบบัญชีพนักงานส่วนกลาง (2)')&&t.includes('คุณสอง')&&t.includes('ร้านเป็นผู้อนุมัติ'));
+ok('request card with 2',t.includes('คำขอลบบัญชีหมอนวดส่วนกลาง (2)')&&t.includes('คุณสอง')&&t.includes('ร้านเป็นผู้อนุมัติ'));
 ok('open jobs warning + approve disabled for q2',t.includes('ยังมีคิวที่ยังไม่เสร็จ 2 คิว')&&await p.$eval('[data-a=sdrok][data-id=q2]',e=>e.disabled));
-ok('anonymized staff hidden from list',!t.includes('พนักงานที่ออกจากระบบ')&&t.includes('พนักงานทั้งหมด (2)'));
+ok('anonymized staff hidden from list',!/(พนักงาน|หมอนวด)ที่ออกจากระบบ/.test(t)&&t.includes('หมอนวดทั้งหมด (2)'));
 await p.screenshot({path:'sdr_admin.png',fullPage:true});
 await p.click('[data-a=sdrok][data-id=q1]');await p.waitForTimeout(200);
 ok('first click asks to confirm, no rpc',sdrCalls.length===0&&(await p.evaluate(()=>document.body.innerText)).includes('กดอีกครั้งเพื่อยืนยันลบ'));
@@ -113,9 +113,9 @@ await p.click('[data-a=sdrx]');await p.waitForTimeout(200);ok('cancel resets',sd
 await p.click('[data-a=sdrno][data-id=q2]');await p.waitForTimeout(200);ok('reject asks reason',!!(await p.$('#sdn_q2')));
 await p.fill('#sdn_q2','ยังมียอดค้างกับร้าน');await p.click('[data-a=sdrno][data-id=q2]');await p.waitForTimeout(600);
 ok('reject rpc sent',sdrCalls.length===1&&sdrCalls[0].p_req==='q2'&&sdrCalls[0].p_approve===false&&sdrCalls[0].p_note==='ยังมียอดค้างกับร้าน');
-t=await p.evaluate(()=>document.body.innerText);ok('card shows 1 left + info',t.includes('คำขอลบบัญชีพนักงานส่วนกลาง (1)')&&t.includes('บันทึกการไม่อนุมัติแล้ว'));
+t=await p.evaluate(()=>document.body.innerText);ok('card shows 1 left + info',t.includes('คำขอลบบัญชีหมอนวดส่วนกลาง (1)')&&t.includes('บันทึกการไม่อนุมัติแล้ว'));
 // approve q1 two-step
 await p.click('[data-a=sdrok][data-id=q1]');await p.click('[data-a=sdrok][data-id=q1]');await p.waitForTimeout(700);
 ok('approve rpc sent',sdrCalls.length===2&&sdrCalls[1].p_req==='q1'&&sdrCalls[1].p_approve===true);
-t=await p.evaluate(()=>document.body.innerText);ok('card gone, info shown, staff removed from list',!t.includes('คำขอลบบัญชีพนักงานส่วนกลาง (')&&t.includes('ลบบัญชีพนักงานแล้ว')&&!t.includes('พนักงานที่ออกจากระบบ')&&t.includes('พนักงานทั้งหมด (1)'));
+t=await p.evaluate(()=>document.body.innerText);ok('card gone, info shown, staff removed from list',!t.includes('คำขอลบบัญชีหมอนวดส่วนกลาง (')&&t.includes('ลบบัญชีหมอนวดแล้ว')&&!/(พนักงาน|หมอนวด)ที่ออกจากระบบ/.test(t)&&t.includes('หมอนวดทั้งหมด (1)'));
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)})();

@@ -127,8 +127,9 @@ await p.click('[data-a=wdset][data-id=all]');await sleep(300);
 ok('day off from shop shown',(await txt('#app')).includes('วันหยุดที่ร้านตั้งไว้'));
 // notifications
 await p.click('[data-id=nt]');await sleep(300);
-ok('feed has announcement + queue note, not others',(await txt('#app')).includes('ประกาศ: ประชุมพนักงาน')&&await (async()=>{await p.click('.nf button:nth-child(2)');await sleep(250);const ok2=(await p.textContent('#app')).includes('คิวใหม่');await p.click('.nf button:nth-child(1)');await sleep(250);return ok2})()&&!(await txt('#app')).includes('ไม่ใช่ของเรา'));
+ok('feed has announcement + queue note, not others',(await txt('#app')).includes('ประกาศ: ประชุมพนักงาน')&&(await p.textContent('.nf')).includes('เกี่ยวกับคิว')&&!(await txt('#app')).includes('ไม่ใช่ของเรา'));
 ok('marked new',(await p.$$('.nti .tag.w')).length>=1);
+await p.click('.nf button:nth-child(2)');await sleep(300);ok('queue tab lists the new-queue notification',(await p.textContent('#app')).includes('คิวใหม่')&&(await p.textContent('#app')).includes('MS100002'));
 ok('reads posted',reads.includes('n1'));
 await p.click('[data-a=ntf][data-id=admin]');ok('filter admin',(await p.$$('.nti')).length===1);
 await p.click('[data-id=q]');await sleep(200);ok('badge cleared',!(await txt('#navb')).match(/🔔.*\d/s)||true);
@@ -137,7 +138,7 @@ ok('no badge element',await p.$('#navb .bdg')===null);
 await p.reload();await sleep(700);ok('session restored after reload',(await txt('#app')).includes('คิวงาน'));
 // network down on refresh doesn't break
 mode.net=true;await p.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));await sleep(300);ok('page still shown offline',(await txt('#app')).includes('คิวงาน'));mode.net=false;
-await p.click('#nav button:last-child');await sleep(300);await p.click('#logout');await sleep(500);ok('logout -> login gate & session cleared',(await txt()).includes('เข้าสู่ระบบหมอนวด')&&await p.evaluate(()=>!localStorage.getItem('sbSessionStaff')));
+await p.click('[data-a=tab][data-id=ac]');await p.waitForSelector('#logout',{timeout:10000});await p.click('#logout');await p.waitForFunction(()=>!!document.body&&document.body.innerText.includes('เข้าสู่ระบบหมอนวด'),null,{timeout:10000}).catch(()=>{});ok('logout -> login gate & session cleared',(await txt()).includes('เข้าสู่ระบบหมอนวด')&&await p.evaluate(()=>!localStorage.getItem('sbSessionStaff')));
 ok('no page errors',errs.length===0);if(errs.length)console.log(errs);
 ok('no demo/localStorage business data',!(await p.evaluate(()=>Object.keys(localStorage).some(k=>/staffData|staffProfile|bookings|shopInbox/.test(k)))));
 await b.close()})();

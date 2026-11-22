@@ -103,12 +103,12 @@ await p.fill('#rg_r1','150');await p.click('[data-a=regok][data-id=r1]');ok('GP 
 await p.fill('#rg_r1','12');await p.fill('#rc_r1','500');await p.click('[data-a=regok][data-id=r1]');
 ok('approved info message',await has('อนุมัติร้าน ร้านใหม่หนึ่ง แล้ว'));
 const ap=calls.filter(c=>c.path.endsWith('approve_shop_registration')).pop();ok('approve rpc args',ap&&ap.body.p_reg==='r1'&&ap.body.p_gp===12&&ap.body.p_credit===500);
-await p.click('[data-a=tab][data-id=staff]');ok('staff list shows link status',(await txt('#main')).includes('เชื่อมบัญชีแล้ว')&&(await txt('#main')).includes('รอพนักงานสมัครสมาชิก'));
-await p.click('[data-a=new][data-t=staff]');await p.fill('#fn','คุณใหม่');await p.fill('#fph','0866666666');await p.click('.sv >> nth=0');await p.click('[data-a=save]');ok('duplicate phone blocked client-side',await has('ถูกใช้กับพนักงานคนอื่นแล้ว'));
+await p.click('[data-a=tab][data-id=staff]');ok('staff list shows link status',(await txt('#main')).includes('เชื่อมบัญชีแล้ว')&&(await txt('#main')).includes('รอหมอนวดสมัครสมาชิก'));
+await p.click('[data-a=new][data-t=staff]');await p.fill('#fn','คุณใหม่');await p.fill('#fph','0866666666');await p.click('.sv >> nth=0');await p.click('[data-a=save]');ok('duplicate phone blocked client-side',await has('ถูกใช้กับหมอนวดคนอื่นแล้ว'));
 await p.fill('#fph','0855555555');await p.click('[data-a=save]');await has('คุณใหม่');
 const ns=T.staff.find(x=>x.name==='คุณใหม่');ok('central staff rpc',ns&&ns.phone==='0855555555'&&T.staff_services.some(q=>q.staff_id===ns.id));
 
 ok('card shown',await has('เพิ่มคุณใหม่แล้ว'));
-await p.click('.card [data-a=stshare]');ok('no link -> hint',await has('ยังไม่ได้ตั้งลิงก์แอปพนักงาน'));
+await p.click('.card [data-a=stshare]');ok('no link -> hint',await has('ยังไม่ได้ตั้งลิงก์แอปหมอนวด'));
 console.log('DONE');await b.close();process.exit(0);
 })();

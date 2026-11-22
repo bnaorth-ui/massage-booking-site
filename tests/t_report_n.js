@@ -110,7 +110,7 @@ ok('staff names',t.includes('คุณนุ่น')&&t.includes('คุณว�
 ok('name masked, phone hidden',t.includes('สมชาย ใ***')&&!t.includes('สมชาย ใจดี')&&!t.includes('0899999999')&&t.includes('มา***'));
 ok('actual times shown (09:05 - 09:58) and duration',t.includes('09:05 - 09:58')&&t.includes('60 นาที')&&t.includes('เวลาให้บริการจริง'));
 const sb=await p.$$eval('.rpst',e=>e.map(x=>x.querySelector('b').textContent+'#'+x.querySelectorAll('tbody tr').length));console.log(sb.join(' | '));
-ok('per-staff blocks (นุ่น 3 คิว, วิภา 1 คิว, cancelled excluded)',sb.join()==='พนักงาน: คุณนุ่น (3 คิว)#3,พนักงาน: คุณวิภา (1 คิว)#1');
+ok('per-staff blocks (นุ่น 3 คิว, วิภา 1 คิว, cancelled excluded)',sb.join()==='หมอนวด: คุณนุ่น (3 คิว)#3,หมอนวด: คุณวิภา (1 คิว)#1');
 ok('per-staff row has start-end, actual, masked customer',(await p.$eval('.rpst',e=>e.innerText)).includes('09:00 - 10:00')&&(await p.$eval('.rpst',e=>e.innerText)).includes('09:05 - 09:58')&&(await p.$eval('.rpst',e=>e.innerText)).includes('สมชาย ใ***'));
 ok('detail rows 5',(await p.$$eval('.rpw:not(.rpst .rpw) tbody tr',r=>r.length))===5);
 ok('no other org bookings',!t.includes('ลูกค้าใหม่'));
@@ -130,7 +130,7 @@ await p.click('[data-a=rpgo]');await until(()=>document.body.innerText.includes(
 const [pop]=await Promise.all([ctx.waitForEvent('page'),p.click('[data-a=rpprint]')]);
 await pop.waitForLoadState();
 const pt=await pop.textContent('body');
-ok('print page opens with report',pt.includes('รายงานการใช้บริการ')&&pt.includes('สรุปภาพรวม')&&pt.includes('แยกตามพนักงาน'));
+ok('print page opens with report',pt.includes('รายงานการใช้บริการ')&&pt.includes('สรุปภาพรวม')&&pt.includes('แยกตามหมอนวด'));
 ok('print page has no control buttons from admin (only its own print button)',!pt.includes('ดาวน์โหลด Excel')&&!pt.includes('สร้างรายงาน')&&pt.includes('พิมพ์ / บันทึกเป็น PDF'));
 ok('print page keeps header logo',!!(await pop.$('.rplogo')));
 await pop.emulateMedia({media:'print'});ok('print page hides its print button in print',await pop.$eval('.noprint',e=>getComputedStyle(e).display==='none'));

@@ -92,7 +92,7 @@ await until(()=>!!document.querySelector('#hacts .srb')&&document.getElementById
 const tabs=await p.$$eval('#tabs button',b=>b.map(x=>x.textContent.trim()));
 ok('tab order: หน้าหลัก, ทะเบียน, การเงิน ('+tabs.slice(0,3).join('|')+')',tabs[0].includes('หน้าหลัก')&&tabs[1].includes('ทะเบียน')&&tabs[2].includes('การเงิน'));
 await goTab('set');
-const subs=await p.$$eval('.subtabs button',x=>x.map(e=>e.textContent));ok('5 settings sub tabs ('+subs.slice(-5).join('|')+')',subs.slice(-5).join('|')==='ข้อมูลสมาคม|การจองและพนักงาน|การแจ้งเตือน|แอดมิน|ล้างข้อมูลเก่า');
+const subs=await p.$$eval('.subtabs button',x=>x.map(e=>e.textContent));ok('5 settings sub tabs ('+subs.slice(-5).join('|')+')',subs.slice(-5).join('|')==='ข้อมูลสมาคม|การจองและหมอนวด|การแจ้งเตือน|แอดมิน|ล้างข้อมูลเก่า');
 const shown=async()=>await p.$$eval('[data-sg]',x=>x.filter(e=>!e.hidden).map(e=>e.dataset.sg).join());
 ok('default shows g only',(await shown())==='g'&&await p.isVisible('#c1')&&!(await p.isVisible('#d9')));
 ok('save button visible',await p.isVisible('[data-a=setsave]'));

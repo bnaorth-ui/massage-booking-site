@@ -110,8 +110,9 @@ await p.click('[data-a=wdset][data-id=all]');await sleep(300);
 ok('day off from shop shown',(await txt('#app')).includes('วันหยุดที่ร้านตั้งไว้'));
 // notifications
 await p.click('[data-id=nt]');await sleep(300);
-ok('feed has announcement + queue note, not others',(await txt('#app')).includes('ประกาศ: ประชุมพนักงาน')&&await (async()=>{await p.click('.nf button:nth-child(2)');await sleep(250);const ok2=(await p.textContent('#app')).includes('คิวใหม่');await p.click('.nf button:nth-child(1)');await sleep(250);return ok2})()&&!(await txt('#app')).includes('ไม่ใช่ของเรา'));
+ok('feed has announcement + queue note, not others',(await txt('#app')).includes('ประกาศ: ประชุมพนักงาน')&&(await p.textContent('.nf')).includes('เกี่ยวกับคิว')&&!(await txt('#app')).includes('ไม่ใช่ของเรา'));
 ok('marked new',(await p.$$('.nti .tag.w')).length>=1);
+await p.click('.nf button:nth-child(2)');await sleep(300);ok('queue tab lists the new-queue notification',(await p.textContent('#app')).includes('คิวใหม่')&&(await p.textContent('#app')).includes('MS100002'));
 ok('reads posted',reads.includes('n1'));
 await p.click('[data-a=ntf][data-id=admin]');ok('filter admin',(await p.$$('.nti')).length===1);
 await p.click('[data-id=q]');await sleep(200);ok('badge cleared',!(await txt('#navb')).match(/🔔.*\d/s)||true);

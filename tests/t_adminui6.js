@@ -140,12 +140,12 @@ const rv=T.services.find(x=>x.name==='นวด 15 นาที พัก 5');ok
 await p.click('[data-a=new][data-t=svc]');await p.fill('#sn','บริการฟรี');await p.fill('#sp','0');await p.click('[data-a=save]');await has('บริการฟรี');ok('admin service price 0 saved',(T.services.find(x=>x.name==='บริการฟรี')||{}).price===0);
 await p.click(`[data-a=tog][data-t=svc][data-id=${sv.id}]`);await wait(150);ok('toggle svc',await W(()=>T.services.find(x=>x.id===sv.id).active===false));
 // ---- พนักงาน
-await p.click('#tabs [data-id=pl]');await p.click('[data-a=tab][data-id=staff]');ok('staff list shows link status',(await txt('#main')).includes('เชื่อมบัญชีแล้ว')&&(await txt('#main')).includes('รอพนักงานสมัครสมาชิก'));
-await p.click('[data-a=new][data-t=staff]');ok('service picker shows rest time',(await p.$$eval('.dchk label',ls=>ls.map(l=>l.textContent))).some(x=>x.includes(', 15 นาที พัก 5 นาที, ')));await p.fill('#fn','คุณใหม่');await p.fill('#fph','0866666666');await p.click('.sv >> nth=0');await p.click('[data-a=save]');ok('duplicate phone blocked client-side',await has('ถูกใช้กับพนักงานคนอื่นแล้ว'));
+await p.click('#tabs [data-id=pl]');await p.click('[data-a=tab][data-id=staff]');ok('staff list shows link status',(await txt('#main')).includes('เชื่อมบัญชีแล้ว')&&(await txt('#main')).includes('รอหมอนวดสมัครสมาชิก'));
+await p.click('[data-a=new][data-t=staff]');ok('service picker shows rest time',(await p.$$eval('.dchk label',ls=>ls.map(l=>l.textContent))).some(x=>x.includes(', 15 นาที พัก 5 นาที, ')));await p.fill('#fn','คุณใหม่');await p.fill('#fph','0866666666');await p.click('.sv >> nth=0');await p.click('[data-a=save]');ok('duplicate phone blocked client-side',await has('ถูกใช้กับหมอนวดคนอื่นแล้ว'));
 await p.fill('#fph','0855555555');await p.click('[data-a=save]');await has('คุณใหม่');
 const ns=T.staff.find(x=>x.name==='คุณใหม่');ok('central staff rpc',ns&&ns.phone==='0855555555'&&T.staff_services.some(q=>q.staff_id===ns.id));
 ok('new staff share card shown',await has('เพิ่มคุณใหม่แล้ว')&&!!(await p.$('.card [data-a=stshare]')));
-await p.click('.card [data-a=stshare]');ok('no link set -> hint',await has('ยังไม่ได้ตั้งลิงก์แอปพนักงาน'));
+await p.click('.card [data-a=stshare]');ok('no link set -> hint',await has('ยังไม่ได้ตั้งลิงก์แอปหมอนวด'));
 ok('list has share btn only for unlinked active',(await p.$$('#lst [data-a=stshare]')).length===T.staff.filter(x=>x.phone&&!x.user_id&&x.active!==false).length||true);
 // ---- หมวดหมู่
 await p.click('#tabs [data-id=sys]');await p.click('[data-a=tab][data-id=cat]');await p.click('[data-a=new][data-t=cat]');await p.click('[data-a=save]');ok('cat name required',await has('กรุณากรอกชื่อหมวดหมู่'));
@@ -172,7 +172,7 @@ await p.click(`[data-a=edit][data-t=org][data-id=og1]`);await p.selectOption('#o
 await p.click('.spk[value=p2]');await p.click('[data-a=save]');ok('server conflict message shown in form',await has('ถูกจัดให้ สำนักงานเขต ในวันเดียวกันแล้ว'));await p.click('[data-a=cancel]');
 // ---- บริษัท
 await p.click('#tabs [data-id=pl]');await p.click('[data-a=tab][data-id=comp]');await p.click('[data-a=new][data-t=comp]');await p.fill('#on','บริษัทใหม่');await p.click('.spk >> nth=0');
-ok('weekday buttons appear',!!(await p.$('[data-a=sday]')));await p.click('[data-a=save]');ok('days required per staff',await has('เลือกวันที่ให้บริการของพนักงาน'));
+ok('weekday buttons appear',!!(await p.$('[data-a=sday]')));await p.click('[data-a=save]');ok('days required per staff',await has('เลือกวันที่ให้บริการของหมอนวด'));
 await p.click('[data-a=sday][data-d="1"]');await p.click('[data-a=sday][data-d="3"]');ok('name kept after weekday toggles',(await p.inputValue('#on'))==='บริษัทใหม่');
 await p.click('[data-a=save]');await has('บริษัทใหม่');await p.waitForTimeout(800);const c2=T.places.find(x=>x.name==='บริษัทใหม่');
 ok('company rpc with weekdays',c2&&c2.type==='company'&&c2.fixed_date===null&&T.place_staff.some(x=>x.place_id===c2.id&&x.weekdays.join()==='1,3'));
@@ -216,7 +216,7 @@ await until(()=>/การเงิน\s*1/.test(document.getElementById('tabs')
 // ---- แจ้งเตือน
 await p.click('[data-a=tab][data-id=nt]');ok('3 unread total in header',(await txt('#main')).includes('3 ใหม่'));
 ok('default cat = first with unread (shop) shows n2 only',(await txt('#main')).includes('ร้านปิดรับจองชั่วคราว')&&!(await txt('#main')).includes('ร้านขอเติมเงิน 500 บาท'));
-const cb=await p.$$eval('[data-a=ntc]',x=>x.map(e=>e.textContent.trim()));ok('5 cats with counts',JSON.stringify(cb)===JSON.stringify(['ร้านค้า (1)','การเงิน (1)','รีวิว','พนักงาน','จากระบบ (1)']));
+const cb=await p.$$eval('[data-a=ntc]',x=>x.map(e=>e.textContent.trim()));ok('5 cats with counts',JSON.stringify(cb)===JSON.stringify(['ร้านค้า (1)','การเงิน (1)','รีวิว','หมอนวด','จากระบบ (1)']));
 await p.click('[data-a=ntc][data-id=fin]');ok('fin shows topup',(await txt('#main')).includes('ร้านขอเติมเงิน 500 บาท')&&!(await txt('#main')).includes('ร้านปิดรับจองชั่วคราว'));
 await p.click('[data-a=ntread][data-id=n1]');await wait(250);ok('mark one read posts',(c=>c&&c.body.length===1&&c.body[0].notification_id==='n1'&&c.body[0].user_id==='u1'&&c.q.includes('on_conflict')&&c.pref.includes('ignore-duplicates'))(calls.filter(c=>c.path.endsWith('notification_reads')&&c.m==='POST').pop()));
 await p.click('[data-a=ntc][data-id=sys]');ok('sys shows n3',(await txt('#main')).includes('มีคำขอลงทะเบียน'));
