@@ -92,7 +92,7 @@ const p=await ctx.newPage();p.on('pageerror',e=>errs.push(e.message));p.on('dial
 await p.goto(require('./config').page('customer-booking.html'));
 const ok=(n,c)=>console.log((c?'PASS ':'FAIL ')+n);
 await p.waitForSelector('[data-pl]',{timeout:5000});
-ok('guest home has company bar after org bar',await p.evaluate(()=>{const a=[...document.querySelectorAll('.regbar')];const i=a.findIndex(x=>x.querySelector('[data-orq=guest]')),j=a.findIndex(x=>x.querySelector('[data-orq=capguest]'));return i>-1&&j===i+1&&a[j].textContent.includes('ดูแลพนักงานของคุณ พร้อมสร้างอาชีพให้ผู้พิการทางการเห็น')&&a[j].textContent.includes('ออฟฟิศซินโดรม')&&a[j].textContent.includes('ลงทะเบียนบริษัท')}));
+ok('guest home has company bar after org bar',await p.evaluate(()=>{const a=[...document.querySelectorAll('.regbar')];const i=a.findIndex(x=>x.querySelector('[data-orq=guest]')),j=a.findIndex(x=>x.querySelector('[data-orq=capguest]'));return i>-1&&j===i+1&&a[j].textContent.includes('ดูแลพนักงานของคุณ พร้อมสร้างอาชีพให้ผู้พิการทางการเห็น')&&!a[j].querySelector('span')&&a[j].textContent.includes('ลงทะเบียนบริษัท')}));
 await p.click('[data-orq=capguest]');await p.waitForSelector('#rph,#lph',{timeout:3000});
 ok('guest must log in first',!!(await p.$('#rph,#lph')));
 if(await p.$('[data-ag=login]'))await p.click('[data-ag=login]');

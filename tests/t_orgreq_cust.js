@@ -92,6 +92,7 @@ const PNG=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42
 await p.waitForSelector('[data-pl]',{timeout:5000});
 // ---- ผู้เยี่ยมชมเห็นปุ่มขอบริการสำหรับหน่วยงาน -> ต้องล็อกอินก่อน
 ok('guest home shows org invitation bar with button',await p.$eval('.regbar:has([data-orq=guest])',e=>e.textContent.includes('ให้หมอนวดไปดูแลคนในองค์กรของคุณถึงที่')&&e.textContent.includes('ขอบริการสำหรับหน่วยงาน')));
+ok('guest home bars: title + button only, no description (22 Nov)',await p.evaluate(()=>{const a=[...document.querySelectorAll('.regbar')];return a.length===3&&a.every(x=>!x.querySelector('span')&&x.querySelector('b')&&x.querySelector('.btn'))&&!a.some(x=>x.textContent.includes('สมาคม'))}));
 ok('org bar sits after register-shop bar',await p.evaluate(()=>{const a=[...document.querySelectorAll('.regbar')];return a.length<2||(a[a.length-2].querySelector('[data-orq=guest]')!==null&&a[a.length-1].querySelector('[data-orq=capguest]')!==null)}));
 await p.click('[data-orq=guest]');await p.waitForSelector('#rph,#lph',{timeout:3000});
 ok('login/register required first',!!(await p.$('#rph,#lph'))&&(await p.textContent('#app')).includes('ส่งคำขอสำหรับหน่วยงาน'));
@@ -172,7 +173,7 @@ await p.click('[data-orq=cancelno]');ok('cancel can be dismissed',CANC.length===
 // ---- สถานะ -> รอชำระเงิน
 ORL[0].status='awaiting_payment';ORL[0].accepted_count=2;ORL[0].amount=4000;ORL[0].pay_due_at=new Date(Date.now()+40*3600000).toISOString();ORL[0].invites=[{id:'i1',staff_id:'st3',name:'คุณนุ่น',status:'accepted'},{id:'i2',staff_id:'st4',name:'คุณมะลิ',status:'accepted'}];
 await p.click('[data-orq=back]');await p.waitForSelector('[data-pl],.list',{timeout:3000}).catch(()=>{});
-await p.click('[data-tab=ac]');await p.waitForSelector('[data-orq=open]');ok('account card has invitation text + button inside',await p.$eval('.regbar:has([data-orq=open])',e=>e.textContent.includes('ให้หมอนวดไปดูแลคนในองค์กรของคุณถึงที่')&&e.textContent.includes('ออฟฟิศ โรงงาน')));await p.waitForFunction(()=>document.querySelector('[data-orq=open] .bdg'),null,{timeout:3000}).catch(()=>{});ok('account shows pay badge (list refreshed)',await p.$eval('[data-orq=open]',e=>!!e.querySelector('.bdg')&&e.textContent.includes('1')));
+await p.click('[data-tab=ac]');await p.waitForSelector('[data-orq=open]');ok('account card has invitation text + button inside',await p.$eval('.regbar:has([data-orq=open])',e=>e.textContent.includes('ให้หมอนวดไปดูแลคนในองค์กรของคุณถึงที่')&&!e.querySelector('span')&&!e.textContent.includes('สมาคม')));await p.waitForFunction(()=>document.querySelector('[data-orq=open] .bdg'),null,{timeout:3000}).catch(()=>{});ok('account shows pay badge (list refreshed)',await p.$eval('[data-orq=open]',e=>!!e.querySelector('.bdg')&&e.textContent.includes('1')));
 await p.click('[data-orq=open]');await p.waitForSelector('[data-orq=pay]');
 ok('list shows amount + therapists accepted',await p.$eval('.orqc',e=>e.textContent.includes('4,000')&&e.textContent.includes('คุณนุ่น ตอบรับ')&&e.textContent.includes('คุณมะลิ ตอบรับ')&&e.textContent.includes('ชำระภายใน')));
 await p.click('[data-orq=pay]');await p.waitForSelector('#orqqr[data-qr]',{timeout:4000});
