@@ -88,7 +88,7 @@ ok('sys sub-menu has บทความและข่าว next to ประ�
 await p.click('#main .subtabs [data-id=art]');
 ok('list shows both, published has link to the public site',await has('บทความร่าง')&&await p.evaluate(()=>{const a=document.querySelector('a[href="https://massage-home-bna.pages.dev/news/1"]');return !!a&&a.target==='_blank'}));
 ok('draft row: no web link, gently suggests a cover description, says pinned',await p.evaluate(()=>!document.querySelector('a[href$="/news/2"]')&&document.body.innerText.includes('รูปปกยังไม่มีคำบรรยาย (แนะนำให้ใส่)')&&document.body.innerText.includes('ปักหมุด')));
-ok('hint links to the public site and counts published (1)',await has('ตอนนี้ 1 เรื่อง'));
+ok('hint links to the public site and counts published (1)',await has('เผยแพร่อยู่ 1 เรื่อง'));
 
 // เขียนใหม่
 await p.click('[data-a=new][data-t=art]');await p.waitForSelector('#arT');

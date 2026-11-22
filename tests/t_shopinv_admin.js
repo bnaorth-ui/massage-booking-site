@@ -117,7 +117,7 @@ let t=await p.evaluate(()=>document.getElementById('main').innerText);
 if(process.env.NOREG){
  ok('no link set: card explains where to set it, no share buttons',t.includes('ชวนร้านนวดมาสมัคร')&&t.includes('ยังไม่ได้ตั้งลิงก์ลงทะเบียนร้านนวด')&&!(await p.$('[data-a=shinv]')));
 }else{
- ok('invite card on top of the new-registrations tab',t.includes('ชวนร้านนวดมาสมัคร')&&t.indexOf('ชวนร้านนวดมาสมัคร')<t.indexOf('ร้านนวดลงทะเบียนเองจากหน้าร้านค้า'));
+ ok('invite card on top of the new-registrations tab',t.includes('ชวนร้านนวดมาสมัคร')&&t.indexOf('ชวนร้านนวดมาสมัคร')<t.indexOf('ร้านนวดลงทะเบียนเองพร้อมแนบใบอนุญาต'));
  const msg=await p.textContent('#shinvtxt');
  ok('message: app name + invitation + 500 credit, no association name',msg.startsWith('ขอเชิญร้านนวดเข้าร่วม "จองคิวนวด" แอปจองนวดออนไลน์\n\n🎁 ร้านที่เข้าร่วมใหม่ รับเครดิต 500 บาท ไว้ใช้หักค่าบริการระบบ')&&!msg.includes('สมาคม'));
  ok('message: licence requirement and GP 10%',msg.includes('ได้รับอนุญาตจัดตั้งสถานประกอบการเพื่อสุขภาพ')&&msg.includes('(GP) 10% ของราคาหลังหักโปรโมชัน'));
