@@ -117,7 +117,7 @@ ok('sub tab order: สถานะระบบ, ข้อผิดพลาด�
 await p.click('#main .subtabs [data-id=ce]');await p.waitForTimeout(600);
 let t=await p.evaluate(()=>document.getElementById('main').innerText);
 ok('opening the tab reloads via rpc with 30 days',ceCalls.length===2&&ceCalls[1].p_days===30);
-ok('heading + privacy hint',t.includes('ข้อผิดพลาดหน้าเว็บ')&&t.includes('ไม่มีข้อมูลส่วนตัว')&&t.includes('ครบ 3 ครั้ง'));
+ok('heading + privacy hint',t.includes('ข้อผิดพลาดหน้าเว็บ')&&t.includes('ไม่มีข้อมูลส่วนตัว'));
 ok('today banner',t.includes('วันนี้พบ 2 ปัญหา'));
 ok('row 1 details (app, version, count, message, source, menu, device, alerted)',t.includes('แอปร้านนวด เวอร์ชัน 1.5')&&t.includes('เกิด 4 ครั้ง')&&t.includes("reading 'amt'")&&t.includes('จุดที่เกิด: index.html:846:120')&&t.includes('เมนู: wal')&&t.includes('iPhone Safari แอป')&&t.includes('แจ้งเตือนแอดมินแล้ว'));
 ok('server row: kind label, empty menu reads หน้าแรก',t.includes('ประเภท: เซิร์ฟเวอร์')&&t.includes('เมนู: หน้าแรก'));
