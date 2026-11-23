@@ -59,6 +59,9 @@ exports.serveDir = () => {
   for (const f of ['sw.js', 'push.js', 'update.js', 'errlog.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'icon-logo-192.png', 'icon-logo-512.png']) {
     for (const dd of Object.values(DIR)) { const s = path.join(ROOT, dd, f); if (fs.existsSync(s) && !fs.existsSync(path.join(d, f))) fs.copyFileSync(s, path.join(d, f)); }
   }
+  // ฟอนต์ที่แอปเก็บไว้เอง (fonts/noto-sans-thai-v*.woff2)
+  const fd = path.join(ROOT, 'customer', 'fonts');
+  if (fs.existsSync(fd)) { fs.mkdirSync(path.join(d, 'fonts'), { recursive: true }); for (const f of fs.readdirSync(fd)) fs.copyFileSync(path.join(fd, f), path.join(d, 'fonts', f)); }
   return d;
 };
 // รอจนเงื่อนไขฝั่งข้อสอบ (เช่น ข้อมูลในฐานข้อมูลจำลอง หรือคำขอที่ส่งมา) เป็นจริง ไม่เกิน ms มิลลิวินาที

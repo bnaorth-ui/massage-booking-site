@@ -60,7 +60,9 @@ const T0=async pg=>await pg.evaluate(()=>document.body.innerText);
 
 const sleep2=sleep;
 let p=await mk(null,'');
-await p.fill('#lph','0844444444');await p.fill('#lpw','staffpass1');await p.click('#agf .btn');await sleep(700);
+await p.fill('#lph','0844444444');await p.fill('#lpw','staffpass1');await p.click('#agf .btn');
+// รอจนเมนูล่างขึ้นครบ (เดิมรอ 700ms ตายตัว ล้มเมื่อเครื่องทำงานหนัก 23 พ.ย. 2569)
+await p.waitForFunction(()=>document.querySelectorAll('#nav button').length===5,null,{timeout:8000}).catch(()=>{});await sleep(200);
 let nav=await p.evaluate(()=>[...document.querySelectorAll('#nav button')].map(b=>b.innerText.replace(/\s+/g,' ').trim()));
 console.log(nav.join(' | '));
 ok('nav order: ... ตารางงาน, รายได้, แจ้งเตือน, บัญชี',nav.length===5&&nav[2].includes('รายได้')&&nav[3].includes('แจ้งเตือน'));

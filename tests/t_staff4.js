@@ -85,6 +85,7 @@ ok('accepted job leaves new tab',(await pills()).join('|')==='งานใหม
 await p.click('[data-a=qt][data-id=wait]');
 ok('accepted tag in wait tab',(await p.textContent('.q')).includes('รับงานแล้ว')&&(await txt('#app')).includes('MS100001'));
 await p.click('.q [data-job=in_progress]');await sleep(300);
+await p.waitForFunction(()=>{const q=document.querySelector('.q');return q&&q.textContent.includes('กำลังนวด')},null,{timeout:8000}).catch(()=>{});
 ok('in-progress tag (still in wait tab)',(await p.textContent('.q')).includes('กำลังนวด'));
 await p.click('.q [data-a=fin]');await sleep(150);await p.click('[data-a=cfmok]');await sleep(300);
 ok('finished leaves wait tab',(await pills()).join('|')==='งานใหม่ (2)|งานที่รออยู่ (0)|งานที่เสร็จสิ้น (1)|งานถูกยกเลิก (1)');

@@ -62,6 +62,8 @@ ok('reg duplicate phone message',(await txt()).includes('เบอร์นี�
 if(await p.$('[data-ag=login]'))await p.click('[data-ag=login]');
 // real login
 await p.fill('#lph','0844444444');await p.fill('#lpw','staffpass1');await (async()=>{const c=await p.$('#rpv');if(c)await c.check();await p.click('#agf .btn[type=submit]')})();await sleep(600);
+// รอจนหน้าคิวงานขึ้น (เดิมรอตายตัว ล้มเป็นครั้งคราวตอนรันพร้อมกัน 23 พ.ย. 2569)
+await p.waitForFunction(()=>{const h=document.getElementById('hdr'),a=document.getElementById('app');return h&&a&&h.innerText.includes('คุณนุ่น')&&a.innerText.includes('คิวงาน')},null,{timeout:8000}).catch(()=>{});
 ok('queue page shown',(await txt('#app')).includes('คิวงาน'));
 ok('header name',(await txt('#hdr')).includes('คุณนุ่น'));
 ok('session saved under sbSessionStaff',await p.evaluate(()=>!!localStorage.getItem('sbSessionStaff')));
