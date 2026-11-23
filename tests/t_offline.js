@@ -26,7 +26,7 @@ const R=path.resolve(__dirname,'..');for(const f of ['update.js','sw.js']){const
 const ROOT=path.join(R,'customer');const T={'.html':'text/html; charset=utf-8','.js':'text/javascript','.png':'image/png','.json':'application/json','.webmanifest':'application/manifest+json'};
 const srv=http.createServer((q,r)=>{let u=decodeURIComponent(q.url.split('?')[0]);if(u.endsWith('/'))u+='index.html';const f=path.join(ROOT,u);if(!f.startsWith(ROOT)||!fs.existsSync(f)){r.statusCode=404;return r.end('nf')}r.setHeader('content-type',T[path.extname(f)]||'application/octet-stream');r.end(fs.readFileSync(f))});
 await new Promise(r=>srv.listen(0,'127.0.0.1',r));const base='http://127.0.0.1:'+srv.address().port;
-const ctx=await b.newContext({locale:'th-TH'});await ctx.route(/supabase\.co|googleapis|gstatic|unpkg|cdnjs|longdo/,r=>r.abort());
+const ctx=await b.newContext({locale:'th-TH'});await ctx.route(/supabase\.co|unpkg|cdnjs|longdo/,r=>r.abort());
 const p=await ctx.newPage();p.on('pageerror',e=>errs.push('sw: '+e.message));
 await p.goto(base+'/');await p.evaluate(()=>navigator.serviceWorker.ready.then(()=>1));await p.reload();await sleep(500);
 ok('page controlled by service worker',await p.evaluate(()=>!!navigator.serviceWorker.controller));

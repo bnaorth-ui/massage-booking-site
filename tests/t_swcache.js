@@ -9,7 +9,7 @@ const srv=http.createServer((q,r)=>{const p=decodeURIComponent(q.url.split('?')[
  r.setHeader('content-type',types[path.extname(f)]||'application/octet-stream');r.setHeader('cache-control','public, max-age=0, must-revalidate');r.end(b)});
 await new Promise(r=>srv.listen(0,'127.0.0.1',r));const base='http://127.0.0.1:'+srv.address().port;
 const b=await chromium.launch(require('./config').launch);const ctx=await b.newContext({locale:'th-TH',timezoneId:'Asia/Bangkok'});
-await ctx.route(/supabase\.co|googleapis|gstatic/,r=>r.abort());
+await ctx.route(/supabase\.co/,r=>r.abort());
 const errs=[];const ok=(n,c)=>console.log((c?'PASS ':'FAIL ')+n);const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const p=await ctx.newPage();p.on('pageerror',e=>errs.push(e.message));
 const U=base+'/customer-booking.html';
