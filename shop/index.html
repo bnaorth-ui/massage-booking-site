@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>สำหรับร้านนวด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.23"><meta name="app-name" content="ร้านนวด"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.24"><meta name="app-name" content="ร้านนวด"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -347,7 +347,7 @@ function byId(a,id){return a.filter(function(x){return x.id===id})[0]}
 function num(id,l,v,ph){return '<div><label for="'+id+'">'+l+'</label><input class="in" id="'+id+'" type="number" inputmode="numeric" value="'+(v==null?"":v)+'"'+(ph!=null?' placeholder="'+ph+'"':"")+'></div>'}
 function svcNames(ids){var n=(ids||[]).map(function(i){var v=byId(D.svc,i);return v&&v.name}).filter(Boolean);return n.length?n.join(", "):"ยังไม่ได้เลือกบริการ"}
 function avatar(sz){var s=D.shop;return '<span class="av" style="width:'+sz+'px;height:'+sz+'px;font-size:'+Math.round(sz*.45)+'px" aria-hidden="true">'+(s.img?'<img loading="lazy" decoding="async" alt="" src="'+s.img+'">':esc((s.name||"ร").trim().charAt(0)))+'</span>'}
-function drawHeader(){var s=D.shop;document.getElementById("hdr").innerHTML='<div class="hav">'+avatar(72)+'</div><div class="hn"><b>'+esc(s.name)+'</b><small>'+(s.closedAt?"ปิดบัญชีแล้ว":s.on?"เปิดรับจอง":"ปิดชั่วคราว")+'</small></div>'+(s.closedAt?"":'<button class="sw'+(s.on?" on":"")+'" role="switch" aria-checked="'+(s.on?"true":"false")+'" aria-label="เปิดหรือปิดร้านชั่วคราว" data-a="toggle"><span></span></button>')+(s.closedAt?'<p class="closed">ร้านปิดบัญชีแล้ว ลูกค้าจะไม่เห็นร้านนี้ หากต้องการเปิดกลับ กรุณาติดต่อเจ้าหน้าที่</p>':s.on||s.autoClosed?"":'<p class="closed">ร้านปิดรับจองชั่วคราว ลูกค้าจะไม่เห็นร้านนี้ในหน้าจอง</p>')+walletBanner()+(S.hmsg?'<p class="closed" role="alert">'+esc(S.hmsg)+'</p>':'')}
+function drawHeader(){var s=D.shop;setHtml(document.getElementById("hdr"),'<div class="hav">'+avatar(72)+'</div><div class="hn"><b>'+esc(s.name)+'</b><small>'+(s.closedAt?"ปิดบัญชีแล้ว":s.on?"เปิดรับจอง":"ปิดชั่วคราว")+'</small></div>'+(s.closedAt?"":'<button class="sw'+(s.on?" on":"")+'" role="switch" aria-checked="'+(s.on?"true":"false")+'" aria-label="เปิดหรือปิดร้านชั่วคราว" data-a="toggle"><span></span></button>')+(s.closedAt?'<p class="closed">ร้านปิดบัญชีแล้ว ลูกค้าจะไม่เห็นร้านนี้ หากต้องการเปิดกลับ กรุณาติดต่อเจ้าหน้าที่</p>':s.on||s.autoClosed?"":'<p class="closed">ร้านปิดรับจองชั่วคราว ลูกค้าจะไม่เห็นร้านนี้ในหน้าจอง</p>')+walletBanner()+(S.hmsg?'<p class="closed" role="alert">'+esc(S.hmsg)+'</p>':''))}
 function walletBanner(){var b=balance(),lv=warnLv(),o=owed();
  if(D.shop.autoClosed||o>0)return'<p class="closed">ร้านถูกปิดชั่วคราวอัตโนมัติ เพราะยอดกระเป๋าเงินไม่พอหักค่า GP'+(o>0?' (ค้างชำระ '+baht(o)+')':'')+' เติมเงินแล้วระบบเปิดร้านให้อัตโนมัติ</p>';
  if(b<lv[1])return'<p class="closed">ยอดกระเป๋าเงินเหลือต่ำกว่า '+baht(lv[1])+' ใกล้ถูกปิดร้านชั่วคราว กรุณาเติมเงิน</p>';
@@ -669,20 +669,23 @@ function qCat(b){if(b.status==="cancelled"||b.status==="rescheduled"||b.status==
  var its=(b.booking_items||[]).filter(function(i){return i.active});
  if(its.length&&its.every(function(i){return i.job==="done"}))return"done";
  return"wait"}
+/* การ์ดคิว: โปรแกรมอ่านหน้าจออ่านสรุปบรรทัดเดียว ส่วนที่ตาเห็นซ่อนจากโปรแกรมอ่าน (23 พ.ย. 2569 แบบเดียวกับแอปหมอนวด) */
+function qTagTxt(b,c){return b.status==="no_show"?"ลูกค้าไม่มา":b.status==="cancelled"?"ยกเลิก":b.status==="rescheduled"?"เลื่อนคิว"+(b.moved_to?" ไป "+b.moved_to:""):c==="done"?"เสร็จสิ้น":"รอให้บริการ"}
+function qSay(b,c,its){return qHM(b.starts_at)+" ถึง "+qHM(b.ends_at)+" น. "+its.map(function(i){return i.service_name+" "+i.minutes+" นาที หมอนวด "+qStaff(i.staff_id)+(c==="wait"&&i.active?" "+QJOB[i.job]:"")}).join(", ")+" "+baht(b.total_price||0)+(b.promo_title?" "+b.promo_title:"")+" ลูกค้า "+b.customer_name+", "+qTagTxt(b,c)}
 function qCard(b){var c=qCat(b),its=(b.booking_items||[]).slice().sort(function(a,z){return a.starts_at<z.starts_at?-1:1}),
  tg=b.status==="no_show"?'<span class="tag b">ลูกค้าไม่มา</span>':b.status==="cancelled"?'<span class="tag b">ยกเลิก</span>':b.status==="rescheduled"?'<span class="tag s">เลื่อนคิว'+(b.moved_to?' → '+esc(b.moved_to):'')+'</span>':c==="done"?'<span class="tag">เสร็จสิ้น</span>':'<span class="tag w">รอให้บริการ</span>';
- return'<div class="card" style="margin-bottom:10px"><div class="row" style="border:0;padding:0 0 6px"><b>'+qHM(b.starts_at)+'-'+qHM(b.ends_at)+' น.</b>'+tg+'</div><b>'+esc(b.customer_name)+'</b>'+(b.phone?'<small style="display:block">โทร <a href="tel:'+esc(b.phone)+'">'+esc(b.phone)+'</a></small>':'')+
- its.map(function(i){return'<small style="display:block">'+esc(i.service_name)+', '+i.minutes+' นาที, หมอนวด '+esc(qStaff(i.staff_id))+(c==="wait"&&i.active?', '+QJOB[i.job]:'')+'</small>'}).join("")+
- '<small style="display:block">เลขที่ '+esc(b.ref)+', '+baht(b.total_price||0)+(b.promo_title?', '+esc(b.promo_title):'')+'</small>'+qCancelUi(b,c)+chatBtn(b.id,"shop",b.ref,b.customer_name,b.ends_at,b.status!=="rescheduled")+'</div>'}
+ return'<div class="card" style="margin-bottom:10px"><span class="sr">'+esc(qSay(b,c,its))+'</span><div aria-hidden="true"><div class="row" style="border:0;padding:0 0 6px"><b>'+qHM(b.starts_at)+'-'+qHM(b.ends_at)+' น.</b>'+tg+'</div><b>'+esc(b.customer_name)+'</b></div>'+(b.phone?'<small style="display:block"><a href="tel:'+esc(b.phone)+'" aria-label="โทร '+esc(b.phone)+'"><span aria-hidden="true">โทร </span>'+esc(b.phone)+'</a></small>':'')+
+ '<div aria-hidden="true">'+its.map(function(i){return'<small style="display:block">'+esc(i.service_name)+', '+i.minutes+' นาที, หมอนวด '+esc(qStaff(i.staff_id))+(c==="wait"&&i.active?', '+QJOB[i.job]:'')+'</small>'}).join("")+
+ '<small style="display:block">เลขที่ '+esc(b.ref)+', '+baht(b.total_price||0)+(b.promo_title?', '+esc(b.promo_title):'')+'</small></div>'+qCancelUi(b,c)+chatBtn(b.id,"shop",b.ref,b.customer_name,b.ends_at,b.status!=="rescheduled")+'</div>'}
 var QCR=["หมอนวดไม่สะดวก","ร้านปิดทำการ","เหตุฉุกเฉิน","อื่นๆ (ระบุเหตุผล)"];
 function qCanCancel(b,c){return c==="wait"&&b.status==="confirmed"&&Date.parse(b.starts_at)>Date.now()&&!(b.booking_items||[]).some(function(i){return i.active&&(i.job==="in_progress"||i.job==="done")})}
 function qCanNoShow(b,c){return c==="wait"&&b.status==="confirmed"&&Date.parse(b.starts_at)<=Date.now()&&!(b.booking_items||[]).some(function(i){return i.active&&(i.job==="in_progress"||i.job==="done")})}
 function qNoShowUi(b){
- if(S.qn!==b.id)return'<div class="acts" style="margin-top:8px"><button type="button" class="btn g" data-a="qns" data-id="'+b.id+'" aria-label="บันทึกว่าลูกค้าไม่มา คิวเลขที่ '+esc(b.ref)+' ของ '+esc(b.customer_name)+'">ลูกค้าไม่มา</button></div>';
+ if(S.qn!==b.id)return'<div class="acts" style="margin-top:8px"><button type="button" class="btn g" data-a="qns" data-id="'+b.id+'" aria-label="ลูกค้าไม่มา '+qHM(b.starts_at)+' น. '+esc(b.customer_name)+'">ลูกค้าไม่มา</button></div>';
  return'<div class="pinbox" role="group" aria-labelledby="qnsh_'+b.id+'" style="margin-top:8px"><b id="qnsh_'+b.id+'" tabindex="-1">ยืนยันว่าลูกค้าไม่มา คิวเลขที่ '+esc(b.ref)+'</b><p class="hint2" style="margin:0">ใช้เมื่อลูกค้าไม่มารับบริการตามนัด ระบบจะปล่อยคิว แจ้งลูกค้า หมอนวด และเจ้าหน้าที่ พร้อมคืนแต้มที่ลูกค้าใช้ (ถ้ามี) ย้อนกลับไม่ได้</p>'+
   '<div class="acts"><button type="button" class="btn d" data-a="qnsok" data-id="'+b.id+'">ยืนยันลูกค้าไม่มา</button><button type="button" class="btn g" data-a="qnsno" data-id="'+b.id+'">ไม่ใช่</button></div></div>'}
 function qCancelUi(b,c){if(qCanNoShow(b,c))return qNoShowUi(b);if(!qCanCancel(b,c))return"";
- if(S.qx!==b.id)return'<div class="acts" style="margin-top:8px"><button type="button" class="btn g" data-a="qcx" data-id="'+b.id+'" aria-label="ยกเลิกคิว เลขที่ '+esc(b.ref)+' ของ '+esc(b.customer_name)+'">ยกเลิกคิวนี้</button></div>';
+ if(S.qx!==b.id)return'<div class="acts" style="margin-top:8px"><button type="button" class="btn g" data-a="qcx" data-id="'+b.id+'" aria-label="ยกเลิกคิว '+qHM(b.starts_at)+' น. '+esc(b.customer_name)+'">ยกเลิกคิวนี้</button></div>';
  return'<div class="pinbox" role="group" aria-labelledby="qcxh_'+b.id+'" style="margin-top:8px"><b id="qcxh_'+b.id+'" tabindex="-1">ยืนยันยกเลิกคิว เลขที่ '+esc(b.ref)+'</b><p class="hint2" style="margin:0">ระบบจะแจ้งลูกค้าและหมอนวด พร้อมคืนแต้มที่ลูกค้าใช้ (ถ้ามี) ยกเลิกแล้วย้อนกลับไม่ได้</p>'+
   '<div><label for="qcr_'+b.id+'">เหตุผลที่ยกเลิก</label><select class="in" id="qcr_'+b.id+'">'+QCR.map(function(x,i){return'<option value="'+i+'">'+x+'</option>'}).join("")+'</select></div>'+
   '<div><label for="qco_'+b.id+'">รายละเอียดเพิ่มเติม (ไม่เกิน 100 ตัวอักษร)</label><input class="in" id="qco_'+b.id+'" maxlength="100"></div>'+
@@ -937,18 +940,23 @@ function rvSend(key){if(RV.busy)return;var f=rvFind(key),ta=document.getElementB
  if(!t){if(er){er.textContent="กรุณาพิมพ์ข้อความตอบกลับ";er.style.display=""}return}
  RV.busy=true;if(er)er.style.display="none";sbApi("/rest/v1/rpc/reply_review",{method:"POST",json:1,body:JSON.stringify({p_kind:f.kind,p_id:f.id,p_text:t})}).then(function(){RV.busy=false;if(f.row){if(f.kind==="shop")f.row.shop_reply=t;else f.row.reply=t}S.rvReply=null;RV.msg="ส่งคำตอบแล้ว";draw()},function(e){RV.busy=false;var m=errTh(e,"ส่งคำตอบไม่สำเร็จ");var x=document.getElementById("rverr");if(x){x.textContent=m;x.style.display=""}var b=document.querySelector('[data-a=rvsend]');if(b)b.disabled=false})}
 function rvReport(key){var f=rvFind(key);sbApi("/rest/v1/rpc/report_review",{method:"POST",json:1,body:JSON.stringify({p_kind:f.kind,p_id:f.id})}).then(function(){if(f.row)f.row.reported=true;RV.msg="แจ้งเจ้าหน้าที่ตรวจสอบแล้ว";draw()},function(e){RV.msg=errTh(e,"แจ้งเจ้าหน้าที่ไม่สำเร็จ");draw()})}
-function navDraw(){var cur=inMg(S.tab)?"mg":S.tab;document.getElementById("tabs").innerHTML=TABS.map(function(x){var u=x[0]==="nt"&&S.tab!=="nt"?ntUnread():0;return'<button type="button" data-a="tab" data-id="'+x[0]+'" class="'+(x[0]===cur?"on":"")+'"><span aria-hidden="true">'+x[2]+'</span>'+x[1]+(u?'<i class="bdg" aria-label="ยังไม่ได้อ่าน '+u+' รายการ">'+u+'</i>':'')+'</button>'}).join("")}
+/* วาดใหม่เฉพาะเมื่อเนื้อหาเปลี่ยน: ตัวโหลดทุก 30 วิ (refresh/softDraw) เคยแทนที่ทั้งหน้าแม้ไม่มีอะไรใหม่ ทำให้ VoiceOver หลุดตำแหน่ง
+   ถ้าเปลี่ยนจริง ให้โฟกัสกลับไปที่ปุ่ม/ช่องเดิม (23 พ.ย. 2569 แบบเดียวกับแอปหมอนวด) */
+function setHtml(el,h){if(el.__h===h&&el.__n===el.firstChild)return false;var k=fKey(el);el.innerHTML=h;el.__h=h;el.__n=el.firstChild;if(k)fBack(el,k);return true}
+function fKey(el){var a=document.activeElement;if(!a||a===document.body||!el.contains(a))return null;var at=["id","data-a","data-id","data-job","data-chat","data-qt","data-k","data-t"],s="";at.forEach(function(n){var v=a.getAttribute(n);if(v!=null)s+="["+n+'="'+String(v).replace(/["\\]/g,"")+'"]'});return s?a.tagName.toLowerCase()+s:null}
+function fBack(el,k){try{var x=el.querySelector(k);if(x&&x.focus)x.focus({preventScroll:true})}catch(e){}}
+function navDraw(){var cur=inMg(S.tab)?"mg":S.tab;setHtml(document.getElementById("tabs"),TABS.map(function(x){var u=x[0]==="nt"&&S.tab!=="nt"?ntUnread():0;return'<button type="button" data-a="tab" data-id="'+x[0]+'" class="'+(x[0]===cur?"on":"")+'"><span aria-hidden="true">'+x[2]+'</span>'+x[1]+(u?'<i class="bdg" aria-label="ยังไม่ได้อ่าน '+u+' รายการ">'+u+'</i>':'')+'</button>'}).join(""))}
 function draw(){drawHeader();
  navDraw();
  if(S.chat&&document.getElementById("chl"))return;
- document.getElementById("main").innerHTML=view();
+ if(!setHtml(document.getElementById("main"),view()))return;
  if(S.tab==="wal"&&S.tpshow){var tq=byId(D.tx,S.tpshow),pq=ppInfo();if(tq&&tq.st==="รอยืนยัน"){if(pq.on)drawQr("qrbox",ppPayload(pq.type,pq.id,tq.amt));var sc=document.getElementById("slipcur");if(sc&&tq.slipPath)loadSlip(tq.slipPath,sc)}}
  if(S.tab==="share")shareEx()}
 /* รีเฟรชเบื้องหลัง: ไม่ล้างฟอร์มที่กำลังกรอกอยู่ */
 function softDraw(){drawHeader();
  navDraw();
  var busyForm=S.form||S.wmode||S.slipDraft||S.tab==="set"||S.tab==="cls"||S.tab==="share"||S.tab==="rp"||S.busy||S.chat||S.rvReply||S.qx||S.qn;
- if(!busyForm){document.getElementById("main").innerHTML=view();
+ if(!busyForm&&setHtml(document.getElementById("main"),view())){
   if(S.tab==="wal"&&S.tpshow){var tq=byId(D.tx,S.tpshow),pq=ppInfo();if(tq&&tq.st==="รอยืนยัน"){if(pq.on)drawQr("qrbox",ppPayload(pq.type,pq.id,tq.amt));var sc=document.getElementById("slipcur");if(sc&&tq.slipPath)loadSlip(tq.slipPath,sc)}}}}
 function refresh(){if(!D||S.busy)return Promise.resolve();return loadLive().then(function(){if(S.tab==="nt"){openNt()}if(S.tab==="rv"&&!S.rvReply)rvLoad();softDraw()},function(e){if(e&&e.status===401)doLogout()})}
 /* ---------- เหตุการณ์ ---------- */
