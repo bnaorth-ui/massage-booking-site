@@ -98,8 +98,10 @@
   function card(a, lvl) {
     var u = imgUrl(a.cover_path), h = lvl || 3;
     return '<li class="card">' + (u ? '<img loading="lazy" decoding="async" src="' + esc(u) + '" alt="">' : '<div class="ph" aria-hidden="true">' + (a.kind === "article" ? "📖" : a.kind === "work" ? "🤝" : "📣") + '</div>') +
-      '<div class="in"><div class="meta"><span class="tag">' + esc(KIND[a.kind] || "ข่าว") + '</span>' + (a.pinned ? '<span class="tag">ปักหมุด</span>' : '') + '<span>' + esc(thDate(a.day)) + '</span></div>' +
-      '<h' + h + '><a href="/news/' + a.no + '" data-nav>' + esc(a.title) + '</a></h' + h + '>' + (a.summary ? '<p>' + esc(a.summary) + '</p>' : '') + '</div></li>';
+      /* หัวข้อขึ้นก่อน แล้วค่อยประเภทและวันที่ (คนใช้โปรแกรมอ่านหน้าจอปัดข้ามทีละหัวข้อ จะได้ยินประเภทและวันที่ต่อจากหัวข้อ) */
+      '<div class="in"><h' + h + '><a href="/news/' + a.no + '" data-nav>' + esc(a.title) + '</a></h' + h + '>' +
+      '<div class="meta"><span class="tag">' + esc(KIND[a.kind] || "ข่าว") + '</span>' + (a.pinned ? '<span class="tag">ปักหมุด</span>' : '') + '<span>' + esc(thDate(a.day)) + '</span></div>' +
+      (a.summary ? '<p>' + esc(a.summary) + '</p>' : '') + '</div></li>';
   }
   function errBox(msg) { return '<div class="err" role="alert"><p>' + esc(msg || "โหลดข้อมูลไม่สำเร็จ") + '</p><button class="btn ghost" type="button" data-retry>ลองอีกครั้ง</button></div>'; }
   var LOADING = '<p>กำลังโหลด...</p>';
