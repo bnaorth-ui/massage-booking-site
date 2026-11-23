@@ -44,7 +44,7 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
  if(tb==='announcements')return J(200,anns);
  return J(404,{message:'nf '+path})});
 const p=await ctx.newPage();await p.setViewportSize({width:420,height:900});p.on('pageerror',e=>errs.push(e.message));p.on('dialog',d=>{errs.push('DIALOG '+d.message());d.dismiss()});
-const ok=(nm,c)=>console.log((c?'PASS ':'FAIL ')+nm);const txt=async s=>await p.textContent(s||'body');let pend=0;p.on('request',()=>{pend++});p.on('requestfinished',()=>{pend--});p.on('requestfailed',()=>{pend--});
+const ok=(nm,c)=>console.log((c?'PASS ':'FAIL ')+nm);const txt=async s=>await p.textContent(s||'body');let pend=0;const PQ=new Set();p.on('request',r=>{PQ.add(r);pend=PQ.size});p.on('requestfinished',r=>{PQ.delete(r);pend=PQ.size});p.on('requestfailed',r=>{PQ.delete(r);pend=PQ.size});p.on('framenavigated',fr=>{if(fr===p.mainFrame()){PQ.clear();pend=0}});/* คำขอที่ค้างตอนหน้าโหลดใหม่ (เช่น /auth/v1/logout ก่อน location.reload) ไม่มีเหตุการณ์จบ เคยทำให้ sleep รอครบ 10 วิทุกครั้งจนข้อสอบหมดเวลา (23 พ.ย. 2569) */
 const nap=ms=>new Promise(r=>setTimeout(r,ms));
 // รอเวลาที่กำหนด แล้วรอต่อจนไม่มีคำขอค้างอย่างต่อเนื่อง 200 มิลลิวินาที (กันเทสต์ล้มเองเมื่อเครื่องช้า)
 const sleep=async ms=>{await nap(ms);let quiet=0,t0=Date.now();while(quiet<200&&Date.now()-t0<10000){await nap(50);if(pend<=0)quiet+=50;else quiet=0}};
