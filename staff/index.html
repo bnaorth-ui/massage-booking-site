@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>แอปหมอนวด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="apple-mobile-web-app-title" content="หมอนวด"><meta name="app-version" content="1.22"><meta name="app-name" content="หมอนวด"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="apple-mobile-web-app-title" content="หมอนวด"><meta name="app-version" content="1.23"><meta name="app-name" content="หมอนวด"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -330,20 +330,20 @@ function mine(d){return JOBS.filter(function(j){return j.active&&bkDate(Date.par
 function rng(j){var s=bkMin(Date.parse(j.starts_at));return hm(s)+"-"+hm(s+j.minutes)+" น."}
 function workOn(d){return(ME.work_days||[]).indexOf(dow(d))>-1&&OFFS.indexOf(d)<0}
 function jobHtml(j){
- if(!j.active||j.bstatus==="cancelled"||j.bstatus==="rescheduled"||j.bstatus==="no_show")return'<div class="jobs"><span class="tag b">'+(j.bstatus==="rescheduled"?"เลื่อนคิวแล้ว":j.bstatus==="no_show"?"ลูกค้าไม่มา":"ยกเลิกแล้ว")+'</span></div>';
+ if(!j.active||j.bstatus==="cancelled"||j.bstatus==="rescheduled"||j.bstatus==="no_show")return'<div class="jobs"><span class="tag b" aria-hidden="true">'+(j.bstatus==="rescheduled"?"เลื่อนคิวแล้ว":j.bstatus==="no_show"?"ลูกค้าไม่มา":"ยกเลิกแล้ว")+'</span></div>';
  var rk=JRANK[j.job]||0;
- if(rk>=3)return'<div class="jobs"><span class="tag">'+JL[3]+'</span></div>';
- var c=S.cfm&&S.cfm.id===j.id?S.cfm.k:"",who=j.customer+" "+j.service+" "+rng(j).replace(" น.","");
+ if(rk>=3)return'<div class="jobs"><span class="tag" aria-hidden="true">'+JL[3]+'</span></div>';
+ var c=S.cfm&&S.cfm.id===j.id?S.cfm.k:"",who=hm(bkMin(Date.parse(j.starts_at)))+" น. "+j.customer;
  if(c)return'<div class="jobs cfm" role="group" aria-label="ยืนยันการทำรายการ"><p class="cq" id="cfq" tabindex="-1">'+(c==="fin"?"ยืนยันว่าเสร็จสิ้นงานนี้แล้ว? ระบบจะคิดค่าบริการและให้แต้มลูกค้า กดแล้วแก้ไม่ได้":"ยืนยันว่าลูกค้าไม่มา? คิวนี้จะถูกยกเลิก ไม่คิดค่าบริการ และคืนคิวว่างให้")+'</p><button type="button" class="btn" data-a="cfmok" data-id="'+j.id+'"'+(S.busy?" disabled":"")+'>'+(c==="fin"?"ยืนยันเสร็จสิ้นงาน":"ยืนยันลูกค้าไม่มา")+'</button><button type="button" class="btn g" data-a="cfmno" data-id="'+j.id+'">ย้อนกลับ</button></div>';
  var st=JSTEPS[rk],late=j.ends_at<new Date().toISOString(),ns=rk<2&&j.starts_at<=new Date().toISOString();
- return'<div class="jobs" role="group" aria-label="อัปเดตสถานะงานของคิวนี้"><span class="tag w">'+JL[rk]+'</span><button type="button" class="btn" data-a="'+(rk===2?"fin":"job")+'" data-job="'+st[2]+'" data-id="'+j.id+'" aria-label="'+st[1]+' '+esc(who)+'"'+(S.busy?" disabled":"")+'>'+st[1]+'</button>'+(ns?'<button type="button" class="btn g" data-a="ns" data-id="'+j.id+'" aria-label="ลูกค้าไม่มา '+esc(who)+'"'+(S.busy?" disabled":"")+'>ลูกค้าไม่มา</button>':'')+'</div>'+
-  (late&&CT.ach>0?'<small class="acc">⏱ คิวจบแล้ว กดเสร็จสิ้นงานหรือลูกค้าไม่มาภายใน '+new Date(Date.parse(j.ends_at)+CT.ach*3600000).toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit",timeZone:"Asia/Bangkok"})+' น. มิฉะนั้นระบบจะปิดงานและคิดค่าบริการให้เอง</small>':'')}
+ return'<div class="jobs"><span class="tag w" aria-hidden="true">'+JL[rk]+'</span><button type="button" class="btn" data-a="'+(rk===2?"fin":"job")+'" data-job="'+st[2]+'" data-id="'+j.id+'" aria-label="'+st[1]+' '+esc(who)+'"'+(S.busy?" disabled":"")+'>'+st[1]+'</button>'+(ns?'<button type="button" class="btn g" data-a="ns" data-id="'+j.id+'" aria-label="ลูกค้าไม่มา '+esc(who)+'"'+(S.busy?" disabled":"")+'>ลูกค้าไม่มา</button>':'')+'</div>'+
+  (late&&CT.ach>0?'<small class="acc"><span aria-hidden="true">⏱ </span>คิวจบแล้ว กดเสร็จสิ้นงานหรือลูกค้าไม่มาภายใน '+new Date(Date.parse(j.ends_at)+CT.ach*3600000).toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit",timeZone:"Asia/Bangkok"})+' น. มิฉะนั้นระบบจะปิดงานและคิดค่าบริการให้เอง</small>':'')}
 /* ===== แชต (ผูกกับการจอง) ===== */
 var CHOK=false,CU={},CH=null,chT=null,chBusy=false;
 function chKey(b,r){return b+"|"+r}
 function loadChatUnread(){return sbApi("/rest/v1/rpc/chat_unread",{method:"POST",json:1,body:"{}"}).then(function(a){CHOK=true;CU={};(a||[]).forEach(function(x){CU[chKey(x.booking_id,x.room)]=+x.n})}).catch(function(){})}
 function chatBtn(bid,room,ref,name,endIso,active){if(!CHOK||!bid||!active)return"";if(Date.parse(endIso)+3*3600000<Date.now())return"";var n=CU[chKey(bid,room)]||0;
- return '<div class="chb"><button type="button" class="btn g" data-chat="'+bid+'" data-room="'+esc(room)+'" data-ref="'+esc(ref)+'" data-name="'+esc(name)+'">💬 แชตกับลูกค้า'+(n?' <span class="cn" aria-label="ข้อความใหม่ '+n+' ข้อความ">'+n+'</span>':'')+'</button></div>'}
+ return '<div class="chb"><button type="button" class="btn g" data-chat="'+bid+'" data-room="'+esc(room)+'" data-ref="'+esc(ref)+'" data-name="'+esc(name)+'"><span aria-hidden="true">💬 </span>แชตกับลูกค้า'+(n?' <span class="cn" aria-label="ข้อความใหม่ '+n+' ข้อความ">'+n+'</span>':'')+'</button></div>'}
 function chTime(iso){var d=new Date(iso),t=d.toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit",timeZone:"Asia/Bangkok"}),day=function(x){return new Date(x.getTime()+252e5).toISOString().slice(0,10)};return (day(d)===day(new Date())?"":d.toLocaleDateString("th-TH",{day:"numeric",month:"short",timeZone:"Asia/Bangkok"})+" ")+t+" น."}
 function chMsgHtml(m){var me=m.sender_id===SBS.user.id;return '<div class="msg '+(me?"mine":"theirs")+'"><small>'+(me?"คุณ":esc(m.sender_name||"ลูกค้า"))+', '+chTime(m.created_at)+'</small><p>'+esc(m.body).replace(/\n/g,"<br>")+'</p></div>'}
 function chatRender(){if(!CH)return;var C=document.getElementById("app");
@@ -424,10 +424,19 @@ function tmNeed(){return csCall("terms_status",{p_app:CSAPP}).then(function(j){r
 function tmAccept(){return csCall("accept_terms",{p_app:CSAPP})}
 function tmBody(nm){var S2=function(t,b){return'<h2 class="csh">'+t+'</h2>'+b},L=function(a){return'<ul class="pvl">'+a.map(function(x){return'<li>'+x+'</li>'}).join("")+'</ul>'};
  return'<div class="pv"><p>'+esc(nm||"สมาคมวิทยากรฝึกอาชีพคนตาบอด")+' เป็นผู้ดูแลระบบจองคิวนวดนี้ การสมัครและใช้งานแอปหมอนวดถือว่าคุณยอมรับเงื่อนไขต่อไปนี้</p>'+S2("1. บัญชีของคุณ",L(["ใช้บัญชีของตัวเองเท่านั้น ห้ามให้ผู้อื่นใช้แทน", "เก็บรหัสผ่านไว้เป็นความลับ"]))+S2("2. การรับงาน",L(["กดรับงานภายในเวลาที่ระบบกำหนด", "ถ้าไปทำงานไม่ได้ ให้แจ้งลางานหรือแจ้งร้านที่สังกัดโดยเร็ว"]))+S2("3. การนวดเพื่อสุขภาพเท่านั้น",L(["บริการในระบบนี้เป็นการนวดเพื่อสุขภาพ ไม่ใช่การรักษาโรค", "ห้ามเสนอหรือให้บริการทางเพศโดยเด็ดขาด ถ้าลูกค้าขอ ให้ปฏิเสธ และกดรายงานได้", "ถ้ารู้สึกไม่ปลอดภัยระหว่างให้บริการ หยุดบริการ แล้วติดต่อร้านหรือเจ้าหน้าที่ทันที"]))+S2("4. ข้อมูลลูกค้า",L(["ใช้ชื่อและเบอร์โทรของลูกค้าเพื่อการจองนั้นเท่านั้น ห้ามนำไปใช้หรือเปิดเผยให้ผู้อื่น", "ห้ามรับงานหรือรับเงินจากลูกค้านอกระบบ"]))+S2("5. ความประพฤติ",L(["ให้เกียรติลูกค้า ร้าน และเพื่อนร่วมงาน", "ห้ามใช้ถ้อยคำหยาบคาย คุกคาม ข่มขู่ หรือเลือกปฏิบัติ ทั้งในแชตและการตอบรีวิว"]))+S2("6. แชต รายงาน และบล็อก",L(["ข้อความแชตเห็นเฉพาะคุณกับลูกค้าของการจองนั้น", "ถ้าเจอข้อความไม่เหมาะสม กดปุ่ม รายงาน ในห้องแชตได้ เจ้าหน้าที่จะเห็นข้อความในห้องที่ถูกรายงาน เพื่อตรวจสอบ", "กดปุ่ม บล็อกลูกค้า ได้ ทั้งสองฝ่ายจะส่งข้อความหากันไม่ได้ และลูกค้าคนนั้นจะจองคุณไม่ได้อีก", "ยกเลิกบล็อกได้ที่เมนู บัญชี &gt; ลูกค้าที่บล็อกไว้"]))+S2("7. การตักเตือนและการพักงาน",L(["ถ้าทำผิดเงื่อนไข ร้านหรือเจ้าหน้าที่อาจตักเตือน พักการรับงาน หรือนำออกจากระบบ", "เจ้าหน้าที่เป็นผู้ตัดสินเสมอ ระบบไม่ลงโทษอัตโนมัติจากการถูกรายงาน"]))+S2("8. การเปลี่ยนแปลงเงื่อนไข",L([esc(nm||"สมาคมวิทยากรฝึกอาชีพคนตาบอด")+"อาจปรับเงื่อนไขนี้ ถ้ามีการเปลี่ยนแปลงสำคัญ จะขอให้คุณกดยอมรับอีกครั้ง"]))+S2("9. ติดต่อ",L(["สอบถามหรือร้องเรียน ติดต่อร้านที่สังกัด หรือเจ้าหน้าที่ที่เมนู บัญชี"]))+'</div>'}
+/* การ์ดคิว: โปรแกรมอ่านหน้าจออ่านสรุปบรรทัดเดียว (jobSay) ส่วนที่ตาเห็นซ่อนจากโปรแกรมอ่าน ลดการปัดจาก ~6 เหลือ ~3 ครั้งต่อคิว (23 พ.ย. 2569) */
+function rngSay(j){var s=bkMin(Date.parse(j.starts_at));return hm(s)+" ถึง "+hm(s+j.minutes)+" น."}
+function jobState(j){var rk=JRANK[j.job]||0;if(!j.active||j.bstatus==="cancelled"||j.bstatus==="rescheduled"||j.bstatus==="no_show")return j.bstatus==="rescheduled"?"เลื่อนคิวแล้ว":j.bstatus==="no_show"?"ลูกค้าไม่มา":"ยกเลิกแล้ว";return rk===0?"คิวใหม่ รอรับงาน":JL[Math.min(rk,3)]}
+function jobSay(j,showDate,d){return (showDate?thS(d)+", ":"")+rngSay(j)+" "+j.service+" "+j.minutes+" นาที"+(j.price>0?" "+Number(j.price).toLocaleString("th-TH")+" บาท":"")+" ลูกค้า "+j.customer+(j.place&&j.place!==ME.place?" ที่ "+j.place:"")+", "+jobState(j)}
 function jobCard(j,showDate){var rk=JRANK[j.job]||0,live=j.active&&j.bstatus==="confirmed"&&rk<3,d=bkDate(Date.parse(j.starts_at));
- return'<div class="q'+(live&&rk===0?" now":"")+'"><div class="qh"><span class="t">'+(showDate?thS(d)+", ":"")+rng(j)+'</span>'+(live&&rk===0?'<span class="tag w">คิวใหม่</span>':'')+'</div><b>'+esc(j.customer)+'</b>'+(j.phone?'<small>โทร <a href="tel:'+esc(j.phone)+'">'+esc(j.phone)+'</a></small>':'')+'<small>'+esc(j.service)+', '+j.minutes+' นาที'+(j.price>0?', ราคา '+Number(j.price).toLocaleString("th-TH")+' บาท':'')+'</small><small>'+esc(j.place)+', เลขที่ '+esc(j.ref)+'</small>'+(live&&rk===0&&j.accept_by?'<small class="acc">⏱ กดรับงานภายใน '+new Date(j.accept_by).toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit",timeZone:"Asia/Bangkok"})+' น. มิฉะนั้นระบบจะยกเลิกคิวนี้อัตโนมัติ</small>':'')+jobHtml(j)+chatBtn(j.booking_id,"staff:"+ME.id,j.ref,j.customer,j.ends_at,j.bstatus==="confirmed"||j.bstatus==="completed")+'</div>'}
-function drawHeader(){var ph=ME.photo_path?pubUrl(ME.photo_path):null,on=ME.accepting;
- document.getElementById("hdr").innerHTML='<div class="prof"><span class="av" aria-hidden="true">'+(ph?'<img loading="lazy" decoding="async" src="'+esc(ph)+'" alt="">':esc(ini(ME.name)))+'</span><div class="pn"><b>'+esc(ME.name)+'</b><small>'+esc(ME.place)+'</small></div><label class="sw'+(on?"":" off")+'"><input type="checkbox" id="onsw" role="switch"'+(on?" checked":"")+' aria-label="เปิดรับงาน"><span class="sl"></span><span class="st">'+(on?"เปิดรับงาน":"ปิดรับงาน")+'</span></label></div>';
+ return'<div class="q'+(live&&rk===0?" now":"")+'"><span class="sr">'+esc(jobSay(j,showDate,d))+'</span><div aria-hidden="true"><div class="qh"><span class="t">'+(showDate?thS(d)+", ":"")+rng(j)+'</span>'+(live&&rk===0?'<span class="tag w">คิวใหม่</span>':'')+'</div><b>'+esc(j.customer)+'</b></div>'+(j.phone?'<small><a href="tel:'+esc(j.phone)+'" aria-label="โทร '+esc(j.phone)+'"><span aria-hidden="true">โทร </span>'+esc(j.phone)+'</a></small>':'')+'<div aria-hidden="true"><small>'+esc(j.service)+', '+j.minutes+' นาที'+(j.price>0?', ราคา '+Number(j.price).toLocaleString("th-TH")+' บาท':'')+'</small><small>'+esc(j.place)+', เลขที่ '+esc(j.ref)+'</small></div>'+(live&&rk===0&&j.accept_by?'<small class="acc"><span aria-hidden="true">⏱ </span>กดรับงานภายใน '+new Date(j.accept_by).toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit",timeZone:"Asia/Bangkok"})+' น. มิฉะนั้นระบบจะยกเลิกคิวนี้อัตโนมัติ</small>':'')+jobHtml(j)+chatBtn(j.booking_id,"staff:"+ME.id,j.ref,j.customer,j.ends_at,j.bstatus==="confirmed"||j.bstatus==="completed")+'</div>'}
+/* วาดใหม่เฉพาะเมื่อเนื้อหาเปลี่ยน: ตัวโหลดข้อมูลทุก 20 วิ (refresh) เคยแทนที่ทั้งหน้าแม้ไม่มีอะไรใหม่
+   ทำให้ VoiceOver หลุดตำแหน่งที่อ่านอยู่ ถ้าเปลี่ยนจริง ให้โฟกัสกลับไปที่ปุ่ม/ช่องเดิม (23 พ.ย. 2569) */
+function setHtml(el,h){if(el.__h===h&&el.__n===el.firstChild)return false;var k=fKey(el);el.innerHTML=h;el.__h=h;el.__n=el.firstChild;if(k)fBack(el,k);return true}
+function fKey(el){var a=document.activeElement;if(!a||a===document.body||!el.contains(a))return null;var at=["id","data-a","data-id","data-job","data-chat","data-qt","data-d","data-ntf"],s="";at.forEach(function(n){var v=a.getAttribute(n);if(v!=null)s+="["+n+'="'+String(v).replace(/["\\]/g,"")+'"]'});return s?a.tagName.toLowerCase()+s:null}
+function fBack(el,k){try{var x=el.querySelector(k);if(x&&x.focus)x.focus({preventScroll:true})}catch(e){}}
+function drawHeader(){var ph=ME.photo_path?pubUrl(ME.photo_path):null,on=ME.accepting,hd=document.getElementById("hdr");
+ if(!setHtml(hd,'<div class="prof"><span class="av" aria-hidden="true">'+(ph?'<img loading="lazy" decoding="async" src="'+esc(ph)+'" alt="">':esc(ini(ME.name)))+'</span><div class="pn"><b>'+esc(ME.name)+'</b><small>'+esc(ME.place)+'</small></div><label class="sw'+(on?"":" off")+'"><input type="checkbox" id="onsw" role="switch"'+(on?" checked":"")+' aria-label="เปิดรับงาน"><span class="sl"></span><span class="st" aria-hidden="true">'+(on?"เปิดรับงาน":"ปิดรับงาน")+'</span></label></div>'))return;
  document.getElementById("onsw").onchange=function(){saveSelf({accepting:this.checked})}}
 function bindAcct(){ var ab=document.getElementById("avb");if(!ab)return;
  ab.onclick=function(){document.getElementById("photo").click()};
@@ -585,13 +594,13 @@ function view(){var t=today(),h="";
   EM.cx="ไม่มีงานที่ถูกยกเลิกใน 7 วันล่าสุด";
   list.forEach(function(j){if(cur[0]!=="done"&&cur[0]!=="cx"&&ended(j)&&!lateShown){lateShown=true;last=null;groups+='<h2 style="margin-top:20px">เลยเวลานัดแล้ว</h2>'}var d=bkDate(Date.parse(j.starts_at));if(d!==last){last=d;groups+='<h3 style="margin:14px 0 6px;font-size:1rem">'+(d===t?"วันนี้, ":"")+thD(d)+'</h3>'}groups+=jobCard(j,false)});
   var coH=compCard()+subCard(),ogH=oinvCard(),hv=hvTabs(!!coH,!!ogH);
-  if(hv.cur==='co')return banner()+'<h1>คิวงาน</h1><p class="sub">'+esc(ME.place)+'</p>'+hv.html+coH;
-  if(hv.cur==='og')return banner()+'<h1>คิวงาน</h1><p class="sub">'+esc(ME.place)+'</p>'+hv.html+ogH;
-  h=banner()+'<h1>คิวงาน</h1><p class="sub">'+esc(ME.place)+'</p>'+hv.html+'<div class="nf" role="tablist" aria-label="หมวดคิวงาน">'+TAB.map(function(x){return'<button type="button" role="tab" data-a="qt" data-id="'+x[0]+'" class="'+(x[0]===cur[0]?"on":"")+'" aria-selected="'+(x[0]===cur[0])+'">'+x[1]+' ('+x[2].length+')</button>'}).join("")+'</div>'+
+  if(hv.cur==='co')return banner()+'<h1>คิวงาน</h1>'+hv.html+coH;
+  if(hv.cur==='og')return banner()+'<h1>คิวงาน</h1>'+hv.html+ogH;
+  h=banner()+'<h1>คิวงาน</h1>'+hv.html+'<div class="nf" role="tablist" aria-label="หมวดคิวงาน">'+TAB.map(function(x){return'<button type="button" role="tab" data-a="qt" data-id="'+x[0]+'" class="'+(x[0]===cur[0]?"on":"")+'" aria-selected="'+(x[0]===cur[0])+'">'+x[1]+' ('+x[2].length+')</button>'}).join("")+'</div>'+
    (list.length?groups:'<div class="empty">'+EM[cur[0]]+'</div>')+
    (cur[0]==="done"?'<p class="sub" style="text-align:center;margin-top:12px">แสดงเฉพาะงานของวันนี้ ดูงานวันอื่นและยอดส่วนแบ่งย้อนหลังได้ที่เมนูรายได้</p><button type="button" class="btn g" data-a="tab" data-id="inc">ไปที่เมนูรายได้</button>'
     :cur[0]==="cx"?'<p class="sub" style="text-align:center;margin-top:12px">แสดงเฉพาะงานที่ถูกยกเลิกหรือเลื่อนคิวใน 7 วันล่าสุด</p>':"")}
- if(S.tab==="sc"){h=banner()+'<h1>ตารางงาน</h1><p class="sub">'+esc(ME.place)+'</p>'+daysCard()+'<h2 style="margin-top:18px">7 วันข้างหน้า</h2>';
+ if(S.tab==="sc"){h=banner()+'<h1>ตารางงาน</h1>'+daysCard()+'<h2 style="margin-top:18px">7 วันข้างหน้า</h2>';
   for(var i=0;i<7;i++){var k=addDays(t,i),open=workOn(k),L2=mine(k),off=OFFS.indexOf(k)>-1;
    h+='<div class="day"><h2>'+(i===0?"วันนี้, ":i===1?"พรุ่งนี้, ":"")+thD(k)+'</h2>'+(!open?'<span class="mute">'+(off?"วันหยุดที่ร้านตั้งไว้":"วันหยุดของคุณ")+'</span>':(L2.length?L2.map(function(j){return'<div class="item"><b>'+rng(j)+'</b> '+esc(j.customer)+'<small class="mute" style="display:block">'+esc(j.service)+'</small></div>'}).join(""):'<span class="mute">ไม่มีคิว</span>'))+'</div>'}}
  if(S.tab==="inc")h=incView();
@@ -602,9 +611,9 @@ function draw(){if(!ME)return;
  if(S.chat&&document.getElementById("chl"))return;
  if(S.rvReply&&document.getElementById("rvtxt"))return;
  if(S.pwOpen&&S.tab==="ac"&&document.getElementById("pwn"))return;
- document.getElementById("app").innerHTML=view();
+ setHtml(document.getElementById("app"),view());
  drawHeader();
- document.getElementById("nav").innerHTML=TABS.map(function(t){var u=t[0]==="nt"?ntUnread():t[0]==="q"?homeBadge():0,lb=t[0]==="nt"?"ยังไม่ได้อ่าน "+u+" รายการ":"งานใหม่หรือรอตอบ "+u+" รายการ";return'<button type="button" data-a="tab" data-id="'+t[0]+'" class="'+(t[0]===S.tab?"on":"")+'"><span aria-hidden="true">'+t[2]+'</span>'+t[1]+(S.tab!==t[0]&&u?'<i class="bdg" aria-label="'+lb+'">'+u+'</i>':'')+'</button>'}).join("");
+ setHtml(document.getElementById("nav"),TABS.map(function(t){var u=t[0]==="nt"?ntUnread():t[0]==="q"?homeBadge():0,lb=t[0]==="nt"?"ยังไม่ได้อ่าน "+u+" รายการ":"งานใหม่หรือรอตอบ "+u+" รายการ";return'<button type="button" data-a="tab" data-id="'+t[0]+'" class="'+(t[0]===S.tab?"on":"")+'"><span aria-hidden="true">'+t[2]+'</span>'+t[1]+(S.tab!==t[0]&&u?'<i class="bdg" aria-label="'+lb+'">'+u+'</i>':'')+'</button>'}).join(""));
  bindAcct();var lg=document.getElementById("logout");if(lg)lg.onclick=doLogout;
 }
 

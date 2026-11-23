@@ -69,7 +69,7 @@ ok('logged in',(await tabsTxt()).includes('คิวงาน'));
 let btns=await p.$$eval('#app .jobs button',b=>b.map(x=>x.textContent));console.log('buttons',btns.join('|'));
 ok('no old 3-button row',!btns.includes('เริ่มงาน')&&!btns.includes('✓ รับงาน'));
 ok('i1 has accept + no-show (started)',btns.filter(x=>x==='รับงาน').length===2&&btns.filter(x=>x==='ลูกค้าไม่มา').length===1);
-ok('aria-label on main button',(await p.$eval('[data-id=i1][data-a=job]',e=>e.getAttribute('aria-label'))).startsWith('รับงาน สมศรี นวดไทย'));
+ok('aria-label on main button (action + time + customer)',/^รับงาน \d\d:\d\d น\. สมศรี/.test(await p.$eval('[data-id=i1][data-a=job]',e=>e.getAttribute('aria-label'))));
 // accept i1
 await p.click('[data-id=i1][data-a=job]');await sleep(400);
 ok('ok message',(await tabsTxt()).includes('รับงานแล้ว สมศรี'));ok('banner shown + announced via live region',!!(await p.$('.okb'))&&(await p.evaluate(()=>document.getElementById('sr').textContent)).includes('รับงานแล้ว'));
