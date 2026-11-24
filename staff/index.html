@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>แอปหมอนวด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="apple-mobile-web-app-title" content="หมอนวด"><meta name="app-version" content="1.24"><meta name="app-name" content="หมอนวด"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="apple-mobile-web-app-title" content="หมอนวด"><meta name="app-version" content="1.25"><meta name="app-name" content="หมอนวด"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preload" href="fonts/noto-sans-thai-v1.woff2" as="font" type="font/woff2" crossorigin>
 <style>
@@ -333,10 +333,11 @@ function jobHtml(j){
  if(!j.active||j.bstatus==="cancelled"||j.bstatus==="rescheduled"||j.bstatus==="no_show")return'<div class="jobs"><span class="tag b" aria-hidden="true">'+(j.bstatus==="rescheduled"?"เลื่อนคิวแล้ว":j.bstatus==="no_show"?"ลูกค้าไม่มา":"ยกเลิกแล้ว")+'</span></div>';
  var rk=JRANK[j.job]||0;
  if(rk>=3)return'<div class="jobs"><span class="tag" aria-hidden="true">'+JL[3]+'</span></div>';
+ /* ชื่อปุ่ม: รับงาน/เริ่มงาน/ลูกค้าไม่มา ใช้เวลาเริ่มคิว, เสร็จสิ้นงาน ใช้เวลาจบคิว "เสร็จสิ้นงาน คิวจบ 11:00 น. <ลูกค้า>" (24 พ.ย. 2569 ผู้ใช้: "เสร็จสิ้นงาน 10:00" ฟังเหมือนเสร็จตอน 10 โมง) */
  var c=S.cfm&&S.cfm.id===j.id?S.cfm.k:"",who=hm(bkMin(Date.parse(j.starts_at)))+" น. "+j.customer;
  if(c)return'<div class="jobs cfm" role="group" aria-label="ยืนยันการทำรายการ"><p class="cq" id="cfq" tabindex="-1">'+(c==="fin"?"ยืนยันว่าเสร็จสิ้นงานนี้แล้ว? ระบบจะคิดค่าบริการและให้แต้มลูกค้า กดแล้วแก้ไม่ได้":"ยืนยันว่าลูกค้าไม่มา? คิวนี้จะถูกยกเลิก ไม่คิดค่าบริการ และคืนคิวว่างให้")+'</p><button type="button" class="btn" data-a="cfmok" data-id="'+j.id+'"'+(S.busy?" disabled":"")+'>'+(c==="fin"?"ยืนยันเสร็จสิ้นงาน":"ยืนยันลูกค้าไม่มา")+'</button><button type="button" class="btn g" data-a="cfmno" data-id="'+j.id+'">ย้อนกลับ</button></div>';
  var st=JSTEPS[rk],late=j.ends_at<new Date().toISOString(),ns=rk<2&&j.starts_at<=new Date().toISOString();
- return'<div class="jobs"><span class="tag w" aria-hidden="true">'+JL[rk]+'</span><button type="button" class="btn" data-a="'+(rk===2?"fin":"job")+'" data-job="'+st[2]+'" data-id="'+j.id+'" aria-label="'+st[1]+' '+esc(who)+'"'+(S.busy?" disabled":"")+'>'+st[1]+'</button>'+(ns?'<button type="button" class="btn g" data-a="ns" data-id="'+j.id+'" aria-label="ลูกค้าไม่มา '+esc(who)+'"'+(S.busy?" disabled":"")+'>ลูกค้าไม่มา</button>':'')+'</div>'+
+ return'<div class="jobs"><span class="tag w" aria-hidden="true">'+JL[rk]+'</span><button type="button" class="btn" data-a="'+(rk===2?"fin":"job")+'" data-job="'+st[2]+'" data-id="'+j.id+'" aria-label="'+st[1]+' '+esc(rk===2?"คิวจบ "+hm(bkMin(Date.parse(j.ends_at)))+" น. "+j.customer:who)+'"'+(S.busy?" disabled":"")+'>'+st[1]+'</button>'+(ns?'<button type="button" class="btn g" data-a="ns" data-id="'+j.id+'" aria-label="ลูกค้าไม่มา '+esc(who)+'"'+(S.busy?" disabled":"")+'>ลูกค้าไม่มา</button>':'')+'</div>'+
   (late&&CT.ach>0?'<small class="acc"><span aria-hidden="true">⏱ </span>คิวจบแล้ว กดเสร็จสิ้นงานหรือลูกค้าไม่มาภายใน '+new Date(Date.parse(j.ends_at)+CT.ach*3600000).toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit",timeZone:"Asia/Bangkok"})+' น. มิฉะนั้นระบบจะปิดงานและคิดค่าบริการให้เอง</small>':'')}
 /* ===== แชต (ผูกกับการจอง) ===== */
 var CHOK=false,CU={},CH=null,chT=null,chBusy=false;

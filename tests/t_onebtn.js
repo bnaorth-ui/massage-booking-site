@@ -78,6 +78,12 @@ ok('focus on next-step button',await p.evaluate(()=>document.activeElement&&docu
 let b2=await p.$eval('[data-id=i1][data-a=job]',e=>e.textContent);ok('button now เริ่มงาน',b2==='เริ่มงาน');
 await p.click('[data-id=i1][data-a=job]');await sleep(400);ok('started',(await tabsTxt()).includes('เริ่มงานแล้ว สมศรี'));
 ok('button now เสร็จสิ้นงาน (fin)',(await p.$eval('[data-id=i1][data-a=fin]',e=>e.textContent))==='เสร็จสิ้นงาน');
+// ชื่อปุ่มเสร็จสิ้นงานบอกเวลาจบคิว ไม่ใช่เวลาเริ่ม (24 พ.ย. 2569) ไม่มีคำยืนยันนำหน้า, ปุ่มเริ่มงานยังใช้เวลาเริ่ม
+{const fl=await p.$eval('[data-id=i1][data-a=fin]',e=>e.getAttribute('aria-label'));const it=items.find(x=>x.id==='i1');
+ const hm=s=>{const d=new Date(Date.parse(s)+7*3600000);return String(d.getUTCHours()).padStart(2,'0')+':'+String(d.getUTCMinutes()).padStart(2,'0')};
+ ok('finish label uses end time ('+fl+')',fl==='เสร็จสิ้นงาน คิวจบ '+hm(it.ends_at)+' น. สมศรี');
+ ok('finish label: no start time, no prefix',!fl.includes(hm(it.starts_at)+' น.')&&!/แล้ว/.test(fl));
+ ok('focus lands on finish button',await p.evaluate(()=>document.activeElement&&document.activeElement.dataset.a==='fin'));}
 ok('no no-show after start',!(await p.$('[data-id=i1][data-a=ns]')));
 // finish with confirm
 const before=calls.filter(c=>c.path&&c.path.includes('set_job_status')).length;
