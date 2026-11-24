@@ -77,8 +77,8 @@ const ord=await p.evaluate(()=>{const y=e=>document.querySelector(e).getBounding
 ok('logout button exists once',(await p.$$('[data-auth=out]')).length===1);}
 ok('no old home button in view',!(await p.$('#home')));
 await p.click('[data-tab=bk]');await p.waitForSelector('[data-bt]');ok('bk view',(await p.textContent('h1'))==='การจองของฉัน'&&(await cur())==='การจอง');
-await p.click('[data-tab=nt]');ok('nt view',(await p.textContent('h1'))==='แจ้งเตือน'&&(await cur())==='แจ้งเตือน');
-{const sb=await p.$$eval('[data-nt]',b=>b.map(x=>x.textContent.trim()));console.log(sb.join('|'));ok('nt has 2 sub-tabs',sb.length===2&&/^แจ้งเตือน \(\d+\)$/.test(sb[0])&&/^จากระบบ \(\d+\)$/.test(sb[1]));
+await p.click('[data-tab=nt]');ok('nt view',(await p.textContent('h1'))==='การแจ้งเตือน'&&(await cur())==='แจ้งเตือน');
+{const sb=await p.$$eval('[data-nt]',b=>b.map(x=>x.textContent.trim()));console.log(sb.join('|'));ok('nt has 2 sub-tabs',sb.length===2&&/^ของฉัน \(\d+\)$/.test(sb[0])&&/^จากระบบ \(\d+\)$/.test(sb[1]));
 ok('default: notifications, no announcements',(await p.$$('.ann')).length===0&&(await p.$eval('[data-nt].on',e=>e.dataset.nt))==='n');
 await p.click('[data-nt=a]');const t2=await p.textContent('#app,main,body');ok('จากระบบ shows announcements only',(await p.$$('.ann')).length>0&&(await p.$$('.msg')).length===0);
 await p.click('[data-nt=n]');ok('back to notifications (empty state)',(await p.$$('.ann')).length===0&&(await p.textContent('body')).includes('ยังไม่มีการแจ้งเตือน'));}

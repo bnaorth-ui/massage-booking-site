@@ -72,7 +72,7 @@ const app=async()=>(await p.textContent('#app')).replace(/\s+/g,' ');
 await p.clock.setFixedTime(new Date(D0+'T10:12:00+07:00'));
 // ไม่มีรายการชื่นชอบ
 await p.click('#tabs [data-tab="fv"]');await p.waitForTimeout(500);
-ok('menu named ชื่นชอบ, heading too',(await p.textContent('#tabs [data-tab="fv"]')).includes('ชื่นชอบ')&&(await p.textContent('#fvt'))==='ชื่นชอบ');
+ok('menu named ชื่นชอบ, heading too',(await p.textContent('#tabs [data-tab="fv"]')).includes('ชื่นชอบ')&&(await p.textContent('#fvt'))==='ชื่นชอบของฉัน');
 ok('two tabs, staff first and selected, counts shown',(await p.$$eval('[data-fvk]',e=>e.map(x=>x.dataset.fvk+':'+x.textContent))).join('|')==='s:หมอนวดที่ชื่นชอบ (0)|p:ร้านที่ชื่นชอบ (0)'&&(await p.getAttribute('[data-fvk=s]','aria-pressed'))==='true');
 ok('no favourite staff: explains how to add',(await app()).includes('ยังไม่มีหมอนวดที่ชื่นชอบ')&&(await app()).includes('กดรูปหัวใจที่ชื่อหมอนวด'));
 // มีแต่ร้านที่ชื่นชอบ -> เปิดแถบร้านที่ชื่นชอบ

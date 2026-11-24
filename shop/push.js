@@ -34,7 +34,7 @@ function paint(){if(!pill)return;var label="",bg="#1f6f5c",fg="#fff";
  else if(state==="denied"){label="🔕 แจ้งเตือนถูกบล็อก";bg="#b3402a"}
  else if(state==="ios"){label="🔔 เปิดแจ้งเตือน (iPhone)"}
  if(busy)label="กำลังดำเนินการ…";if(msg)label=msg;
- pill.textContent=label;pill.style.background=bg;pill.style.color=fg;pill.disabled=busy;setTimeout(ask,600)}
+ pill.textContent=label;/* โปรแกรมอ่านหน้าจอไม่อ่านอีโมจิ (กระดิ่ง ✓) 24 พ.ย. 2569 */pill.setAttribute("aria-label",label.replace(/^[\uD83D][\uDD14\uDD15]\s*/,"").replace(/\s*\u2713$/,""));pill.style.background=bg;pill.style.color=fg;pill.disabled=busy;setTimeout(ask,600)}
 function say(t,ms){msg=t;paint();clearTimeout(say._t);say._t=setTimeout(function(){msg="";paint()},ms||6000)}
 function reg(){return navigator.serviceWorker.register("sw.js").then(function(){return navigator.serviceWorker.ready})}
 /* ส่งชื่อแอป (customer/shop/staff/admin) ไปด้วย ระบบจะส่งแจ้งเตือนนอกหน้าจอเฉพาะแอปที่ตรงกับเรื่องนั้น

@@ -9,7 +9,7 @@ await ctx.route(/^https?:/,r=>{const u=r.request().url();if(/supabase/.test(u))r
 const p=await ctx.newPage();p.on('pageerror',e=>errs.push(e.message));await p.goto(C.page('customer-booking.html'));await sleep(1500);
 const st=async(fn)=>{await p.evaluate(fn);await p.evaluate(()=>render(true));await sleep(150);return{l:(await p.textContent('#locl')).trim(),b:await p.$$eval('.loc button',e=>e.map(x=>x.dataset.loc+':'+x.textContent.trim()))}};
 let r=await st(()=>{V.loc=null;V.manual=false;V.locName="";V.kind="shop"});
-ok('no location: label says all shops, two buttons',r.l==='📍 แสดงร้านทั้งหมด ระบุตำแหน่งเพื่อดูร้านใกล้คุณ'&&r.b.join('|')==='gps:ใช้ตำแหน่งของฉัน|find:ค้นหาสถานที่');
+ok('no location: label says all shops, two buttons',r.l==='📍 ยังไม่ได้ระบุตำแหน่ง'&&r.b.join('|')==='gps:ใช้ตำแหน่งของฉัน|find:ค้นหาสถานที่');
 r=await st(()=>{V.loc={lat:13.7,lng:100.5};V.manual=false;V.locName=""});
 ok('gps, no name yet',r.l==='📍 แสดงร้านใกล้ตำแหน่งของคุณ'&&r.b.join('|')==='gps:อัปเดตตำแหน่ง|find:ค้นหาสถานที่|reset:ร้านทั้งหมด');
 r=await st(()=>{V.manual=true;V.locName=""});
@@ -25,6 +25,6 @@ ok('screen reader text reads name then address',r.l.includes('แสดงร้
 r=await st(()=>{V.kind="org"});
 ok('organization tab: wording uses หน่วยงาน',r.l.startsWith('📍 แสดงหน่วยงานใกล้: โรงแรมเซ็นทารา แกรนด์')&&r.b.includes('reset:หน่วยงานทั้งหมด'));
 await st(()=>{V.kind="shop"});await p.click('[data-loc=reset]');await sleep(300);
-ok('all shops button: location cleared, label updated, focus on first button',(await p.textContent('#locl')).includes('แสดงร้านทั้งหมด')&&!(await p.$('[data-loc=reset]'))&&(await p.evaluate(()=>document.activeElement&&document.activeElement.dataset.loc))==='gps');
+ok('all shops button: location cleared, label updated, focus on first button',(await p.textContent('#locl')).includes('ยังไม่ได้ระบุตำแหน่ง')&&!(await p.$('[data-loc=reset]'))&&(await p.evaluate(()=>document.activeElement&&document.activeElement.dataset.loc))==='gps');
 ok('announced for screen readers',(await p.evaluate(()=>new Promise(r=>setTimeout(()=>r((document.querySelector('#sr')||{}).textContent||''),200)))).includes('แสดงร้านทั้งหมดแล้ว'));
 console.log('errors:',errs.join('|')||'none');ok('no page errors',errs.length===0);await b.close();process.exit(0)})();

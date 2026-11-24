@@ -108,7 +108,7 @@ await p.click('[data-loc=find]');await p.waitForSelector('#mpov');await p.waitFo
 ok('load failure message',true);
 await p.fill('#mp_lat','7.8804');await p.fill('#mp_lng','98.2923');await p.click('[data-mp=ok]');await wait(300);
 ok('manual coords work without map',(await names()).join('|').includes('ร้านป่าตอง')&&(await p.evaluate(()=>document.getElementById('locl').textContent+' '+document.querySelector('.loc').textContent)).includes('กลับไปใช้ตำแหน่งของฉัน'));
-await p.click('[data-loc=reset]');await wait(200);ok('reset clears manual',(await p.evaluate(()=>document.getElementById('locl').textContent+' '+document.querySelector('.loc').textContent)).includes('แสดงร้านทั้งหมด'));
+await p.click('[data-loc=reset]');await wait(200);ok('reset clears manual',(await p.evaluate(()=>document.getElementById('locl').textContent+' '+document.querySelector('.loc').textContent)).includes('ยังไม่ได้ระบุตำแหน่ง'));
 // ---- ค้นหาสถานที่ ----
 stubOn=true;const NMQ=[];let nmMode='ok';
 const RES={'ป่าตอง':[{lat:'7.8961',lon:'98.2964',name:'หาดป่าตอง',display_name:'หาดป่าตอง, ป่าตอง, กะทู้, ภูเก็ต',address:{suburb:'ป่าตอง',county:'กะทู้',state:'ภูเก็ต'}},{lat:'7.8930',lon:'98.3000',name:'ถนนบางลา',display_name:'ถนนบางลา, ป่าตอง, ภูเก็ต',address:{road:'ถนนบางลา',suburb:'ป่าตอง',state:'ภูเก็ต'}}]};

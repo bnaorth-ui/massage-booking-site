@@ -65,8 +65,8 @@ await p.fill('#lph','0811111111');await p.fill('#lpw','abc123');await p.click('b
 await p.click('[data-tab="ac"]');await p.waitForTimeout(300);
 let t=await A();ok('points card shows 450',t.includes('แต้มสะสม')&&t.includes('450'));ok('redeem value 45 baht',t.includes('45 บาท'));ok('expiry line',t.includes('แต้มที่จะหมดอายุก่อน 100'));
 await p.click('#pthist');await p.waitForTimeout(200);ok('history shown',(await A()).includes('ได้รับ 450'));ok('aria-expanded true',(await p.getAttribute('#pthist','aria-expanded'))==='true');
-PTS.balance=60;await p.click('[data-tab=""]');await p.waitForTimeout(200);await p.click('[data-tab="ac"]');await p.waitForTimeout(500);t=await A();ok('below min sentence',t.includes('อีก 40 แต้ม'));
-PTS.balance=450;await p.click('[data-tab="bk"]').catch(()=>{});await p.click('[data-tab="ac"]');await p.waitForTimeout(500);
+PTS.balance=60;await p.evaluate(()=>{RUAT=0});/* กดแท็บภายใน 30 วิ ใช้ข้อมูลเดิม (24 พ.ย. 2569) */await p.click('[data-tab=""]');await p.waitForTimeout(200);await p.click('[data-tab="ac"]');await p.waitForTimeout(500);t=await A();ok('below min sentence',t.includes('อีก 40 แต้ม'));
+PTS.balance=450;await p.evaluate(()=>{RUAT=0});await p.click('[data-tab="bk"]').catch(()=>{});await p.click('[data-tab="ac"]');await p.waitForTimeout(500);
 // booking flow
 async function toStep4(){await p.click('[data-tab=""]');for(let i=0;i<5&&!(await p.$('[data-pl]'));i++){await p.click('#back');await p.waitForTimeout(150)}await p.waitForSelector('[data-pl]');
  await p.click('[data-pl="sh1"]');await p.waitForSelector('[data-qty]');await p.click('[data-qty]:not([disabled]) >> nth=0');await p.click('#next');await p.waitForSelector('#selT');await p.waitForTimeout(500);
