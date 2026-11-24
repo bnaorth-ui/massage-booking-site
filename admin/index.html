@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>แอดมิน - สมาคมวิทยากรฝึกอาชีพคนตาบอด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.43"><meta name="app-name" content="สำหรับแอดมิน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.44"><meta name="app-name" content="สำหรับแอดมิน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preload" href="fonts/noto-sans-thai-v1.woff2" as="font" type="font/woff2" crossorigin>
 <style>
@@ -1026,7 +1026,7 @@ function navDraw(){var g=groupOf(S.tab);document.getElementById("navb").hidden=f
  setHtml(document.getElementById("hacts"),'<button type="button" class="srb" data-a="sropen" aria-label="ค้นหา" title="ค้นหา (กด /)"><span aria-hidden="true">🔍</span></button>')}
 function subBar(g){var L=SUBM[g]?grpTabs(g):null;if(!L||!L.length)return"";var cur=curSub();return '<div class="subtabs mgb" role="tablist" aria-label="'+NAVN[g]+'">'+L.map(function(x){var u=x[0]==="shop"?regPending():x[0]==="pprq"?tpPending():x[0]==="rvw"?rvwPending():x[0]==="oreq"?oreqPending():x[0]==="staff"?spFresh():x[0]==="hl"?hlN():x[0]==="ce"?ceN():0;return '<button type="button" role="tab" data-a="tab" data-id="'+x[0]+'" class="'+(x[0]===cur?"on":"")+'" aria-selected="'+(x[0]===cur)+'">'+x[1]+(u?' ('+u+')':'')+'</button>'}).join("")+'</div>'}
 /* ปุ่มในแถวรายการ (ปิด แก้ไข ลบ อนุมัติ ฯลฯ) อ่านพร้อมชื่อรายการ เช่น "แก้ไข ร้านสบายดี สปา" ไม่งั้นในรายการปุ่มของ VoiceOver ไม่รู้ว่าของใคร */
-function rowLabels(){[].forEach.call(document.querySelectorAll('#main .row button[data-a="tog"],#main .row button[data-a="edit"],#main .row button[data-a="del"],#main .row button[data-a="regok"],#main .row button[data-a="regno"],#main .row button[data-a="reglic"]'),function(b){if(b.hasAttribute("aria-label"))return;var r=b.closest(".row"),n=r&&r.querySelector("b");n=n?n.textContent.trim():"";if(n)b.setAttribute("aria-label",b.textContent.trim()+" "+n)})}
+function rowLabels(){[].forEach.call(document.querySelectorAll('#main .row button[data-a="tog"],#main .row button[data-a="edit"],#main .row button[data-a="del"],#main .row button[data-a="regok"],#main .row button[data-a="regno"],#main .row button[data-a="reglic"],#main .row button[data-a="tpok"],#main .row button[data-a="tprej"],#main .item button[data-a="capdraft"],#main .item button[data-a="caprj"]'),function(b){if(b.hasAttribute("aria-label"))return;var r=b.closest(".row,.item"),n=r&&r.querySelector("b");n=n?n.textContent.trim().replace(/\s*฿/g," บาท"):"";if(n)b.setAttribute("aria-label",b.textContent.trim()+" "+n)})}
 function post(){rowLabels();
  if(S.tab==="pp"){if(D.pp.id&&ppValid(D.pp.type,D.pp.id)&&document.getElementById("ppqr"))drawQr("ppqr",ppPayload(D.pp.type,D.pp.id,0));if(D.opp&&D.opp.id&&ppValid(D.opp.type,D.opp.id)&&document.getElementById("oppqr"))drawQr("oppqr",ppPayload(D.opp.type,D.opp.id,0));
   slipHashAll();D.tp.forEach(function(t){var el=document.getElementById("slipth_"+t.id);if(el&&t.slipPath)loadBlobInto("/storage/v1/object/authenticated/slips/"+t.slipPath,el,"สลิปการโอน","slipth",t.slipPath);var bg=document.getElementById("slipbig_"+t.id);if(bg&&t.slipPath)loadBlobInto("/storage/v1/object/authenticated/slips/"+t.slipPath,bg,"สลิปการโอนขยาย","slipbig")})}
@@ -1110,7 +1110,13 @@ function draw(){navDraw();setHtml(document.getElementById("main"),view(),true);p
 /* วาดรายการห้องแชตใหม่โดยโฟกัสไม่หาย (ปุ่มห้องเดิม หรือหัวข้อหน้า) */
 function supRedraw(){var a=document.activeElement,k=a&&a.dataset&&a.dataset.a==="supopen"?[a.dataset.id,a.dataset.t]:null,hf=!!(a&&a.tagName==="H1"&&a.closest&&a.closest("#main"));draw();var e=k?document.querySelector('.supb[data-id="'+k[0]+'"][data-t="'+k[1]+'"]'):hf?document.querySelector("#main h1"):null;if(e){if(hf)e.tabIndex=-1;e.focus()}}
 function softDraw(){navDraw();var a=document.activeElement;if(S.form||S.busy||(a&&/INPUT|SELECT|TEXTAREA/.test(a.tagName)&&a.id!=="")||S.tab==="set"||S.tab==="usr"||S.tab==="hl"||S.tab==="ce"||S.tab==="au"||S.tab==="fm"||SR.open||(S.tab==="sup"&&SUP.cur))return;if(setHtml(document.getElementById("main"),view()))post()}
-function refresh(){if(!D||S.busy)return Promise.resolve();if(S.tab==="rvw"||RW.loaded)rvwLoad();return Promise.all([apLoad(),loadLive(),loadBk(),supLoad(),prLoad()]).then(function(r){if(r[0]){S.form=null;draw()}else softDraw()},function(e){if(e&&e.status===401)doLogout()})}
+/* refresh("tick") = ตัวจับเวลาทุก 30 วิ: โหลดแค่คิวงาน แจ้งเตือน และแชตกับผู้ใช้ ส่วนอื่น (คำขอทุกประเภท รีวิว ใบสมัคร สิทธิ์ การอ่าน) ทุก 2 นาที
+   (24 พ.ย. 2569 เดิมขอ 23 ครั้งทุก 30 วิ) เปิดแอปกลับมา กดปุ่ม และอยู่หน้าทะเบียน/การเงิน ยังโหลดครบ */
+var SLOWAT=Date.now(),SLOW_MS=120000;
+function plFin(){return S.tab==="pp"||SUBM.pl.concat(SUBM.fin).some(function(x){return x[0]===S.tab})}
+function refresh(mode){if(!D||S.busy)return Promise.resolve();var slow=mode!=="tick"||plFin()||Date.now()-SLOWAT>=SLOW_MS;
+ if(!slow)return Promise.all([false,g1("notifications?select=*&audience=eq.admin&order=created_at.desc&limit=200").then(function(r){D.nt=r.map(function(n){return{id:n.id,title:n.title,text:n.body||"",kind:n.kind,at:n.created_at}})},function(){}),loadBk(),supLoad()]).then(function(){softDraw()},function(e){if(e&&e.status===401)doLogout()});
+ SLOWAT=Date.now();if(S.tab==="rvw"||RW.loaded)rvwLoad();return Promise.all([apLoad(),loadLive(),loadBk(),supLoad(),prLoad()]).then(function(r){if(r[0]){S.form=null;draw()}else softDraw()},function(e){if(e&&e.status===401)doLogout()})}
 
 /* ===================== เหตุการณ์ ===================== */
 function setPin(la,lo){document.getElementById("olat").value=la;document.getElementById("olng").value=lo;document.getElementById("pinst").innerHTML=pinStatus(String(la),String(lo));pinName(+la,+lo)}
@@ -1467,7 +1473,7 @@ document.addEventListener("click",function(e){
 });
 function post__reads(ids){return sbApi("/rest/v1/notification_reads?on_conflict=notification_id,user_id",{method:"POST",json:1,headers:{Prefer:"resolution=ignore-duplicates,return=minimal"},body:JSON.stringify(ids.map(function(i){return{notification_id:i,user_id:WHO.id}}))})}
 function startMain(){if(started){draw();return}started=true;S.busy=false;draw();rvwLoad();
- setInterval(function(){if(!document.hidden)refresh()},30000);
+ setInterval(function(){if(!document.hidden)refresh("tick")},30000);
  document.addEventListener("visibilitychange",function(){if(!document.hidden)refresh()})}
 /* ---------- เริ่มทำงาน ---------- */
 SBS=rd(SSK,null);

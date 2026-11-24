@@ -78,6 +78,8 @@ ok('accepted tag',(await p.textContent('.q')).includes('รับงานแล
 await p.click('.q [data-job=in_progress]');await sleep(300);
 ok('in-progress tag',(await p.textContent('.q')).includes('กำลังนวด'));
 await p.click('.q [data-a=fin]');await sleep(150);await p.click('[data-a=cfmok]');await sleep(300);
+// รอจนป้ายขึ้นจริง (เดิมรอ 300ms ตายตัว ล้มเป็นครั้งคราวตอนรันพร้อมกัน 24 พ.ย. 2569)
+await p.waitForFunction(()=>{const q=document.querySelector('.q');return q&&q.textContent.includes('เสร็จสิ้นแล้ว')},null,{timeout:8000}).catch(()=>{});
 ok('done tag',(await p.textContent('.q')).includes('เสร็จสิ้นแล้ว'));
 ok('rpc calls in order',calls.filter(c=>c.path.endsWith('set_job_status')).map(c=>c.body.p_status).join()==='accepted,in_progress,done');
 // switch
