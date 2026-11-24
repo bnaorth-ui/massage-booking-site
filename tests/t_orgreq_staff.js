@@ -110,7 +110,7 @@ ok('org section labelled as extra work',t.includes('งานนอกสถา�
 // ---- วันประจำบริษัท (จันทร์/พุธ) เปลี่ยนเป็นวันหยุดเองไม่ได้
 await p.click('#nav button:nth-child(2)');await sleep(400);t=await T0(p);
 const lab=async d=>await p.getAttribute('[data-a=wd][data-d="'+d+'"]','aria-label');
-ok('company days labelled as fixed',(await lab(1)).includes('ประจำบริษัท บริษัท ไทยออฟฟิศ')&&(await lab(3)).includes('เปลี่ยนไม่ได้')&&!(await lab(2)).includes('ประจำ')&&t.includes('ติดป้าย'));
+ok('company days labelled as fixed',(await lab(1)).includes('ประจำบริษัท บริษัท ไทยออฟฟิศ')&&(await lab(3)).includes('เปลี่ยนไม่ได้')&&!(await lab(2)).includes('ประจำ')&&t.includes('มีป้าย "ประจำ"'));
 const sv0=oiCalls.length;let saves=0;await p.route('**/rpc/staff_save_self',async r=>{saves++;await r.fallback()});
 await p.click('[data-a=wd][data-d="1"]');await sleep(400);
 ok('cannot take a company day off: message, no save, still on',saves===0&&(await p.textContent('#wdsum')).includes('เป็นวันประจำบริษัท')&&(await p.getAttribute('[data-a=wd][data-d="1"]','aria-pressed'))==='true'&&ST.work_days.includes(1));

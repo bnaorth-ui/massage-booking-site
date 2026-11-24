@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>แอปหมอนวด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="apple-mobile-web-app-title" content="หมอนวด"><meta name="app-version" content="1.25"><meta name="app-name" content="หมอนวด"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="apple-mobile-web-app-title" content="หมอนวด"><meta name="app-version" content="1.26"><meta name="app-name" content="หมอนวด"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preload" href="fonts/noto-sans-thai-v1.woff2" as="font" type="font/woff2" crossorigin>
 <style>
@@ -143,20 +143,26 @@ var AG={step:"load",fail:0,lock:0,ok:"",err:"",join:"",ph:""};
 var INS={ev:null,done:false,fd:false};
 var inflight=false;
 /* loadAll(light): ครั้งแรกโหลดครบ; ตอนรีเฟรชซ้ำ (light) ข้ามวันหยุดกับข้อมูลติดต่อสมาคมที่ไม่ค่อยเปลี่ยน */
+/* loadAll("tick") = ตัวจับเวลาทุก 20 วิ: โหลดแค่คิวงาน + ข้อมูลตัวเอง ส่วนที่เปลี่ยนไม่บ่อย (แจ้งเตือน ประกาศ คำเชิญ การลา แชต) ทุก 2 นาที
+   (24 พ.ย. 2569 เดิมขอ 12 ครั้งทุก 20 วิ) เปิดแอปกลับมา/กดปุ่ม/เปิดหน้าแจ้งเตือน ยังโหลดครบเหมือนเดิม */
+var SLOWAT=0,SLOW_MS=120000;
 function loadAll(light){
+ var tick=light==="tick",slow=!tick||Date.now()-SLOWAT>=SLOW_MS,skip=function(){return null};
  var t=today(),pre=Promise.all([rpc("my_jobs",{p_from:new Date(Date.parse(t+"T00:00:00+07:00")-30*86400000).toISOString()}),
-   sbApi("/rest/v1/notifications?select=*&audience=eq.staff&order=created_at.desc&limit=100"),
-   sbApi("/rest/v1/notification_reads?select=notification_id&limit=2000"),
-   sbApi("/rest/v1/announcements?select=*&active=eq.true&order=created_at.desc&limit=50"),
-   light?null:sbApi("/rest/v1/app_settings?select=*&limit=1").catch(function(){return[]}),rpc("my_org_invites").catch(function(){return[]}),rpc("my_handovers").catch(function(){return[]}),rpc("my_assignments").catch(function(){return[]}),rpc("my_leaves").catch(function(){return[]}),rpc("my_sub_handovers").catch(function(){return[]})]);
+   slow?sbApi("/rest/v1/notifications?select=*&audience=eq.staff&order=created_at.desc&limit=100"):null,
+   slow?sbApi("/rest/v1/notification_reads?select=notification_id&limit=2000"):null,
+   slow?sbApi("/rest/v1/announcements?select=*&active=eq.true&order=created_at.desc&limit=50"):null,
+   light?null:sbApi("/rest/v1/app_settings?select=*&limit=1").catch(function(){return[]}),slow?rpc("my_org_invites").catch(function(){return[]}):null,slow?rpc("my_handovers").catch(function(){return[]}):null,slow?rpc("my_assignments").catch(function(){return[]}):null,slow?rpc("my_leaves").catch(function(){return[]}):null,slow?rpc("my_sub_handovers").catch(function(){return[]}):null]);
  pre.catch(function(){});
  return rpc("staff_me").then(function(me){
   if(!me)return null;ME=me;
-  return Promise.all([pre,light?null:sbApi("/rest/v1/staff_days_off?select=day&staff_id=eq."+me.id+"&day=gte."+t),loadChatUnread(),loadSupUnread()]).then(function(x){
+  return Promise.all([pre,light?null:sbApi("/rest/v1/staff_days_off?select=day&staff_id=eq."+me.id+"&day=gte."+t),slow?loadChatUnread():skip(),slow?loadSupUnread():skip()]).then(function(x){
     var r=x[0];JOBS=r[0]||[];if(!light)OFFS=(x[1]||[]).map(function(d){return d.day});
-    NT=(r[1]||[]).filter(function(n){return n.kind!=="announce"});READS=(r[2]||[]).map(function(d){return d.notification_id});
     if(!light){var st=(r[4]||[])[0]||{};CT={name:st.association_name||"",addr:st.address||"",phone:st.phone||"",hours:st.hours_text||"",ach:+st.auto_close_hours||0}}
-    OINV=Array.isArray(r[5])?r[5]:[];HO=Array.isArray(r[6])?r[6]:[];ASGN=Array.isArray(r[7])?r[7]:[];LVS=Array.isArray(r[8])?r[8]:[];SUBH=Array.isArray(r[9])?r[9]:[];ANN=(r[3]||[]).filter(function(a){return(a.audiences||[]).indexOf("พนักงาน")>-1});return true})})}
+    if(slow){SLOWAT=Date.now();
+     NT=(r[1]||[]).filter(function(n){return n.kind!=="announce"});READS=(r[2]||[]).map(function(d){return d.notification_id});
+     OINV=Array.isArray(r[5])?r[5]:[];HO=Array.isArray(r[6])?r[6]:[];ASGN=Array.isArray(r[7])?r[7]:[];LVS=Array.isArray(r[8])?r[8]:[];SUBH=Array.isArray(r[9])?r[9]:[];ANN=(r[3]||[]).filter(function(a){return(a.audiences||[]).indexOf("พนักงาน")>-1})}
+    return true})})}
 function feed(){var L=[];
  ANN.forEach(function(a){L.push({id:"a-"+a.id,from:"admin",title:"ประกาศ: "+a.title,text:a.body||"",at:a.created_at||(a.day+"T00:00:00Z")})});
  NT.forEach(function(n){L.push({id:"n-"+n.id,nid:n.id,sup:n.kind==="support",from:"booking",title:n.title,text:n.body||"",at:n.created_at})});
@@ -321,9 +327,9 @@ var timer=null;
 function enter(){AG.d=null;S.busy=false;if(mustPw()){AG.err="";AG.step="npw";gateDraw();return Promise.resolve()}AG.step="load";gateDraw();
  return loadAll().then(function(ok){if(!ok){return rpc("my_staff_applications").catch(function(){return[]}).then(function(l){if(APPLY||(l&&l.length)){AP.list=l||[];AP.fd=false;AG.step="apply";gateDraw();return apInit()}AG.step="denied";gateDraw()})}return tmNeed().then(function(n){if(n){AG.step="tmgate";gateDraw();var t=document.getElementById("tmgt");if(t)t.focus();return}startMain()})}).catch(function(e){if(e&&(e.status===401||e.message==="NOSESS")){doLogout();return}AG.err=errTh(e,"โหลดข้อมูลไม่สำเร็จ");AG.step="loaderr";gateDraw()})}
 function startMain(){if(!S.hv)S.hv=ogPend()>0?"og":coPend()>0?"co":"cu";document.getElementById("navb").style.display="";if(S.tab==="nt")openNt();draw();
- if(!timer){timer=setInterval(refresh,20000);document.addEventListener("visibilitychange",function(){if(!document.hidden)refresh()})}}
-function refresh(){if(!ME||inflight||document.hidden||S.busy)return;var a=document.activeElement;if(a&&/INPUT|SELECT|TEXTAREA/.test(a.tagName))return;
- inflight=true;loadAll(true).then(function(ok){inflight=false;if(!ok)return;if(S.tab==="nt")openNt();if(S.tab==="ac")rvLoad();draw()},function(e){inflight=false;if(e&&e.status===401)doLogout()})}
+ if(!timer){timer=setInterval(function(){refresh("tick")},20000);document.addEventListener("visibilitychange",function(){if(!document.hidden)refresh()})}}
+function refresh(mode){if(!ME||inflight||document.hidden||S.busy)return;var a=document.activeElement;if(a&&/INPUT|SELECT|TEXTAREA/.test(a.tagName))return;
+ inflight=true;loadAll(mode==="tick"&&S.tab!=="nt"?"tick":true).then(function(ok){inflight=false;if(!ok)return;if(S.tab==="nt")openNt();if(S.tab==="ac")rvLoad();draw()},function(e){inflight=false;if(e&&e.status===401)doLogout()})}
 
 /* ===================== ส่วนแสดงผล ===================== */
 function mine(d){return JOBS.filter(function(j){return j.active&&bkDate(Date.parse(j.starts_at))===d}).sort(function(a,b){return a.starts_at<b.starts_at?-1:1})}
@@ -471,7 +477,7 @@ function incLoad(){if(!ME)return;if(!INC.ym)INC.ym=today().slice(0,7);var my=INC
   if(rq!==INC.req)return;if(e&&e.status===401){doLogout();return}INC.rows=[];INC.loaded=true;
   if(/schema cache|Could not find the function|does not exist/i.test(String(e&&e.message||"")))INC.off=true;else INC.err=errTh(e,"โหลดรายได้ไม่สำเร็จ");
   if(S.tab==="inc")draw()})}
-function incView(){var cur=today().slice(0,7),ym=INC.ym||cur,h='<h1>รายได้ของฉัน</h1><p class="sub">ส่วนแบ่งจากงานที่เสร็จสิ้นแล้ว ตามอัตราที่ร้านตั้งไว้ เห็นเฉพาะคุณ</p>'+
+function incView(){var cur=today().slice(0,7),ym=INC.ym||cur,h='<h1>รายได้ของฉัน</h1><p class="sub">เห็นเฉพาะคุณ</p>'+
  '<div class="inm"><button type="button" class="btn g" data-a="incprev" aria-label="เดือนก่อนหน้า"'+(ym<=ymAdd(cur,-11)?" disabled":"")+'>◀</button><b aria-live="polite">'+ymTh(ym)+'</b><button type="button" class="btn g" data-a="incnext" aria-label="เดือนถัดไป"'+(ym>=cur?" disabled":"")+'>▶</button></div>';
  if(INC.off)return h+'<div class="empty">เมนูนี้ยังไม่พร้อมใช้งาน กรุณาติดต่อเจ้าหน้าที่</div>';
  if(INC.err)return h+'<div class="toast" role="alert">'+esc(INC.err)+'</div><button type="button" class="btn g" data-a="incretry">ลองใหม่</button>';
@@ -485,7 +491,7 @@ function incView(){var cur=today().slice(0,7),ym=INC.ym||cur,h='<h1>รายไ
   h+='<div class="cal"><div class="inr" style="padding-top:0"><b>'+(d===today()?"วันนี้, ":"")+thS(d)+'</b><span class="am">'+money(sub)+' บาท</span></div>'+
   L.map(function(x){var t=Date.parse(x.starts_at);return'<div class="inr"><div><b>'+hm(bkMin(t))+' น. '+esc(x.service)+'</b><small>'+esc(x.place)+(x.share!=null&&x.list_price!=null?', ราคาเต็ม '+money(x.list_price)+' × '+money(x.pct)+'%':'')+'</small></div><span class="am">'+(x.share==null?'<span class="mute">ไม่มียอด</span>':money(x.share)+' บาท')+'</span></div>'}).join("")+'</div>'});
  return h}
-function pwView(){var h='<div class="ctc"><b>รหัสผ่าน</b>'+(S.pwOk?'<div class="okb" style="margin-top:8px">'+esc(S.pwOk)+'</div>':'');
+function pwView(){var h='<div class="ctc">'+(S.pwOk?'<div class="okb" style="margin-top:8px">'+esc(S.pwOk)+'</div>':'');
  if(!S.pwOpen)return h+'<button type="button" class="btn g" data-a="pwopen">เปลี่ยนรหัสผ่าน</button></div>';
  return h+'<label for="pwo" class="sub">รหัสผ่านเดิม</label><input id="pwo" class="pwi" type="password" autocomplete="current-password"><label for="pwn" class="sub">รหัสผ่านใหม่ (อย่างน้อย 6 ตัวอักษร)</label><input id="pwn" class="pwi" type="password" autocomplete="new-password"><label for="pwn2" class="sub">พิมพ์รหัสผ่านใหม่อีกครั้ง</label><input id="pwn2" class="pwi" type="password" autocomplete="new-password"><div id="pwe" class="toast" role="alert"'+(S.pwErr?'':' style="display:none"')+'>'+esc(S.pwErr||"")+'</div><div class="mini" style="display:flex;gap:6px"><button type="button" class="btn" data-a="pwsave"'+(S.pwBusy?" disabled":"")+'>บันทึกรหัสผ่านใหม่</button><button type="button" class="btn g" data-a="pwno">ยกเลิก</button></div></div>'}
 function pwSave(){if(S.pwBusy)return;var g=function(i){var e=document.getElementById(i);return e?e.value:""},o=g("pwo"),n=g("pwn"),n2=g("pwn2"),er=function(t){S.pwErr=t;var x=document.getElementById("pwe");if(x){x.textContent=t;x.style.display=t?"":"none"}};
@@ -523,12 +529,12 @@ function saveSelf(o){var acc=o.accepting==null?ME.accepting:o.accepting,wd=o.wd|
   ME.accepting=acc;ME.work_days=wd;if(!keep)ME.photo_path=o.photo;S.busy=false;draw();if(o.accepting!=null){var sw=document.getElementById("onsw");if(sw)try{sw.focus({preventScroll:true})}catch(x){}}ann(o.accepting!=null?(acc?"เปิดรับงานแล้ว":"พักรับงานแล้ว"):o.wd?"บันทึกวันทำงานแล้ว":"เปลี่ยนรูปโปรไฟล์แล้ว")},function(e){S.busy=false;if(e&&e.status===401){doLogout();return}fail(errTh(e,"บันทึกไม่สำเร็จ"));throw e}).catch(function(){})}
 function lockDays(){var L={};ASGN.forEach(function(a){(a.days||[]).forEach(function(d){d=+d;L[d]=(L[d]?L[d]+", ":"")+a.name})});return L}
 function daysCard(){var lk=lockDays(),w=(ME.work_days||[]).concat(Object.keys(lk).map(Number).filter(function(d){return(ME.work_days||[]).indexOf(d)<0})).sort(function(a,b){return a-b});
- return'<div class="cal wd"><b>วันทำงานประจำสัปดาห์</b><p class="sub" style="margin:2px 0 8px">เลือกวันที่คุณทำงาน ลูกค้าจองคุณได้เฉพาะวันที่เลือก (ร้านต้องเปิดวันนั้นด้วย)'+(Object.keys(lk).length?' วันที่ติดป้าย "ประจำ" คือวันประจำบริษัท เปลี่ยนไม่ได้ ถ้าไม่สะดวกบางวันให้ใช้ "แจ้งลางาน" ในเมนูบัญชี':'')+'</p><div class="wdg" role="group" aria-label="เลือกวันทำงาน">'+DAYF.map(function(n,d){var on=w.indexOf(d)>-1||!!lk[d];return'<button type="button" class="wdb'+(on?" on":"")+'" data-a="wd" data-d="'+d+'" aria-pressed="'+on+'" aria-label="วัน'+n+' '+(on?"ทำงาน":"หยุด")+(lk[d]?" ประจำบริษัท "+esc(lk[d])+" เปลี่ยนไม่ได้":"")+'"><span>'+DAYS[d]+'</span><small>'+(lk[d]?"ประจำ":on?"ทำงาน":"หยุด")+'</small></button>'}).join("")+'</div><div class="mini" style="display:flex;gap:6px;margin-top:8px"><button type="button" class="btn g" data-a="wdset" data-id="all" style="margin:0">ทุกวัน</button><button type="button" class="btn g" data-a="wdset" data-id="wk" style="margin:0">จันทร์-ศุกร์</button></div><p class="sub" id="wdsum" role="status" style="margin:8px 0 0">ทำงาน '+w.length+' วัน: '+w.map(function(d){return DAYS[d]}).join(" ")+(S.wdMsg?", "+esc(S.wdMsg):"")+'</p></div>'}
+ return'<div class="cal wd"><b>วันทำงานประจำสัปดาห์</b><p class="sub" style="margin:2px 0 8px">ลูกค้าจองได้เฉพาะวันที่เลือก'+(Object.keys(lk).length?' วันที่มีป้าย "ประจำ" เป็นวันของบริษัท เปลี่ยนไม่ได้ ไม่สะดวกให้ "แจ้งลางาน" ในเมนูบัญชี':'')+'</p><div class="wdg" role="group" aria-label="เลือกวันทำงาน">'+DAYF.map(function(n,d){var on=w.indexOf(d)>-1||!!lk[d];return'<button type="button" class="wdb'+(on?" on":"")+'" data-a="wd" data-d="'+d+'" aria-pressed="'+on+'" aria-label="วัน'+n+' '+(on?"ทำงาน":"หยุด")+(lk[d]?" ประจำบริษัท "+esc(lk[d])+" เปลี่ยนไม่ได้":"")+'"><span>'+DAYS[d]+'</span><small>'+(lk[d]?"ประจำ":on?"ทำงาน":"หยุด")+'</small></button>'}).join("")+'</div><div class="mini" style="display:flex;gap:6px;margin-top:8px"><button type="button" class="btn g" data-a="wdset" data-id="all" style="margin:0">ทุกวัน</button><button type="button" class="btn g" data-a="wdset" data-id="wk" style="margin:0">จันทร์-ศุกร์</button></div><p class="sub" id="wdsum" role="status" style="margin:8px 0 0">ทำงาน '+w.length+' วัน: '+w.map(function(d){return DAYS[d]}).join(" ")+(S.wdMsg?", "+esc(S.wdMsg):"")+'</p></div>'}
 function ntView(){var L=feed(),n=S.ntNew||[],CATS=[["admin","จากระบบ"],["booking","เกี่ยวกับคิว"]],
  cnt=function(k){return L.filter(function(x){return x.from===k}).length},nw=function(k){return L.filter(function(x){return x.from===k&&n.indexOf(x.id)>-1}).length};
  if(!S.ntf||S.ntf==="all"){var first=CATS.filter(function(c){return nw(c[0])>0})[0];S.ntf=first?first[0]:"admin"}
  var f=S.ntf,F=L.filter(function(x){return x.from===f});
- return'<h1>แจ้งเตือน</h1><p class="sub">เลือกหมวด: ระบบ หรือคิวของคุณ</p><div class="nf" role="group" aria-label="เลือกหมวดการแจ้งเตือน">'+CATS.map(function(x){var w=nw(x[0]);return'<button type="button" data-a="ntf" data-id="'+x[0]+'" class="'+(f===x[0]?"on":"")+'" aria-pressed="'+(f===x[0])+'">'+x[1]+' ('+cnt(x[0])+')'+(w?', ใหม่ '+w:'')+'</button>'}).join("")+'</div>'+
+ return'<h1>แจ้งเตือน</h1><div class="nf" role="group" aria-label="เลือกหมวดการแจ้งเตือน">'+CATS.map(function(x){var w=nw(x[0]);return'<button type="button" data-a="ntf" data-id="'+x[0]+'" class="'+(f===x[0]?"on":"")+'" aria-pressed="'+(f===x[0])+'" aria-label="'+x[1]+(w?', ใหม่ '+w:'')+'">'+x[1]+' ('+cnt(x[0])+')'+(w?', ใหม่ '+w:'')+'</button>'}).join("")+'</div>'+
  (F.length?F.map(function(x){return'<div class="nti"><div class="qh"><b>'+esc(x.title)+'</b><span class="tag'+(x.from==="admin"?"":" w")+'">'+(x.from==="admin"?"ระบบ":"คิว")+'</span>'+(n.indexOf(x.id)>-1?'<span class="tag w">ใหม่</span>':'')+'</div><small>'+ntAt(x.at)+'</small><pre>'+esc(x.text)+'</pre>'+(x.sup?'<div class="acts"><button type="button" class="btn g" data-supgo="1">เปิดแชตกับเจ้าหน้าที่</button></div>':'')+'</div>'}).join(""):'<div class="empty">ยังไม่มีการแจ้งเตือนในหมวดนี้</div>')}
 function hoOpen(x){return x.status==="pending_admin"||x.status==="pending_staff"}
 function hoForm(i){var H=S.ho;if(!H||H.inv!==i.id)return"";
@@ -593,7 +599,7 @@ function view(){var t=today(),h="";
    EM={new:"ยังไม่มีงานใหม่ งานที่ลูกค้าจองเข้ามาจะขึ้นที่นี่ กดรับงานเพื่อย้ายไปที่ \"งานที่รออยู่\"",wait:"ไม่มีงานที่รออยู่ งานที่คุณรับแล้วและยังไม่เสร็จจะขึ้นที่นี่",done:"วันนี้ยังไม่มีงานที่เสร็จสิ้น"},
    groups="",last=null,lateShown=false;
   EM.cx="ไม่มีงานที่ถูกยกเลิกใน 7 วันล่าสุด";
-  list.forEach(function(j){if(cur[0]!=="done"&&cur[0]!=="cx"&&ended(j)&&!lateShown){lateShown=true;last=null;groups+='<h2 style="margin-top:20px">เลยเวลานัดแล้ว</h2>'}var d=bkDate(Date.parse(j.starts_at));if(d!==last){last=d;groups+='<h3 style="margin:14px 0 6px;font-size:1rem">'+(d===t?"วันนี้, ":"")+thD(d)+'</h3>'}groups+=jobCard(j,false)});
+  list.forEach(function(j){if(cur[0]!=="done"&&cur[0]!=="cx"&&ended(j)&&!lateShown){lateShown=true;last=null;groups+='<h2 style="margin-top:20px">เลยเวลานัดแล้ว</h2>'}var d=bkDate(Date.parse(j.starts_at));if(d!==last){last=d;var hx=lateShown?"h3":"h2";groups+='<'+hx+' style="margin:14px 0 6px;font-size:1rem">'+(d===t?"วันนี้, ":"")+thD(d)+'</'+hx+'>'}groups+=jobCard(j,false)});
   var coH=compCard()+subCard(),ogH=oinvCard(),hv=hvTabs(!!coH,!!ogH);
   if(hv.cur==='co')return banner()+'<h1>คิวงาน</h1>'+hv.html+coH;
   if(hv.cur==='og')return banner()+'<h1>คิวงาน</h1>'+hv.html+ogH;
@@ -621,7 +627,7 @@ function draw(){if(!ME)return;
 /* ===================== การกระทำ ===================== */
 document.addEventListener("click",function(e){
  var el=e.target.closest&&e.target.closest("[data-a]");if(!el||!ME)return;var a=el.dataset.a,id=el.dataset.id;
- if(a==="tab"){srClear();S.tab=id;S.lv=false;S.err="";S.ok="";S.cfm=null;S.rvReply=null;if(id==="nt")openNt();if(id==="ac"){rvLoad();DL.confirm=false;DL.err="";DL.ok="";dlLoad()}S.pwOpen=false;S.pwErr="";S.pwOk="";S.pv=false;S.tm=false;S.blk=false;if(id==="nt")S.ntf="all";if(id==="inc"){INC.ym=today().slice(0,7);incLoad()}draw();return}
+ if(a==="tab"){srClear();S.tab=id;S.lv=false;S.err="";S.ok="";S.cfm=null;S.rvReply=null;if(id==="nt"){openNt();if(Date.now()-SLOWAT>20000)setTimeout(refresh,0)}if(id==="ac"){rvLoad();DL.confirm=false;DL.err="";DL.ok="";dlLoad()}S.pwOpen=false;S.pwErr="";S.pwOk="";S.pv=false;S.tm=false;S.blk=false;if(id==="nt")S.ntf="all";if(id==="inc"){INC.ym=today().slice(0,7);incLoad()}draw();return}
  if(a==="rvreply"){S.rvReply=id;draw();var ta=document.getElementById("rvtxt");if(ta)ta.focus();return}
  if(a==="rvno"){S.rvReply=null;draw();return}
  if(a==="rvsend"){rvSend(id);return}
