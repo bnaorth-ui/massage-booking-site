@@ -14,7 +14,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"สมาคมวิทยากรฝึกอาชีพคนตาบอด","url":"https://bna.or.th","logo":"https://massage-customer-bna.pages.dev/icon-512.png"}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"จองนวดออนไลน์ต้องทำอย่างไร?","acceptedAnswer":{"@type":"Answer","text":"เลือกร้านและบริการ เลือกวันเวลาและหมอนวด แล้วสมัครสมาชิกหรือเข้าสู่ระบบด้วยเบอร์โทรเพื่อยืนยันการจอง"}},{"@type":"Question","name":"ใครเป็นผู้ให้บริการนวด?","acceptedAnswer":{"@type":"Answer","text":"ผู้ให้บริการเป็นคนพิการทางการเห็นที่ขึ้นทะเบียนกับกรมสนับสนุนบริการสุขภาพ กระทรวงสาธารณสุข และร้านนวดจดทะเบียนตามกฎหมายสถานประกอบการเพื่อสุขภาพ"}},{"@type":"Question","name":"เลื่อนนัดหรือยกเลิกการจองได้ไหม?","acceptedAnswer":{"@type":"Answer","text":"ทำได้เองในแอป ตามเงื่อนไขของแต่ละร้าน"}},{"@type":"Question","name":"ติดต่อร้านหรือหมอนวดได้อย่างไร?","acceptedAnswer":{"@type":"Answer","text":"แชตกับร้านหรือหมอนวดได้ในแอป"}},{"@type":"Question","name":"มีแต้มสะสมหรือรีวิวไหม?","acceptedAnswer":{"@type":"Answer","text":"มี สะสมแต้มจากการใช้บริการ และรีวิวร้านที่ใช้บริการได้"}},{"@type":"Question","name":"หน่วยงานขอให้หมอนวดไปให้บริการนอกสถานที่ได้ไหม และคิดค่าบริการเท่าไร?","acceptedAnswer":{"@type":"Answer","text":"ได้ เฉพาะหน่วยงานในกรุงเทพมหานคร ค่าบริการ 400 บาทต่อหมอนวด 1 คน ต่อชั่วโมง ไม่รวมช่วงพักเที่ยง ชำระเงินหลังเจ้าหน้าที่อนุมัติและหมอนวดตอบรับแล้ว โดยต้องชำระภายใน 3 วันก่อนวันให้บริการ และขอบริการล่วงหน้าอย่างน้อย 10 วัน"}},{"@type":"Question","name":"ใครจัดทำระบบนี้?","acceptedAnswer":{"@type":"Answer","text":"สมาคมวิทยากรฝึกอาชีพคนตาบอด เพื่อให้คนพิการทางการเห็นมีช่องทางประกอบอาชีพและเข้าถึงลูกค้าได้ง่ายขึ้น"}}]}</script>
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.52"><meta name="app-name" content="จองคิวนวด"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.53"><meta name="app-name" content="จองคิวนวด"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preload" href="fonts/noto-sans-thai-v1.woff2" as="font" type="font/woff2" crossorigin>
 <style>
@@ -848,8 +848,11 @@ function mustPw(){var m=SBS&&SBS.user&&SBS.user.user_metadata;return !!(m&&m.mus
 function fmtTel(p){p=String(p||"");return /^0\d{9}$/.test(p)?p.slice(0,3)+"-"+p.slice(3,6)+"-"+p.slice(6):p}
 function sbSave(s){SBS=s;if(s)wr(SSK,s);else try{localStorage.removeItem(SSK)}catch(e){}}
 function sbSet(j){var s={access_token:j.access_token,refresh_token:j.refresh_token,expires_at:j.expires_at||Math.floor(Date.now()/1000)+(j.expires_in||3600),user:j.user};sbSave(s);return s}
+/* ต่ออายุการล็อกอินครั้งเดียว: คำขอที่มาพร้อมกันรอผลเดียวกัน (27 พ.ย. 2569) */
+var SBR=null;
 function sbEnsure(){if(!SBS)return Promise.reject(new Error("NOSESS"));if(SBS.expires_at-60>Date.now()/1000)return Promise.resolve(SBS);
- return sbReq("/auth/v1/token?grant_type=refresh_token",{method:"POST",json:1,auth:false,body:JSON.stringify({refresh_token:SBS.refresh_token})}).then(sbSet)}
+ if(SBR)return SBR;
+ SBR=sbReq("/auth/v1/token?grant_type=refresh_token",{method:"POST",json:1,auth:false,body:JSON.stringify({refresh_token:SBS.refresh_token})}).then(function(j){SBR=null;return sbSet(j)},function(e){SBR=null;throw e});return SBR}
 function sbApi(path,o){if(!SBS){var o2={};for(var k in (o||{}))o2[k]=o[k];o2.auth=false;return sbReq(path,o2)}return sbEnsure().then(function(){return sbReq(path,o)})}
 if(window.Push){Push.watch(function(){return ME?unread():null});Push.attach({app:"customer",url:SB.url,key:SB.key,api:sbApi,token:function(){return SBS&&SBS.access_token},uid:function(){return SBS&&SBS.user&&SBS.user.id}});window.addEventListener("push-refresh",function(){try{refreshUser()}catch(e){}})}
 function avUrl(p){return p?SB.url+"/storage/v1/object/public/avatars/"+p:""}

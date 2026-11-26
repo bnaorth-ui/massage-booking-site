@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>แอปหมอนวด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="apple-mobile-web-app-title" content="หมอนวด"><meta name="app-version" content="1.28"><meta name="app-name" content="หมอนวด"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="apple-mobile-web-app-title" content="หมอนวด"><meta name="app-version" content="1.29"><meta name="app-name" content="หมอนวด"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preload" href="fonts/noto-sans-thai-v1.woff2" as="font" type="font/woff2" crossorigin>
 <style>
@@ -96,8 +96,11 @@ function sbReq(path,o){o=o||{};var h={apikey:SB.key};if(o.json)h["Content-Type"]
   if(!r.ok){var er=new Error((j&&(j.msg||j.message||j.error_description||j.error))||("HTTP "+r.status));er.status=r.status;er.code=j&&(j.error_code||j.code)||"";if(window.ErrLog)ErrLog.server(path,r.status,er.code);throw er}return j})},function(){throw new Error("NET")})}
 function sbSave(s){SBS=s;if(s)wr(SSK,s);else try{localStorage.removeItem(SSK)}catch(e){}}
 function sbSet(j){var s={access_token:j.access_token,refresh_token:j.refresh_token,expires_at:j.expires_at||Math.floor(Date.now()/1000)+(j.expires_in||3600),user:j.user};sbSave(s);return s}
+/* ต่ออายุการล็อกอินครั้งเดียว: คำขอที่มาพร้อมกันรอผลเดียวกัน (27 พ.ย. 2569) */
+var SBR=null;
 function sbEnsure(){if(!SBS)return Promise.reject(new Error("NOSESS"));if(SBS.expires_at-60>Date.now()/1000)return Promise.resolve(SBS);
- return sbReq("/auth/v1/token?grant_type=refresh_token",{method:"POST",json:1,auth:false,body:JSON.stringify({refresh_token:SBS.refresh_token})}).then(sbSet,function(e){if(e&&e.message!=="NET")e.status=401;throw e})}
+ if(SBR)return SBR;
+ SBR=sbReq("/auth/v1/token?grant_type=refresh_token",{method:"POST",json:1,auth:false,body:JSON.stringify({refresh_token:SBS.refresh_token})}).then(function(j){SBR=null;return sbSet(j)},function(e){SBR=null;if(e&&e.message!=="NET")e.status=401;throw e});return SBR}
 function sbApi(path,o){return sbEnsure().then(function(){return sbReq(path,o)})}
 if(window.Push){Push.watch(function(){return ME?ntUnread():null});Push.attach({app:"staff",url:SB.url,key:SB.key,api:sbApi,token:function(){return SBS&&SBS.access_token},uid:function(){return SBS&&SBS.user&&SBS.user.id}});window.addEventListener("push-refresh",function(){try{refresh()}catch(e){}})}
 function rpc(name,args){return sbApi("/rest/v1/rpc/"+name,{method:"POST",json:1,body:JSON.stringify(args||{})})}
