@@ -80,7 +80,7 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
    T.service_places=T.service_places.filter(x=>x.place_id!==p.id).concat(body.p_services.map(v=>({service_id:v,place_id:p.id})));T.place_staff=T.place_staff.filter(x=>x.place_id!==p.id).concat(body.p_staff.map(s=>({place_id:p.id,staff_id:s.staff_id,weekdays:s.weekdays})));return J(200,p.id)}
   if(f==='admin_hide_review'){hides.push(body);const row=(body.p_kind==='shop'?T.reviews:T.review_staff).find(x=>x.id===body.p_id);row.hidden=body.p_hidden;row.reported=false;return J(204,null)}
   if(f==='admin_search'){SRQ.push(body.p_q);const q=body.p_q;if(q.trim().length<2)return J(400,{code:'P0001',message:'พิมพ์อย่างน้อย 2 ตัวอักษร'});if(q.includes('ไม่มี'))return J(200,{bookings:[],customers:[],places:[],staff:[],regs:[]});
-   return J(200,{bookings:[{id:'b1',ref:'MS1024',starts_at:'2026-11-20T03:00:00Z',status:'confirmed',customer_name:'สมชาย ใจดี',phone:'081-234-5678',customer_id:'cu1',place_id:'sh1',place_name:'ร้านสบายดี สปา',place_type:'shop',total:500,discount:50,items:[{service:'นวดไทย',staff:'คุณกลาง',starts_at:'2026-11-20T03:00:00Z',price:500}]}],
+   return J(200,{bookings:[{id:'b1',ref:'MS1024',starts_at:'2026-11-20T03:00:00Z',status:'confirmed',customer_name:'สมชาย ใจดี',phone:'081-234-5678',customer_id:'cu1',place_id:'sh1',place_name:'ร้านสบายดี สปา',place_type:'shop',total:500,discount:50,arrived_at:'2026-11-20T02:55:00Z',arrived_ok:true,started_at:'2026-11-20T03:05:00Z',items:[{service:'นวดไทย',staff:'คุณกลาง',starts_at:'2026-11-20T03:00:00Z',price:500}]}],
     customers:[{id:'cu1',name:'สมชาย ใจดี',phone:'0812345678',created_at:'2026-10-01T03:00:00Z',suspended:true,kind:'user',is_admin:false,room:true,recent:[{id:'b1',ref:'MS1024',starts_at:'2026-11-20T03:00:00Z',status:'confirmed',place_name:'ร้านสบายดี สปา'}]}],
     places:[{id:'sh1',type:'shop',name:'ร้านสบายดี สปา',phone:'0899',area:'สุขุมวิท',status:'approved',active:true}],
     staff:[{id:'p1',name:'คุณกลาง',phone:'0866666666',place_id:null,active:true,linked:false},{id:'zz',name:'คุณร้าน',phone:'0811',place_id:'sh1',place_name:'ร้านสบายดี สปา',place_type:'shop',active:true,linked:true}],
@@ -124,7 +124,9 @@ await p.type('#srq','081-234 5');
 ok('searches after typing (debounced, single call with full text)',await W(()=>SRQ.includes('081-234 5'))&&SRQ.length===1);
 ok('results grouped with counts',await W(async()=>{const t=await p.textContent('#srres');return t.includes('การจอง (1)')&&t.includes('ลูกค้า (1)')&&t.includes('ร้าน หน่วยงาน บริษัท (1)')&&t.includes('หมอนวด (2)')&&t.includes('ร้านสมัครใหม่ รออนุมัติ (1)')}));
 ok('result count announced',await W(async()=>(await p.evaluate(()=>(document.getElementById('ann')||document.querySelector('[aria-live]')||{}).textContent||'')).includes('พบ 6 รายการ')));
+ok('result shows arrival time (26 พ.ย. 2569)',(await p.textContent('#srres')).includes('ถึงร้าน 09:55 น.'));
 await p.click('[data-a=srpick][data-t=bookings]');
+ok('booking detail: arrival verified + job start',await W(async()=>(await p.textContent('#main')).includes('การมาถึง: ลูกค้าถึงร้าน 09:55 น. (ยืนยันตำแหน่ง), เริ่มงาน 10:05 น.')));
 ok('booking detail: heading focused, shop, staff, price, tel link',await W(async()=>(await p.evaluate(()=>document.activeElement&&document.activeElement.id))==='srh')&&(await p.textContent('#main')).includes('การจอง MS1024')&&(await p.textContent('#main')).includes('คุณกลาง')&&(await p.textContent('#main')).includes('ส่วนลด 50')&&!!(await p.$('#main a[href="tel:0812345678"]')));
 await p.click('[data-a=srunsel]');
 ok('back to results keeps the query and focuses input',await W(async()=>(await p.inputValue('#srq'))==='081-234 5'&&(await p.evaluate(()=>document.activeElement.id))==='srq'));

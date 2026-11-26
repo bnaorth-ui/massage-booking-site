@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>สำหรับร้านนวด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.27"><meta name="app-name" content="ร้านนวด"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.28"><meta name="app-name" content="ร้านนวด"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preload" href="fonts/noto-sans-thai-v1.woff2" as="font" type="font/woff2" crossorigin>
 <style>
@@ -671,20 +671,23 @@ function qCat(b){if(b.status==="cancelled"||b.status==="rescheduled"||b.status==
  return"wait"}
 /* การ์ดคิว: โปรแกรมอ่านหน้าจออ่านสรุปบรรทัดเดียว ส่วนที่ตาเห็นซ่อนจากโปรแกรมอ่าน (23 พ.ย. 2569 แบบเดียวกับแอปหมอนวด) */
 function qTagTxt(b,c){return b.status==="no_show"?"ลูกค้าไม่มา":b.status==="cancelled"?"ยกเลิก":b.status==="rescheduled"?"เลื่อนคิว"+(b.moved_to?" ไป "+b.moved_to:""):c==="done"?"เสร็จสิ้น":"รอให้บริการ"}
-function qSay(b,c,its){return qHM(b.starts_at)+" ถึง "+qHM(b.ends_at)+" น. "+its.map(function(i){return i.service_name+" "+i.minutes+" นาที หมอนวด "+qStaff(i.staff_id)+(c==="wait"&&i.active?" "+QJOB[i.job]:"")}).join(", ")+" "+baht(b.total_price||0)+(b.promo_title?" "+b.promo_title:"")+" ลูกค้า "+b.customer_name+", "+qTagTxt(b,c)}
+function qSay(b,c,its){return qHM(b.starts_at)+" ถึง "+qHM(b.ends_at)+" น. "+its.map(function(i){return i.service_name+" "+i.minutes+" นาที หมอนวด "+qStaff(i.staff_id)+(c==="wait"&&i.active?" "+QJOB[i.job]:"")}).join(", ")+" "+baht(b.total_price||0)+(b.promo_title?" "+b.promo_title:"")+" ลูกค้า "+b.customer_name+", "+qTagTxt(b,c)+(qArr(b)?", "+qArr(b):"")}
 function qCard(b){var c=qCat(b),its=(b.booking_items||[]).slice().sort(function(a,z){return a.starts_at<z.starts_at?-1:1}),
  tg=b.status==="no_show"?'<span class="tag b">ลูกค้าไม่มา</span>':b.status==="cancelled"?'<span class="tag b">ยกเลิก</span>':b.status==="rescheduled"?'<span class="tag s">เลื่อนคิว'+(b.moved_to?' → '+esc(b.moved_to):'')+'</span>':c==="done"?'<span class="tag">เสร็จสิ้น</span>':'<span class="tag w">รอให้บริการ</span>';
  return'<div class="card" style="margin-bottom:10px"><span class="sr">'+esc(qSay(b,c,its))+'</span><div aria-hidden="true"><div class="row" style="border:0;padding:0 0 6px"><b>'+qHM(b.starts_at)+'-'+qHM(b.ends_at)+' น.</b>'+tg+'</div><b>'+esc(b.customer_name)+'</b></div>'+(b.phone?'<small style="display:block"><a href="tel:'+esc(b.phone)+'" aria-label="โทร '+esc(b.phone)+'"><span aria-hidden="true">โทร </span>'+esc(b.phone)+'</a></small>':'')+
  '<div aria-hidden="true">'+its.map(function(i){return'<small style="display:block">'+esc(i.service_name)+', '+i.minutes+' นาที, หมอนวด '+esc(qStaff(i.staff_id))+(c==="wait"&&i.active?', '+QJOB[i.job]:'')+'</small>'}).join("")+
- '<small style="display:block">เลขที่ '+esc(b.ref)+', '+baht(b.total_price||0)+(b.promo_title?', '+esc(b.promo_title):'')+'</small></div>'+qCancelUi(b,c)+chatBtn(b.id,"shop",b.ref,b.customer_name,b.ends_at,b.status!=="rescheduled")+'</div>'}
+ '<small style="display:block">เลขที่ '+esc(b.ref)+', '+baht(b.total_price||0)+(b.promo_title?', '+esc(b.promo_title):'')+'</small>'+(qArr(b)?'<small style="display:block" class="arok"><span aria-hidden="true">✅ </span>'+qArr(b)+'</small>':'')+'</div>'+qCancelUi(b,c)+chatBtn(b.id,"shop",b.ref,b.customer_name,b.ends_at,b.status!=="rescheduled")+'</div>'}
 var QCR=["หมอนวดไม่สะดวก","ร้านปิดทำการ","เหตุฉุกเฉิน","อื่นๆ (ระบุเหตุผล)"];
 function qCanCancel(b,c){return c==="wait"&&b.status==="confirmed"&&Date.parse(b.starts_at)>Date.now()&&!(b.booking_items||[]).some(function(i){return i.active&&(i.job==="in_progress"||i.job==="done")})}
-function qCanNoShow(b,c){return c==="wait"&&b.status==="confirmed"&&Date.parse(b.starts_at)<=Date.now()&&!(b.booking_items||[]).some(function(i){return i.active&&(i.job==="in_progress"||i.job==="done")})}
+function qStarted(b){return (b.booking_items||[]).some(function(i){return i.active&&(i.job==="in_progress"||i.job==="done")})}
+function qCanNoShow(b,c){return c==="wait"&&b.status==="confirmed"&&Date.parse(b.starts_at)<=Date.now()&&!qStarted(b)&&!b.arrived_ok}
+/* ลูกค้ากดถึงร้านแล้ว (26 พ.ย. 2569) แสดงจนกว่าจะเริ่มงาน ยืนยันตำแหน่งแล้วกดลูกค้าไม่มาไม่ได้ */
+function qArr(b){if(!b.arrived_at||b.status!=="confirmed"||qStarted(b))return"";return "ลูกค้าถึงร้านแล้ว "+qHM(b.arrived_at)+" น."+(b.arrived_ok?"":" (ไม่ได้ยืนยันตำแหน่ง)")}
 function qNoShowUi(b){
  if(S.qn!==b.id)return'<div class="acts" style="margin-top:8px"><button type="button" class="btn g" data-a="qns" data-id="'+b.id+'" aria-label="ลูกค้าไม่มา '+qHM(b.starts_at)+' น. '+esc(b.customer_name)+'">ลูกค้าไม่มา</button></div>';
  return'<div class="pinbox" role="group" aria-labelledby="qnsh_'+b.id+'" style="margin-top:8px"><b id="qnsh_'+b.id+'" tabindex="-1">ยืนยันว่าลูกค้าไม่มา คิวเลขที่ '+esc(b.ref)+'</b><p class="hint2" style="margin:0">ใช้เมื่อลูกค้าไม่มารับบริการตามนัด ระบบจะปล่อยคิว แจ้งลูกค้า หมอนวด และเจ้าหน้าที่ พร้อมคืนแต้มที่ลูกค้าใช้ (ถ้ามี) ย้อนกลับไม่ได้</p>'+
   '<div class="acts"><button type="button" class="btn d" data-a="qnsok" data-id="'+b.id+'">ยืนยันลูกค้าไม่มา</button><button type="button" class="btn g" data-a="qnsno" data-id="'+b.id+'">ไม่ใช่</button></div></div>'}
-function qCancelUi(b,c){if(qCanNoShow(b,c))return qNoShowUi(b);if(!qCanCancel(b,c))return"";
+function qCancelUi(b,c){if(qCanNoShow(b,c))return qNoShowUi(b);if(qArr(b)&&b.arrived_ok&&Date.parse(b.starts_at)<=Date.now())return'<small class="hint" style="display:block">ลูกค้ายืนยันตำแหน่งว่าถึงร้านแล้ว จึงกดลูกค้าไม่มาไม่ได้</small>';if(!qCanCancel(b,c))return"";
  if(S.qx!==b.id)return'<div class="acts" style="margin-top:8px"><button type="button" class="btn g" data-a="qcx" data-id="'+b.id+'" aria-label="ยกเลิกคิว '+qHM(b.starts_at)+' น. '+esc(b.customer_name)+'">ยกเลิกคิวนี้</button></div>';
  return'<div class="pinbox" role="group" aria-labelledby="qcxh_'+b.id+'" style="margin-top:8px"><b id="qcxh_'+b.id+'" tabindex="-1">ยืนยันยกเลิกคิว เลขที่ '+esc(b.ref)+'</b><p class="hint2" style="margin:0">ระบบจะแจ้งลูกค้าและหมอนวด พร้อมคืนแต้มที่ลูกค้าใช้ (ถ้ามี) ยกเลิกแล้วย้อนกลับไม่ได้</p>'+
   '<div><label for="qcr_'+b.id+'">เหตุผลที่ยกเลิก</label><select class="in" id="qcr_'+b.id+'">'+QCR.map(function(x,i){return'<option value="'+i+'">'+x+'</option>'}).join("")+'</select></div>'+
@@ -863,7 +866,7 @@ function loadCls(){return rpc("shop_close_status",{p_place:WID}).then(function(a
 function loadSdr(){return rpc("shop_staff_delete_requests",{p_place:WID}).then(function(a){D.sdr=a||[];D.sdrOff=false},function(){D.sdr=[];D.sdrOff=true})}
 function annRead(){return rd("shopAnnRead_"+WHO.id,[])}
 function loadBk(){var pid=WID,from=new Date(Date.now()-30*864e5).toISOString();
- return g1("bookings?select=id,ref,customer_name,phone,status,starts_at,ends_at,total_price,promo_title,moved_to,created_at,booking_items(id,service_name,minutes,price,starts_at,ends_at,active,job,staff_id)&place_id=eq."+pid+"&ends_at=gte."+from+"&order=starts_at.asc&limit=500").then(function(r){D.bk=r||[]},function(){})}
+ return g1("bookings?select=id,ref,customer_name,phone,status,starts_at,ends_at,total_price,promo_title,moved_to,created_at,arrived_at,arrived_ok,booking_items(id,service_name,minutes,price,starts_at,ends_at,active,job,staff_id)&place_id=eq."+pid+"&ends_at=gte."+from+"&order=starts_at.asc&limit=500").then(function(r){D.bk=r||[]},function(){})}
 /* loadLive("tick") = ตัวจับเวลาทุก 30 วิ: โหลดแค่คิวงาน + สถานะร้าน ส่วนที่เปลี่ยนไม่บ่อย (กระเป๋าเงิน แจ้งเตือน ประกาศ ตั้งค่า แชต สถานะปิดบัญชี) ทุก 2 นาที
    (24 พ.ย. 2569 เดิมขอ 11 ครั้งทุก 30 วิ) อยู่หน้ากระเป๋าเงิน/แจ้งเตือน เปิดแอปกลับมา กดปุ่ม หรือได้แจ้งเตือนใหม่ ยังโหลดครบ */
 var SLOWAT=0,SLOW_MS=120000;
