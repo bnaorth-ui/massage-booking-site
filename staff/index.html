@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>แอปหมอนวด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="apple-mobile-web-app-title" content="หมอนวด"><meta name="app-version" content="1.31"><meta name="app-name" content="หมอนวด"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script><script src="rt.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="apple-mobile-web-app-title" content="หมอนวด"><meta name="app-version" content="1.32"><meta name="app-name" content="หมอนวด"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script><script src="rt.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preload" href="fonts/noto-sans-thai-v1.woff2" as="font" type="font/woff2" crossorigin>
 <style>
@@ -168,7 +168,8 @@ function loadAll(light){
     return true})})}
 function feed(){var L=[];
  ANN.forEach(function(a){L.push({id:"a-"+a.id,from:"admin",title:"ประกาศ: "+a.title,text:a.body||"",at:a.created_at||(a.day+"T00:00:00Z")})});
- NT.forEach(function(n){L.push({id:"n-"+n.id,nid:n.id,sup:n.kind==="support",from:"booking",title:n.title,text:n.body||"",at:n.created_at})});
+ /* หมวด: ข้อความจากเจ้าหน้าที่และผลอนุมัติบัญชีไปอยู่ "จากระบบ" ที่เหลือเป็นเรื่องคิว (27 พ.ย. 2569) */
+ NT.forEach(function(n){var sy=n.kind==="support"||n.kind==="approval";L.push({id:"n-"+n.id,nid:n.id,sup:n.kind==="support",from:sy?"admin":"booking",title:n.title,text:n.body||"",at:n.created_at})});
  return L.sort(function(a,b){return a.at<b.at?1:-1})}
 function isRead(x){return x.nid?READS.indexOf(x.nid)>-1:ANNREAD.indexOf(x.id)>-1}
 function newJobs(){return JOBS.filter(function(j){return j.active&&j.bstatus==="confirmed"&&j.job==="pending"}).length}
@@ -554,7 +555,7 @@ function ntView(){var L=feed(),n=S.ntNew||[],CATS=[["admin","จากระบ�
  if(!S.ntf||S.ntf==="all"){var first=CATS.filter(function(c){return nw(c[0])>0})[0];S.ntf=first?first[0]:"admin"}
  var f=S.ntf,F=L.filter(function(x){return x.from===f});
  return'<h1>แจ้งเตือน</h1><div class="nf" role="group" aria-label="เลือกหมวดการแจ้งเตือน">'+CATS.map(function(x){var w=nw(x[0]);return'<button type="button" data-a="ntf" data-id="'+x[0]+'" class="'+(f===x[0]?"on":"")+'" aria-pressed="'+(f===x[0])+'" aria-label="'+x[1]+(w?', ใหม่ '+w:'')+'">'+x[1]+' ('+cnt(x[0])+')'+(w?', ใหม่ '+w:'')+'</button>'}).join("")+'</div>'+
- (F.length?F.map(function(x){return'<div class="nti"><div class="qh"><b>'+esc(x.title)+'</b><span class="tag'+(x.from==="admin"?"":" w")+'">'+(x.from==="admin"?"ระบบ":"คิว")+'</span>'+(n.indexOf(x.id)>-1?'<span class="tag w">ใหม่</span>':'')+'</div><small>'+ntAt(x.at)+'</small><pre>'+esc(x.text)+'</pre>'+(x.sup?'<div class="acts"><button type="button" class="btn g" data-supgo="1">เปิดแชตกับเจ้าหน้าที่</button></div>':'')+'</div>'}).join(""):'<div class="empty">ยังไม่มีการแจ้งเตือนในหมวดนี้</div>')}
+ (F.length?F.map(function(x){return'<div class="nti"><div class="qh"><b>'+esc(x.title)+'</b><span class="tag'+(x.from==="admin"?"":" w")+'">'+(x.sup?"แชต":x.from==="admin"?"ระบบ":"คิว")+'</span>'+(n.indexOf(x.id)>-1?'<span class="tag w">ใหม่</span>':'')+'</div><small>'+ntAt(x.at)+'</small><pre>'+esc(x.text)+'</pre>'+(x.sup?'<div class="acts"><button type="button" class="btn g" data-supgo="1">เปิดแชตกับเจ้าหน้าที่</button></div>':'')+'</div>'}).join(""):'<div class="empty">ยังไม่มีการแจ้งเตือนในหมวดนี้</div>')}
 function hoOpen(x){return x.status==="pending_admin"||x.status==="pending_staff"}
 function hoForm(i){var H=S.ho;if(!H||H.inv!==i.id)return"";
  if(H.err)return'<p class="toast" role="alert">'+esc(H.err)+'</p>'+hoClose();
