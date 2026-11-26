@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>แอปหมอนวด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="apple-mobile-web-app-title" content="หมอนวด"><meta name="app-version" content="1.29"><meta name="app-name" content="หมอนวด"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="apple-mobile-web-app-title" content="หมอนวด"><meta name="app-version" content="1.30"><meta name="app-name" content="หมอนวด"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script><script src="rt.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preload" href="fonts/noto-sans-thai-v1.woff2" as="font" type="font/woff2" crossorigin>
 <style>
@@ -371,14 +371,20 @@ function chFetch(){if(!CH||chBusy)return Promise.resolve();chBusy=true;var c=CH,
    if(a.some(function(m){return m.sender_id!==SBS.user.id}))chatReadMark()}},function(e){chBusy=false;if(CH!==c)return;if(first){c.loaded=true;chatRender();chErr(errTh(e,"โหลดข้อความไม่สำเร็จ"))}})}
 function chatReadMark(){if(!CH)return;var c=CH;if(c.sup){sbApi("/rest/v1/rpc/support_mark_read",{method:"POST",json:1,body:JSON.stringify({p_app:c.sup})}).then(function(){SUPN=0}).catch(function(){});return}sbApi("/rest/v1/rpc/chat_mark_read",{method:"POST",json:1,body:JSON.stringify({p_booking:c.bid,p_room:c.room})}).then(function(){delete CU[chKey(c.bid,c.room)]}).catch(function(){})}
 function openChat(bid,room,ref,name){CH={bid:bid,room:room,ref:ref,name:name,msgs:[],ids:{},last:null,loaded:false,closed:false,sending:false,st:null,rp:false,bq:false};chState(CH);S.chat=true;document.getElementById("app").innerHTML='<p class="sub" role="status">กำลังโหลดข้อความ</p>';window.scrollTo(0,0);
- chFetch();clearInterval(chT);chT=setInterval(function(){if(!document.hidden)chFetch()},4000)}
+ chFetch();clearInterval(chT);chRt("chat:"+CH.bid+":"+CH.room);chT=setInterval(function(){if(!document.hidden&&chDue())chFetch()},4000)}
 /* แชตกับเจ้าหน้าที่ (ฐานข้อมูล: support_room, support_send, support_mark_read, support_unread, p_app = staff) ใช้หน้าจอเดียวกับแชตกับลูกค้า ไม่มีรายงาน/บล็อก */
 var SUPN=0;
 function supBtn(){return '<button type="button" class="cta" data-supgo="1"'+(SUPN?' aria-label="แชตกับเจ้าหน้าที่ ข้อความใหม่ '+SUPN+' ข้อความ"':'')+'><span aria-hidden="true">💬</span><div>แชตกับเจ้าหน้าที่</div>'+(SUPN?'<span class="cn" aria-hidden="true">'+SUPN+'</span>':'')+'</button>'}
 function loadSupUnread(){return sbApi("/rest/v1/rpc/support_unread",{method:"POST",json:1,body:JSON.stringify({p_app:"staff"})}).then(function(n){SUPN=+n||0}).catch(function(){})}
 function openSup(){CH={sup:"staff",name:"",msgs:[],ids:{},last:null,loaded:false,closed:false,sending:false,st:null,rp:false,bq:false};S.chat=true;document.getElementById("app").innerHTML='<p class="sub" role="status">กำลังโหลดข้อความ</p>';window.scrollTo(0,0);
- chFetch();clearInterval(chT);chT=setInterval(function(){if(!document.hidden)chFetch()},5000)}
-function closeChat(){clearInterval(chT);chT=null;CH=null;S.chat=false;document.getElementById("navb").style.display="";draw();loadAll(true).then(draw,function(){})}
+ chFetch();clearInterval(chT);chRt("sup:"+SBS.user.id+":"+CH.sup);chT=setInterval(function(){if(!document.hidden&&chDue())chFetch()},5000)}
+/* แชตแบบกดกริ่ง (rt.js, 27 พ.ย. 2569): ต่อได้ = โหลดทันทีเมื่อมีข้อความใหม่ และถามสำรองทุก 30 วินาที, ต่อไม่ได้ = ถามทุก 4-5 วินาทีแบบเดิม */
+var CHRT=null;
+function rtTok(){return sbEnsure().then(function(s){return s.access_token})}
+function chRt(topic){if(CHRT){CHRT.close();CHRT=null}if(!topic||!window.Bell)return;
+ CHRT=Bell.sub({url:SB.url,key:SB.key,token:rtTok,topic:topic,onBell:function ring(){if(!CH||document.hidden)return;if(chBusy){setTimeout(ring,400);return}chFetch()}})}
+function chDue(){return !CHRT||CHRT.due()}
+function closeChat(){chRt(null);clearInterval(chT);chT=null;CH=null;S.chat=false;document.getElementById("navb").style.display="";draw();loadAll(true).then(draw,function(){})}
 function chatSend(){if(!CH||CH.sending)return;var c=CH,ta=document.getElementById("chi"),txt=ta?ta.value.trim():"";if(!txt){if(ta)ta.focus();return}
  c.sending=true;var bt=document.getElementById("chsend");if(bt)bt.disabled=true;chErr("");
  (c.sup?sbApi("/rest/v1/rpc/support_send",{method:"POST",json:1,body:JSON.stringify({p_app:c.sup,p_body:txt})}):sbApi("/rest/v1/rpc/chat_send",{method:"POST",json:1,body:JSON.stringify({p_booking:c.bid,p_room:c.room,p_body:txt})})).then(function(){c.sending=false;if(CH!==c)return;if(ta)ta.value="";if(bt)bt.disabled=false;chBusy=false;return chFetch().then(function(){var t=document.getElementById("chi");if(t)t.focus()})},function(e){c.sending=false;if(bt)bt.disabled=false;var m=errTh(e,"ส่งข้อความไม่สำเร็จ");if(/ปิดแล้ว/.test(m))c.closed=true;chErr(m);if(/บล็อก|ระงับ/.test(m))chState(c);if(c.closed){clearInterval(chT);var f=document.getElementById("chf");if(f)f.outerHTML='<p class="sub">ห้องแชตนี้ปิดแล้ว อ่านย้อนหลังได้อย่างเดียว</p>'}})}

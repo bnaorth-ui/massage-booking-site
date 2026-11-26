@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>แอดมิน - สมาคมวิทยากรฝึกอาชีพคนตาบอด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.47"><meta name="app-name" content="สำหรับแอดมิน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.48"><meta name="app-name" content="สำหรับแอดมิน"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script><script src="rt.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preload" href="fonts/noto-sans-thai-v1.woff2" as="font" type="font/woff2" crossorigin>
 <style>
@@ -1060,12 +1060,20 @@ function supFetch(){var c=SUP.cur;if(!c||SUP.busy&&SUP.msgs.length)return Promis
   if(nw.some(function(m){return m.sender_role==="user"})||!c.read){c.read=true;rpc("admin_support_mark_read",{p_user:c.u,p_app:c.a}).then(function(){var r=supRoom();if(r)r.unread=0;navDraw()}).catch(function(){})}},
   function(e){SUP.busy=false;if(SUP.cur!==c)return;SUP.serr=errTh(e,"โหลดข้อความไม่สำเร็จ");if(!c.shown){c.shown=true;draw()}else{var x=document.getElementById("supe");if(x)x.textContent=SUP.serr}})}
 function supOpen(u,a){var r=(SUP.rooms||[]).filter(function(x){return x.user_id===u&&x.app===a})[0];if(!r)return;supClose();SUP.cur={u:u,a:a,r:r,shown:false,read:false};SUP.msgs=[];SUP.ids={};SUP.last=null;SUP.serr="";
- document.getElementById("main").innerHTML='<p class="sub" role="status">กำลังโหลดข้อความ</p>';supView1(true);SUP.hb=setInterval(function(){if(!document.hidden)supView1(true)},60000);supFetch();SUP.t=setInterval(function(){if(!document.hidden)supFetch()},5000)}
+ document.getElementById("main").innerHTML='<p class="sub" role="status">กำลังโหลดข้อความ</p>';supView1(true);SUP.hb=setInterval(function(){if(!document.hidden)supView1(true)},60000);supFetch();supRt("sup:"+u+":"+a);SUP.t=setInterval(function(){if(!document.hidden&&(!SUP.rt||SUP.rt.due()))supFetch()},5000)}
 function supVwHtml(){return SUP.warn?'<div class="closed" role="status">'+esc(SUP.warn)+' กำลังดูห้องนี้อยู่ ระวังตอบซ้ำ</div>':''}
 function supView1(on){var c=SUP.cur;if(!c)return Promise.resolve();return rpc("admin_support_viewing",{p_user:c.u,p_app:c.a,p_on:on}).then(function(nm){if(!on||SUP.cur!==c)return;var w=nm||"";if(w!==SUP.warn){SUP.warn=w;var el=document.getElementById("supvw");if(el)el.innerHTML=supVwHtml()}}).catch(function(){})}
 /* รายชื่อห้อง: อัปเดตป้ายทุก 15 วินาทีขณะเปิดอยู่ วาดใหม่เฉพาะเมื่อข้อมูลเปลี่ยน และคืนโฟกัสปุ่มเดิม */
-setInterval(function(){if(!D||S.tab!=="sup"||SUP.cur||SR.open||document.hidden)return;var o=JSON.stringify(SUP.rooms);supLoad().then(function(){if(S.tab!=="sup"||SUP.cur||SR.open||JSON.stringify(SUP.rooms)===o)return;supRedraw()})},15000);
-function supClose(){if(SUP.cur){supView1(false)}clearInterval(SUP.hb);SUP.hb=null;SUP.warn="";clearInterval(SUP.t);SUP.t=null;SUP.cur=null;SUP.msgs=[];SUP.ids={};SUP.last=null;SUP.serr=""}
+/* แชตแบบกดกริ่ง (rt.js, 27 พ.ย. 2569): ห้องที่เปิดอยู่ฟัง "sup:<ผู้ใช้>:<แอป>" รายชื่อห้องฟัง "sup-admin" ต่อไม่ได้ = ถามแบบเดิม */
+function rtTok(){return sbEnsure().then(function(s){return s.access_token})}
+function supRt(topic){if(SUP.rt){SUP.rt.close();SUP.rt=null}if(!topic||!window.Bell)return;
+ SUP.rt=Bell.sub({url:SB.url,key:SB.key,token:rtTok,topic:topic,onBell:function ring(){if(!SUP.cur||document.hidden)return;if(SUP.busy){setTimeout(ring,400);return}supFetch()}})}
+var SUPL=null;
+function supListOn(){return D&&S.tab==="sup"&&!SUP.cur&&!SR.open}
+function supListTick(force){if(!supListOn()||document.hidden)return;if(!force&&SUPL&&!SUPL.due())return;var o=JSON.stringify(SUP.rooms);supLoad().then(function(){if(!supListOn()||JSON.stringify(SUP.rooms)===o)return;supRedraw()})}
+setInterval(function(){if(!supListOn()){if(SUPL){SUPL.close();SUPL=null}return}
+ if(!SUPL&&window.Bell)SUPL=Bell.sub({url:SB.url,key:SB.key,token:rtTok,topic:"sup-admin",onBell:function(){supListTick(true)}});supListTick(false)},15000);
+function supClose(){supRt(null);if(SUP.cur){supView1(false)}clearInterval(SUP.hb);SUP.hb=null;SUP.warn="";clearInterval(SUP.t);SUP.t=null;SUP.cur=null;SUP.msgs=[];SUP.ids={};SUP.last=null;SUP.serr=""}
 function supSend(){var c=SUP.cur,ta=document.getElementById("supi"),tx=ta?ta.value.trim():"";if(!c||SUP.sending)return;if(!tx){if(ta)ta.focus();return}
  SUP.sending=true;var bt=document.getElementById("supsend"),er=document.getElementById("supe");if(bt)bt.disabled=true;if(er)er.textContent="";SUP.serr="";
  rpc("admin_support_reply",{p_user:c.u,p_app:c.a,p_body:tx}).then(function(){SUP.sending=false;if(bt)bt.disabled=false;if(SUP.cur!==c)return;ta.value="";var r=supRoom();if(r){r.last_from="admin";r.last_body=tx;r.last_at=new Date().toISOString()}navDraw();SUP.busy=false;return supFetch().then(function(){var t=document.getElementById("supi");if(t)t.focus();ann("ส่งคำตอบแล้ว")})},

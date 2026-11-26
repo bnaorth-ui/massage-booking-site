@@ -219,6 +219,7 @@ ok('server error shown, form kept',(await err()).includes('อัตราค่
 await p.click('[data-orq=back]');
 ORL.push({id:'rq9',ref:'ORG-TEST-0009',org_name:'บริษัท รอตรวจ',district:'ดุสิต',address:'9 ถนนทดสอบ',lat:13.77,lng:100.52,contact_name:'คุณทดสอบ',contact_phone:'0811112222',service_date:bkk(30),start_time:'09:00:00',end_time:'12:00:00',lunch_start:null,lunch_end:null,hours:3,rate:400,status:'pending',accepted_count:0,amount:null,pay_due_at:null,slip_path:null,slip_at:null,note:null,service_label:'นวดไทย 30 นาที',created_at:new Date().toISOString(),invites:[]});
 await p.click('[data-tab=ac]');await p.click('[data-orq=open]');await p.waitForSelector('.orqtabs',{timeout:4000});
+const TABS=JSON.stringify(['กำลังดำเนินการ (1)','ยืนยันแล้ว (1)','ยกเลิกและหมดอายุ (0)','รายงาน']);await p.waitForFunction(t=>JSON.stringify([...document.querySelectorAll('.orqtabs button')].map(x=>x.textContent))===t,TABS,{timeout:5000}).catch(()=>{});
 ok('tab counts shown',JSON.stringify(await p.$$eval('.orqtabs button',o=>o.map(x=>x.textContent)))===JSON.stringify(['กำลังดำเนินการ (1)','ยืนยันแล้ว (1)','ยกเลิกและหมดอายุ (0)','รายงาน']));
 ok('default tab = in progress, shows only pending card',(await p.getAttribute('#orqtab_act','aria-pressed'))==='true'&&await p.$$eval('.orqc',o=>o.length===1&&o[0].textContent.includes('บริษัท รอตรวจ')));
 await p.click('.orqc [data-orq=lcopy]');
@@ -260,7 +261,7 @@ ok('free list excludes already invited, shows st4 only',JSON.stringify(await p.$
 await p.check('[data-orqm=st4]');
 ok('send button reflects selection',(await p.textContent('[data-orq=moresend]')).includes('1 คน'));
 await p.click('[data-orq=moresend]');
-ok('invite-more RPC called with selection',await p.waitForFunction(()=>true).then(()=>MORE.length===1&&MORE[0].p_id==='rq10'&&MORE[0].p_staff[0]==='st4'));
+ok('invite-more RPC called with selection',await require('./config').waitFor(()=>MORE.length===1&&MORE[0].p_id==='rq10'&&MORE[0].p_staff[0]==='st4'));
 ok('after sending: status invited + flash + SR',await p.waitForFunction(t=>document.getElementById('sr').textContent.includes(t),'ส่งคำเชิญหมอนวดเพิ่ม 1 คน',{timeout:4000}).then(()=>true,()=>false)&&!(await p.$('[data-orq=more]')));
 // ---- แก้ไขคำขอที่ยังรออนุมัติ
 {const q=ORL.find(x=>x.id==='rq9');q.service_id='sv30';q.staff_ids=['st3'];}

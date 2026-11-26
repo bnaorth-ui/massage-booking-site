@@ -82,6 +82,7 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
  if(m==='PATCH'){filt(rows).forEach(x=>Object.assign(x,body));return J(204,null)}
  if(m==='DELETE'){if(tb==='services'&&mode.fkErr&&sp.get('id')==='eq.vUsed')return J(409,{code:'23503',message:'violates foreign key constraint'});const keep=rows.filter(x=>!filt([x]).length);T[tb]=keep;if(tb==='services')T.staff_services=T.staff_services.filter(x=>keep.some(s=>s.id===x.service_id));return J(204,null)}
  return J(404,{message:'nf'})});
+const RTJ=[];await ctx.routeWebSocket(/\/realtime\/v1\/websocket/,ws=>{ws.onMessage(raw=>{const m=JSON.parse(raw);if(m.event==='phx_join')RTJ.push(m.topic)})});
 const p=await ctx.newPage();p.on('pageerror',e=>errs.push(e.message));p.on('dialog',d=>{errs.push('DIALOG '+d.message());d.dismiss()});
 const ok=(nm,c)=>console.log((c?'PASS ':'FAIL ')+nm);
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -101,4 +102,5 @@ ok('msg',(await txt('#chl')).includes('ขอเลื่อนเวลาไ�
 await p.fill('#chi','ได้ค่ะ');await p.click('#chsend');await sleep(700);ok('own reply',(await txt('#chl')).includes('คุณ,')&&(await txt('#chl')).includes('ได้ค่ะ'));
 await p.fill('#chi','พิมพ์ค้าง');await sleep(31000);ok('survives 30s refresh',(await p.inputValue('#chi'))==='พิมพ์ค้าง'&&!!(await p.$('#chl')));
 await p.click('#chback');await sleep(800);ok('back, nav visible',await p.$eval('#navb',e=>getComputedStyle(e).display!=='none')&&!!(await p.$('[data-chat=b1]')));ok('badge cleared',!(await p.$('[data-chat=b1] .cn')));
+ok('shop chat listens to its room bell (rt.js) '+RTJ.join(','),RTJ.some(t=>/^realtime:chat:[^:]+:shop$/.test(t)));
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)})();

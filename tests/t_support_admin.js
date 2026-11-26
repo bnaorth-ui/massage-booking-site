@@ -96,6 +96,7 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
  if(m==='DELETE'){const keep=T[tb].filter(x=>!filt([x]).length);if(tb==='places'&&sp.get('id')==='eq.sh1')return J(409,{code:'23503',message:'fk'});T[tb]=keep;return J(204,null)}
  return J(404,{message:'nf'})});
 
+const RTJ=[];await ctx.routeWebSocket(/\/realtime\/v1\/websocket/,ws=>{ws.onMessage(raw=>{const m=JSON.parse(raw);if(m.event==='phx_join')RTJ.push(m.topic)})});
 const p=await ctx.newPage();await p.setViewportSize({width:420,height:900});p.on('pageerror',e=>errs.push(e.message));p.on('dialog',d=>{errs.push('DIALOG '+d.message());d.dismiss()});
 const dels=[],marks=[];let delFail=false;const OLD=[1,2,3].map(i=>({id:'old'+i,slip_path:'sh1/old'+i+'.jpg'}));const hides=[],finds=[],resets=[];let resetErr=null;const PEOPLE=[{id:'x1',name:'สมชาย ใจดี',phone:'0812345678',kind:'user',is_admin:false},{id:'x2',name:'ร้านนวด เจ้าของ',phone:'0812349999',kind:'shop',is_admin:false},{id:'u1',name:'แอดมิน หนึ่ง',phone:'0811111111',kind:'user',is_admin:true}];T.password_reset_log=[{id:0,admin_name:'แอดมิน เก่า',user_name:'ผู้ใช้เก่า',user_phone:'0800000000',created_at:'2026-01-01T00:00:00Z'}];const ok=(nm,c)=>console.log((c?'PASS ':'FAIL ')+nm);
 const until=async(f,a)=>{try{await p.waitForFunction(f,a,{timeout:4000});return true}catch(e){return false}};
@@ -155,4 +156,5 @@ await p.click('[data-a=setsave]');await p.waitForTimeout(800);
 const pt=calls.filter(c=>c.m==='PATCH'&&c.path==='/rest/v1/app_settings').pop();
 ok('saving settings no longer sends line_url',!!pt&&!('line_url' in pt.body)&&'hours_text' in pt.body);
 ok('no page errors',errs.length===0);
+ok('admin listens to room bell / room list bell (rt.js) '+[...new Set(RTJ)].join(','),RTJ.some(t=>/^realtime:sup:[^:]+:[a-z]+$/.test(t)));
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)})();
