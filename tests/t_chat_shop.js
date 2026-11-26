@@ -1,7 +1,7 @@
 const {chromium}=require('playwright');
 const PNG=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==','base64');
 (async()=>{const b=await chromium.launch(require('./config').launch);
-const ctx=await b.newContext({timezoneId:'Asia/Bangkok',locale:'th-TH'});const errs=[],calls=[],stor=[];
+const ctx=await b.newContext({timezoneId:'Asia/Bangkok',locale:'th-TH'});const CMG={n:0};const errs=[],calls=[],stor=[];
 let n=100;const now=()=>new Date().toISOString();
 const users={'0811111111':{id:'u1',pw:'abc123'},'0822222222':{id:'u2',pw:'abc123'}};
 const byTok=t=>Object.values(users).find(u=>'at-'+u.id===t);
@@ -62,7 +62,7 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
   if(f==='chat_mark_read'){marks.push(body);UNR=UNR.filter(x=>x.booking_id!==body.p_booking);return J(204,null)}
   if(f==='chat_send'){MSGS.push({id:'m'+(MSGS.length+1),booking_id:body.p_booking,room_key:body.p_room,sender_id:'u1',sender_role:'shop',sender_name:'ร้านสบายดี สปา',body:body.p_body,created_at:new Date().toISOString().replace('Z','000+00:00')});return J(200,'x')}
   return J(404,{message:'no rpc '+f})}
- if(path==='/rest/v1/chat_messages'){const bb=sp.get('booking_id').replace('eq.',''),rr=sp.get('room_key').replace('eq.','');return J(200,MSGS.filter(m=>m.booking_id===bb&&m.room_key===rr))}
+ if(path==='/rest/v1/chat_messages'){CMG.n++;const bb=sp.get('booking_id').replace('eq.',''),rr=sp.get('room_key').replace('eq.','');return J(200,MSGS.filter(m=>m.booking_id===bb&&m.room_key===rr))}
  const tb=path.replace('/rest/v1/','');if(T[tb]===undefined)return J(404,{message:'nf '+path});
  let rows=T[tb];
  const filt=rr=>{for(const [k,v] of sp.entries()){if(['select','order','limit','on_conflict'].includes(k))continue;if(v.startsWith('eq.'))rr=rr.filter(x=>String(x[k])===v.slice(3))}return rr};
@@ -103,4 +103,14 @@ await p.fill('#chi','ได้ค่ะ');await p.click('#chsend');await sleep(7
 await p.fill('#chi','พิมพ์ค้าง');await sleep(31000);ok('survives 30s refresh',(await p.inputValue('#chi'))==='พิมพ์ค้าง'&&!!(await p.$('#chl')));
 await p.click('#chback');await sleep(800);ok('back, nav visible',await p.$eval('#navb',e=>getComputedStyle(e).display!=='none')&&!!(await p.$('[data-chat=b1]')));ok('badge cleared',!(await p.$('[data-chat=b1] .cn')));
 ok('shop chat listens to its room bell (rt.js) '+RTJ.join(','),RTJ.some(t=>/^realtime:chat:[^:]+:shop$/.test(t)));
+// ออกจากแชตด้วยเมนูด้านล่าง (27 พ.ย. 2569)
+{const tab0=await p.evaluate(()=>(document.querySelector('#tabs [data-a=tab].on')||{}).dataset.id);await p.click('[data-chat=b1]');await p.waitForSelector('#chi',{timeout:4000});await p.fill('#chi','ร่างค้างไว้');
+const other=await p.evaluate(t=>{const b=[...document.querySelectorAll('#tabs [data-a=tab]')].find(x=>x.dataset.id!==t&&x.dataset.id!=='nt');return b&&b.dataset.id},tab0);
+await p.click('#tabs [data-a=tab][data-id="'+other+'"]');await sleep(700);
+const n0=CMG.n;await sleep(9000);
+const x=await p.evaluate(()=>({tab:(document.querySelector('#tabs [data-a=tab].on')||{}).dataset.id,inChat:!!document.getElementById('chl')}));
+ok('menu tab from chat closes chat and opens '+other+' '+JSON.stringify(x)+' chat fetches after='+(CMG.n-n0),!x.inChat&&x.tab===other&&CMG.n-n0===0);
+await p.click('#tabs [data-a=tab][data-id="'+tab0+'"]');await sleep(700);await p.click('[data-chat=b1]');await p.waitForSelector('#chi',{timeout:4000});
+ok('draft kept per room',(await p.inputValue('#chi'))==='ร่างค้างไว้');
+await p.fill('#chi','');await p.click('#chback');await sleep(600);ok('back button still works',await p.evaluate(()=>!document.getElementById('chl')));}
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)})();

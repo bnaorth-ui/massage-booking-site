@@ -1,7 +1,7 @@
 const {chromium}=require('playwright');require('./config').pinClock();
 const PNG=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==','base64');
 (async()=>{const b=await chromium.launch(require('./config').launch);
-const ctx=await b.newContext({timezoneId:'Asia/Bangkok',locale:'th-TH'});await require('./config').pinCtx(ctx);const errs=[],calls=[],stor=[];
+const ctx=await b.newContext({timezoneId:'Asia/Bangkok',locale:'th-TH'});await require('./config').pinCtx(ctx);const CMG={n:0};const errs=[],calls=[],stor=[];
 const H7=7*3600000,bkDate=t=>new Date(t+H7).toISOString().slice(0,10);
 const todayS=bkDate(Date.now()),addD=(d,n)=>new Date(Date.parse(d+'T00:00:00Z')+n*86400000).toISOString().slice(0,10);
 const at=(d,m)=>new Date(Date.parse(d+'T00:00:00+07:00')+m*60000).toISOString();
@@ -45,7 +45,7 @@ await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.pro
   if(f==='set_job_status'){const it=items.find(i=>i.id===body.p_item);const R={pending:0,accepted:1,in_progress:2,done:3};if(!it||R[body.p_status]<=R[it.job])return J(400,{code:'P0001',message:'สถานะงานย้อนกลับไม่ได้'});it.job=body.p_status;if(body.p_status==='done')it.bstatus='completed';return J(204,null)}
   return J(404,{message:'no rpc '+f})}
  const tb=path.replace('/rest/v1/','');
- if(tb.startsWith('chat_messages')){const b=sp.get('booking_id').replace('eq.',''),r=sp.get('room_key').replace('eq.','');return J(200,MSGS.filter(m=>m.booking_id===b&&m.room_key===r))}
+ if(tb.startsWith('chat_messages')){CMG.n++;const b=sp.get('booking_id').replace('eq.',''),r=sp.get('room_key').replace('eq.','');return J(200,MSGS.filter(m=>m.booking_id===b&&m.room_key===r))}
  if(tb==='staff_days_off')return J(200,[{day:addD(todayS,3)}]);
  if(tb==='staff_blocks')return J(200,blocks);
  if(tb==='notifications')return J(200,nts);
@@ -77,4 +77,14 @@ await p.fill('#chi','รับทราบค่ะ');await p.click('#chsend');a
 await p.fill('#chi','พิมพ์ค้าง');await sleep(21000);ok('chat survives 20s refresh + typed kept',(await p.inputValue('#chi'))==='พิมพ์ค้าง');
 await p.click('#chback');await sleep(700);ok('back to list + nav',await p.$eval('#navb',e=>getComputedStyle(e).display!=='none')&&(await txt('#app')).includes('คิวงาน'));
 ok('badge cleared',!(await p.$('[data-chat=bk1] .cn')));
+// ออกจากแชตด้วยเมนูด้านล่าง (27 พ.ย. 2569)
+{const tab0=await p.evaluate(()=>(document.querySelector('#nav [data-a=tab].on')||{}).dataset.id);await p.click('[data-chat=bk1]');await p.waitForSelector('#chi',{timeout:4000});await p.fill('#chi','ร่างค้างไว้');
+const other=await p.evaluate(t=>{const b=[...document.querySelectorAll('#nav [data-a=tab]')].find(x=>x.dataset.id!==t&&x.dataset.id!=='nt');return b&&b.dataset.id},tab0);
+await p.click('#nav [data-a=tab][data-id="'+other+'"]');await sleep(700);
+const n0=CMG.n;await sleep(9000);
+const x=await p.evaluate(()=>({tab:(document.querySelector('#nav [data-a=tab].on')||{}).dataset.id,inChat:!!document.getElementById('chl')}));
+ok('menu tab from chat closes chat and opens '+other+' '+JSON.stringify(x)+' chat fetches after='+(CMG.n-n0),!x.inChat&&x.tab===other&&CMG.n-n0===0);
+await p.click('#nav [data-a=tab][data-id="'+tab0+'"]');await sleep(700);await p.click('[data-chat=bk1]');await p.waitForSelector('#chi',{timeout:4000});
+ok('draft kept per room',(await p.inputValue('#chi'))==='ร่างค้างไว้');
+await p.fill('#chi','');await p.click('#chback');await sleep(600);ok('back button still works',await p.evaluate(()=>!document.getElementById('chl')));}
 console.log('errors:',errs.join('|')||'none');await b.close();process.exit(0)})();

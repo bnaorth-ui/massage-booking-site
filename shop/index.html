@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>สำหรับร้านนวด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.30"><meta name="app-name" content="ร้านนวด"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script><script src="rt.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.31"><meta name="app-name" content="ร้านนวด"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script><script src="rt.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preload" href="fonts/noto-sans-thai-v1.woff2" as="font" type="font/woff2" crossorigin>
 <style>
@@ -719,13 +719,13 @@ function chFetch(){if(!CH||chBusy)return Promise.resolve();chBusy=true;var c=CH,
   if(a.length){var l=document.getElementById("chl");if(l){var em=document.getElementById("chempty");if(em)em.remove();var near=l.scrollHeight-l.scrollTop-l.clientHeight<80;l.insertAdjacentHTML("beforeend",a.map(chMsgHtml).join(""));if(near)l.scrollTop=l.scrollHeight;window.scrollTo(0,document.body.scrollHeight)}
    if(a.some(function(m){return m.sender_id!==WHO.id}))chatReadMark()}},function(e){chBusy=false;if(CH!==c)return;if(first){c.loaded=true;chatRender();chErr(errTh(e,"โหลดข้อความไม่สำเร็จ"))}})}
 function chatReadMark(){if(!CH)return;var c=CH;if(c.sup){sbApi("/rest/v1/rpc/support_mark_read",{method:"POST",json:1,body:JSON.stringify({p_app:c.sup})}).then(function(){SUPN=0}).catch(function(){});return}sbApi("/rest/v1/rpc/chat_mark_read",{method:"POST",json:1,body:JSON.stringify({p_booking:c.bid,p_room:c.room})}).then(function(){delete CU[chKey(c.bid,c.room)]}).catch(function(){})}
-function openChat(bid,room,ref,name){CH={bid:bid,room:room,ref:ref,name:name,msgs:[],ids:{},last:null,loaded:false,closed:false,sending:false,st:null,rp:false,bq:false};chState(CH);S.chat=true;document.getElementById("main").innerHTML='<p class="sub" role="status">กำลังโหลดข้อความ</p>';window.scrollTo(0,0);
+function openChat(bid,room,ref,name){CH={bid:bid,room:room,ref:ref,name:name,msgs:[],ids:{},last:null,loaded:false,closed:false,sending:false,st:null,rp:false,bq:false};chDraftLoad();chState(CH);S.chat=true;document.getElementById("main").innerHTML='<p class="sub" role="status">กำลังโหลดข้อความ</p>';window.scrollTo(0,0);
  chFetch();clearInterval(chT);chRt("chat:"+CH.bid+":"+CH.room);chT=setInterval(function(){if(!document.hidden&&chDue())chFetch()},4000)}
 /* แชตกับเจ้าหน้าที่ (ฐานข้อมูล: support_room, support_send, support_mark_read, support_unread, p_app = shop) ใช้หน้าจอเดียวกับแชตกับลูกค้า ไม่มีรายงาน/บล็อก */
 var SUPN=0;
 function supBtn(){return '<button type="button" class="cta" data-supgo="1"'+(SUPN?' aria-label="แชตกับเจ้าหน้าที่ ข้อความใหม่ '+SUPN+' ข้อความ"':'')+'><span aria-hidden="true">💬</span><div>แชตกับเจ้าหน้าที่</div>'+(SUPN?'<span class="cn" aria-hidden="true">'+SUPN+'</span>':'')+'</button>'}
 function loadSupUnread(){return sbApi("/rest/v1/rpc/support_unread",{method:"POST",json:1,body:JSON.stringify({p_app:"shop"})}).then(function(n){SUPN=+n||0}).catch(function(){})}
-function openSup(){CH={sup:"shop",name:"",msgs:[],ids:{},last:null,loaded:false,closed:false,sending:false,st:null,rp:false,bq:false};S.chat=true;document.getElementById("main").innerHTML='<p class="sub" role="status">กำลังโหลดข้อความ</p>';window.scrollTo(0,0);
+function openSup(){CH={sup:"shop",name:"",msgs:[],ids:{},last:null,loaded:false,closed:false,sending:false,st:null,rp:false,bq:false};chDraftLoad();S.chat=true;document.getElementById("main").innerHTML='<p class="sub" role="status">กำลังโหลดข้อความ</p>';window.scrollTo(0,0);
  chFetch();clearInterval(chT);chRt("sup:"+SBS.user.id+":"+CH.sup);chT=setInterval(function(){if(!document.hidden&&chDue())chFetch()},5000)}
 /* แชตแบบกดกริ่ง (rt.js, 27 พ.ย. 2569): ต่อได้ = โหลดทันทีเมื่อมีข้อความใหม่ และถามสำรองทุก 30 วินาที, ต่อไม่ได้ = ถามทุก 4-5 วินาทีแบบเดิม */
 var CHRT=null;
@@ -733,7 +733,15 @@ function rtTok(){return sbEnsure().then(function(s){return s.access_token})}
 function chRt(topic){if(CHRT){CHRT.close();CHRT=null}if(!topic||!window.Bell)return;
  CHRT=Bell.sub({url:SB.url,key:SB.key,token:rtTok,topic:topic,onBell:function ring(){if(!CH||document.hidden)return;if(chBusy){setTimeout(ring,400);return}chFetch()}})}
 function chDue(){return !CHRT||CHRT.due()}
-function closeChat(){chRt(null);clearInterval(chT);chT=null;CH=null;S.chat=false;document.getElementById("navb").style.display="";draw();Promise.all([loadChatUnread(),loadSupUnread()]).then(function(){if(!S.chat)softDraw()})}
+/* ออกจากแชต: กดปุ่มกลับ หรือกดเมนูด้านล่างระหว่างแชต (27 พ.ย. 2569) ข้อความที่พิมพ์ค้างจำไว้ต่อห้อง กลับเข้าห้องเดิมยังอยู่ */
+var CHDR={};
+function chKey(c){return c.sup?"sup:"+c.sup:c.bid+":"+c.room}
+function chLeave(){if(!CH)return;var t=document.getElementById("chi"),k=chKey(CH),v=t?t.value:"";if(v&&v.trim())CHDR[k]=v;else delete CHDR[k];
+ chRt(null);clearInterval(chT);chT=null;CH=null;S.chat=false;document.getElementById("navb").style.display=""}
+function chDraftLoad(){if(CH&&CHDR[chKey(CH)])CH.draft=CHDR[chKey(CH)]}
+function chDraftTake(){var d=CH&&CH.draft;if(CH)CH.draft=null;return d?esc(d):""}
+function chAfter(){Promise.all([loadChatUnread(),loadSupUnread()]).then(function(){if(!S.chat)softDraw()})}
+function closeChat(){chLeave();draw();chAfter()}
 function chatSend(){if(!CH||CH.sending)return;var c=CH,ta=document.getElementById("chi"),txt=ta?ta.value.trim():"";if(!txt){if(ta)ta.focus();return}
  c.sending=true;var bt=document.getElementById("chsend");if(bt)bt.disabled=true;chErr("");
  (c.sup?sbApi("/rest/v1/rpc/support_send",{method:"POST",json:1,body:JSON.stringify({p_app:c.sup,p_body:txt})}):sbApi("/rest/v1/rpc/chat_send",{method:"POST",json:1,body:JSON.stringify({p_booking:c.bid,p_room:c.room,p_body:txt})})).then(function(){c.sending=false;if(CH!==c)return;if(ta)ta.value="";if(bt)bt.disabled=false;chBusy=false;return chFetch().then(function(){var t=document.getElementById("chi");if(t)t.focus()})},function(e){c.sending=false;if(bt)bt.disabled=false;var m=errTh(e,"ส่งข้อความไม่สำเร็จ");if(/ปิดแล้ว/.test(m))c.closed=true;chErr(m);if(/บล็อก|ระงับ/.test(m))chState(c);if(c.closed){clearInterval(chT);var f=document.getElementById("chf");if(f)f.outerHTML='<p class="sub">ห้องแชตนี้ปิดแล้ว อ่านย้อนหลังได้อย่างเดียว</p>'}})}
@@ -748,7 +756,7 @@ function csCall(fn,body){return sbApi("/rest/v1/rpc/"+fn,{method:"POST",json:1,b
 function chState(c){return csCall("chat_room_state",{p_booking:c.bid,p_room:c.room}).then(function(j){if(CH!==c)return;c.st=j||null;chSafeUpdate()},function(){if(CH!==c)return;c.st=null;chSafeUpdate()})}
 function chLock(){var s=CH&&CH.st;if(!s)return"";if(s.blocked_by_me)return"คุณบล็อกลูกค้าคนนี้ไว้ ส่งข้อความหากันไม่ได้ กดปุ่ม ยกเลิกบล็อก ถ้าต้องการคุยต่อ";if(s.blocked_by_other)return"ลูกค้าปิดรับข้อความจากคุณ ส่งข้อความในห้องนี้ไม่ได้ ถ้าต้องการติดต่อเรื่องการจอง ให้โทรหาลูกค้าหรือติดต่อเจ้าหน้าที่";return""}
 function chFormHtml(){if(!CH)return"";if(CH.closed)return'<p class="sub">ห้องแชตนี้ปิดแล้ว อ่านย้อนหลังได้อย่างเดียว</p>';var lk=chLock();if(lk)return'<p class="sub" id="chlock">'+esc(lk)+'</p>';
- return'<form id="chf" class="chf"><label class="vh" for="chi">พิมพ์ข้อความ</label><textarea id="chi" maxlength="'+(CH.sup?1000:500)+'" rows="2" placeholder="พิมพ์ข้อความ (ไม่เกิน '+(CH.sup?"1,000":"500")+' ตัวอักษร)"></textarea><button class="btn" type="submit" id="chsend">ส่ง</button></form>'}
+ return'<form id="chf" class="chf"><label class="vh" for="chi">พิมพ์ข้อความ</label><textarea id="chi" maxlength="'+(CH.sup?1000:500)+'" rows="2" placeholder="พิมพ์ข้อความ (ไม่เกิน '+(CH.sup?"1,000":"500")+' ตัวอักษร)">'+chDraftTake()+'</textarea><button class="btn" type="submit" id="chsend">ส่ง</button></form>'}
 function chSafeHtml(){var s=CH&&CH.st;if(!s)return"";
  if(CH.rp)return'<form id="chrf" class="csb" novalidate><fieldset style="border:0;margin:0;padding:0"><legend id="chrl" tabindex="-1"><b>รายงานแชตนี้ถึงเจ้าหน้าที่</b></legend><p class="cst">เจ้าหน้าที่จะเห็นข้อความล่าสุดในห้องนี้ เพื่อตรวจสอบ ลูกค้าจะไม่รู้ว่ามีการรายงาน</p>'+
   RSN.map(function(x){return'<label class="csk" for="chr_'+x[0]+'"><input type="radio" name="chr" id="chr_'+x[0]+'" value="'+x[0]+'"><span>'+x[1]+'</span></label>'}).join("")+'</fieldset>'+
@@ -1015,7 +1023,7 @@ document.addEventListener("click",function(e){
   if(!navigator.geolocation){ps.innerHTML='<p class="hint2" style="color:var(--bad)">อุปกรณ์นี้ไม่รองรับ ใช้การวางลิงก์หรือพิกัดแทน</p>';return}
   ps.innerHTML='<p class="hint2">กำลังหาตำแหน่ง...</p>';
   navigator.geolocation.getCurrentPosition(function(p){setPin(p.coords.latitude.toFixed(6),p.coords.longitude.toFixed(6))},function(){ps.innerHTML='<p class="hint2" style="color:var(--bad)">ใช้ตำแหน่งปัจจุบันไม่ได้ ตรวจสอบสิทธิ์ตำแหน่ง หรือวางลิงก์/พิกัดแทน</p>'},{timeout:10000});return}
- if(a==="tab"){srClear();S.slipMsg="";if(id==="mg")id=S.mg;if(inMg(id))S.mg=id;if(id==="nt"){S.ntf=null;S.ntNew=[];openNt()}if(id==="rv")rvLoad();S.clmsg="";S.clc=0;S.tab=id;S.form=null;S.del=null;S.saved=false;S.pwdone=false;S.shareok=false;S.sdc=null;S.sdn=null;S.stmsg="";S.stnew=null;S.pv=false;S.tm=false;S.blk=false;S.wmode=null;S.werr="";S.hmsg="";draw();if(id==="wal"||id==="nt"||id==="q")refresh();return}
+ if(a==="tab"){if(S.chat){chLeave();setTimeout(chAfter,0)}srClear();S.slipMsg="";if(id==="mg")id=S.mg;if(inMg(id))S.mg=id;if(id==="nt"){S.ntf=null;S.ntNew=[];openNt()}if(id==="rv")rvLoad();S.clmsg="";S.clc=0;S.tab=id;S.form=null;S.del=null;S.saved=false;S.pwdone=false;S.shareok=false;S.sdc=null;S.sdn=null;S.stmsg="";S.stnew=null;S.pv=false;S.tm=false;S.blk=false;S.wmode=null;S.werr="";S.hmsg="";draw();if(id==="wal"||id==="nt"||id==="q")refresh();return}
  if(a==="rvreply"){S.rvReply=id;draw();var ta=document.getElementById("rvtxt");if(ta)ta.focus();return}
  if(a==="rvno"){S.rvReply=null;draw();return}
  if(a==="rvsend"){rvSend(id);return}
