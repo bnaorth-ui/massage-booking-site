@@ -74,7 +74,7 @@ ok('work post: "more photos and news" line with Facebook page link (new window, 
 ok('post: cover without description -> alt from story title, no caption, og:image:alt too',view(h).includes('alt="รูปประกอบเรื่อง นวดให้พนักงานบริษัท ก">')&&!view(h).includes('<figcaption>')&&h.includes('<meta property="og:image:alt" content="รูปประกอบเรื่อง นวดให้พนักงานบริษัท ก">'));
 ROWS.find(x=>x.no===9).cover_alt='หมอนวดกำลังนวด';
 ({h}=await get('/news/8'));ok('article post: no Facebook "more news" line (keeps HR readers on site)',!view(h).includes('fbmore'));
-({h}=await get('/'));ok('footer: Facebook page link (same address as FB_PAGE), new window, right before เว็บไซต์หลักของสมาคม',/<p><a href="https:\/\/www\.facebook\.com\/Bna2559" rel="noopener" target="_blank">เพจ Facebook ของสมาคม<\/a><\/p>\s*<p><a href="https:\/\/bna\.or\.th\/">เว็บไซต์หลักของสมาคม/.test(h)&&ld(h)[0].j.sameAs.includes('https://www.facebook.com/Bna2559'));
+({h}=await get('/'));ok('footer: Facebook page link (same address as FB_PAGE), new window, then Google Play, then เว็บไซต์หลักของสมาคม',/<p><a href="https:\/\/www\.facebook\.com\/Bna2559" rel="noopener" target="_blank">เพจ Facebook ของสมาคม<\/a><\/p>\s*<p><a href="https:\/\/play\.google\.com[^"]*"[^>]*>[^<]*<\/a><\/p>\s*<p><a href="https:\/\/bna\.or\.th\/">เว็บไซต์หลักของสมาคม/.test(h)&&ld(h)[0].j.sameAs.includes('https://www.facebook.com/Bna2559'));
 ({h}=await get('/'));ok('footer (server): link named เว็บไซต์หลักของสมาคม, no bare address',h.includes('<a href="https://bna.or.th/">เว็บไซต์หลักของสมาคม</a>')&&!h.includes('>bna.or.th<'));
 ({h}=await get('/news/?k=bogus'));ok('list: unknown filter = all, canonical /news/',view(h).includes('href="/news/7"')&&h.includes('<link rel="canonical" href="'+B+'/news/">'));
 
@@ -125,6 +125,8 @@ ok('calc (server): option to work at the association (องค์กรสา�
 ({h}=await get('/company/calc/?n=99'));ok('calc (server): 99 staff -> not required, suggests occasional service',view(h).includes('ยังไม่ต้องจ้างคนพิการตามกฎหมาย')&&view(h).includes('?orgreq=1'));
 ({h}=await get('/company/calc/?n=abc'));ok('calc (server): bad number -> error message, no numbers',view(h).includes('กรอกจำนวนพนักงานเป็นตัวเลข')&&!view(h).includes('ต้องจ้างคนพิการ '));
 ({h}=await get('/company/'));ok('company: regular-hire card mentions working at the association',view(h).split('badge regular')[1].split('</div>')[0].includes('หรือให้คนตาบอดทำงานที่สมาคม (องค์กรสาธารณประโยชน์) บริษัทไม่ต้องจัดตำแหน่งงานหรือสถานที่เอง'));
+ok('company: occasional steps say employees can install the Google Play app (Android)',view(h).split('id="once"')[1].split('</div>')[0].includes('ผู้ใช้ Android ติดตั้ง<a href="https://play.google.com/store/apps/details?id=th.or.bna.massage" rel="noopener" target="_blank">แอปจองคิวนวดจาก Google Play</a>ได้'));
+ok('footer: Google Play link labelled Android, right after Facebook',/เพจ Facebook ของสมาคม<\/a><\/p>\s*<p><a href="https:\/\/play\.google\.com\/store\/apps\/details\?id=th\.or\.bna\.massage" rel="noopener" target="_blank">แอปจองคิวนวด บน Google Play \(Android\)<\/a>/.test(h));
 ok('company: law section has box with button to calculator',view(h).includes('href="/company/calc/" data-nav>คำนวณจำนวนคนพิการที่ต้องจ้าง</a>')&&view(h).indexOf('calcbox')>view(h).indexOf('id="hLaw"'));
 ({h}=await get('/'));ok('home: บริษัทและหน่วยงาน section has calculator button',view(h).split('id="hBiz"')[1].split('</section>')[0].includes('href="/company/calc/"'));
 // RSS สำหรับ bna.or.th (WordPress บล็อก/วิดเจ็ต RSS)
