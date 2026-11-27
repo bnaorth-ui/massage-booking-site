@@ -127,6 +127,25 @@ ok('calc (server): option to work at the association (องค์กรสา�
 ({h}=await get('/company/'));ok('company: regular-hire card mentions working at the association',view(h).split('badge regular')[1].split('</div>')[0].includes('หรือให้คนตาบอดทำงานที่สมาคม (องค์กรสาธารณประโยชน์) บริษัทไม่ต้องจัดตำแหน่งงานหรือสถานที่เอง'));
 ok('company: law section has box with button to calculator',view(h).includes('href="/company/calc/" data-nav>คำนวณจำนวนคนพิการที่ต้องจ้าง</a>')&&view(h).indexOf('calcbox')>view(h).indexOf('id="hLaw"'));
 ({h}=await get('/'));ok('home: บริษัทและหน่วยงาน section has calculator button',view(h).split('id="hBiz"')[1].split('</section>')[0].includes('href="/company/calc/"'));
+// RSS สำหรับ bna.or.th (WordPress บล็อก/วิดเจ็ต RSS)
+{const fa=await imp('functions/feed.xml.js'),fw=await imp('functions/feed-work.xml.js'),fd=await imp('shared/feed.js');
+const xmlOk=x=>{const tags=[...x.matchAll(/<(\/?)([a-zA-Z:]+)[^>]*?(\/?)>/g)].filter(m=>!m[0].startsWith('<?'));const st=[];for(const m of tags){if(m[3])continue;if(m[1]){if(st.pop()!==m[2])return false}else st.push(m[2])}return st.length===0&&!/&(?!amp;|lt;|gt;|quot;|#39;)/.test(x)};
+let n0=ASKED.length;r=await fa.onRequestGet({request:new Request(B+'/feed.xml')});h=await r.text();
+const it=[...h.matchAll(/<item>([\s\S]*?)<\/item>/g)].map(m=>m[1]);
+ok('feed.xml: RSS 2.0 content type, valid nesting/escaping, readable by any site (CORS), cached 15 min',/application\/rss\+xml/.test(r.headers.get('Content-Type'))&&h.startsWith('<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0"')&&xmlOk(h)&&r.headers.get('Access-Control-Allow-Origin')==='*'&&/max-age=900/.test(r.headers.get('Cache-Control')));
+ok('feed.xml: channel title/link/language/self link',h.includes('<title>ข่าวและบทความ | สมาคมวิทยากรฝึกอาชีพคนตาบอด</title>')&&h.includes('<link>'+B+'/news/</link>')&&h.includes('<language>th</language>')&&h.includes('<atom:link href="'+B+'/feed.xml" rel="self"'));
+ok('feed.xml: only published stories (3), newest first, asks DB for active + day order + max 20',it.length===3&&!h.includes('ร่าง')&&ASKED.slice(n0).some(a=>/active=eq\.true/.test(a.u)&&/order=day\.desc,no\.desc/.test(a.u)&&/limit=20/.test(a.u)&&!/kind=/.test(a.u)));
+const i7=it.find(x=>x.includes('/news/7<'));
+ok('feed item: escaped title, link + permalink guid, Thai date as RFC 822, category, summary as description',!!i7&&i7.includes('<title>อบรม &quot;หมอนวด&quot; &lt;รุ่น 2&gt;</title>')&&i7.includes('<link>'+B+'/news/7</link>')&&i7.includes('<guid isPermaLink="true">'+B+'/news/7</guid>')&&/<pubDate>\w{3}, \d{2} \w{3} \d{4} 01:00:00 GMT<\/pubDate>/.test(i7)&&i7.includes('<category>ข่าวและกิจกรรม</category>')&&i7.includes('<description>สรุปข่าว &amp; กิจกรรม</description>'));
+const i8=it.find(x=>x.includes('/news/8<'));
+ok('feed item without summary: description from body as plain text (no ##, -, image lines; named links -> name), not full article',!!i8&&!/##|\[รูป/.test(i8)&&/<description>เนื้อหา ดูต่อ/.test(i8));
+ok('plain(): strips markup, keeps link names, cuts long text with …',fd.plain('## หัวข้อ\n- ข้อ [กรม](https://x.go.th/)\n[รูป: ก](place-images/a.jpg)\nจบ')==='หัวข้อ ข้อ กรม จบ'&&fd.plain('ก'.repeat(250)).length===201&&fd.plain('ก'.repeat(250)).endsWith('…')&&fd.rfc822('2026-11-20')==='Fri, 20 Nov 2026 01:00:00 GMT'&&fd.rfc822('x')==='');
+n0=ASKED.length;r=await fw.onRequestGet({request:new Request(B+'/feed-work.xml')});h=await r.text();
+ok('feed-work.xml: only ผลงานบริการ, own title/link/self',xmlOk(h)&&[...h.matchAll(/<item>/g)].length===1&&h.includes('/news/9</link>')&&h.includes('<title>ผลงานบริการ | สมาคมวิทยากรฝึกอาชีพคนตาบอด</title>')&&h.includes('<link>'+B+'/news/?k=work</link>')&&h.includes('href="'+B+'/feed-work.xml" rel="self"')&&ASKED.slice(n0).some(a=>/kind=eq\.work/.test(a.u)));
+FAIL=true;r=await fa.onRequestGet({request:new Request(B+'/feed.xml')});FAIL=false;
+ok('feed: database down -> 503 + retry later, not cached (WordPress keeps old list)',r.status===503&&r.headers.get('Retry-After')==='600'&&/no-store/.test(r.headers.get('Cache-Control')));
+({h}=await get('/'));ok('home: <link rel=alternate> points to /feed.xml',h.includes('<link rel="alternate" type="application/rss+xml" title="ข่าวและบทความ | สมาคมวิทยากรฝึกอาชีพคนตาบอด" href="/feed.xml">'));
+r=await mw.onRequest({request:new Request(B+'/feed.xml'),next:async()=>new Response('FEED')});ok('middleware passes /feed.xml through untouched',(await r.text())==='FEED');}
 r=await sm.onRequestGet({request:new Request(B+'/sitemap.xml')});h=await r.text();
 ok('sitemap: home, company, list and each published article',/application\/xml/.test(r.headers.get('Content-Type'))&&['/','/company/','/company/calc/','/news/'].every(p=>h.includes('<loc>'+B+p+'</loc>'))&&h.includes('<loc>'+B+'/news/7</loc><lastmod>2026-11-05</lastmod>')&&h.includes('/news/8</loc><lastmod>2026-11-10</lastmod>'));
 FAIL=true;h=await (await sm.onRequestGet({request:new Request('https://a.b/sitemap.xml')})).text();FAIL=false;
