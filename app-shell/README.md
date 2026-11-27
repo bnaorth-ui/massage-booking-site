@@ -63,4 +63,4 @@
 
 ### ยังไม่ได้ทำ (รอบถัดไป)
 - แจ้งเตือนแบบแอปจริงบน iPhone (APNs): ต้องมีบัญชี Apple และกุญแจแจ้งเตือน `.p8` ก่อน ต้องแก้ฐานข้อมูลและ `send-push`
-- รหัส SHA-256 ของ Google (App signing) ใน `assetlinks.json`: รอผู้ใช้อัปโหลด .aab ขึ้น Play Console แล้วส่งรหัสมา
+- รหัส SHA-256 ของ Google (App signing) ใน `assetlinks.json`: ใส่แล้ว 27 พ.ย. 2569 (ขึ้นต้น 8E:0B:25) เก็บรหัส Upload key เดิม (78:13:8F) ไว้ด้วย
