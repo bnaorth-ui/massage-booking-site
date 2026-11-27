@@ -3,12 +3,6 @@
   Cache-Control: public, max-age=0, must-revalidate
 /index.html
   Cache-Control: public, max-age=0, must-revalidate
-/android/*
-  Content-Type: application/vnd.android.package-archive
-  Content-Disposition: attachment; filename="jongkiewnuad.apk"
-  X-Robots-Tag: noindex
-  Cache-Control: no-cache
-
 /*
   Cache-Control: public, max-age=0, must-revalidate
 /shared/*

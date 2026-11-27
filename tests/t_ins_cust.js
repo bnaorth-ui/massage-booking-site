@@ -80,6 +80,7 @@ ok('NEW install page: no intro, steps and features remain',await pg.evaluate(()=
 ok('NEW both skip buttons same label',await pg.evaluate(()=>[...document.querySelectorAll('#app [data-ins=skip]')].length===2&&[...document.querySelectorAll('#app [data-ins=skip]')].every(b=>b.textContent.trim()==='ใช้งานต่อโดยไม่ติดตั้ง')));
 ok('skip is first button',await pg.evaluate(()=>document.querySelector('#app button').textContent.includes('ใช้งานต่อโดยไม่ติดตั้ง')));
 ok('heading focused',await pg.evaluate(()=>document.activeElement.id==='inst'));
+ok('android: Google Play button is the main way (27 พ.ย.)',await pg.evaluate(()=>{const a=document.getElementById('insplay'),h=[...document.querySelectorAll('#app h2')].find(x=>x.textContent==='หรือติดตั้งจากหน้าเว็บ');return a&&a.href==='https://play.google.com/store/apps/details?id=th.or.bna.massage'&&a.textContent==='ติดตั้งจาก Google Play'&&!!h&&!!(a.compareDocumentPosition(h)&Node.DOCUMENT_POSITION_FOLLOWING)&&a.getBoundingClientRect().height>=44}));
 ok('manual steps w/o event',t.includes('เมนู')&&!t.includes('กดปุ่มด้านบน')&&!(await pg.$('[data-ins=go]')));
 await pg.evaluate(()=>{window.__p=0;const e=new Event('beforeinstallprompt');e.prompt=()=>{window.__p++};e.userChoice=Promise.resolve({outcome:'accepted'});window.dispatchEvent(e)});await pg.waitForTimeout(300);
 ok('install button after event',!!(await pg.$('[data-ins=go]')));
@@ -101,13 +102,13 @@ await pg.click('[data-ag=ins]');await pg.waitForTimeout(300);ok('link reopens in
 await pg.click('[data-ins=skip]');await pg.waitForTimeout(200);await pg.waitForSelector('[data-pl]',{timeout:4000});ok('back to shop list',!!(await pg.$('[data-pl]')));
 await pg.close();
 // line
-pg=await open(UA.line);t=await T(pg);ok('line: open in chrome',t.includes('เปิดใน Chrome')&&t.includes('LINE'));
+pg=await open(UA.line);t=await T(pg);ok('line: open in chrome',t.includes('เปิดใน Chrome')&&t.includes('LINE'));ok('line: Play button opens Play Store app (market intent + web fallback)',await pg.evaluate(()=>{const a=document.getElementById('insplay');return a&&/^intent:\/\/details\?id=th\.or\.bna\.massage#Intent;scheme=market;package=com\.android\.vending;S\.browser_fallback_url=https%3A%2F%2Fplay\.google\.com/.test(a.getAttribute('href'))}));
 ok('NEW open button label = ติดตั้งแอป',((await pg.textContent('[data-ins=open]'))||'').trim()==='ติดตั้งแอป');
 ok('NEW cust LINE: copy+open + features 5 + 3 icons',!!(await pg.$('[data-ins=copy]'))&&!!(await pg.$('[data-ins=open]'))&&(await pg.$$('.insft li')).length===5&&(await pg.$$('.insst li svg')).length===3&&t.includes('แอปนี้ทำอะไรได้'));
 await pg.evaluate(()=>{Object.defineProperty(navigator,'clipboard',{value:{writeText:t=>{window.__cp=t;return Promise.resolve()}},configurable:true})});
 await pg.click('[data-ins=copy]');await pg.waitForTimeout(200);ok('NEW cust copy ok + msg',!!(await pg.evaluate(()=>window.__cp))&&(await pg.textContent('#insmsg')).includes('คัดลอกลิงก์แล้ว'));
 await pg.close();
-pg=await open(UA.ios);t=await T(pg);ok('ios: share steps',t.includes('แชร์')&&t.includes('เพิ่มไปยังหน้าจอโฮม')&&t.includes('รับแจ้งเตือนบน iPhone')&&!(await pg.$('[data-ins=go]')));await pg.close();
+pg=await open(UA.ios);t=await T(pg);ok('ios: share steps',t.includes('แชร์')&&t.includes('เพิ่มไปยังหน้าจอโฮม')&&t.includes('รับแจ้งเตือนบน iPhone')&&!(await pg.$('[data-ins=go]')));ok('ios: no Google Play button',!(await pg.$('#insplay')));await pg.close();
 pg=await open(UA.iosl);t=await T(pg);ok('ios in LINE: safari first',t.includes('เปิดใน Safari')&&t.includes('เพิ่มไปยังหน้าจอโฮม'));await pg.close();
 pg=await open(UA.desk);ok('desktop: shop list, no install button',!!(await pg.$('[data-pl]'))&&!(await pg.$('[data-gb=ins]'))&&!!(await pg.$('[data-gb=login]')));await pg.click('[data-gb=login]');await pg.waitForSelector('#lph');ok('desktop: login has no link',!(await pg.$('[data-ag=ins]')));await pg.close();
 pg=await open(UA.and,true);ok('standalone: shop list, no install button',!!(await pg.$('[data-pl]'))&&!(await pg.$('[data-gb=ins]')));await pg.click('#tabs [data-tab=ac]');await pg.click('[data-gb=login]');await pg.waitForSelector('#lph');ok('standalone: login has no link',!(await pg.$('[data-ag=ins]')));ok('NEW intro absent in installed app',!(await pg.$('#app .seoin')));

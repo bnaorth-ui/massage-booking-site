@@ -5,6 +5,8 @@
 
 - ชื่อแอป: จองคิวนวด
 - รหัสประจำแอป (เปลี่ยนไม่ได้หลังสร้างในร้านค้า): `th.or.bna.massage`
+- ลิงก์ Google Play (ขึ้นร้านค้าแล้ว 27 พ.ย. 2569): `https://play.google.com/store/apps/details?id=th.or.bna.massage` ใช้ใน `PLAY_URL` ของแอปผู้ใช้งาน (หน้าติดตั้งแอปบน Android) และ `PLAY_URL` ใน `site/shared/views.js` กับท้ายเว็บ `site/index.html`
+- ไฟล์ .apk ทดสอบที่เคยวางในเว็บประชาสัมพันธ์ (`site/android/`) ลบแล้ว 27 พ.ย. 2569
 - หน้าเว็บรู้ว่าเปิดอยู่ในแอปจากร้านค้า (ฟังก์ชัน `storeApp()` ใน `customer/index.html`) แล้วซ่อนแถบผู้ยังไม่ล็อกอิน ปุ่มติดตั้งแอป และส่วนแนะนำเว็บ
   - iPhone: ตัวห่อเติม `BNAMassageApp/ios` ต่อท้าย user agent (ตั้งใน `ios-customer/capacitor.config.json`)
   - Android: เปิดหน้าแรกเป็น `/?src=twa` (ตั้งใน PWABuilder)

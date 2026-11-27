@@ -50,6 +50,7 @@
 ### หน้าสาธารณะและแอปในร้านค้า
 - `customer/privacy/` และ `customer/delete-account/` สร้างจาก `tools/gen-legal.js` ห้ามแก้ไฟล์ตรงๆ แก้นโยบาย (`pvHtml`) ในแอปแล้วรัน `node tools/gen-legal.js` (ข้อสอบ `t_legal_pages.js` เตือน)
 - ตัวห่อแอป Google Play / App Store อยู่ใน `app-shell/` (คู่มือ `app-shell/README.md`) และ `codemagic.yaml` ที่ราก รหัสประจำแอป `th.or.bna.massage`
+- แอปผู้ใช้งานขึ้น Google Play แล้ว (27 พ.ย. 2569) ลิงก์ https://play.google.com/store/apps/details?id=th.or.bna.massage อยู่ใน `PLAY_URL` ของ `customer/index.html` (หน้าติดตั้งแอปบน Android) และ `site/shared/views.js` (หน้าแรก) + ท้ายเว็บ `site/index.html` (ข้อสอบ `t_ins_cust.js`, `t_site.js`) ยังไม่มีใน App Store
 
 ### การทดสอบ
 - ชุดทดสอบอยู่ใน `tests/` (Playwright) รันทั้งหมด: `cd tests && JOBS=4 node run-all.js .` เฉพาะบางไฟล์: `node run-all.js . <ส่วนของชื่อไฟล์>` หรือรันไฟล์เดียว `node t_xxx.js`

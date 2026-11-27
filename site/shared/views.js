@@ -17,6 +17,8 @@
   var SITE_HOST = "massage-home-bna.pages.dev";
   /* เว็บไซต์หลักของสมาคม (ผู้ใช้ยืนยัน 18 พ.ย. 2569) เว็บนี้เน้นการจ้างงานคนตาบอด ข่าว ผลงาน การสมัคร และจองนวด */
   var ORG_SITE = "https://bna.or.th/";
+  // แอปผู้ใช้งานใน Google Play (ขึ้นร้านค้า 27 พ.ย. 2569) ต้องตรงกับลิงก์ท้ายเว็บใน index.html
+  var PLAY_URL = "https://play.google.com/store/apps/details?id=th.or.bna.massage";
   /* ข้อมูลกฎหมายหน้า "สำหรับบริษัท" ตรวจเมื่อ พ.ย. 2569 (กรมการจัดหางาน, กรมส่งเสริมและพัฒนาคุณภาพชีวิตคนพิการ) มูลค่ามาตรา 35 เปลี่ยนทุกปี ปรับที่นี่ */
   var LAW = { s35Value: "123,005", s35Year: "2570" };
   var LIST_COLS = "no,kind,title,summary,cover_path,cover_alt,day,pinned";
@@ -137,7 +139,7 @@
       worksSection(works) +
       '<section aria-labelledby="hLatest"><div class="secHead"><h2 id="hLatest">ข่าวและบทความล่าสุด</h2><a href="/news/" data-nav>ดูทั้งหมด</a></div>' + (latest ? '<div id="latest">' + latestHTML(latest) + '</div>' : '<div id="latest" data-pending>' + LOADING + '</div>') + '</section>' +
       '<section aria-labelledby="hJoin"><h2 id="hJoin">ร่วมงานกับเรา</h2><div class="cols"><div class="box"><h3>สมัครเป็นหมอนวด</h3><p>หมอนวดที่ขึ้นทะเบียนแล้ว สมัครเพื่อรับงานจากร้านและหน่วยงานในระบบ</p><a class="btn" href="' + APP.staff + '">สมัครเป็นหมอนวด</a></div><div class="box"><h3>สมัครเปิดร้านนวด</h3><p>ร้านนวดที่จดทะเบียนถูกต้อง สมัครเข้าระบบเพื่อรับคิวจากลูกค้าออนไลน์</p><a class="btn" href="' + APP.shop + '">สมัครเปิดร้าน</a></div></div></section>' +
-      '<section aria-labelledby="hHow"><h2 id="hHow">จองนวดง่ายๆ 3 ขั้นตอน</h2><div class="box"><ol class="steps"><li>เลือกร้านนวดใกล้คุณ และเลือกบริการที่ต้องการ</li><li>เลือกวัน เวลา และหมอนวด</li><li>เข้าสู่ระบบด้วยเบอร์โทร แล้วยืนยันการจอง เลื่อนหรือยกเลิกเองได้ภายหลัง</li></ol><p style="margin:14px 0 0"><a class="btn" href="' + APP.book + '">เริ่มจองนวด</a></p></div></section>';
+      '<section aria-labelledby="hHow"><h2 id="hHow">จองนวดง่ายๆ 3 ขั้นตอน</h2><div class="box"><ol class="steps"><li>เลือกร้านนวดใกล้คุณ และเลือกบริการที่ต้องการ</li><li>เลือกวัน เวลา และหมอนวด</li><li>เข้าสู่ระบบด้วยเบอร์โทร แล้วยืนยันการจอง เลื่อนหรือยกเลิกเองได้ภายหลัง</li></ol><p style="margin:14px 0 0"><a class="btn" href="' + APP.book + '">เริ่มจองนวด</a></p><p style="margin:10px 0 0">ใช้มือถือ Android? <a href="' + PLAY_URL + '" rel="noopener" target="_blank">ดาวน์โหลดแอปจองคิวนวดจาก Google Play</a></p></div></section>';
   }
   /* ส่วน "หน่วยงานที่เราเคยไปให้บริการ" (ใช้ทั้งหน้าแรกและหน้าบริษัท) */
   function worksSection(works) {
@@ -318,7 +320,7 @@
   function copyText(year) { return "© " + year + " " + SITE_NAME + " สงวนลิขสิทธิ์"; }
 
   G.SV = {
-    SB: SB, ORG_SITE: ORG_SITE, SITE_NAME: SITE_NAME, ORG_STATUS: ORG_STATUS, FB_PAGE: FB_PAGE, PAGE: PAGE, POST_GONE: POST_GONE, LOADING: LOADING, KINDS_Q: KINDS_Q,
+    SB: SB, ORG_SITE: ORG_SITE, SITE_NAME: SITE_NAME, ORG_STATUS: ORG_STATUS, FB_PAGE: FB_PAGE, PLAY_URL: PLAY_URL, PAGE: PAGE, POST_GONE: POST_GONE, LOADING: LOADING, KINDS_Q: KINDS_Q,
     esc: esc, imgUrl: imgUrl, card: card, errBox: errBox, listQ: listQ, postQ: postQ, kindsOf: kindsOf, filtersHTML: filtersHTML, renderBody: renderBody, altFor: altFor, linkedNos: linkedNos, titlesQ: titlesQ, titleMap: titleMap,
     parse: parse, canonPath: canonPath, meta: meta, homeHTML: homeHTML, latestHTML: latestHTML, listHTML: listHTML, listBody: listBody, moreBtn: moreBtn,
     postHTML: postHTML, adjQ: adjQ, adjHTML: adjHTML, notFoundHTML: notFoundHTML, companyHTML: companyHTML, faqLD: faqLD, calcHTML: calcHTML, calcResult: calcResult, calcNeed: calcNeed, baht: baht, telHref: telHref, contactParts: contactParts, copyText: copyText
