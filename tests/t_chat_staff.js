@@ -19,7 +19,7 @@ let items=[
  {id:'i3',booking_id:'bk3',ref:'MS3',bstatus:'confirmed',active:true,job:'in_progress',service:'นวดคอ',minutes:60,starts_at:new Date(Date.now()-2*3600000).toISOString(),ends_at:new Date(Date.now()-3600000).toISOString(),price:300,customer:'เมื่อกี้',phone:null,place:'ร้านสบายดี'}];
 let nts=[{id:'n1',audience:'staff',staff_id:'s1',kind:'booking',title:'คิวใหม่',body:'เลขที่ MS100002',created_at:new Date().toISOString()}];
 let anns=[{id:'a1',title:'ประชุมพนักงาน',body:'วันศุกร์ 10 โมง',audiences:['พนักงาน'],day:todayS,active:true,created_at:new Date(Date.now()-3600000).toISOString()},{id:'a2',title:'ไม่ใช่ของเรา',body:'x',audiences:['ผู้ใช้งาน'],day:todayS,active:true,created_at:new Date().toISOString()}];
-let reads=[],blocks=[],mode={};let MSGS=[{id:'m1',booking_id:'bk1',room_key:'staff:s1',sender_id:'cust',sender_role:'user',sender_name:'สมศรี',body:'ถึงหน้าร้านแล้วค่ะ',created_at:'2026-10-29T10:00:00.000000+00:00'}];let UNR=[{booking_id:'bk1',room:'staff:s1',n:1}];let marks=[];
+let reads=[],blocks=[],mode={};let MSGS=[{id:'m1',booking_id:'bk1',room_key:'staff:s1',sender_id:'cust',sender_role:'user',sender_name:'สมศรี',body:'ถึงหน้าร้านแล้วค่ะ',created_at:'2026-10-29T10:00:00.000000+00:00'}]; let UNR=[{booking_id:'bk1',room:'shop',n:7},{booking_id:'bk1',room:'staff:s1',n:1}];let marks=[];
 await ctx.route('**/*',async r=>{const q=r.request(),u=new URL(q.url());if(u.protocol==='file:')return r.continue();if(!u.host.endsWith('supabase.co'))return r.abort();
  const m=q.method(),path=u.pathname,sp=u.searchParams;let body=null;try{body=JSON.parse(q.postData()||'null')}catch(e){}
  const auth=(q.headers().authorization||'').replace('Bearer ',''),me=Object.values(users).find(x=>'at-'+x.id===auth);calls.push({m,path,q:u.search,body});

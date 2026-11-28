@@ -71,6 +71,12 @@ await p.click('[data-tab="bk"]');await p.waitForTimeout(500);
 let btns=await p.$$eval('[data-chat]',b=>b.map(x=>x.textContent.trim()));console.log('chat buttons',btns.join(' | '));
 ok('shop + staff buttons on upcoming booking',btns.some(x=>x.includes('แชตกับร้าน'))&&btns.some(x=>x.includes('แชตกับหมอนวด คุณวิภา')));
 ok('unread badge on shop button',!!(await p.$('[data-chat][data-room=shop] .cn[aria-label*="ข้อความใหม่ 1"]')));
+// ตัวเลขข้อความใหม่แยกต่อห้อง (28 พ.ย. 2569: ชื่อฟังก์ชันซ้ำทำให้ตัวเลขห้องหมอนวดไปโชว์ที่ปุ่มแชตกับร้าน)
+{const sr=await p.$eval('[data-chat][data-room^="staff:"]',e=>e.dataset.room);UNR.push({booking_id:'bid-MS1',room:sr,n:3});
+await p.evaluate(()=>{RUAT=0});await p.click('[data-tab="nt"]');await p.waitForTimeout(300);await p.click('[data-tab="bk"]');await p.waitForTimeout(700);
+const cn=await p.$$eval('[data-chat]',b=>b.map(x=>x.dataset.room+'='+((x.querySelector('.cn')||{}).textContent||'')));
+ok('unread counted per room: shop 1, staff 3 ('+cn.join(' ')+')',cn.includes('shop=1')&&cn.includes(sr+'=3'));
+UNR=UNR.filter(x=>x.room!==sr);await p.click('[data-tab="nt"]');await p.waitForTimeout(300);await p.click('[data-tab="bk"]');await p.waitForTimeout(700);}
 ok('no chat buttons on old booking',(await p.$$('[data-chat][data-ref=MS2]')).length===0);
 await p.click('[data-chat="bid-MS1"][data-room=shop]');await p.waitForTimeout(600);
 ok('chat title',(await p.textContent('#chtitle')).includes('แชตกับร้าน'));

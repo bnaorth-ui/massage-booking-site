@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>สำหรับร้านนวด</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.31"><meta name="app-name" content="ร้านนวด"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script><script src="rt.js"></script>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f6f5c"><link rel="apple-touch-icon" href="icon-logo-192.png"><meta name="app-version" content="1.32"><meta name="app-name" content="ร้านนวด"><script src="errlog.js"></script><script src="update.js"></script><script src="push.js"></script><script src="rt.js"></script>
 <link rel="preconnect" href="https://dwdnmfwepydyweeqfdxn.supabase.co" crossorigin>
 <link rel="preload" href="fonts/noto-sans-thai-v1.woff2" as="font" type="font/woff2" crossorigin>
 <style>
@@ -735,10 +735,10 @@ function chRt(topic){if(CHRT){CHRT.close();CHRT=null}if(!topic||!window.Bell)ret
 function chDue(){return !CHRT||CHRT.due()}
 /* ออกจากแชต: กดปุ่มกลับ หรือกดเมนูด้านล่างระหว่างแชต (27 พ.ย. 2569) ข้อความที่พิมพ์ค้างจำไว้ต่อห้อง กลับเข้าห้องเดิมยังอยู่ */
 var CHDR={};
-function chKey(c){return c.sup?"sup:"+c.sup:c.bid+":"+c.room}
-function chLeave(){if(!CH)return;var t=document.getElementById("chi"),k=chKey(CH),v=t?t.value:"";if(v&&v.trim())CHDR[k]=v;else delete CHDR[k];
+function chDKey(c){return c.sup?"sup:"+c.sup:c.bid+":"+c.room}
+function chLeave(){if(!CH)return;var t=document.getElementById("chi"),k=chDKey(CH),v=t?t.value:"";if(v&&v.trim())CHDR[k]=v;else delete CHDR[k];
  chRt(null);clearInterval(chT);chT=null;CH=null;S.chat=false;document.getElementById("navb").style.display=""}
-function chDraftLoad(){if(CH&&CHDR[chKey(CH)])CH.draft=CHDR[chKey(CH)]}
+function chDraftLoad(){if(CH&&CHDR[chDKey(CH)])CH.draft=CHDR[chDKey(CH)]}
 function chDraftTake(){var d=CH&&CH.draft;if(CH)CH.draft=null;return d?esc(d):""}
 function chAfter(){Promise.all([loadChatUnread(),loadSupUnread()]).then(function(){if(!S.chat)softDraw()})}
 function closeChat(){chLeave();draw();chAfter()}
